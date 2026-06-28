@@ -1,13 +1,728 @@
-<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>واجهة البوابة الموحدة — مدارس أمين الرضا</title><link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="stylesheet" href="assets/portal.css"><link rel="stylesheet" href="assets/amin-identity.css"><link rel="stylesheet" href="assets/brand-redesign.css"><link rel="stylesheet" href="assets/amin-v3.css">
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>المسؤول الأعلى — مدارس أمين الرضا</title>
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="stylesheet" href="assets/portal.css">
+<link rel="stylesheet" href="assets/amin-identity.css">
+<link rel="stylesheet" href="assets/brand-redesign.css">
+<link rel="stylesheet" href="assets/amin-v3.css">
 <link rel="stylesheet" href="assets/i18n.css">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="assets/amin-logo-small.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="أمين الرضا">
-</head><body data-portal="super">
+</head>
+<body data-portal="super">
 <a class="skip-link" href="#mainContent">تخطي إلى المحتوى</a>
-<div class="shell"><aside class="sidebar" id="sidebar"><div class="brand"><div class="brand-mark">ع</div><div><h1>الإدارة العليا</h1><small>مدارس أمين الرضا (ع)</small></div></div><div class="profile-mini"><div class="avatar">👑</div><div><b id="profileName">...</b><small id="profileRole">...</small></div></div><nav class="nav"><button onclick="location.href='portal.html'">🏛️ البوابة الموحدة</button><button data-view="overview" class="active">🏠 الرئيسية</button><button data-view="students">🎓 الطلاب</button><button data-view="academics">🏫 الأكاديمية والجداول</button><button onclick="location.href='schedule-management.html'">🗓️ إدارة الجدول المدرسي</button><button onclick="location.href='section-assignment-management.html'">🧩 الشعب وإسنادات المعلمين</button><button data-view="finance">💰 المالية</button><button onclick="location.href='finance-pro.html'">🏦 النظام المالي الاحترافي</button><button onclick="location.href='admin-finance-rules.html'">🔐 أجور المعلمات ورسوم الصفوف</button><button data-view="attendance">📋 الحضور</button><button data-view="behavior">🌟 الانضباط والإرشاد</button><button data-view="evaluation">📊 التقييم والإعفاءات</button><button onclick="location.href='academic-pro.html'">🎓 النظام الأكاديمي الاحترافي</button><button data-view="users">👥 المستخدمون والصلاحيات</button><button data-view="reports">📈 التقارير</button><div class="nav-section">نماذج التسجيل</div><button onclick="location.href='family-registration.html'">📝 تسجيل ولي أمر/طالب</button><button onclick="location.href='teacher-registration.html'">👩‍🏫 تسجيل معلم</button><button onclick="location.href='registrations-admin.html'">📥 مراجعة الطلبات</button><div class="nav-section">روابط النظام</div><button onclick="location.href='permissions-management.html'">🔐 التفويضات</button><button onclick="location.href='final-readiness.html'">✅ جاهزية النظام</button><button onclick="location.href='system-maintenance.html'">🛠️ الصيانة</button></nav><div class="side-footer"><button id="logoutBtn" class="btn red block">تسجيل الخروج</button></div></aside><main class="main" id="mainContent" tabindex="-1"><header class="topbar"><button class="btn mobile-menu" id="mobileMenuBtn">☰</button><h2>لوحة البوابة الموحدة</h2><div class="top-actions"><button class="btn gold" onclick="AminPortal.showView('reports')">التقارير</button></div></header><section id="view-overview" class="view active"></section><section id="view-students" class="view"></section><section id="view-academics" class="view"></section><section id="view-finance" class="view"></section><section id="view-attendance" class="view"></section><section id="view-behavior" class="view"></section><section id="view-evaluation" class="view"></section><section id="view-users" class="view"></section><section id="view-reports" class="view"></section></main></div><div id="toast" class="toast"></div><script src="libs/supabase.min.js"></script><script src="assets/config.js"></script><script src="assets/platform-modules.js"></script><script src="assets/i18n.js"></script><script src="assets/core.js"></script><script>window.addEventListener('load',()=>AminPortal.bootPortal());</script><script src="assets/ux-enhancements.js"></script>
+
+<div class="shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-mark">👑</div>
+      <div>
+        <h1>المسؤول الأعلى</h1>
+        <small>إدارة شاملة للنظام</small>
+      </div>
+    </div>
+    
+    <div class="profile-mini">
+      <div class="avatar">👑</div>
+      <div>
+        <b id="profileName">...</b>
+        <small id="profileRole">...</small>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <button onclick="location.href='portal.html'">🏛️ البوابة الموحدة</button>
+      <button data-view="overview" class="active">🏠 لوحة القيادة</button>
+      <button data-view="students">🎓 الطلاب</button>
+      <button data-view="teachers">👨‍🏫 المعلمون</button>
+      <button data-view="parents">👨‍👩‍👧 أولياء الأمور</button>
+      <button data-view="finance">💰 المالية</button>
+      <button data-view="academic">📚 الأكاديمي</button>
+      <button data-view="reports">📈 التقارير</button>
+      <hr style="border:none;border-top:1px solid rgba(255,255,255,0.1);margin:8px 0;">
+      <button onclick="location.href='finance-pro.html'">💵 النظام المالي</button>
+      <button onclick="location.href='academic-pro.html'">📖 النظام الأكاديمي</button>
+      <button onclick="location.href='registrations-admin.html'">📋 التسجيلات</button>
+      <button onclick="location.href='permissions-management.html'">🔑 الصلاحيات</button>
+      <button onclick="location.href='analytics-center.html'">📊 التحليلات</button>
+      <button onclick="location.href='announcements.html'">📢 الإعلانات</button>
+      <button onclick="location.href='system-maintenance.html'">⚙️ الصيانة</button>
+      <button onclick="location.href='security-governance.html'">🛡️ حوكمة الأمن</button>
+    </nav>
+
+    <div class="side-footer">
+      <button id="logoutBtn" class="btn red block">تسجيل الخروج</button>
+    </div>
+  </aside>
+
+  <main class="main" id="mainContent" tabindex="-1">
+    <header class="topbar">
+      <button class="btn mobile-menu" id="mobileMenuBtn">☰</button>
+      <h2>👑 لوحة المسؤول الأعلى</h2>
+      <div class="top-actions">
+        <button class="btn" style="background:#3b82f6;color:white;" onclick="SuperAdmin.refresh()">🔄 تحديث</button>
+      </div>
+    </header>
+
+    <section id="view-overview" class="view active"></section>
+    <section id="view-students" class="view"></section>
+    <section id="view-teachers" class="view"></section>
+    <section id="view-parents" class="view"></section>
+    <section id="view-finance" class="view"></section>
+    <section id="view-academic" class="view"></section>
+    <section id="view-reports" class="view"></section>
+  </main>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script src="libs/supabase.min.js"></script>
+<script src="assets/config.js"></script>
+<script src="assets/platform-modules.js"></script>
+<script src="assets/i18n.js"></script>
+
+<script>
+(function(){
+  'use strict';
+
+  const SCHOOL_PHONE = '+9647700000000';
+  const SCHOOL_NAME = 'مدرسة أمين الرضا';
+  const SCHOOL_LOGO = '🎓';
+
+  function $(s, r){r=r||document;return r.querySelector(s)}
+  function $$(s, r){r=r||document;return Array.from(r.querySelectorAll(s))}
+  function esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;')}
+  function num(v){var n=Number(v);return Number.isFinite(n)?n:0}
+  function money(v){return '$'+num(v).toLocaleString('en-US',{maximumFractionDigits:0})}
+  function iso(){return new Date().toISOString().slice(0,10)}
+  
+  let sb = null;
+  let ME = null;
+  let DATA = {
+    students: [],
+    teachers: [],
+    parents: [],
+    users: [],
+    classes: [],
+    subjects: [],
+    attendance: [],
+    grades: [],
+    fees: [],
+    payments: [],
+    behavior: [],
+    notifications: []
+  };
+  let SUBJECTS_MAP = {};
+  let CLASSES_MAP = {};
+
+  function cfg() { return window.AMIN_CONFIG || {}; }
+  
+  function client() {
+    if(sb) return sb;
+    if(!window.supabase) throw new Error('Supabase library not loaded');
+    sb = window.supabase.createClient(
+      cfg().supabaseUrl, 
+      cfg().supabaseAnonKey, 
+      {auth:{persistSession:true, autoRefreshToken:true, detectSessionInUrl:true, storageKey:(cfg().authStorageKey||'amin-ovcjzsrqqgjsbqswtkro-auth-v2')}}
+    );
+    return sb;
+  }
+
+  function toast(title, msg, type) {
+    const t = $('#toast');
+    if(!t) return;
+    t.innerHTML = '<b>'+esc(title)+'</b><br><span class="muted">'+esc(msg||'')+'</span>';
+    t.className = 'toast show ' + (type||'');
+    clearTimeout(t._to);
+    t._to = setTimeout(function(){t.classList.remove('show')}, 4000);
+  }
+
+  function getSubjectName(id) { return SUBJECTS_MAP[id] || 'مادة'; }
+  function getClassName(id) { return CLASSES_MAP[id] || 'صف'; }
+
+  async function init() {
+    try {
+      const c = client();
+      
+      const sessionRes = await c.auth.getSession();
+      const session = sessionRes.data.session;
+      if(!session) {
+        location.href = 'index.html';
+        return;
+      }
+
+      const userRes = await c.from('users').select('*').eq('id', session.user.id).maybeSingle();
+      if(userRes.error || !userRes.data) {
+        toast('خطأ', 'تعذر تحميل بيانات الحساب', 'red');
+        return;
+      }
+      ME = userRes.data;
+      window.ME = ME;
+      
+      // تأكد أنه مسؤول
+      if(!ME.is_super_admin && ME.role !== 'admin') {
+        toast('ممنوع', 'ليس لديك صلاحية الوصول لهذه الصفحة', 'red');
+        setTimeout(function(){ location.href = 'portal.html'; }, 2000);
+        return;
+      }
+
+      $('#profileName').textContent = ME.name || ME.email || 'مدير';
+      $('#profileRole').textContent = ME.is_super_admin ? '👑 المسؤول الأعلى' : 'مدير';
+
+      $('#logoutBtn').onclick = async function() {
+        await c.auth.signOut({scope:'local'}).catch(function(){});
+        location.href = 'index.html';
+      };
+
+      const mobileBtn = $('#mobileMenuBtn');
+      if(mobileBtn) mobileBtn.addEventListener('click', function() {
+        const sb = $('#sidebar');
+        if(sb) sb.classList.toggle('open');
+      });
+
+      const navBtns = document.querySelectorAll('.nav button[data-view]');
+      navBtns.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          const view = btn.dataset.view;
+          showView(view);
+          navBtns.forEach(function(b) { b.classList.toggle('active', b === btn); });
+          const sb = $('#sidebar');
+          if(sb) sb.classList.remove('open');
+        });
+      });
+
+      await loadAllData();
+      renderOverview();
+
+    } catch(e) {
+      console.error('❌ Init error:', e);
+      toast('خطأ', e.message, 'red');
+    }
+  }
+
+  async function loadAllData() {
+    const c = client();
+    
+    try {
+      const results = await Promise.all([
+        c.from('users').select('*'),
+        c.from('students').select('*, users:user_id(name, email)'),
+        c.from('subjects').select('id, name'),
+        c.from('classes').select('id, name'),
+        c.from('attendance').select('*').order('date', {ascending: false}).limit(1000),
+        c.from('grades').select('*'),
+        c.from('student_fees').select('*'),
+        c.from('fee_payments').select('*').order('created_at', {ascending: false}).limit(200).then(function(r){ return r; }).catch(function(){ return {data: []}; }),
+        c.from('behavior_records').select('*').order('created_at', {ascending: false}).limit(100),
+        c.from('school_notifications').select('*').eq('recipient_user_id', ME.id).order('created_at', {ascending: false}).limit(10).then(function(r){ return r; }).catch(function(){ return {data: []}; })
+      ]);
+      
+      DATA.users = results[0].data || [];
+      DATA.students = results[1].data || [];
+      DATA.subjects = results[2].data || [];
+      DATA.classes = results[3].data || [];
+      DATA.attendance = results[4].data || [];
+      DATA.grades = results[5].data || [];
+      DATA.fees = results[6].data || [];
+      DATA.payments = results[7].data || [];
+      DATA.behavior = results[8].data || [];
+      DATA.notifications = results[9].data || [];
+      
+      // تصنيف المستخدمين
+      DATA.teachers = DATA.users.filter(function(u){ return u.role === 'teacher'; });
+      DATA.parents = DATA.users.filter(function(u){ return u.role === 'parent'; });
+      
+      // المواد والصفوف
+      DATA.subjects.forEach(function(s) { SUBJECTS_MAP[s.id] = s.name; });
+      DATA.classes.forEach(function(c) { CLASSES_MAP[c.id] = c.name; });
+      
+      console.log('✅ Super Admin Data loaded:', DATA);
+    } catch(e) {
+      console.error('Data load error:', e);
+    }
+  }
+
+  function getStats() {
+    const today = iso();
+    const todayAtt = DATA.attendance.filter(function(a){ return String(a.date).slice(0,10) === today; });
+    const presentToday = todayAtt.filter(function(a){ return a.status === 'present'; }).length;
+    const absentToday = todayAtt.filter(function(a){ return a.status === 'absent'; }).length;
+    
+    const totalFees = DATA.fees.reduce(function(s,f){ return s + num(f.net_amount || f.base_amount); }, 0);
+    const totalPaid = DATA.fees.reduce(function(s,f){ return s + num(f.total_paid); }, 0);
+    const totalRemaining = Math.max(totalFees - totalPaid, 0);
+    
+    const overdueStudents = DATA.fees.filter(function(f){
+      const remaining = num(f.net_amount || f.base_amount) - num(f.total_paid);
+      return remaining > 0;
+    }).length;
+    
+    const gradesAvg = DATA.grades.length 
+      ? Math.round(DATA.grades.reduce(function(s,g){ return s + num(g.score || g.grade || g.mark); }, 0) / DATA.grades.length)
+      : 0;
+    
+    return {
+      totalStudents: DATA.students.length,
+      totalTeachers: DATA.teachers.length,
+      totalParents: DATA.parents.length,
+      totalClasses: DATA.classes.length,
+      totalSubjects: DATA.subjects.length,
+      todayAttendance: todayAtt.length,
+      presentToday: presentToday,
+      absentToday: absentToday,
+      attRate: todayAtt.length ? Math.round((presentToday/todayAtt.length)*100) : 0,
+      totalFees: totalFees,
+      totalPaid: totalPaid,
+      totalRemaining: totalRemaining,
+      overdueStudents: overdueStudents,
+      collectionRate: totalFees ? Math.round((totalPaid/totalFees)*100) : 0,
+      gradesAvg: gradesAvg,
+      totalGrades: DATA.grades.length,
+      totalBehavior: DATA.behavior.length
+    };
+  }
+
+  function getSmartAlerts() {
+    const alerts = [];
+    const stats = getStats();
+    
+    if(stats.todayAttendance === 0 && stats.totalStudents > 0) {
+      alerts.push({type:'danger',icon:'📋',title:'لم يتم تسجيل حضور اليوم',message:'لا توجد سجلات حضور لهذا اليوم'});
+    } else if(stats.absentToday > stats.totalStudents * 0.2) {
+      alerts.push({type:'warning',icon:'⚠️',title:'نسبة غياب مرتفعة اليوم',message:stats.absentToday+' طالب غائب من أصل '+stats.todayAttendance});
+    }
+    
+    if(stats.overdueStudents > 0) {
+      alerts.push({type:'warning',icon:'💰',title:stats.overdueStudents+' طالب لديهم متأخرات',message:'إجمالي المتأخرات: '+money(stats.totalRemaining)});
+    }
+    
+    if(stats.collectionRate < 50 && stats.totalFees > 0) {
+      alerts.push({type:'danger',icon:'📉',title:'نسبة التحصيل منخفضة',message:'فقط '+stats.collectionRate+'% من الرسوم محصّلة'});
+    }
+    
+    const studentsWithoutParent = DATA.students.filter(function(s){ return !s.parent_id; }).length;
+    if(studentsWithoutParent > 0) {
+      alerts.push({type:'info',icon:'👨‍👩‍👧',title:studentsWithoutParent+' طالب بدون ولي أمر',message:'يحتاج ربطهم بأولياء أمور'});
+    }
+    
+    return alerts;
+  }
+
+  function showView(viewId) {
+    document.querySelectorAll('.view').forEach(function(v) {
+      v.classList.toggle('active', v.id === 'view-' + viewId);
+    });
+    
+    if(viewId === 'overview') renderOverview();
+    else if(viewId === 'students') renderStudents();
+    else if(viewId === 'teachers') renderTeachers();
+    else if(viewId === 'parents') renderParents();
+    else if(viewId === 'finance') renderFinance();
+    else if(viewId === 'academic') renderAcademic();
+    else if(viewId === 'reports') renderReports();
+  }
+
+  function renderOverview() {
+    const container = $('#view-overview');
+    const stats = getStats();
+    const alerts = getSmartAlerts();
+    
+    let html = '<div class="page-head"><div><h1>👑 لوحة القيادة الشاملة</h1><p>'+SCHOOL_NAME+' · إدارة شاملة لكل أقسام المدرسة</p></div></div>';
+
+    // الإحصائيات الرئيسية
+    html += '<h3 style="margin-bottom:12px;">📊 إحصائيات النظام</h3>';
+    html += '<div class="kpis" style="margin-bottom:24px;">';
+    html += '<div class="kpi blue"><small>الطلاب</small><b>'+stats.totalStudents+'</b></div>';
+    html += '<div class="kpi green"><small>المعلمون</small><b>'+stats.totalTeachers+'</b></div>';
+    html += '<div class="kpi gold"><small>أولياء الأمور</small><b>'+stats.totalParents+'</b></div>';
+    html += '<div class="kpi"><small>الصفوف</small><b>'+stats.totalClasses+'</b></div>';
+    html += '</div>';
+    
+    // إحصائيات اليوم
+    html += '<h3 style="margin-bottom:12px;">📅 إحصائيات اليوم</h3>';
+    html += '<div class="kpis" style="margin-bottom:24px;">';
+    html += '<div class="kpi green"><small>حضور اليوم</small><b>'+stats.presentToday+'</b></div>';
+    html += '<div class="kpi red"><small>غياب اليوم</small><b>'+stats.absentToday+'</b></div>';
+    html += '<div class="kpi blue"><small>نسبة الحضور</small><b>'+stats.attRate+'%</b></div>';
+    html += '<div class="kpi gold"><small>المعدل العام</small><b>'+stats.gradesAvg+'%</b></div>';
+    html += '</div>';
+    
+    // المالية
+    html += '<h3 style="margin-bottom:12px;">💰 الملخص المالي</h3>';
+    html += '<div class="kpis" style="margin-bottom:24px;">';
+    html += '<div class="kpi blue"><small>إجمالي الرسوم</small><b>'+money(stats.totalFees)+'</b></div>';
+    html += '<div class="kpi green"><small>المحصّل</small><b>'+money(stats.totalPaid)+'</b></div>';
+    html += '<div class="kpi red"><small>المتأخرات</small><b>'+money(stats.totalRemaining)+'</b></div>';
+    html += '<div class="kpi gold"><small>نسبة التحصيل</small><b>'+stats.collectionRate+'%</b></div>';
+    html += '</div>';
+    
+    // التنبيهات الذكية
+    if(alerts.length > 0) {
+      html += '<h3 style="margin-bottom:12px;">⚠️ تنبيهات تحتاج اهتمامك ('+alerts.length+')</h3>';
+      html += '<div class="cards" style="margin-bottom:24px;">';
+      alerts.forEach(function(a) {
+        const bgColor = a.type === 'danger' ? '#fee2e2' : a.type === 'warning' ? '#fef3c7' : '#dbeafe';
+        const borderColor = a.type === 'danger' ? '#dc2626' : a.type === 'warning' ? '#d97706' : '#2563eb';
+        html += '<div style="background:'+bgColor+';border-right:4px solid '+borderColor+';padding:14px;border-radius:10px;color:#333;"><div style="font-size:16px;font-weight:bold;margin-bottom:4px;">'+a.icon+' '+esc(a.title)+'</div><div style="font-size:13px;opacity:0.85;">'+esc(a.message)+'</div></div>';
+      });
+      html += '</div>';
+    }
+    
+    // إجراءات سريعة
+    html += '<h3 style="margin-bottom:12px;">⚡ روابط سريعة</h3>';
+    html += '<div class="cards">';
+    html += '<div onclick="location.href=\'finance-pro.html\'" class="card" style="background:linear-gradient(135deg,#10b981,#059669);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">💰</div><div style="font-weight:bold;margin-top:8px;">النظام المالي</div></div>';
+    html += '<div onclick="location.href=\'academic-pro.html\'" class="card" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📚</div><div style="font-weight:bold;margin-top:8px;">النظام الأكاديمي</div></div>';
+    html += '<div onclick="location.href=\'registrations-admin.html\'" class="card" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📋</div><div style="font-weight:bold;margin-top:8px;">التسجيلات</div></div>';
+    html += '<div onclick="location.href=\'permissions-management.html\'" class="card" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">🔑</div><div style="font-weight:bold;margin-top:8px;">الصلاحيات</div></div>';
+    html += '<div onclick="location.href=\'analytics-center.html\'" class="card" style="background:linear-gradient(135deg,#ec4899,#be185d);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📊</div><div style="font-weight:bold;margin-top:8px;">التحليلات</div></div>';
+    html += '<div onclick="location.href=\'announcements.html\'" class="card" style="background:linear-gradient(135deg,#06b6d4,#0891b2);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📢</div><div style="font-weight:bold;margin-top:8px;">الإعلانات</div></div>';
+    html += '<div onclick="location.href=\'system-maintenance.html\'" class="card" style="background:linear-gradient(135deg,#6b7280,#4b5563);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">⚙️</div><div style="font-weight:bold;margin-top:8px;">الصيانة</div></div>';
+    html += '<div onclick="location.href=\'security-governance.html\'" class="card" style="background:linear-gradient(135deg,#dc2626,#991b1b);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">🛡️</div><div style="font-weight:bold;margin-top:8px;">الأمن</div></div>';
+    html += '</div>';
+    
+    container.innerHTML = html;
+  }
+
+  function renderStudents() {
+    const container = $('#view-students');
+    
+    let html = '<div class="page-head"><div><h1>🎓 إدارة الطلاب</h1><p>إجمالي: <b>'+DATA.students.length+'</b> طالب</p></div></div>';
+    
+    if(!DATA.students.length) {
+      html += '<div class="empty" style="text-align:center;padding:60px;">لا يوجد طلاب مسجلين.</div>';
+    } else {
+      // فلاتر
+      const classCounts = {};
+      DATA.students.forEach(function(s){
+        const cn = getClassName(s.class_id);
+        classCounts[cn] = (classCounts[cn] || 0) + 1;
+      });
+      
+      html += '<div class="cards" style="margin-bottom:20px;">';
+      Object.keys(classCounts).slice(0, 6).forEach(function(cn) {
+        html += '<div class="card" style="text-align:center;padding:16px;"><b style="font-size:24px;color:#3b82f6;">'+classCounts[cn]+'</b><div style="color:#666;font-size:13px;">'+esc(cn)+'</div></div>';
+      });
+      html += '</div>';
+      
+      html += '<div class="table-wrap"><table><thead><tr><th>#</th><th>الطالب</th><th>الصف</th><th>ولي الأمر</th><th>الحضور</th><th>المعدل</th><th>المالية</th></tr></thead><tbody>';
+      
+      DATA.students.forEach(function(s, i) {
+        const studentName = (s.users && s.users.name) || s.name || 'طالب';
+        const parentInfo = DATA.parents.find(function(p){ return p.id === s.parent_id; });
+        const parentName = parentInfo ? parentInfo.name : '—';
+        
+        const studentAtt = DATA.attendance.filter(function(a){ return String(a.student_id) === String(s.id); });
+        const present = studentAtt.filter(function(a){ return a.status === 'present'; }).length;
+        const attRate = studentAtt.length ? Math.round((present/studentAtt.length)*100) : 0;
+        
+        const studentGrades = DATA.grades.filter(function(g){ return String(g.student_id) === String(s.id); });
+        const avg = studentGrades.length ? Math.round(studentGrades.reduce(function(sum,g){ return sum + num(g.score || g.grade || g.mark); }, 0) / studentGrades.length) : 0;
+        
+        const fee = DATA.fees.find(function(f){ return String(f.student_id) === String(s.id); });
+        const total = num(fee && (fee.net_amount || fee.base_amount));
+        const paid = num(fee && fee.total_paid);
+        const remaining = Math.max(total - paid, 0);
+        
+        const attColor = attRate >= 90 ? 'green' : attRate >= 75 ? 'gold' : 'red';
+        const gradeColor = avg >= 85 ? 'green' : avg >= 60 ? 'gold' : 'red';
+        const feeColor = remaining === 0 ? 'green' : 'red';
+        
+        html += '<tr>';
+        html += '<td>'+(i+1)+'</td>';
+        html += '<td><b>'+esc(studentName)+'</b></td>';
+        html += '<td>'+esc(getClassName(s.class_id))+'</td>';
+        html += '<td>'+esc(parentName)+'</td>';
+        html += '<td><span class="badge '+attColor+'">'+attRate+'%</span></td>';
+        html += '<td>'+(studentGrades.length ? '<span class="badge '+gradeColor+'">'+avg+'%</span>' : '—')+'</td>';
+        html += '<td><span class="badge '+feeColor+'">'+(remaining === 0 ? 'مدفوع' : money(remaining))+'</span></td>';
+        html += '</tr>';
+      });
+      
+      html += '</tbody></table></div>';
+    }
+    
+    container.innerHTML = html;
+  }
+
+  function renderTeachers() {
+    const container = $('#view-teachers');
+    
+    let html = '<div class="page-head"><div><h1>👨‍🏫 المعلمون</h1><p>إجمالي: <b>'+DATA.teachers.length+'</b> معلم</p></div></div>';
+    
+    if(!DATA.teachers.length) {
+      html += '<div class="empty" style="text-align:center;padding:60px;">لا يوجد معلمون مسجلون.</div>';
+    } else {
+      html += '<div class="table-wrap"><table><thead><tr><th>#</th><th>الاسم</th><th>البريد</th><th>الهاتف</th><th>الحالة</th></tr></thead><tbody>';
+      
+      DATA.teachers.forEach(function(t, i) {
+        html += '<tr>';
+        html += '<td>'+(i+1)+'</td>';
+        html += '<td><b>'+esc(t.name || '—')+'</b></td>';
+        html += '<td>'+esc(t.email || '—')+'</td>';
+        html += '<td>'+esc(t.phone || '—')+'</td>';
+        html += '<td><span class="badge '+(t.active !== false ? 'green' : 'red')+'">'+(t.active !== false ? 'نشط' : 'غير نشط')+'</span></td>';
+        html += '</tr>';
+      });
+      
+      html += '</tbody></table></div>';
+    }
+    
+    container.innerHTML = html;
+  }
+
+  function renderParents() {
+    const container = $('#view-parents');
+    
+    let html = '<div class="page-head"><div><h1>👨‍👩‍👧 أولياء الأمور</h1><p>إجمالي: <b>'+DATA.parents.length+'</b> ولي أمر</p></div></div>';
+    
+    if(!DATA.parents.length) {
+      html += '<div class="empty" style="text-align:center;padding:60px;">لا يوجد أولياء أمور مسجلون.</div>';
+    } else {
+      html += '<div class="table-wrap"><table><thead><tr><th>#</th><th>الاسم</th><th>البريد</th><th>الهاتف</th><th>عدد الأبناء</th></tr></thead><tbody>';
+      
+      DATA.parents.forEach(function(p, i) {
+        const childrenCount = DATA.students.filter(function(s){ return String(s.parent_id) === String(p.id); }).length;
+        
+        html += '<tr>';
+        html += '<td>'+(i+1)+'</td>';
+        html += '<td><b>'+esc(p.name || '—')+'</b></td>';
+        html += '<td>'+esc(p.email || '—')+'</td>';
+        html += '<td>'+esc(p.phone || '—')+'</td>';
+        html += '<td><span class="badge blue">'+childrenCount+' أبناء</span></td>';
+        html += '</tr>';
+      });
+      
+      html += '</tbody></table></div>';
+    }
+    
+    container.innerHTML = html;
+  }
+
+  function renderFinance() {
+    const container = $('#view-finance');
+    const stats = getStats();
+    
+    let html = '<div class="page-head" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">';
+    html += '<div><h1>💰 المالية الشاملة</h1></div>';
+    html += '<button class="btn" style="background:#10b981;color:white;" onclick="location.href=\'finance-pro.html\'">📊 النظام المالي الكامل</button>';
+    html += '</div>';
+    
+    html += '<div class="kpis" style="margin-bottom:24px;">';
+    html += '<div class="kpi blue"><small>إجمالي الرسوم</small><b>'+money(stats.totalFees)+'</b></div>';
+    html += '<div class="kpi green"><small>المحصّل</small><b>'+money(stats.totalPaid)+'</b></div>';
+    html += '<div class="kpi red"><small>المتأخرات</small><b>'+money(stats.totalRemaining)+'</b></div>';
+    html += '<div class="kpi gold"><small>نسبة التحصيل</small><b>'+stats.collectionRate+'%</b></div>';
+    html += '</div>';
+    
+    // الطلاب المتأخرين
+    const overdueFees = DATA.fees.filter(function(f){
+      return num(f.net_amount || f.base_amount) - num(f.total_paid) > 0;
+    }).sort(function(a,b){
+      const rA = num(a.net_amount || a.base_amount) - num(a.total_paid);
+      const rB = num(b.net_amount || b.base_amount) - num(b.total_paid);
+      return rB - rA;
+    });
+    
+    if(overdueFees.length > 0) {
+      html += '<h3 style="margin:24px 0 12px;">⚠️ الطلاب المتأخرين ('+overdueFees.length+')</h3>';
+      html += '<div class="table-wrap"><table><thead><tr><th>الطالب</th><th>الإجمالي</th><th>المدفوع</th><th>المتبقي</th></tr></thead><tbody>';
+      
+      overdueFees.slice(0, 20).forEach(function(f) {
+        const student = DATA.students.find(function(s){ return String(s.id) === String(f.student_id); });
+        const studentName = student ? ((student.users && student.users.name) || student.name) : 'طالب';
+        const total = num(f.net_amount || f.base_amount);
+        const paid = num(f.total_paid);
+        const remaining = total - paid;
+        
+        html += '<tr>';
+        html += '<td><b>'+esc(studentName)+'</b></td>';
+        html += '<td>'+money(total)+'</td>';
+        html += '<td>'+money(paid)+'</td>';
+        html += '<td><span class="badge red">'+money(remaining)+'</span></td>';
+        html += '</tr>';
+      });
+      
+      html += '</tbody></table></div>';
+    }
+    
+    container.innerHTML = html;
+  }
+
+  function renderAcademic() {
+    const container = $('#view-academic');
+    const stats = getStats();
+    
+    let html = '<div class="page-head" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">';
+    html += '<div><h1>📚 الشؤون الأكاديمية</h1></div>';
+    html += '<button class="btn" style="background:#3b82f6;color:white;" onclick="location.href=\'academic-pro.html\'">📖 النظام الأكاديمي الكامل</button>';
+    html += '</div>';
+    
+    html += '<div class="kpis" style="margin-bottom:24px;">';
+    html += '<div class="kpi blue"><small>إجمالي الدرجات</small><b>'+stats.totalGrades+'</b></div>';
+    html += '<div class="kpi gold"><small>المعدل العام</small><b>'+stats.gradesAvg+'%</b></div>';
+    html += '<div class="kpi green"><small>المواد</small><b>'+stats.totalSubjects+'</b></div>';
+    html += '<div class="kpi"><small>الصفوف</small><b>'+stats.totalClasses+'</b></div>';
+    html += '</div>';
+    
+    // أفضل الطلاب
+    const studentAverages = DATA.students.map(function(s) {
+      const grades = DATA.grades.filter(function(g){ return String(g.student_id) === String(s.id); });
+      const avg = grades.length ? Math.round(grades.reduce(function(sum,g){ return sum + num(g.score || g.grade || g.mark); }, 0) / grades.length) : 0;
+      return {
+        name: (s.users && s.users.name) || s.name || 'طالب',
+        className: getClassName(s.class_id),
+        avg: avg,
+        count: grades.length
+      };
+    }).filter(function(x){ return x.count > 0; }).sort(function(a,b){ return b.avg - a.avg; });
+    
+    if(studentAverages.length > 0) {
+      html += '<h3 style="margin:24px 0 12px;">🏆 أفضل 10 طلاب</h3>';
+      html += '<div class="table-wrap"><table><thead><tr><th>الترتيب</th><th>الطالب</th><th>الصف</th><th>المعدل</th></tr></thead><tbody>';
+      
+      studentAverages.slice(0, 10).forEach(function(s, i) {
+        const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i+1);
+        const color = s.avg >= 85 ? 'green' : s.avg >= 60 ? 'gold' : 'red';
+        html += '<tr>';
+        html += '<td>'+medal+'</td>';
+        html += '<td><b>'+esc(s.name)+'</b></td>';
+        html += '<td>'+esc(s.className)+'</td>';
+        html += '<td><span class="badge '+color+'">'+s.avg+'%</span></td>';
+        html += '</tr>';
+      });
+      
+      html += '</tbody></table></div>';
+    }
+    
+    container.innerHTML = html;
+  }
+
+  function renderReports() {
+    const container = $('#view-reports');
+    const stats = getStats();
+    
+    let html = '<div class="page-head"><div><h1>📈 التقارير الشاملة</h1></div></div>';
+    
+    html += '<div class="cards">';
+    html += '<div class="card"><div class="card-head"><h3>📊 التقرير العام</h3></div><div class="card-body"><p>إجمالي الطلاب: <b>'+stats.totalStudents+'</b></p><p>المعلمون: <b>'+stats.totalTeachers+'</b></p><p>أولياء الأمور: <b>'+stats.totalParents+'</b></p><button class="btn blue" style="margin-top:12px;" onclick="SuperAdmin.printGeneralReport()">🖨️ طباعة</button></div></div>';
+    html += '<div class="card"><div class="card-head"><h3>💰 التقرير المالي</h3></div><div class="card-body"><p>إجمالي الرسوم: <b>'+money(stats.totalFees)+'</b></p><p>المحصّل: <b style="color:#10b981;">'+money(stats.totalPaid)+'</b></p><p>المتأخرات: <b style="color:#dc2626;">'+money(stats.totalRemaining)+'</b></p><button class="btn gold" style="margin-top:12px;" onclick="SuperAdmin.printFinanceReport()">🖨️ طباعة</button></div></div>';
+    html += '<div class="card"><div class="card-head"><h3>📚 التقرير الأكاديمي</h3></div><div class="card-body"><p>إجمالي الدرجات: <b>'+stats.totalGrades+'</b></p><p>المعدل العام: <b>'+stats.gradesAvg+'%</b></p><button class="btn green" style="margin-top:12px;" onclick="SuperAdmin.printAcademicReport()">🖨️ طباعة</button></div></div>';
+    html += '<div class="card"><div class="card-head"><h3>📋 تقرير الحضور</h3></div><div class="card-body"><p>سجلات الحضور: <b>'+DATA.attendance.length+'</b></p><p>حضور اليوم: <b>'+stats.attRate+'%</b></p><button class="btn" style="background:#8b5cf6;color:white;margin-top:12px;" onclick="SuperAdmin.printAttendanceReport()">🖨️ طباعة</button></div></div>';
+    html += '</div>';
+    
+    container.innerHTML = html;
+  }
+
+  function printReport(title, content) {
+    const today = new Date().toLocaleDateString('ar-IQ');
+    const html = '<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>'+title+'</title>'+
+      '<style>'+
+      '* { margin: 0; padding: 0; box-sizing: border-box; }'+
+      'body { font-family: "Cairo", "Segoe UI", Tahoma, sans-serif; padding: 30px; color: #333; line-height: 1.6; }'+
+      '.print-header { text-align: center; padding-bottom: 20px; border-bottom: 3px double #1e40af; margin-bottom: 30px; }'+
+      '.print-header h1 { color: #1e40af; font-size: 28px; margin-bottom: 8px; }'+
+      'table { width: 100%; border-collapse: collapse; margin: 20px 0; }'+
+      'table th { background: #1e40af; color: white; padding: 12px; text-align: right; }'+
+      'table td { padding: 10px 12px; border-bottom: 1px solid #e5e7eb; }'+
+      'table tr:nth-child(even) td { background: #f9fafb; }'+
+      '.stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin: 20px 0; }'+
+      '.stat-card { background: #f3f4f6; padding: 15px; border-radius: 8px; text-align: center; }'+
+      '.stat-card .label { color: #6b7280; font-size: 13px; }'+
+      '.stat-card .value { color: #1e40af; font-size: 24px; font-weight: bold; }'+
+      '.section-title { color: #1e40af; font-size: 18px; margin: 25px 0 12px; padding-bottom: 8px; border-bottom: 2px solid #1e40af; }'+
+      '@media print { @page { size: A4; margin: 1cm; } .no-print { display: none !important; } }'+
+      '.print-btn { position: fixed; top: 20px; left: 20px; background: #1e40af; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; }'+
+      '</style></head><body>'+
+      '<button class="print-btn no-print" onclick="window.print()">🖨️ طباعة</button>'+
+      '<div class="print-header"><h1>'+SCHOOL_LOGO+' '+SCHOOL_NAME+'</h1><h2>'+title+'</h2><div>📅 '+today+'</div></div>'+
+      content+
+      '</body></html>';
+    
+    const w = window.open('', '_blank', 'width=900,height=700');
+    w.document.write(html);
+    w.document.close();
+    setTimeout(function(){ w.print(); }, 500);
+  }
+
+  function printGeneralReport() {
+    const stats = getStats();
+    let content = '<div class="section-title">📊 الإحصائيات العامة</div>';
+    content += '<div class="stat-grid">';
+    content += '<div class="stat-card"><div class="label">الطلاب</div><div class="value">'+stats.totalStudents+'</div></div>';
+    content += '<div class="stat-card"><div class="label">المعلمون</div><div class="value">'+stats.totalTeachers+'</div></div>';
+    content += '<div class="stat-card"><div class="label">أولياء الأمور</div><div class="value">'+stats.totalParents+'</div></div>';
+    content += '<div class="stat-card"><div class="label">الصفوف</div><div class="value">'+stats.totalClasses+'</div></div>';
+    content += '</div>';
+    printReport('التقرير العام للمدرسة', content);
+  }
+
+  function printFinanceReport() {
+    const stats = getStats();
+    let content = '<div class="section-title">💰 الملخص المالي</div>';
+    content += '<div class="stat-grid">';
+    content += '<div class="stat-card"><div class="label">إجمالي الرسوم</div><div class="value">'+money(stats.totalFees)+'</div></div>';
+    content += '<div class="stat-card"><div class="label">المحصّل</div><div class="value">'+money(stats.totalPaid)+'</div></div>';
+    content += '<div class="stat-card"><div class="label">المتأخرات</div><div class="value">'+money(stats.totalRemaining)+'</div></div>';
+    content += '<div class="stat-card"><div class="label">نسبة التحصيل</div><div class="value">'+stats.collectionRate+'%</div></div>';
+    content += '</div>';
+    printReport('التقرير المالي الشامل', content);
+  }
+
+  function printAcademicReport() {
+    const stats = getStats();
+    let content = '<div class="section-title">📚 ملخص الأداء الأكاديمي</div>';
+    content += '<div class="stat-grid">';
+    content += '<div class="stat-card"><div class="label">إجمالي الدرجات</div><div class="value">'+stats.totalGrades+'</div></div>';
+    content += '<div class="stat-card"><div class="label">المعدل العام</div><div class="value">'+stats.gradesAvg+'%</div></div>';
+    content += '<div class="stat-card"><div class="label">المواد</div><div class="value">'+stats.totalSubjects+'</div></div>';
+    content += '<div class="stat-card"><div class="label">الصفوف</div><div class="value">'+stats.totalClasses+'</div></div>';
+    content += '</div>';
+    printReport('التقرير الأكاديمي', content);
+  }
+
+  function printAttendanceReport() {
+    const stats = getStats();
+    let content = '<div class="section-title">📋 الحضور</div>';
+    content += '<div class="stat-grid">';
+    content += '<div class="stat-card"><div class="label">حضور اليوم</div><div class="value">'+stats.presentToday+'</div></div>';
+    content += '<div class="stat-card"><div class="label">غياب اليوم</div><div class="value">'+stats.absentToday+'</div></div>';
+    content += '<div class="stat-card"><div class="label">نسبة الحضور</div><div class="value">'+stats.attRate+'%</div></div>';
+    content += '<div class="stat-card"><div class="label">إجمالي السجلات</div><div class="value">'+DATA.attendance.length+'</div></div>';
+    content += '</div>';
+    printReport('تقرير الحضور والغياب', content);
+  }
+
+  async function refresh() {
+    toast('🔄 تحديث', 'جاري تحديث البيانات...', 'blue');
+    await loadAllData();
+    renderOverview();
+    toast('✅ تم', 'تم تحديث البيانات بنجاح', 'green');
+  }
+
+  window.addEventListener('load', init);
+  
+  window.SuperAdmin = {
+    init: init,
+    showView: showView,
+    refresh: refresh,
+    printGeneralReport: printGeneralReport,
+    printFinanceReport: printFinanceReport,
+    printAcademicReport: printAcademicReport,
+    printAttendanceReport: printAttendanceReport
+  };
+})();
+</script>
+
 <script src="assets/ux-enhancements.js"></script>
-  <script src="assets/smart-alerts.js"></script>
-</body></html>
+<script src="assets/smart-alerts.js"></script>
+</body>
+</html>
