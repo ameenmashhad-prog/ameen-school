@@ -174,10 +174,48 @@ const SmartAlerts = {
   },
 
   // ========== تنبيهات المدير ==========
-  async loadAdminAlerts() {
-    // تسجيلات جديدة
-    const { data: regs } = await this.sb.from('registrations')
-      .select('id').eq('status', 'pending').limit(50);
+   async loadAdminAlerts() {
+    // إجمالي المتأخرات المالية
+    try {
+      const { data: fees } = await this.sb.from('student_fees').select('net_amount, base_amount, total_paid').limit(500);
+      if(fees) {
+        const totalDue = fees.reduce((s,f) => s + Math.max((f.net_amount || f.base_amount || 0) - (f.total_paid || 0), 0), 0);
+        if(totalDue > 0) this.alerts.push({
+          type:'danger', icon:'💰',
+          title:'متأخرات مالية',
+          msg:'$'+Math.round(totalDue).toLocaleString(),
+          link:'finance-pro.html'
+        });
+      }
+    } catch(e) { console.log('Admin fees alert skip'); }
+    
+    // عدد الطلاب الكلي
+    try {
+      const { data: students } = await this.sb.from('students').select('id').limit(1000);
+      if(students && students.length > 0) {
+        this.alerts.push({
+          type:'info', icon:'🎓',
+          title:'إجمالي الطلاب',
+          msg:students.length + ' طالب',
+          link:'super-admin.html'
+        });
+      }
+    } catch(e) { console.log('Admin students alert skip'); }
+    
+    // غيابات اليوم
+    try {
+      const today = new Date().toISOString().slice(0,10);
+      const { data: att } = await this.sb.from('attendance').select('id').eq('date', today).eq('status', 'absent').limit(100);
+      if(att && att.length > 0) {
+        this.alerts.push({
+          type:'warning', icon:'⚠️',
+          title:'غيابات اليوم',
+          msg:att.length + ' غياب',
+          link:'super-admin.html'
+        });
+      }
+    } catch(e) { console.log('Admin attendance alert skip'); }
+  },
     
     if(regs && regs.length > 0) {
       this.alerts.push({
