@@ -84,6 +84,8 @@
   'use strict';
 
   const SCHOOL_PHONE = '+9647700000000';
+  const SCHOOL_NAME = 'مدرسة أمين الرضا';
+  const SCHOOL_LOGO = '🎓';
 
   function $(s, r){r=r||document;return r.querySelector(s)}
   function esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;')}
@@ -349,6 +351,7 @@
       html += '<button class="btn small blue" onclick="event.stopPropagation();ParentPortal.viewChild(\''+child.id+'\',\'grades\')">📊 الدرجات</button>';
       html += '<button class="btn small green" onclick="event.stopPropagation();ParentPortal.viewChild(\''+child.id+'\',\'attendance\')">📋 الحضور</button>';
       html += '<button class="btn small gold" onclick="event.stopPropagation();ParentPortal.viewChild(\''+child.id+'\',\'finance\')">💰 الأقساط</button>';
+      html += '<button class="btn small" style="background:#1e40af;color:white;" onclick="event.stopPropagation();ParentPortal.selectChild(\''+child.id+'\');setTimeout(function(){ParentPortal.printChildReport(\'full\');},200);">🖨️ تقرير كامل</button>';
       html += '</div></div></div>';
     });
     html += '</div>';
@@ -371,7 +374,9 @@
     const child = CHILDREN.find(function(c){ return c.id === currentChildId; });
     const childName = (child && child.users && child.users.name) || (child && child.name) || 'الطالب';
     
-    let html = '<div class="page-head"><div><h1>📊 درجات '+esc(childName)+'</h1></div></div>';
+    let html = '<div class="page-head" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;"><div><h1>📊 درجات '+esc(childName)+'</h1></div>';
+    html += '<button class="btn" style="background:#1e40af;color:white;padding:10px 18px;" onclick="ParentPortal.printChildReport(\'grades\')">🖨️ طباعة الكشف</button>';
+    html += '</div>';
     
     if(!data.grades.length) {
       html += '<div class="empty" style="text-align:center;padding:60px;">لا توجد درجات مسجلة بعد.</div>';
@@ -398,7 +403,9 @@
     const absent = data.attendance.filter(function(a){ return a.status === 'absent'; }).length;
     const late = data.attendance.filter(function(a){ return a.status === 'late'; }).length;
     
-    let html = '<div class="page-head"><div><h1>📋 حضور '+esc(childName)+'</h1></div></div>';
+    let html = '<div class="page-head" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;"><div><h1>📋 حضور '+esc(childName)+'</h1></div>';
+    html += '<button class="btn" style="background:#1e40af;color:white;padding:10px 18px;" onclick="ParentPortal.printChildReport(\'attendance\')">🖨️ طباعة الكشف</button>';
+    html += '</div>';
     html += '<div class="kpis" style="margin-bottom:20px;"><div class="kpi green"><small>أيام الحضور</small><b>'+present+'</b></div><div class="kpi red"><small>أيام الغياب</small><b>'+absent+'</b></div><div class="kpi gold"><small>أيام التأخير</small><b>'+late+'</b></div><div class="kpi blue"><small>الإجمالي</small><b>'+data.attendance.length+'</b></div></div>';
     
     if(!data.attendance.length) {
@@ -423,7 +430,9 @@
     const child = CHILDREN.find(function(c){ return c.id === currentChildId; });
     const childName = (child && child.users && child.users.name) || (child && child.name) || 'الطالب';
     
-    let html = '<div class="page-head"><div><h1>💰 أقساط '+esc(childName)+'</h1></div></div>';
+    let html = '<div class="page-head" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;"><div><h1>💰 أقساط '+esc(childName)+'</h1></div>';
+    html += '<button class="btn" style="background:#1e40af;color:white;padding:10px 18px;" onclick="ParentPortal.printChildReport(\'finance\')">🖨️ طباعة الكشف</button>';
+    html += '</div>';
     
     if(!data.fees.length) {
       html += '<div class="empty" style="text-align:center;padding:60px;">لا توجد بيانات مالية.</div>';
@@ -477,8 +486,8 @@
   }
 
   function requestAppointment() {
-    const childName = (CHILDREN.find(function(c){ return c.id === currentChildId; }) || {}).users || {};
-    const name = childName.name || (CHILDREN[0] && CHILDREN[0].users && CHILDREN[0].users.name) || 'ابني';
+    const childObj = CHILDREN.find(function(c){ return c.id === currentChildId; });
+    const name = (childObj && childObj.users && childObj.users.name) || (CHILDREN[0] && CHILDREN[0].users && CHILDREN[0].users.name) || 'ابني';
     const date = prompt('متى تريد الموعد؟ (مثال: غداً الساعة 10 صباحاً)');
     if(!date) return;
     
@@ -503,6 +512,256 @@
     if(confirm('سيتم فتح واتساب لإرسال الرسالة. متابعة؟')) {
       window.open('https://wa.me/'+phoneClean+'?text='+msg, '_blank');
     }
+  }
+
+  // ========== طباعة التقارير ==========
+  function printChildReport(type) {
+    const child = CHILDREN.find(function(c){ return c.id === currentChildId; });
+    if(!child) {
+      alert('اختر ابناً أولاً');
+      return;
+    }
+    
+    const childName = (child.users && child.users.name) || child.name || 'الطالب';
+    const data = CHILD_DATA[currentChildId] || {attendance: [], grades: [], fees: [], behavior: []};
+    const today = new Date().toLocaleDateString('ar-IQ');
+    
+    let title = '';
+    let content = '';
+    
+    if(type === 'full') {
+      title = 'التقرير الشامل';
+      content = buildFullReport(childName, data);
+    } else if(type === 'attendance') {
+      title = 'كشف الحضور والغياب';
+      content = buildAttendanceReport(childName, data);
+    } else if(type === 'grades') {
+      title = 'كشف الدرجات';
+      content = buildGradesReport(childName, data);
+    } else if(type === 'finance') {
+      title = 'كشف الأقساط المالية';
+      content = buildFinanceReport(childName, data);
+    }
+    
+    const printWindow = window.open('', '_blank', 'width=900,height=700');
+    printWindow.document.write(buildPrintHTML(title, childName, today, content));
+    printWindow.document.close();
+    
+    setTimeout(function() {
+      printWindow.print();
+    }, 500);
+  }
+  
+  function buildPrintHTML(title, childName, today, content) {
+    return '<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>'+title+' - '+childName+'</title>'+
+      '<style>'+
+      '* { margin: 0; padding: 0; box-sizing: border-box; }'+
+      'body { font-family: "Cairo", "Segoe UI", Tahoma, sans-serif; padding: 30px; color: #333; line-height: 1.6; }'+
+      '.print-header { text-align: center; padding-bottom: 20px; border-bottom: 3px double #1e40af; margin-bottom: 30px; }'+
+      '.print-header h1 { color: #1e40af; font-size: 28px; margin-bottom: 8px; }'+
+      '.print-header h2 { color: #555; font-size: 18px; font-weight: normal; }'+
+      '.print-header .date { color: #888; font-size: 14px; margin-top: 8px; }'+
+      '.info-box { background: #f3f4f6; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-right: 4px solid #3b82f6; }'+
+      '.info-box h3 { color: #1e40af; margin-bottom: 8px; }'+
+      'table { width: 100%; border-collapse: collapse; margin: 20px 0; }'+
+      'table th { background: #1e40af; color: white; padding: 12px; text-align: right; }'+
+      'table td { padding: 10px 12px; border-bottom: 1px solid #e5e7eb; }'+
+      'table tr:nth-child(even) td { background: #f9fafb; }'+
+      '.stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin: 20px 0; }'+
+      '.stat-card { background: #f3f4f6; padding: 15px; border-radius: 8px; text-align: center; border: 1px solid #d1d5db; }'+
+      '.stat-card .label { color: #6b7280; font-size: 13px; margin-bottom: 5px; }'+
+      '.stat-card .value { color: #1e40af; font-size: 24px; font-weight: bold; }'+
+      '.section-title { color: #1e40af; font-size: 18px; margin: 25px 0 12px; padding-bottom: 8px; border-bottom: 2px solid #1e40af; }'+
+      '.badge-green { background: #d1fae5; color: #065f46; padding: 3px 10px; border-radius: 4px; font-size: 12px; }'+
+      '.badge-red { background: #fee2e2; color: #991b1b; padding: 3px 10px; border-radius: 4px; font-size: 12px; }'+
+      '.badge-gold { background: #fef3c7; color: #92400e; padding: 3px 10px; border-radius: 4px; font-size: 12px; }'+
+      '.print-footer { margin-top: 50px; padding-top: 20px; border-top: 2px dashed #ccc; text-align: center; color: #666; font-size: 13px; }'+
+      '.signature { display: flex; justify-content: space-around; margin-top: 60px; }'+
+      '.signature div { text-align: center; }'+
+      '.signature .line { width: 200px; border-top: 1px solid #333; padding-top: 5px; }'+
+      '@media print { body { padding: 15px; } .no-print { display: none !important; } @page { size: A4; margin: 1cm; } }'+
+      '.print-btn { position: fixed; top: 20px; left: 20px; background: #1e40af; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; box-shadow: 0 4px 12px rgba(30,64,175,0.3); }'+
+      '</style></head><body>'+
+      '<button class="print-btn no-print" onclick="window.print()">🖨️ طباعة الآن</button>'+
+      '<div class="print-header">'+
+      '<h1>'+SCHOOL_LOGO+' '+SCHOOL_NAME+'</h1>'+
+      '<h2>'+title+'</h2>'+
+      '<div class="date">📅 تاريخ التقرير: '+today+'</div>'+
+      '</div>'+
+      '<div class="info-box">'+
+      '<h3>👤 معلومات الطالب</h3>'+
+      '<div><b>الاسم:</b> '+esc(childName)+'</div>'+
+      '<div><b>ولي الأمر:</b> '+esc(ME.name||'')+'</div>'+
+      '</div>'+
+      content+
+      '<div class="signature">'+
+      '<div><div class="line">توقيع ولي الأمر</div></div>'+
+      '<div><div class="line">ختم المدرسة</div></div>'+
+      '</div>'+
+      '<div class="print-footer">'+
+      '<div>📞 '+SCHOOL_PHONE+' | '+SCHOOL_NAME+'</div>'+
+      '<div>تم إنشاء هذا التقرير من النظام الإلكتروني للمدرسة</div>'+
+      '</div>'+
+      '</body></html>';
+  }
+  
+  function buildFullReport(childName, data) {
+    let html = '';
+    
+    const presentCount = data.attendance.filter(function(a){ return a.status === 'present'; }).length;
+    const absentCount = data.attendance.filter(function(a){ return a.status === 'absent'; }).length;
+    const totalAtt = data.attendance.length;
+    const attRate = totalAtt ? Math.round((presentCount/totalAtt) * 100) : 0;
+    
+    const fee = data.fees[0];
+    const total = num(fee && (fee.net_amount || fee.base_amount));
+    const paid = num(fee && fee.total_paid);
+    const remaining = Math.max(total - paid, 0);
+    
+    const gradesAvg = data.grades.length ? Math.round(data.grades.reduce(function(s,g){ return s + num(g.score || g.grade || g.mark); }, 0) / data.grades.length) : 0;
+    
+    html += '<div class="section-title">📊 ملخص الأداء</div>';
+    html += '<div class="stat-grid">';
+    html += '<div class="stat-card"><div class="label">نسبة الحضور</div><div class="value">'+attRate+'%</div></div>';
+    html += '<div class="stat-card"><div class="label">أيام الغياب</div><div class="value">'+absentCount+'</div></div>';
+    html += '<div class="stat-card"><div class="label">المعدل العام</div><div class="value">'+gradesAvg+'%</div></div>';
+    html += '<div class="stat-card"><div class="label">المتبقي</div><div class="value">$'+remaining+'</div></div>';
+    html += '</div>';
+    
+    if(data.grades.length) {
+      html += '<div class="section-title">📚 الدرجات</div>';
+      html += '<table><thead><tr><th>المادة</th><th>الدرجة</th><th>التقييم</th></tr></thead><tbody>';
+      data.grades.forEach(function(g) {
+        const score = num(g.score || g.grade || g.mark);
+        const badge = score >= 85 ? 'badge-green' : score >= 60 ? 'badge-gold' : 'badge-red';
+        const eval2 = score >= 85 ? 'ممتاز' : score >= 60 ? 'جيد' : 'يحتاج تحسين';
+        html += '<tr><td>'+esc(g.subject_name || g.subject_id || 'مادة')+'</td><td><span class="'+badge+'">'+score+'</span></td><td>'+eval2+'</td></tr>';
+      });
+      html += '</tbody></table>';
+    }
+    
+    if(data.attendance.length) {
+      html += '<div class="section-title">📋 آخر سجلات الحضور</div>';
+      html += '<table><thead><tr><th>التاريخ</th><th>الحالة</th><th>ملاحظة</th></tr></thead><tbody>';
+      data.attendance.slice(0, 10).forEach(function(a) {
+        const status = a.status || '—';
+        const badge = status === 'present' ? 'badge-green' : status === 'absent' ? 'badge-red' : 'badge-gold';
+        const label = status === 'present' ? 'حاضر' : status === 'absent' ? 'غائب' : status === 'late' ? 'متأخر' : status;
+        html += '<tr><td>'+esc(String(a.date).slice(0,10))+'</td><td><span class="'+badge+'">'+label+'</span></td><td>'+esc(a.note || '—')+'</td></tr>';
+      });
+      html += '</tbody></table>';
+    }
+    
+    if(data.fees.length) {
+      html += '<div class="section-title">💰 الوضع المالي</div>';
+      html += '<table><thead><tr><th>الإجمالي</th><th>المدفوع</th><th>المتبقي</th><th>الحالة</th></tr></thead><tbody>';
+      data.fees.forEach(function(f) {
+        const t = num(f.net_amount || f.base_amount);
+        const p = num(f.total_paid);
+        const r = Math.max(t - p, 0);
+        const status = r === 0 ? 'مدفوع كاملاً' : p > 0 ? 'مدفوع جزئياً' : 'غير مدفوع';
+        const badge = r === 0 ? 'badge-green' : p > 0 ? 'badge-gold' : 'badge-red';
+        html += '<tr><td>$'+t+'</td><td>$'+p+'</td><td>$'+r+'</td><td><span class="'+badge+'">'+status+'</span></td></tr>';
+      });
+      html += '</tbody></table>';
+    }
+    
+    return html;
+  }
+  
+  function buildAttendanceReport(childName, data) {
+    const present = data.attendance.filter(function(a){ return a.status === 'present'; }).length;
+    const absent = data.attendance.filter(function(a){ return a.status === 'absent'; }).length;
+    const late = data.attendance.filter(function(a){ return a.status === 'late'; }).length;
+    const total = data.attendance.length;
+    const rate = total ? Math.round((present/total)*100) : 0;
+    
+    let html = '<div class="section-title">📊 الإحصائيات</div>';
+    html += '<div class="stat-grid">';
+    html += '<div class="stat-card"><div class="label">أيام الحضور</div><div class="value">'+present+'</div></div>';
+    html += '<div class="stat-card"><div class="label">أيام الغياب</div><div class="value">'+absent+'</div></div>';
+    html += '<div class="stat-card"><div class="label">أيام التأخير</div><div class="value">'+late+'</div></div>';
+    html += '<div class="stat-card"><div class="label">نسبة الحضور</div><div class="value">'+rate+'%</div></div>';
+    html += '</div>';
+    
+    if(data.attendance.length) {
+      html += '<div class="section-title">📋 التفاصيل الكاملة</div>';
+      html += '<table><thead><tr><th>#</th><th>التاريخ</th><th>الحالة</th><th>ملاحظة</th></tr></thead><tbody>';
+      data.attendance.forEach(function(a, i) {
+        const status = a.status || '—';
+        const badge = status === 'present' ? 'badge-green' : status === 'absent' ? 'badge-red' : 'badge-gold';
+        const label = status === 'present' ? 'حاضر' : status === 'absent' ? 'غائب' : status === 'late' ? 'متأخر' : status;
+        html += '<tr><td>'+(i+1)+'</td><td>'+esc(String(a.date).slice(0,10))+'</td><td><span class="'+badge+'">'+label+'</span></td><td>'+esc(a.note || '—')+'</td></tr>';
+      });
+      html += '</tbody></table>';
+    } else {
+      html += '<p style="text-align:center;padding:30px;color:#888;">لا توجد سجلات حضور.</p>';
+    }
+    
+    return html;
+  }
+  
+  function buildGradesReport(childName, data) {
+    const avg = data.grades.length ? Math.round(data.grades.reduce(function(s,g){ return s + num(g.score || g.grade || g.mark); }, 0) / data.grades.length) : 0;
+    const excellent = data.grades.filter(function(g){ return num(g.score || g.grade || g.mark) >= 85; }).length;
+    const good = data.grades.filter(function(g){ var v=num(g.score || g.grade || g.mark); return v >= 60 && v < 85; }).length;
+    const weak = data.grades.filter(function(g){ return num(g.score || g.grade || g.mark) < 60; }).length;
+    
+    let html = '<div class="section-title">📊 ملخص الأداء الأكاديمي</div>';
+    html += '<div class="stat-grid">';
+    html += '<div class="stat-card"><div class="label">المعدل العام</div><div class="value">'+avg+'%</div></div>';
+    html += '<div class="stat-card"><div class="label">ممتاز (85+)</div><div class="value">'+excellent+'</div></div>';
+    html += '<div class="stat-card"><div class="label">جيد (60-84)</div><div class="value">'+good+'</div></div>';
+    html += '<div class="stat-card"><div class="label">يحتاج تحسين</div><div class="value">'+weak+'</div></div>';
+    html += '</div>';
+    
+    if(data.grades.length) {
+      html += '<div class="section-title">📚 تفاصيل الدرجات</div>';
+      html += '<table><thead><tr><th>#</th><th>المادة</th><th>الدرجة</th><th>التقييم</th><th>ملاحظة</th></tr></thead><tbody>';
+      data.grades.forEach(function(g, i) {
+        const score = num(g.score || g.grade || g.mark);
+        const badge = score >= 85 ? 'badge-green' : score >= 60 ? 'badge-gold' : 'badge-red';
+        const eval2 = score >= 85 ? 'ممتاز' : score >= 60 ? 'جيد' : 'يحتاج تحسين';
+        html += '<tr><td>'+(i+1)+'</td><td>'+esc(g.subject_name || g.subject_id || 'مادة')+'</td><td><span class="'+badge+'">'+score+'</span></td><td>'+eval2+'</td><td>'+esc(g.notes || g.note || '—')+'</td></tr>';
+      });
+      html += '</tbody></table>';
+    } else {
+      html += '<p style="text-align:center;padding:30px;color:#888;">لا توجد درجات مسجلة بعد.</p>';
+    }
+    
+    return html;
+  }
+  
+  function buildFinanceReport(childName, data) {
+    const totalAll = data.fees.reduce(function(s,f){ return s + num(f.net_amount || f.base_amount); }, 0);
+    const paidAll = data.fees.reduce(function(s,f){ return s + num(f.total_paid); }, 0);
+    const remainingAll = Math.max(totalAll - paidAll, 0);
+    
+    let html = '<div class="section-title">💰 الملخص المالي</div>';
+    html += '<div class="stat-grid">';
+    html += '<div class="stat-card"><div class="label">إجمالي الرسوم</div><div class="value">$'+totalAll+'</div></div>';
+    html += '<div class="stat-card"><div class="label">المدفوع</div><div class="value">$'+paidAll+'</div></div>';
+    html += '<div class="stat-card"><div class="label">المتبقي</div><div class="value">$'+remainingAll+'</div></div>';
+    html += '<div class="stat-card"><div class="label">نسبة السداد</div><div class="value">'+(totalAll ? Math.round((paidAll/totalAll)*100) : 0)+'%</div></div>';
+    html += '</div>';
+    
+    if(data.fees.length) {
+      html += '<div class="section-title">📋 تفاصيل الأقساط</div>';
+      html += '<table><thead><tr><th>#</th><th>الإجمالي</th><th>المدفوع</th><th>المتبقي</th><th>الحالة</th></tr></thead><tbody>';
+      data.fees.forEach(function(f, i) {
+        const t = num(f.net_amount || f.base_amount);
+        const p = num(f.total_paid);
+        const r = Math.max(t - p, 0);
+        const status = r === 0 ? 'مدفوع كاملاً' : p > 0 ? 'مدفوع جزئياً' : 'غير مدفوع';
+        const badge = r === 0 ? 'badge-green' : p > 0 ? 'badge-gold' : 'badge-red';
+        html += '<tr><td>'+(i+1)+'</td><td>$'+t+'</td><td>$'+p+'</td><td>$'+r+'</td><td><span class="'+badge+'">'+status+'</span></td></tr>';
+      });
+      html += '</tbody></table>';
+    } else {
+      html += '<p style="text-align:center;padding:30px;color:#888;">لا توجد بيانات مالية.</p>';
+    }
+    
+    return html;
   }
 
   async function selectChild(childId) {
@@ -534,7 +793,8 @@
     selectChild: selectChild,
     viewChild: viewChild,
     requestAppointment: requestAppointment,
-    sendMessage: sendMessage
+    sendMessage: sendMessage,
+    printChildReport: printChildReport
   };
 })();
 </script>
