@@ -132,4 +132,414 @@
       console.log('✅ Session OK:', session.user.email);
 
       const userRes = await c.from('users').select('*').eq('id', session.user.id).maybeSingle();
-      if(userRes.error 
+      if(userRes.error || !userRes.data) {
+        toast('خطأ', 'تعذر تحميل بيانات الحساب', 'red');
+        return;
+      }
+      ME = userRes.data;
+      window.ME = ME;
+      console.log('✅ User loaded:', ME.name);
+
+      $('#profileName').textContent = ME.name || ME.email || 'ولي أمر';
+      $('#profileRole').textContent = 'ولي أمر';
+
+      $('#logoutBtn').onclick = async function() {
+        await c.auth.signOut({scope:'local'}).catch(function(){});
+        location.href = 'index.html';
+      };
+
+      const mobileBtn = $('#mobileMenuBtn');
+      if(mobileBtn) mobileBtn.addEventListener('click', function() {
+        const sb = $('#sidebar');
+        if(sb) sb.classList.toggle('open');
+      });
+
+      const navBtns = document.querySelectorAll('.nav button[data-view]');
+      navBtns.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          const view = btn.dataset.view;
+          showView(view);
+          navBtns.forEach(function(b) { b.classList.toggle('active', b === btn); });
+          const sb = $('#sidebar');
+          if(sb) sb.classList.remove('open');
+        });
+      });
+
+      const childRes = await c.from('students').select('*, users:user_id(name, email)').eq('parent_id', ME.id);
+      if(childRes.error) {
+        console.error('❌ Error fetching children:', childRes.error);
+      }
+      CHILDREN = childRes.data || [];
+      window.CHILDREN = CHILDREN;
+      console.log('✅ Children count:', CHILDREN.length);
+
+      await loadNotifications();
+      setupChildSelector();
+
+      if(CHILDREN.length > 0) {
+        currentChildId = CHILDREN[0].id;
+        await Promise.all(CHILDREN.map(function(c){ return loadChildData(c.id); }));
+        renderOverview();
+      } else {
+        $('#view-overview').innerHTML = '<div class="empty" style="text-align:center;padding:60px 20px;"><div style="font-size:64px;margin-bottom:20px;">⚠️</div><h3>لا يوجد طلاب مسجلين تحت هذا الحساب</h3><p style="color:#999;margin-top:10px;">يرجى مراجعة الإدارة لربط الطلاب بحسابك.</p></div>';
+      }
+
+    } catch(e) {
+      console.error('❌ Init error:', e);
+      toast('خطأ في التحميل', e.message, 'red');
+    }
+  }
+
+  async function loadNotifications() {
+    try {
+      const res = await client().from('school_notifications').select('*').eq('recipient_user_id', ME.id).order('created_at', {ascending: false}).limit(10);
+      NOTIFICATIONS = res.data || [];
+    } catch(e) {
+      NOTIFICATIONS = [];
+    }
+  }
+
+  function getSmartAlerts() {
+    const alerts = [];
+    CHILDREN.forEach(function(child) {
+      const childName = (child.users && child.users.name) || child.name || 'الطالب';
+      const data = CHILD_DATA[child.id] || {attendance: [], grades: [], fees: [], behavior: []};
+      
+      const absent = data.attendance.filter(function(a){ return a.status === 'absent'; }).length;
+      const total = data.attendance.length;
+      if(total > 0 && absent > 0) {
+        const rate = (absent/total) * 100;
+        if(rate > 20) {
+          alerts.push({type:'danger',icon:'⚠️',title:'غياب مرتفع لـ '+childName,message:'نسبة الغياب '+Math.round(rate)+'%'});
+        }
+      }
+      
+      data.fees.forEach(function(f) {
+        const t = num(f.net_amount || f.base_amount);
+        const p = num(f.total_paid);
+        const r = t - p;
+        if(r > 0) {
+          alerts.push({type:'warning',icon:'💰',title:'قسط مستحق لـ '+childName,message:'المبلغ المتبقي: '+money(r)});
+        }
+      });
+      
+      const lowGrades = data.grades.filter(function(g){ return num(g.score || g.grade || g.mark) < 60; });
+      if(lowGrades.length > 0) {
+        alerts.push({type:'warning',icon:'📉',title:'درجات تحتاج متابعة لـ '+childName,message:lowGrades.length+' مواد بدرجات أقل من 60'});
+      }
+    });
+    return alerts;
+  }
+
+  function setupChildSelector() {
+    const selector = $('#childSelector');
+    if(!selector) return;
+    
+    if(CHILDREN.length > 1) {
+      selector.style.display = 'block';
+      selector.innerHTML = CHILDREN.map(function(c) {
+        const childName = (c.users && c.users.name) || c.name || 'طالب';
+        return '<option value="'+c.id+'">'+esc(childName)+'</option>';
+      }).join('');
+      
+      selector.onchange = async function(e) {
+        currentChildId = e.target.value;
+        if(!CHILD_DATA[currentChildId]) {
+          await loadChildData(currentChildId);
+        }
+        const activeView = (document.querySelector('.view.active') || {}).id || 'view-overview';
+        showView(activeView.replace('view-', ''));
+      };
+    } else if(CHILDREN.length === 1) {
+      currentChildId = CHILDREN[0].id;
+      selector.style.display = 'none';
+    }
+  }
+
+  async function loadChildData(childId) {
+    if(!childId) return;
+    const c = client();
+    
+    try {
+      const results = await Promise.all([
+        c.from('attendance').select('*').eq('student_id', childId).order('date', {ascending: false}).limit(50),
+        c.from('grades').select('*').eq('student_id', childId),
+        c.from('student_fees').select('*').eq('student_id', childId),
+        c.from('behavior_records').select('*').eq('student_id', childId).order('created_at', {ascending: false}).limit(20)
+      ]);
+
+      CHILD_DATA[childId] = {
+        attendance: results[0].data || [],
+        grades: results[1].data || [],
+        fees: results[2].data || [],
+        behavior: results[3].data || []
+      };
+    } catch(e) {
+      CHILD_DATA[childId] = {attendance: [], grades: [], fees: [], behavior: []};
+    }
+  }
+
+  function showView(viewId) {
+    document.querySelectorAll('.view').forEach(function(v) {
+      v.classList.toggle('active', v.id === 'view-' + viewId);
+    });
+    
+    if(viewId === 'overview') renderOverview();
+    else if(viewId === 'grades') renderGrades();
+    else if(viewId === 'attendance') renderAttendance();
+    else if(viewId === 'finance') renderFinance();
+    else if(viewId === 'behavior') renderBehavior();
+  }
+
+  function renderOverview() {
+    const container = $('#view-overview');
+    if(!CHILDREN.length) return;
+
+    const alerts = getSmartAlerts();
+    const unreadNotifs = NOTIFICATIONS.filter(function(n){ return !n.read_at; }).length;
+    const whatsappMsg = encodeURIComponent('السلام عليكم، أنا ولي أمر '+(ME.name||'')+'، أحتاج للتواصل معكم');
+    const phoneClean = SCHOOL_PHONE.replace('+','');
+
+    let html = '<div class="page-head"><div><h1>أهلاً بك، '+esc(ME.name)+' 👋</h1><p>متابعة شاملة لأبنائك · عدد الأبناء: <b>'+CHILDREN.length+'</b>'+(unreadNotifs > 0 ? ' · <span class="badge red">'+unreadNotifs+' إشعار جديد</span>' : '')+'</p></div></div>';
+
+    html += '<h3 style="margin-bottom:12px;">📞 تواصل سريع مع المدرسة</h3>';
+    html += '<div class="cards" style="margin-bottom:24px;">';
+    html += '<a href="tel:'+SCHOOL_PHONE+'" style="text-decoration:none;color:inherit;"><div class="card" style="background:linear-gradient(135deg,#10b981,#059669);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📞</div><div style="font-weight:bold;margin-top:8px;font-size:15px;">اتصال بالمدرسة</div><small style="opacity:0.9;">للتواصل المباشر</small></div></a>';
+    html += '<a href="https://wa.me/'+phoneClean+'?text='+whatsappMsg+'" target="_blank" style="text-decoration:none;color:inherit;"><div class="card" style="background:linear-gradient(135deg,#25d366,#128c7e);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">💬</div><div style="font-weight:bold;margin-top:8px;font-size:15px;">واتساب الإدارة</div><small style="opacity:0.9;">رد سريع</small></div></a>';
+    html += '<div onclick="ParentPortal.requestAppointment()" class="card" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📅</div><div style="font-weight:bold;margin-top:8px;font-size:15px;">طلب موعد</div><small style="opacity:0.9;">مع المرشد/الإدارة</small></div>';
+    html += '<div onclick="ParentPortal.sendMessage()" class="card" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">✉️</div><div style="font-weight:bold;margin-top:8px;font-size:15px;">رسالة للمدرسة</div><small style="opacity:0.9;">عبر النظام</small></div>';
+    html += '</div>';
+    
+    if(alerts.length > 0) {
+      html += '<div style="margin-bottom:20px;"><h3 style="margin-bottom:12px;">⚠️ تنبيهات تحتاج اهتمامك ('+alerts.length+')</h3><div class="cards">';
+      alerts.slice(0, 4).forEach(function(a) {
+        const bgColor = a.type === 'danger' ? '#fee2e2' : a.type === 'warning' ? '#fef3c7' : '#dbeafe';
+        const borderColor = a.type === 'danger' ? '#dc2626' : a.type === 'warning' ? '#d97706' : '#2563eb';
+        html += '<div style="background:'+bgColor+';border-right:4px solid '+borderColor+';padding:14px;border-radius:10px;color:#333;"><div style="font-size:16px;font-weight:bold;margin-bottom:4px;">'+a.icon+' '+esc(a.title)+'</div><div style="font-size:13px;opacity:0.85;">'+esc(a.message)+'</div></div>';
+      });
+      html += '</div></div>';
+    }
+    
+    html += '<h3 style="margin-bottom:12px;">🎓 أبناؤك</h3><div class="cards">';
+    CHILDREN.forEach(function(child) {
+      const childName = (child.users && child.users.name) || child.name || 'طالب';
+      const data = CHILD_DATA[child.id] || {attendance: [], grades: [], fees: [], behavior: []};
+      
+      const presentCount = data.attendance.filter(function(a){ return a.status === 'present'; }).length;
+      const absentCount = data.attendance.filter(function(a){ return a.status === 'absent'; }).length;
+      const totalAtt = data.attendance.length;
+      const attRate = totalAtt ? Math.round((presentCount/totalAtt) * 100) : 0;
+      
+      const fee = data.fees[0];
+      const total = num(fee && (fee.net_amount || fee.base_amount));
+      const paid = num(fee && fee.total_paid);
+      const remaining = Math.max(total - paid, 0);
+      
+      const gradesAvg = data.grades.length ? Math.round(data.grades.reduce(function(s,g){ return s + num(g.score || g.grade || g.mark); }, 0) / data.grades.length) : 0;
+      const isActive = String(child.id) === String(currentChildId);
+      
+      html += '<div class="card" style="'+(isActive ? 'border:2px solid #fbbf24;box-shadow:0 4px 20px rgba(251,191,36,0.2);' : '')+'cursor:pointer;" onclick="ParentPortal.selectChild(\''+child.id+'\')">';
+      html += '<div class="card-head"><h3>🎓 '+esc(childName)+'</h3>'+(isActive ? '<span class="badge gold">👁️ المحدد</span>' : '')+'</div>';
+      html += '<div class="card-body"><div class="kpis">';
+      html += '<div class="kpi green"><small>الحضور</small><b>'+attRate+'%</b></div>';
+      html += '<div class="kpi red"><small>الغياب</small><b>'+absentCount+' يوم</b></div>';
+      html += '<div class="kpi gold"><small>المعدل</small><b>'+gradesAvg+'%</b></div>';
+      html += '<div class="kpi '+(remaining > 0 ? 'red' : 'green')+'"><small>المتبقي</small><b>'+money(remaining)+'</b></div>';
+      html += '</div><div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">';
+      html += '<button class="btn small blue" onclick="event.stopPropagation();ParentPortal.viewChild(\''+child.id+'\',\'grades\')">📊 الدرجات</button>';
+      html += '<button class="btn small green" onclick="event.stopPropagation();ParentPortal.viewChild(\''+child.id+'\',\'attendance\')">📋 الحضور</button>';
+      html += '<button class="btn small gold" onclick="event.stopPropagation();ParentPortal.viewChild(\''+child.id+'\',\'finance\')">💰 الأقساط</button>';
+      html += '</div></div></div>';
+    });
+    html += '</div>';
+
+    if(NOTIFICATIONS.length > 0) {
+      html += '<h3 style="margin:24px 0 12px;">🔔 آخر الإشعارات</h3><div class="list">';
+      NOTIFICATIONS.slice(0, 5).forEach(function(n) {
+        const isUnread = !n.read_at;
+        html += '<div class="item" style="'+(isUnread ? 'background:#fef3c7;border-right:3px solid #f59e0b;' : '')+'"><div><b>'+esc(n.title || 'إشعار')+'</b><small>'+esc(n.body || n.message || '')+' · '+esc(String(n.created_at || '').slice(0,10))+'</small></div><span class="badge '+(isUnread ? 'gold' : 'blue')+'">'+(isUnread ? 'جديد' : 'مقروء')+'</span></div>';
+      });
+      html += '</div>';
+    }
+
+    container.innerHTML = html;
+  }
+
+  function renderGrades() {
+    const container = $('#view-grades');
+    const data = CHILD_DATA[currentChildId] || {grades: []};
+    const child = CHILDREN.find(function(c){ return c.id === currentChildId; });
+    const childName = (child && child.users && child.users.name) || (child && child.name) || 'الطالب';
+    
+    let html = '<div class="page-head"><div><h1>📊 درجات '+esc(childName)+'</h1></div></div>';
+    
+    if(!data.grades.length) {
+      html += '<div class="empty" style="text-align:center;padding:60px;">لا توجد درجات مسجلة بعد.</div>';
+    } else {
+      html += '<div class="table-wrap"><table><thead><tr><th>المادة</th><th>الدرجة</th><th>ملاحظة</th></tr></thead><tbody>';
+      data.grades.forEach(function(g) {
+        const score = num(g.score || g.grade || g.mark);
+        const color = score >= 85 ? 'green' : score >= 60 ? 'gold' : 'red';
+        html += '<tr><td>'+esc(g.subject_name || g.subject_id || 'مادة')+'</td><td><span class="badge '+color+'">'+score+'</span></td><td>'+esc(g.notes || g.note || '—')+'</td></tr>';
+      });
+      html += '</tbody></table></div>';
+    }
+    
+    container.innerHTML = html;
+  }
+
+  function renderAttendance() {
+    const container = $('#view-attendance');
+    const data = CHILD_DATA[currentChildId] || {attendance: []};
+    const child = CHILDREN.find(function(c){ return c.id === currentChildId; });
+    const childName = (child && child.users && child.users.name) || (child && child.name) || 'الطالب';
+    
+    const present = data.attendance.filter(function(a){ return a.status === 'present'; }).length;
+    const absent = data.attendance.filter(function(a){ return a.status === 'absent'; }).length;
+    const late = data.attendance.filter(function(a){ return a.status === 'late'; }).length;
+    
+    let html = '<div class="page-head"><div><h1>📋 حضور '+esc(childName)+'</h1></div></div>';
+    html += '<div class="kpis" style="margin-bottom:20px;"><div class="kpi green"><small>أيام الحضور</small><b>'+present+'</b></div><div class="kpi red"><small>أيام الغياب</small><b>'+absent+'</b></div><div class="kpi gold"><small>أيام التأخير</small><b>'+late+'</b></div><div class="kpi blue"><small>الإجمالي</small><b>'+data.attendance.length+'</b></div></div>';
+    
+    if(!data.attendance.length) {
+      html += '<div class="empty" style="text-align:center;padding:60px;">لا توجد سجلات حضور.</div>';
+    } else {
+      html += '<div class="table-wrap"><table><thead><tr><th>التاريخ</th><th>الحالة</th><th>ملاحظة</th></tr></thead><tbody>';
+      data.attendance.slice(0, 50).forEach(function(a) {
+        const status = a.status || '—';
+        const color = status === 'present' ? 'green' : status === 'absent' ? 'red' : 'gold';
+        const label = status === 'present' ? 'حاضر' : status === 'absent' ? 'غائب' : status === 'late' ? 'متأخر' : status;
+        html += '<tr><td>'+esc(String(a.date).slice(0,10))+'</td><td><span class="badge '+color+'">'+esc(label)+'</span></td><td>'+esc(a.note || '—')+'</td></tr>';
+      });
+      html += '</tbody></table></div>';
+    }
+    
+    container.innerHTML = html;
+  }
+
+  function renderFinance() {
+    const container = $('#view-finance');
+    const data = CHILD_DATA[currentChildId] || {fees: []};
+    const child = CHILDREN.find(function(c){ return c.id === currentChildId; });
+    const childName = (child && child.users && child.users.name) || (child && child.name) || 'الطالب';
+    
+    let html = '<div class="page-head"><div><h1>💰 أقساط '+esc(childName)+'</h1></div></div>';
+    
+    if(!data.fees.length) {
+      html += '<div class="empty" style="text-align:center;padding:60px;">لا توجد بيانات مالية.</div>';
+    } else {
+      const totalAll = data.fees.reduce(function(s,f){ return s + num(f.net_amount || f.base_amount); }, 0);
+      const paidAll = data.fees.reduce(function(s,f){ return s + num(f.total_paid); }, 0);
+      const remainingAll = Math.max(totalAll - paidAll, 0);
+      
+      html += '<div class="kpis" style="margin-bottom:20px;"><div class="kpi blue"><small>إجمالي الرسوم</small><b>'+money(totalAll)+'</b></div><div class="kpi green"><small>المدفوع</small><b>'+money(paidAll)+'</b></div><div class="kpi '+(remainingAll > 0 ? 'red' : 'green')+'"><small>المتبقي</small><b>'+money(remainingAll)+'</b></div></div>';
+      html += '<div class="table-wrap"><table><thead><tr><th>الإجمالي</th><th>المدفوع</th><th>المتبقي</th><th>الحالة</th></tr></thead><tbody>';
+      data.fees.forEach(function(f) {
+        const total = num(f.net_amount || f.base_amount);
+        const paid = num(f.total_paid);
+        const remaining = Math.max(total - paid, 0);
+        const status = remaining === 0 ? '✅ مدفوع كاملاً' : paid > 0 ? '⏳ مدفوع جزئياً' : '❌ غير مدفوع';
+        const color = remaining === 0 ? 'green' : paid > 0 ? 'gold' : 'red';
+        html += '<tr><td>'+money(total)+'</td><td>'+money(paid)+'</td><td>'+money(remaining)+'</td><td><span class="badge '+color+'">'+status+'</span></td></tr>';
+      });
+      html += '</tbody></table></div>';
+    }
+    
+    container.innerHTML = html;
+  }
+
+  function renderBehavior() {
+    const container = $('#view-behavior');
+    const data = CHILD_DATA[currentChildId] || {behavior: []};
+    const child = CHILDREN.find(function(c){ return c.id === currentChildId; });
+    const childName = (child && child.users && child.users.name) || (child && child.name) || 'الطالب';
+    
+    let html = '<div class="page-head"><div><h1>🌟 سلوك '+esc(childName)+'</h1></div></div>';
+    
+    if(!data.behavior.length) {
+      html += '<div class="empty" style="text-align:center;padding:60px;">لا توجد ملاحظات سلوكية.</div>';
+    } else {
+      const totalPoints = data.behavior.reduce(function(s,b){ return s + num(b.points || 0); }, 0);
+      const color = totalPoints >= 0 ? 'green' : 'red';
+      
+      html += '<div class="kpis" style="margin-bottom:20px;"><div class="kpi '+color+'"><small>مجموع النقاط</small><b>'+(totalPoints > 0 ? '+' : '')+totalPoints+'</b></div><div class="kpi blue"><small>عدد السجلات</small><b>'+data.behavior.length+'</b></div></div><div class="list">';
+      
+      data.behavior.forEach(function(b) {
+        const points = num(b.points || 0);
+        const pointColor = points >= 0 ? 'green' : 'red';
+        html += '<div class="item"><div><b>'+esc(b.note || b.description || 'ملاحظة سلوك')+'</b><small>'+esc(String(b.created_at || b.date || '').slice(0,10))+'</small></div><span class="badge '+pointColor+'">'+(points > 0 ? '+' : '')+points+'</span></div>';
+      });
+      
+      html += '</div>';
+    }
+    
+    container.innerHTML = html;
+  }
+
+  function requestAppointment() {
+    const childName = (CHILDREN.find(function(c){ return c.id === currentChildId; }) || {}).users || {};
+    const name = childName.name || (CHILDREN[0] && CHILDREN[0].users && CHILDREN[0].users.name) || 'ابني';
+    const date = prompt('متى تريد الموعد؟ (مثال: غداً الساعة 10 صباحاً)');
+    if(!date) return;
+    
+    const reason = prompt('ما سبب الموعد؟ (اختياري)');
+    const msg = encodeURIComponent('السلام عليكم،\nأنا ولي أمر الطالب: '+name+'\nأطلب موعداً في: '+date+'\n'+(reason ? 'السبب: ' + reason : ''));
+    const phoneClean = SCHOOL_PHONE.replace('+','');
+    
+    if(confirm('سيتم فتح واتساب لإرسال الطلب. متابعة؟')) {
+      window.open('https://wa.me/'+phoneClean+'?text='+msg, '_blank');
+    }
+  }
+  
+  function sendMessage() {
+    const subject = prompt('موضوع الرسالة:');
+    if(!subject) return;
+    const body = prompt('نص الرسالة:');
+    if(!body) return;
+    
+    const msg = encodeURIComponent('السلام عليكم،\nأنا ولي أمر: '+ME.name+'\n\nالموضوع: '+subject+'\n\n'+body);
+    const phoneClean = SCHOOL_PHONE.replace('+','');
+    
+    if(confirm('سيتم فتح واتساب لإرسال الرسالة. متابعة؟')) {
+      window.open('https://wa.me/'+phoneClean+'?text='+msg, '_blank');
+    }
+  }
+
+  async function selectChild(childId) {
+    currentChildId = childId;
+    const selector = $('#childSelector');
+    if(selector) selector.value = childId;
+    if(!CHILD_DATA[childId]) await loadChildData(childId);
+    renderOverview();
+  }
+
+  async function viewChild(childId, view) {
+    currentChildId = childId;
+    const selector = $('#childSelector');
+    if(selector) selector.value = childId;
+    if(!CHILD_DATA[childId]) await loadChildData(childId);
+    showView(view);
+    document.querySelectorAll('.nav button[data-view]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.view === view);
+    });
+  }
+
+  window.addEventListener('load', init);
+  
+  window.ParentPortal = {
+    init: init,
+    showView: showView,
+    renderOverview: renderOverview,
+    loadChildData: loadChildData,
+    selectChild: selectChild,
+    viewChild: viewChild,
+    requestAppointment: requestAppointment,
+    sendMessage: sendMessage
+  };
+})();
+</script>
+
+<script src="assets/ux-enhancements.js"></script>
+<script src="assets/smart-alerts.js"></script>
+</body>
+</html>
