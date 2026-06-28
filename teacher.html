@@ -1,11 +1,15 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#081426">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>لوحة المعلم — مدارس أمين الرضا</title>
-<link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<link rel="stylesheet" href="assets/portal.css"><link rel="stylesheet" href="assets/amin-identity.css"><link rel="stylesheet" href="assets/teacher-dashboard.css?v=20260626-currhw2">
-<link rel="stylesheet" href="assets/brand-redesign.css"><link rel="stylesheet" href="assets/amin-v3.css">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="stylesheet" href="assets/portal.css">
+<link rel="stylesheet" href="assets/amin-identity.css">
+<link rel="stylesheet" href="assets/brand-redesign.css">
+<link rel="stylesheet" href="assets/amin-v3.css">
 <link rel="stylesheet" href="assets/i18n.css">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="assets/amin-logo-small.png">
@@ -15,37 +19,764 @@
 </head>
 <body data-portal="teacher">
 <a class="skip-link" href="#mainContent">تخطي إلى المحتوى</a>
-<div class="shell teacher-shell">
+
+<div class="shell">
   <aside class="sidebar" id="sidebar">
-    <div class="brand"><div class="brand-mark">م</div><div><h1>لوحة المعلم</h1><small>طلابك · حضور · واجبات · درجات</small></div></div>
-    <div class="profile-mini"><div class="avatar">م</div><div><b id="profileName">...</b><small id="profileRole">...</small></div></div>
-    <nav class="nav teacher-nav"><button onclick="location.href='portal.html'">🏛️ البوابة الموحدة</button>
-      <button data-view="overview" class="active">الرئيسية</button>
-      <button data-view="attendance">الحضور والغياب</button>
-      <button onclick="location.href='curriculum-planner.html'">مخطط المنهج</button>
-      <button data-view="homework">الواجبات</button><button data-view="plan">تحضير الدروس</button>
-      <button data-view="grades">إدخال الدرجات</button><button onclick="location.href='teacher-exams.html'">بنك الأسئلة والاختبارات</button><button onclick="location.href='homework-reports.html'">تقارير الواجبات</button><button onclick="location.href='library.html'">المكتبة</button><button onclick="location.href='homework-audit.html'">سجل الواجبات</button><button onclick="location.href='labs-activities.html'">المختبرات والأنشطة</button><button onclick="location.href='documents.html'">الوثائق</button><button onclick="location.href='smart-calendar.html'">التقويم الذكي</button><button onclick="location.href='achievements.html'">الإنجازات والشارات</button><button onclick="location.href='notifications.html'">الإشعارات</button>
-      <button data-view="students">طلابي</button>
-      <button data-view="schedule">جدولي</button>
+    <div class="brand">
+      <div class="brand-mark">م</div>
+      <div>
+        <h1>لوحة المعلم</h1>
+        <small>طلاب · حضور · واجبات · درجات</small>
+      </div>
+    </div>
+    
+    <div class="profile-mini">
+      <div class="avatar">👨‍🏫</div>
+      <div>
+        <b id="profileName">...</b>
+        <small id="profileRole">...</small>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <button onclick="location.href='portal.html'">🏛️ البوابة الموحدة</button>
+      <button data-view="overview" class="active">🏠 الرئيسية</button>
+      <button data-view="attendance">📋 تحضير الحضور</button>
+      <button data-view="students">👥 طلابي</button>
+      <button data-view="grades">📊 إدخال الدرجات</button>
+      <button data-view="schedule">📅 جدولي</button>
+      <button data-view="homeworks">📚 الواجبات</button>
+      <button onclick="location.href='curriculum-planner.html'">📖 مخطط المنهج</button>
+      <button onclick="location.href='teacher-exams.html'">📝 بنك الأسئلة</button>
+      <button onclick="location.href='homework-reports.html'">📊 تقارير الواجبات</button>
+      <button onclick="location.href='smart-calendar.html'">🗓️ التقويم</button>
+      <button onclick="location.href='notifications.html'">🔔 الإشعارات</button>
     </nav>
-    <div class="side-footer"><button id="logoutBtn" class="btn red block">تسجيل الخروج</button></div>
+
+    <div class="side-footer">
+      <button id="logoutBtn" class="btn red block">تسجيل الخروج</button>
+    </div>
   </aside>
+
   <main class="main" id="mainContent" tabindex="-1">
-    <header class="topbar"><button class="btn mobile-menu" id="mobileMenuBtn">☰</button><h2>لوحة المعلم</h2><div class="top-actions"><button class="btn gold" onclick="TeacherDashboard.show('attendance')">تحضير الحضور</button><button class="btn blue" onclick="TeacherDashboard.reload()">تحديث</button></div></header>
+    <header class="topbar">
+      <button class="btn mobile-menu" id="mobileMenuBtn">☰</button>
+      <h2>لوحة المعلم</h2>
+      <div class="top-actions">
+        <button class="btn" style="background:#10b981;color:white;" onclick="TeacherPortal.showView('attendance')">📋 تحضير اليوم</button>
+      </div>
+    </header>
+
     <section id="view-overview" class="view active"></section>
     <section id="view-attendance" class="view"></section>
-    <section id="view-homework" class="view"></section><section id="view-plan" class="view"></section>
-    <section id="view-grades" class="view"></section>
     <section id="view-students" class="view"></section>
+    <section id="view-grades" class="view"></section>
     <section id="view-schedule" class="view"></section>
+    <section id="view-homeworks" class="view"></section>
   </main>
 </div>
+
 <div id="toast" class="toast"></div>
-<script src="libs/supabase.min.js"></script><script src="assets/config.js"></script><script src="assets/platform-modules.js"></script><script src="assets/i18n.js"></script><script src="assets/teacher-dashboard.js?v=20260626-currhw2"></script>
-<script>window.addEventListener('load',()=>TeacherDashboard.init());</script>
+
+<script src="libs/supabase.min.js"></script>
+<script src="assets/config.js"></script>
+<script src="assets/platform-modules.js"></script>
+<script src="assets/i18n.js"></script>
+
+<script>
+(function(){
+  'use strict';
+
+  const SCHOOL_PHONE = '+9647700000000';
+  const SCHOOL_NAME = 'مدرسة أمين الرضا';
+  const SCHOOL_LOGO = '🎓';
+  const DAYS = ['السبت','الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة'];
+
+  function $(s, r){r=r||document;return r.querySelector(s)}
+  function $$(s, r){r=r||document;return Array.from(r.querySelectorAll(s))}
+  function esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;')}
+  function num(v){var n=Number(v);return Number.isFinite(n)?n:0}
+  function iso(){return new Date().toISOString().slice(0,10)}
+  
+  let sb = null;
+  let ME = null;
+  let DATA = {
+    schedule: [],
+    students: [],
+    attendance: [],
+    grades: [],
+    classes: [],
+    subjects: [],
+    homeworks: [],
+    notifications: []
+  };
+  let SUBJECTS_MAP = {};
+  let CLASSES_MAP = {};
+  let SELECTED_CLASS_ID = null;
+  let SELECTED_DATE = iso();
+
+  function cfg() { return window.AMIN_CONFIG || {}; }
+  
+  function client() {
+    if(sb) return sb;
+    if(!window.supabase) throw new Error('Supabase library not loaded');
+    sb = window.supabase.createClient(
+      cfg().supabaseUrl, 
+      cfg().supabaseAnonKey, 
+      {auth:{persistSession:true, autoRefreshToken:true, detectSessionInUrl:true, storageKey:(cfg().authStorageKey||'amin-ovcjzsrqqgjsbqswtkro-auth-v2')}}
+    );
+    return sb;
+  }
+
+  function toast(title, msg, type) {
+    const t = $('#toast');
+    if(!t) return;
+    t.innerHTML = '<b>'+esc(title)+'</b><br><span class="muted">'+esc(msg||'')+'</span>';
+    t.className = 'toast show ' + (type||'');
+    clearTimeout(t._to);
+    t._to = setTimeout(function(){t.classList.remove('show')}, 4000);
+  }
+
+  function getSubjectName(id) {
+    if(!id) return 'مادة';
+    return SUBJECTS_MAP[id] || 'مادة';
+  }
+
+  function getClassName(id) {
+    if(!id) return 'صف';
+    return CLASSES_MAP[id] || 'صف';
+  }
+
+  async function init() {
+    try {
+      const c = client();
+      
+      const sessionRes = await c.auth.getSession();
+      const session = sessionRes.data.session;
+      if(!session) {
+        location.href = 'index.html';
+        return;
+      }
+
+      const userRes = await c.from('users').select('*').eq('id', session.user.id).maybeSingle();
+      if(userRes.error || !userRes.data) {
+        toast('خطأ', 'تعذر تحميل بيانات الحساب', 'red');
+        return;
+      }
+      ME = userRes.data;
+      window.ME = ME;
+      console.log('✅ User loaded:', ME.name, 'Role:', ME.role);
+
+      $('#profileName').textContent = ME.name || ME.email || 'معلم';
+      $('#profileRole').textContent = 'معلم';
+
+      $('#logoutBtn').onclick = async function() {
+        await c.auth.signOut({scope:'local'}).catch(function(){});
+        location.href = 'index.html';
+      };
+
+      const mobileBtn = $('#mobileMenuBtn');
+      if(mobileBtn) mobileBtn.addEventListener('click', function() {
+        const sb = $('#sidebar');
+        if(sb) sb.classList.toggle('open');
+      });
+
+      const navBtns = document.querySelectorAll('.nav button[data-view]');
+      navBtns.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          const view = btn.dataset.view;
+          showView(view);
+          navBtns.forEach(function(b) { b.classList.toggle('active', b === btn); });
+          const sb = $('#sidebar');
+          if(sb) sb.classList.remove('open');
+        });
+      });
+
+      await loadAllData();
+      renderOverview();
+
+    } catch(e) {
+      console.error('❌ Init error:', e);
+      toast('خطأ', e.message, 'red');
+    }
+  }
+
+  async function loadAllData() {
+    const c = client();
+    
+    try {
+      const results = await Promise.all([
+        c.from('subjects').select('id, name'),
+        c.from('classes').select('id, name'),
+        c.from('weekly_schedule').select('*').eq('teacher_id', ME.id),
+        c.from('school_notifications').select('*').eq('recipient_user_id', ME.id).order('created_at', {ascending: false}).limit(10).then(function(r){ return r; }).catch(function(){ return {data: []}; })
+      ]);
+      
+      // المواد والصفوف
+      (results[0].data || []).forEach(function(s) { SUBJECTS_MAP[s.id] = s.name; });
+      (results[1].data || []).forEach(function(c) { CLASSES_MAP[c.id] = c.name; });
+      DATA.subjects = results[0].data || [];
+      DATA.classes = results[1].data || [];
+      DATA.schedule = results[2].data || [];
+      DATA.notifications = results[3].data || [];
+      
+      // جلب الطلاب من الصفوف التي يدرّسها المعلم
+      const classIds = Array.from(new Set(DATA.schedule.map(function(s){ return s.class_id; }).filter(Boolean)));
+      
+      if(classIds.length > 0) {
+        const studentsRes = await c.from('students').select('*, users:user_id(name, email)').in('class_id', classIds);
+        DATA.students = studentsRes.data || [];
+        
+        const studentIds = DATA.students.map(function(s){ return s.id; });
+        
+        if(studentIds.length > 0) {
+          const subResults = await Promise.all([
+            c.from('attendance').select('*').in('student_id', studentIds).order('date', {ascending: false}).limit(500),
+            c.from('grades').select('*').in('student_id', studentIds)
+          ]);
+          DATA.attendance = subResults[0].data || [];
+          DATA.grades = subResults[1].data || [];
+        }
+      }
+      
+      console.log('✅ Data loaded:', DATA);
+    } catch(e) {
+      console.error('Data load error:', e);
+    }
+  }
+
+  function getSmartAlerts() {
+    const alerts = [];
+    const today = iso();
+    
+    // لم يتم تحضير الحضور اليوم
+    const todayAtt = DATA.attendance.filter(function(a){ return String(a.date).slice(0,10) === today; });
+    if(todayAtt.length === 0 && DATA.students.length > 0) {
+      alerts.push({type:'danger',icon:'📋',title:'لم تسجل حضور اليوم!',message:'سجّل حضور '+DATA.students.length+' طالب الآن'});
+    }
+    
+    // طلاب لم يحضروا اليوم
+    const absentToday = todayAtt.filter(function(a){ return a.status === 'absent'; });
+    if(absentToday.length > 0) {
+      alerts.push({type:'warning',icon:'⚠️',title:'غياب اليوم',message:absentToday.length+' طالب غائب'});
+    }
+    
+    // طلاب بحاجة متابعة (غياب متكرر)
+    const studentAbsents = {};
+    DATA.attendance.filter(function(a){ return a.status === 'absent'; }).forEach(function(a){
+      studentAbsents[a.student_id] = (studentAbsents[a.student_id] || 0) + 1;
+    });
+    const needAttention = Object.keys(studentAbsents).filter(function(sid){ return studentAbsents[sid] >= 5; });
+    if(needAttention.length > 0) {
+      alerts.push({type:'warning',icon:'👥',title:'طلاب يحتاجون متابعة',message:needAttention.length+' طلاب غيابهم مرتفع'});
+    }
+    
+    return alerts;
+  }
+
+  function showView(viewId) {
+    document.querySelectorAll('.view').forEach(function(v) {
+      v.classList.toggle('active', v.id === 'view-' + viewId);
+    });
+    
+    if(viewId === 'overview') renderOverview();
+    else if(viewId === 'attendance') renderAttendance();
+    else if(viewId === 'students') renderStudents();
+    else if(viewId === 'grades') renderGrades();
+    else if(viewId === 'schedule') renderSchedule();
+    else if(viewId === 'homeworks') renderHomeworks();
+  }
+
+  function renderOverview() {
+    const container = $('#view-overview');
+    const alerts = getSmartAlerts();
+    const today = iso();
+    const todayDay = new Date().getDay() === 5 ? 6 : (new Date().getDay() + 1) % 7;
+    
+    const todayClasses = DATA.schedule.filter(function(s){ return num(s.day) === todayDay; });
+    const todayAtt = DATA.attendance.filter(function(a){ return String(a.date).slice(0,10) === today; });
+    const presentCount = todayAtt.filter(function(a){ return a.status === 'present'; }).length;
+    const absentCount = todayAtt.filter(function(a){ return a.status === 'absent'; }).length;
+    const unreadNotifs = DATA.notifications.filter(function(n){ return !n.read_at; }).length;
+    
+    let html = '<div class="page-head"><div><h1>أهلاً بك، '+esc(ME.name)+' 👨‍🏫</h1><p>لوحة معلوماتك التشغيلية اليومية'+(unreadNotifs > 0 ? ' · <span class="badge red">'+unreadNotifs+' إشعار</span>' : '')+'</p></div></div>';
+
+    // الإحصائيات
+    html += '<div class="kpis" style="margin-bottom:24px;">';
+    html += '<div class="kpi blue"><small>طلابي</small><b>'+DATA.students.length+'</b></div>';
+    html += '<div class="kpi gold"><small>حصصي اليوم</small><b>'+todayClasses.length+'</b></div>';
+    html += '<div class="kpi green"><small>حضور اليوم</small><b>'+presentCount+'</b></div>';
+    html += '<div class="kpi red"><small>غياب اليوم</small><b>'+absentCount+'</b></div>';
+    html += '</div>';
+    
+    // التنبيهات
+    if(alerts.length > 0) {
+      html += '<div style="margin-bottom:24px;"><h3 style="margin-bottom:12px;">⚠️ تنبيهات تحتاج اهتمامك ('+alerts.length+')</h3><div class="cards">';
+      alerts.forEach(function(a) {
+        const bgColor = a.type === 'danger' ? '#fee2e2' : a.type === 'warning' ? '#fef3c7' : '#dbeafe';
+        const borderColor = a.type === 'danger' ? '#dc2626' : a.type === 'warning' ? '#d97706' : '#2563eb';
+        html += '<div style="background:'+bgColor+';border-right:4px solid '+borderColor+';padding:14px;border-radius:10px;color:#333;"><div style="font-size:16px;font-weight:bold;margin-bottom:4px;">'+a.icon+' '+esc(a.title)+'</div><div style="font-size:13px;opacity:0.85;">'+esc(a.message)+'</div></div>';
+      });
+      html += '</div></div>';
+    }
+    
+    // أزرار سريعة
+    html += '<h3 style="margin-bottom:12px;">⚡ إجراءات سريعة</h3>';
+    html += '<div class="cards" style="margin-bottom:24px;">';
+    html += '<div onclick="TeacherPortal.showView(\'attendance\')" class="card" style="background:linear-gradient(135deg,#10b981,#059669);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📋</div><div style="font-weight:bold;margin-top:8px;">تحضير الحضور</div></div>';
+    html += '<div onclick="TeacherPortal.showView(\'grades\')" class="card" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📊</div><div style="font-weight:bold;margin-top:8px;">إدخال الدرجات</div></div>';
+    html += '<div onclick="TeacherPortal.showView(\'students\')" class="card" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">👥</div><div style="font-weight:bold;margin-top:8px;">طلابي</div></div>';
+    html += '<div onclick="location.href=\'teacher-exams.html\'" class="card" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📝</div><div style="font-weight:bold;margin-top:8px;">بنك الأسئلة</div></div>';
+    html += '</div>';
+    
+    // جدول اليوم
+    if(todayClasses.length > 0) {
+      html += '<h3 style="margin-bottom:12px;">📅 حصص اليوم (' + DAYS[todayDay] + ')</h3>';
+      html += '<div class="table-wrap"><table><thead><tr><th>الحصة</th><th>الصف</th><th>المادة</th></tr></thead><tbody>';
+      todayClasses.sort(function(a,b){ return num(a.period_number) - num(b.period_number); }).forEach(function(s) {
+        html += '<tr><td><b>الحصة '+(s.period_number || s.period_no || '-')+'</b></td><td>'+esc(getClassName(s.class_id))+'</td><td>'+esc(getSubjectName(s.subject_id))+'</td></tr>';
+      });
+      html += '</tbody></table></div>';
+    } else {
+      html += '<div class="empty" style="padding:30px;background:#f3f4f6;border-radius:10px;text-align:center;margin:20px 0;">🎉 لا توجد حصص لك اليوم</div>';
+    }
+    
+    container.innerHTML = html;
+  }
+
+  function renderAttendance() {
+    const container = $('#view-attendance');
+    
+    let html = '<div class="page-head"><div><h1>📋 تحضير الحضور</h1><p>اختر الصف والتاريخ ثم سجّل الحضور</p></div></div>';
+    
+    // أدوات الاختيار
+    html += '<div class="card" style="margin-bottom:20px;"><div class="card-body" style="display:flex;gap:12px;flex-wrap:wrap;align-items:end;">';
+    html += '<div><label>الصف:</label><select id="attClassSelect" class="select" style="display:block;margin-top:4px;padding:8px;min-width:200px;">';
+    html += '<option value="">-- اختر الصف --</option>';
+    
+    const teacherClassIds = Array.from(new Set(DATA.schedule.map(function(s){ return s.class_id; }).filter(Boolean)));
+    teacherClassIds.forEach(function(cid) {
+      const selected = SELECTED_CLASS_ID === cid ? 'selected' : '';
+      html += '<option value="'+cid+'" '+selected+'>'+esc(getClassName(cid))+'</option>';
+    });
+    
+    html += '</select></div>';
+    html += '<div><label>التاريخ:</label><input type="date" id="attDateInput" class="input" value="'+SELECTED_DATE+'" style="display:block;margin-top:4px;padding:8px;"></div>';
+    html += '<button class="btn" style="background:#3b82f6;color:white;padding:10px 20px;" onclick="TeacherPortal.loadAttendanceEditor()">📥 تحميل الطلاب</button>';
+    html += '</div></div>';
+    
+    html += '<div id="attendanceEditor"></div>';
+    
+    container.innerHTML = html;
+    
+    // إذا كان هناك صف محدد، حمّله مباشرة
+    if(SELECTED_CLASS_ID) {
+      setTimeout(loadAttendanceEditor, 100);
+    }
+  }
+
+  function loadAttendanceEditor() {
+    const classSelect = $('#attClassSelect');
+    const dateInput = $('#attDateInput');
+    if(!classSelect || !dateInput) return;
+    
+    SELECTED_CLASS_ID = classSelect.value;
+    SELECTED_DATE = dateInput.value;
+    
+    if(!SELECTED_CLASS_ID) {
+      toast('تنبيه', 'اختر الصف أولاً', 'red');
+      return;
+    }
+    
+    const editor = $('#attendanceEditor');
+    const classStudents = DATA.students.filter(function(s){ return String(s.class_id) === String(SELECTED_CLASS_ID); });
+    
+    if(!classStudents.length) {
+      editor.innerHTML = '<div class="empty">لا يوجد طلاب في هذا الصف</div>';
+      return;
+    }
+    
+    let html = '<div class="card"><div class="card-body">';
+    html += '<h3 style="margin-bottom:16px;">📋 الصف: '+esc(getClassName(SELECTED_CLASS_ID))+' · التاريخ: '+SELECTED_DATE+' · عدد الطلاب: '+classStudents.length+'</h3>';
+    
+    html += '<div class="table-wrap"><table><thead><tr><th>#</th><th>الطالب</th><th>الحالة</th><th>ملاحظة</th></tr></thead><tbody>';
+    
+    classStudents.forEach(function(s, i) {
+      const studentName = (s.users && s.users.name) || s.name || 'طالب';
+      const existing = DATA.attendance.find(function(a){ 
+        return String(a.student_id) === String(s.id) && String(a.date).slice(0,10) === SELECTED_DATE; 
+      });
+      const status = existing ? existing.status : 'present';
+      const note = existing ? (existing.note || '') : '';
+      
+      html += '<tr>';
+      html += '<td>'+(i+1)+'</td>';
+      html += '<td><b>'+esc(studentName)+'</b></td>';
+      html += '<td><select class="select" data-student-id="'+s.id+'" style="padding:6px;">';
+      html += '<option value="present" '+(status==='present'?'selected':'')+'>✅ حاضر</option>';
+      html += '<option value="absent" '+(status==='absent'?'selected':'')+'>❌ غائب</option>';
+      html += '<option value="late" '+(status==='late'?'selected':'')+'>⏰ متأخر</option>';
+      html += '</select></td>';
+      html += '<td><input class="input" data-note-id="'+s.id+'" value="'+esc(note)+'" placeholder="ملاحظة..." style="padding:6px;width:100%;"></td>';
+      html += '</tr>';
+    });
+    
+    html += '</tbody></table></div>';
+    html += '<div style="margin-top:20px;text-align:left;">';
+    html += '<button class="btn" style="background:#10b981;color:white;padding:12px 32px;font-size:16px;" onclick="TeacherPortal.saveAttendance()">💾 حفظ الحضور</button>';
+    html += '</div></div></div>';
+    
+    editor.innerHTML = html;
+  }
+
+  async function saveAttendance() {
+    if(!SELECTED_CLASS_ID || !SELECTED_DATE) {
+      toast('تنبيه', 'اختر الصف والتاريخ', 'red');
+      return;
+    }
+    
+    const selects = $$('[data-student-id]');
+    if(!selects.length) return;
+    
+    let saved = 0;
+    let errors = 0;
+    const c = client();
+    
+    for(const sel of selects) {
+      const sid = sel.dataset.studentId;
+      const status = sel.value;
+      const noteEl = $('[data-note-id="'+sid+'"]');
+      const note = noteEl ? noteEl.value : null;
+      
+      try {
+        const payload = {
+          student_id: sid,
+          recorded_by: ME.id,
+          date: SELECTED_DATE,
+          status: status,
+          note: note,
+          attendance_type: 'daily'
+        };
+        
+        // ابحث عن سجل موجود
+        const existing = await c.from('attendance').select('id').eq('student_id', sid).eq('date', SELECTED_DATE).eq('attendance_type', 'daily').maybeSingle();
+        
+        let res;
+        if(existing.data) {
+          res = await c.from('attendance').update(payload).eq('id', existing.data.id);
+        } else {
+          res = await c.from('attendance').insert(payload);
+        }
+        
+        if(res.error) {
+          console.error('Save error for student', sid, res.error);
+          errors++;
+        } else {
+          saved++;
+        }
+      } catch(e) {
+        console.error('Exception saving student', sid, e);
+        errors++;
+      }
+    }
+    
+    if(errors === 0) {
+      toast('✅ تم الحفظ', 'تم حفظ حضور '+saved+' طالب بنجاح', 'green');
+    } else {
+      toast('⚠️ تم مع أخطاء', 'حُفظ '+saved+' · فشل '+errors, 'red');
+    }
+    
+    // إعادة تحميل البيانات
+    await loadAllData();
+  }
+
+  function renderStudents() {
+    const container = $('#view-students');
+    
+    let html = '<div class="page-head"><div><h1>👥 طلابي</h1><p>عدد طلابك: <b>'+DATA.students.length+'</b></p></div></div>';
+    
+    if(!DATA.students.length) {
+      html += '<div class="empty" style="text-align:center;padding:60px;">لا يوجد طلاب في صفوفك حالياً.</div>';
+    } else {
+      // فلتر بالصف
+      const classIds = Array.from(new Set(DATA.students.map(function(s){ return s.class_id; }).filter(Boolean)));
+      
+      html += '<div style="margin-bottom:20px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">';
+      html += '<b>فلتر:</b>';
+      html += '<button class="btn small blue" onclick="TeacherPortal.filterStudents(null)">كل الصفوف</button>';
+      classIds.forEach(function(cid) {
+        html += '<button class="btn small" style="background:#e5e7eb;color:#333;" onclick="TeacherPortal.filterStudents(\''+cid+'\')">'+esc(getClassName(cid))+'</button>';
+      });
+      html += '</div>';
+      
+      html += '<div id="studentsList">';
+      html += buildStudentsTable(DATA.students);
+      html += '</div>';
+    }
+    
+    container.innerHTML = html;
+  }
+
+  function buildStudentsTable(students) {
+    let html = '<div class="table-wrap"><table><thead><tr><th>#</th><th>الطالب</th><th>الصف</th><th>الحضور</th><th>المعدل</th><th>إجراء</th></tr></thead><tbody>';
+    
+    students.forEach(function(s, i) {
+      const studentName = (s.users && s.users.name) || s.name || 'طالب';
+      const studentAtt = DATA.attendance.filter(function(a){ return String(a.student_id) === String(s.id); });
+      const present = studentAtt.filter(function(a){ return a.status === 'present'; }).length;
+      const attRate = studentAtt.length ? Math.round((present/studentAtt.length)*100) : 0;
+      
+      const studentGrades = DATA.grades.filter(function(g){ return String(g.student_id) === String(s.id); });
+      const avg = studentGrades.length ? Math.round(studentGrades.reduce(function(sum,g){ return sum + num(g.score || g.grade || g.mark); }, 0) / studentGrades.length) : 0;
+      
+      const attColor = attRate >= 90 ? 'green' : attRate >= 75 ? 'gold' : 'red';
+      const gradeColor = avg >= 85 ? 'green' : avg >= 60 ? 'gold' : 'red';
+      
+      html += '<tr>';
+      html += '<td>'+(i+1)+'</td>';
+      html += '<td><b>'+esc(studentName)+'</b></td>';
+      html += '<td>'+esc(getClassName(s.class_id))+'</td>';
+      html += '<td><span class="badge '+attColor+'">'+attRate+'%</span></td>';
+      html += '<td>'+(studentGrades.length ? '<span class="badge '+gradeColor+'">'+avg+'%</span>' : '—')+'</td>';
+      html += '<td><button class="btn small blue" onclick="TeacherPortal.showStudentDetails(\''+s.id+'\')">👁️ تفاصيل</button></td>';
+      html += '</tr>';
+    });
+    
+    html += '</tbody></table></div>';
+    return html;
+  }
+
+  function filterStudents(classId) {
+    const filtered = classId ? DATA.students.filter(function(s){ return String(s.class_id) === String(classId); }) : DATA.students;
+    $('#studentsList').innerHTML = buildStudentsTable(filtered);
+  }
+
+  function showStudentDetails(sid) {
+    const s = DATA.students.find(function(x){ return String(x.id) === String(sid); });
+    if(!s) return;
+    
+    const studentName = (s.users && s.users.name) || s.name || 'طالب';
+    const studentAtt = DATA.attendance.filter(function(a){ return String(a.student_id) === String(sid); });
+    const studentGrades = DATA.grades.filter(function(g){ return String(g.student_id) === String(sid); });
+    
+    let html = '👤 ' + studentName + '\n';
+    html += '📚 الصف: ' + getClassName(s.class_id) + '\n\n';
+    html += '📋 الحضور: ' + studentAtt.length + ' سجل\n';
+    html += '   - حاضر: ' + studentAtt.filter(function(a){ return a.status === 'present'; }).length + '\n';
+    html += '   - غائب: ' + studentAtt.filter(function(a){ return a.status === 'absent'; }).length + '\n';
+    html += '   - متأخر: ' + studentAtt.filter(function(a){ return a.status === 'late'; }).length + '\n\n';
+    html += '📊 الدرجات: ' + studentGrades.length + ' درجة\n';
+    
+    if(studentGrades.length > 0) {
+      const avg = Math.round(studentGrades.reduce(function(sum,g){ return sum + num(g.score || g.grade || g.mark); }, 0) / studentGrades.length);
+      html += '   - المعدل: ' + avg + '%\n';
+    }
+    
+    alert(html);
+  }
+
+  function renderGrades() {
+    const container = $('#view-grades');
+    
+    let html = '<div class="page-head"><div><h1>📊 إدخال الدرجات</h1><p>اختر الصف والمادة لإدخال درجات الطلاب</p></div></div>';
+    
+    // أدوات الاختيار
+    html += '<div class="card" style="margin-bottom:20px;"><div class="card-body" style="display:flex;gap:12px;flex-wrap:wrap;align-items:end;">';
+    html += '<div><label>الصف:</label><select id="gradeClassSelect" class="select" style="display:block;margin-top:4px;padding:8px;min-width:180px;">';
+    html += '<option value="">-- اختر الصف --</option>';
+    
+    const teacherClassIds = Array.from(new Set(DATA.schedule.map(function(s){ return s.class_id; }).filter(Boolean)));
+    teacherClassIds.forEach(function(cid) {
+      html += '<option value="'+cid+'">'+esc(getClassName(cid))+'</option>';
+    });
+    
+    html += '</select></div>';
+    
+    html += '<div><label>المادة:</label><select id="gradeSubjectSelect" class="select" style="display:block;margin-top:4px;padding:8px;min-width:180px;">';
+    html += '<option value="">-- اختر المادة --</option>';
+    
+    const teacherSubjectIds = Array.from(new Set(DATA.schedule.map(function(s){ return s.subject_id; }).filter(Boolean)));
+    teacherSubjectIds.forEach(function(sid) {
+      html += '<option value="'+sid+'">'+esc(getSubjectName(sid))+'</option>';
+    });
+    
+    html += '</select></div>';
+    html += '<button class="btn" style="background:#3b82f6;color:white;padding:10px 20px;" onclick="TeacherPortal.loadGradesEditor()">📥 تحميل الطلاب</button>';
+    html += '</div></div>';
+    
+    html += '<div id="gradesEditor"></div>';
+    
+    container.innerHTML = html;
+  }
+
+  function loadGradesEditor() {
+    const classId = $('#gradeClassSelect').value;
+    const subjectId = $('#gradeSubjectSelect').value;
+    
+    if(!classId || !subjectId) {
+      toast('تنبيه', 'اختر الصف والمادة', 'red');
+      return;
+    }
+    
+    const editor = $('#gradesEditor');
+    const classStudents = DATA.students.filter(function(s){ return String(s.class_id) === String(classId); });
+    
+    if(!classStudents.length) {
+      editor.innerHTML = '<div class="empty">لا يوجد طلاب في هذا الصف</div>';
+      return;
+    }
+    
+    let html = '<div class="card"><div class="card-body">';
+    html += '<h3 style="margin-bottom:16px;">📊 الصف: '+esc(getClassName(classId))+' · المادة: '+esc(getSubjectName(subjectId))+'</h3>';
+    html += '<div class="table-wrap"><table><thead><tr><th>#</th><th>الطالب</th><th>الدرجة</th><th>ملاحظة</th></tr></thead><tbody>';
+    
+    classStudents.forEach(function(s, i) {
+      const studentName = (s.users && s.users.name) || s.name || 'طالب';
+      const existing = DATA.grades.find(function(g){ 
+        return String(g.student_id) === String(s.id) && String(g.subject_id) === String(subjectId); 
+      });
+      const score = existing ? num(existing.score || existing.grade || existing.mark) : '';
+      const note = existing ? (existing.notes || existing.note || '') : '';
+      
+      html += '<tr>';
+      html += '<td>'+(i+1)+'</td>';
+      html += '<td><b>'+esc(studentName)+'</b></td>';
+      html += '<td><input type="number" min="0" max="100" class="input" data-grade-student="'+s.id+'" value="'+score+'" placeholder="0-100" style="padding:6px;width:80px;"></td>';
+      html += '<td><input class="input" data-grade-note="'+s.id+'" value="'+esc(note)+'" placeholder="ملاحظة..." style="padding:6px;width:100%;"></td>';
+      html += '</tr>';
+    });
+    
+    html += '</tbody></table></div>';
+    html += '<div style="margin-top:20px;">';
+    html += '<button class="btn" style="background:#10b981;color:white;padding:12px 32px;" onclick="TeacherPortal.saveGrades(\''+subjectId+'\')">💾 حفظ الدرجات</button>';
+    html += '</div></div></div>';
+    
+    editor.innerHTML = html;
+  }
+
+  async function saveGrades(subjectId) {
+    const inputs = $$('[data-grade-student]');
+    if(!inputs.length) return;
+    
+    let saved = 0;
+    let errors = 0;
+    const c = client();
+    
+    for(const input of inputs) {
+      const sid = input.dataset.gradeStudent;
+      const score = input.value;
+      if(!score) continue;
+      
+      const noteEl = $('[data-grade-note="'+sid+'"]');
+      const note = noteEl ? noteEl.value : null;
+      
+      try {
+        const payload = {
+          student_id: sid,
+          subject_id: subjectId,
+          score: num(score),
+          notes: note
+        };
+        
+        const existing = await c.from('grades').select('id').eq('student_id', sid).eq('subject_id', subjectId).maybeSingle();
+        
+        let res;
+        if(existing.data) {
+          res = await c.from('grades').update(payload).eq('id', existing.data.id);
+        } else {
+          res = await c.from('grades').insert(payload);
+        }
+        
+        if(res.error) {
+          console.error('Save error for student', sid, res.error);
+          errors++;
+        } else {
+          saved++;
+        }
+      } catch(e) {
+        errors++;
+      }
+    }
+    
+    if(errors === 0) {
+      toast('✅ تم الحفظ', 'تم حفظ درجات '+saved+' طالب', 'green');
+    } else {
+      toast('⚠️ تم مع أخطاء', 'حُفظ '+saved+' · فشل '+errors, 'red');
+    }
+    
+    await loadAllData();
+  }
+
+  function renderSchedule() {
+    const container = $('#view-schedule');
+    
+    let html = '<div class="page-head"><div><h1>📅 جدولي الأسبوعي</h1></div></div>';
+    
+    if(!DATA.schedule.length) {
+      html += '<div class="empty" style="text-align:center;padding:60px;">لا يوجد جدول مسجل لك حالياً.</div>';
+    } else {
+      // تجميع حسب اليوم
+      const byDay = {};
+      DATA.schedule.forEach(function(s) {
+        const day = num(s.day);
+        if(!byDay[day]) byDay[day] = [];
+        byDay[day].push(s);
+      });
+      
+      html += '<div class="cards">';
+      Object.keys(byDay).sort().forEach(function(day) {
+        const dayClasses = byDay[day].sort(function(a,b){ return num(a.period_number) - num(b.period_number); });
+        html += '<div class="card"><div class="card-head"><h3>📅 '+DAYS[day]+' ('+dayClasses.length+' حصة)</h3></div><div class="card-body">';
+        html += '<div class="list">';
+        dayClasses.forEach(function(s) {
+          html += '<div class="item"><div><b>الحصة '+(s.period_number || s.period_no || '-')+'</b><small>'+esc(getClassName(s.class_id))+'</small></div><span class="badge blue">'+esc(getSubjectName(s.subject_id))+'</span></div>';
+        });
+        html += '</div></div></div>';
+      });
+      html += '</div>';
+    }
+    
+    container.innerHTML = html;
+  }
+
+  function renderHomeworks() {
+    const container = $('#view-homeworks');
+    
+    let html = '<div class="page-head" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">';
+    html += '<div><h1>📚 الواجبات</h1></div>';
+    html += '<div style="display:flex;gap:8px;">';
+    html += '<button class="btn" style="background:#3b82f6;color:white;" onclick="location.href=\'curriculum-planner.html\'">📖 مخطط المنهج</button>';
+    html += '<button class="btn" style="background:#10b981;color:white;" onclick="location.href=\'homework-reports.html\'">📊 تقارير الواجبات</button>';
+    html += '</div></div>';
+    
+    html += '<div class="empty" style="text-align:center;padding:60px;background:#f9fafb;border-radius:12px;margin-top:20px;">';
+    html += '<div style="font-size:64px;">📚</div>';
+    html += '<h3 style="margin-top:16px;">إدارة الواجبات</h3>';
+    html += '<p style="color:#666;margin-top:8px;">استخدم الأزرار أعلاه لإدارة المنهج والواجبات والتقارير.</p>';
+    html += '<div style="margin-top:20px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">';
+    html += '<button class="btn blue" onclick="location.href=\'teacher-exams.html\'">📝 بنك الأسئلة</button>';
+    html += '<button class="btn gold" onclick="location.href=\'homework-audit.html\'">📋 سجل الواجبات</button>';
+    html += '</div></div>';
+    
+    container.innerHTML = html;
+  }
+
+  window.addEventListener('load', init);
+  
+  window.TeacherPortal = {
+    init: init,
+    showView: showView,
+    loadAttendanceEditor: loadAttendanceEditor,
+    saveAttendance: saveAttendance,
+    loadGradesEditor: loadGradesEditor,
+    saveGrades: saveGrades,
+    filterStudents: filterStudents,
+    showStudentDetails: showStudentDetails
+  };
+})();
+</script>
+
 <script src="assets/ux-enhancements.js"></script>
-  <script src="assets/smart-alerts.js"></script>
-</body></html>
-
-
-
+<script src="assets/smart-alerts.js"></script>
+</body>
+</html>
