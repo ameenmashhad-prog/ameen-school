@@ -71,7 +71,19 @@ async function authProfile(){
 }
 
 function routeFor(profile){
-  // بوابة موحدة: كل المستخدمين يدخلون إلى portal.html ثم تظهر الواجهات حسب الصلاحيات المفوضة.
+  if(!profile) return 'portal.html';
+  
+  // المسؤول الأعلى
+  if(profile.is_super_admin || profile.role === 'admin') return 'super-admin.html';
+  
+  // الأدوار التخصصية
+  const r = profile.role;
+  if(r === 'parent') return 'parent.html';
+  if(r === 'teacher') return 'teacher.html';
+  if(r === 'student') return 'student.html';
+  if(r === 'counselor' || r === 'psychologist') return 'counselor.html';
+  
+  // باقي الأدوار (finance, discipline, academic, supervisor...) → البوابة الموحدة
   return 'portal.html';
 }
 
