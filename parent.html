@@ -98,6 +98,7 @@
   let CHILDREN = [];
   let CHILD_DATA = {};
   let NOTIFICATIONS = [];
+  let SUBJECTS_MAP = {};
 
   function cfg() { return window.AMIN_CONFIG || {}; }
   
@@ -176,6 +177,7 @@
       console.log('✅ Children count:', CHILDREN.length);
 
       await loadNotifications();
+      await loadSubjects();
       setupChildSelector();
 
       if(CHILDREN.length > 0) {
@@ -199,6 +201,25 @@
     } catch(e) {
       NOTIFICATIONS = [];
     }
+  }
+
+  async function loadSubjects() {
+    try {
+      const res = await client().from('subjects').select('id, name');
+      if(res.data) {
+        res.data.forEach(function(s) {
+          SUBJECTS_MAP[s.id] = s.name;
+        });
+        console.log('✅ Subjects loaded:', Object.keys(SUBJECTS_MAP).length);
+      }
+    } catch(e) {
+      console.error('Subjects error:', e);
+    }
+  }
+
+  function getSubjectName(id) {
+    if(!id) return 'مادة';
+    return SUBJECTS_MAP[id] || 'مادة';
   }
 
   function getSmartAlerts() {
@@ -385,7 +406,7 @@
       data.grades.forEach(function(g) {
         const score = num(g.score || g.grade || g.mark);
         const color = score >= 85 ? 'green' : score >= 60 ? 'gold' : 'red';
-        html += '<tr><td>'+esc(g.subject_name || g.subject_id || 'مادة')+'</td><td><span class="badge '+color+'">'+score+'</span></td><td>'+esc(g.notes || g.note || '—')+'</td></tr>';
+        html += '<tr><td>'+esc(getSubjectName(g.subject_id))+'</td><td><span class="badge '+color+'">'+score+'</span></td><td>'+esc(g.notes || g.note || '—')+'</td></tr>';
       });
       html += '</tbody></table></div>';
     }
@@ -514,7 +535,6 @@
     }
   }
 
-  // ========== طباعة التقارير ==========
   function printChildReport(type) {
     const child = CHILDREN.find(function(c){ return c.id === currentChildId; });
     if(!child) {
@@ -635,7 +655,7 @@
         const score = num(g.score || g.grade || g.mark);
         const badge = score >= 85 ? 'badge-green' : score >= 60 ? 'badge-gold' : 'badge-red';
         const eval2 = score >= 85 ? 'ممتاز' : score >= 60 ? 'جيد' : 'يحتاج تحسين';
-        html += '<tr><td>'+esc(g.subject_name || g.subject_id || 'مادة')+'</td><td><span class="'+badge+'">'+score+'</span></td><td>'+eval2+'</td></tr>';
+        html += '<tr><td>'+esc(getSubjectName(g.subject_id))+'</td><td><span class="'+badge+'">'+score+'</span></td><td>'+eval2+'</td></tr>';
       });
       html += '</tbody></table>';
     }
@@ -722,7 +742,7 @@
         const score = num(g.score || g.grade || g.mark);
         const badge = score >= 85 ? 'badge-green' : score >= 60 ? 'badge-gold' : 'badge-red';
         const eval2 = score >= 85 ? 'ممتاز' : score >= 60 ? 'جيد' : 'يحتاج تحسين';
-        html += '<tr><td>'+(i+1)+'</td><td>'+esc(g.subject_name || g.subject_id || 'مادة')+'</td><td><span class="'+badge+'">'+score+'</span></td><td>'+eval2+'</td><td>'+esc(g.notes || g.note || '—')+'</td></tr>';
+        html += '<tr><td>'+(i+1)+'</td><td>'+esc(getSubjectName(g.subject_id))+'</td><td><span class="'+badge+'">'+score+'</span></td><td>'+eval2+'</td><td>'+esc(g.notes || g.note || '—')+'</td></tr>';
       });
       html += '</tbody></table>';
     } else {
