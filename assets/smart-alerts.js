@@ -185,7 +185,31 @@ const SmartAlerts = {
   },
 
   // ========== تنبيهات المرشد ==========
-  async loadCounselorAlerts() {
+   async loadCounselorAlerts() {
+    try {
+      const { data: students } = await this.sb.from('students').select('id').limit(100);
+      if(students) {
+        this.alerts.push({
+          type:'info', icon:'👥',
+          title:'الطلاب المتابعون',
+          msg:students.length + ' طالب',
+          link:'counselor.html'
+        });
+      }
+    } catch(e) { console.log('Counselor alert skip'); }
+    
+    try {
+      const { data: behavior } = await this.sb.from('behavior_records').select('id').lt('points', 0).limit(50);
+      if(behavior && behavior.length > 0) {
+        this.alerts.push({
+          type:'warning', icon:'⚠️',
+          title:'حالات سلوك سلبي',
+          msg:behavior.length + ' حالة تحتاج متابعة',
+          link:'counselor.html'
+        });
+      }
+    } catch(e) { console.log('Behavior alert skip'); }
+  },
     // طلبات مواعيد
     const { data: requests } = await this.sb.from('counseling_session_requests')
       .select('*').eq('status', 'pending').limit(20);
