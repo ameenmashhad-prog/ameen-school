@@ -497,4 +497,14 @@ async function bootPortal(){
 
 window.showView = showView;
 window.AminPortal={bootLogin,bootPortal,login,logout,renderAttendanceEditor,saveAttendance,showView,requestSkillProgramAppointment};
+
+// ========== تحميل نظام التنبيهات الذكية تلقائياً ==========
+(function loadSmartAlerts(){
+  if(document.querySelector('script[src*="smart-alerts.js"]')) return;
+  const script = document.createElement('script');
+  script.src = 'assets/smart-alerts.js';
+  script.async = true;
+  document.body.appendChild(script);
+})();
+
 }());
