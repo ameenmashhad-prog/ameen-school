@@ -66,4 +66,612 @@
 
     <section id="view-overview" class="view active"></section>
     <section id="view-grades" class="view"></section>
-    <section id="view-attendance" 
+    <section id="view-attendance" class="view"></section>
+    <section id="view-finance" class="view"></section>
+    <section id="view-behavior" class="view"></section>
+  </main>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script src="libs/supabase.min.js"></script>
+<script src="assets/config.js"></script>
+<script src="assets/platform-modules.js"></script>
+<script src="assets/i18n.js"></script>
+
+<script>
+(function(){
+  'use strict';
+
+  // ========== دوال مساعدة ==========
+  function $(s, r=document){return r.querySelector(s)}
+  function esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;')}
+  function num(v){const n=Number(v);return Number.isFinite(n)?n:0}
+  function money(v){return num(v).toLocaleString('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0})}
+  
+  // ========== متغيرات عامة ==========
+  let currentChildId = null;
+  let sb = null;
+  let ME = null;
+  let SESSION = null;
+  let CHILDREN = [];
+  let CHILD_DATA = {};
+  let NOTIFICATIONS = [];
+
+  function cfg() { return window.AMIN_CONFIG || {}; }
+  
+  function client() {
+    if(sb) return sb;
+    if(!window.supabase) throw new Error('Supabase library not loaded');
+    sb = window.supabase.createClient(
+      cfg().supabaseUrl, 
+      cfg().supabaseAnonKey, 
+      {auth:{persistSession:true, autoRefreshToken:true, detectSessionInUrl:true, storageKey:(cfg().authStorageKey||'amin-ovcjzsrqqgjsbqswtkro-auth-v2')}}
+    );
+    return sb;
+  }
+
+  function toast(title, msg, type='') {
+    const t = $('#toast');
+    if(!t) return;
+    t.innerHTML = `<b>${esc(title)}</b><br><span class="muted">${esc(msg||'')}</span>`;
+    t.className = 'toast show ' + type;
+    clearTimeout(t._to);
+    t._to = setTimeout(() => t.classList.remove('show'), 4000);
+  }
+
+  // ========== التهيئة الأساسية ==========
+  async function init() {
+    try {
+      const c = client();
+      
+      const { data: { session } } = await c.auth.getSession();
+      if(!session) {
+        console.log('❌ No session - redirecting');
+        location.href = 'index.html';
+        return;
+      }
+      SESSION = session;
+      console.log('✅ Session OK:', session.user.email);
+
+      const { data: user, error } = await c.from('users').select('*').eq('id', session.user.id).maybeSingle();
+      if(error || !user) {
+        console.error('❌ Failed to load user:', error);
+        toast('خطأ', 'تعذر تحميل بيانات الحساب', 'red');
+        return;
+      }
+      ME = user;
+      window.ME = ME;
+      console.log('✅ User loaded:', ME.name, 'Role:', ME.role);
+
+      $('#profileName').textContent = ME.name || ME.email || 'ولي أمر';
+      $('#profileRole').textContent = 'ولي أمر';
+
+      $('#logoutBtn').onclick = async () => {
+        await c.auth.signOut({scope:'local'}).catch(()=>{});
+        location.href = 'index.html';
+      };
+
+      $('#mobileMenuBtn')?.addEventListener('click', () => {
+        $('#sidebar')?.classList.toggle('open');
+      });
+
+      document.querySelectorAll('.nav button[data-view]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const view = btn.dataset.view;
+          showView(view);
+          document.querySelectorAll('.nav button[data-view]').forEach(b => b.classList.toggle('active', b === btn));
+          $('#sidebar')?.classList.remove('open');
+        });
+      });
+
+      console.log('🔍 Fetching children for parent_id:', ME.id);
+      const { data: children, error: childError } = await c
+        .from('students')
+        .select('*, users:user_id(name, email)')
+        .eq('parent_id', ME.id);
+
+      if(childError) {
+        console.error('❌ Error fetching children:', childError);
+        toast('خطأ', 'فشل جلب الأبناء: ' + childError.message, 'red');
+      }
+
+      CHILDREN = children || [];
+      window.CHILDREN = CHILDREN;
+      console.log('✅ Children count:', CHILDREN.length);
+      console.log('✅ Children data:', CHILDREN);
+
+      // جلب الإشعارات
+      await loadNotifications();
+
+      // إعداد قائمة الأبناء
+      setupChildSelector();
+
+      if(CHILDREN.length > 0) {
+        currentChildId = CHILDREN[0].id;
+        // جلب بيانات كل الأبناء (للإحصائيات)
+        await Promise.all(CHILDREN.map(c => loadChildData(c.id)));
+        renderOverview();
+      } else {
+        $('#view-overview').innerHTML = `
+          <div class="empty" style="text-align:center;padding:60px 20px;">
+            <div style="font-size:64px;margin-bottom:20px;">⚠️</div>
+            <h3>لا يوجد طلاب مسجلين تحت هذا الحساب</h3>
+            <p style="color:#999;margin-top:10px;">يرجى مراجعة الإدارة لربط الطلاب بحسابك.</p>
+            <p style="color:#666;font-size:12px;margin-top:20px;font-family:monospace;">معرف الحساب: ${esc(ME.id)}</p>
+          </div>
+        `;
+      }
+
+    } catch(e) {
+      console.error('❌ Init error:', e);
+      toast('خطأ في التحميل', e.message, 'red');
+    }
+  }
+
+  // ========== جلب الإشعارات ==========
+  async function loadNotifications() {
+    const c = client();
+    try {
+      const { data } = await c.from('school_notifications')
+        .select('*')
+        .eq('recipient_user_id', ME.id)
+        .order('created_at', {ascending: false})
+        .limit(10);
+      NOTIFICATIONS = data || [];
+      console.log('✅ Notifications loaded:', NOTIFICATIONS.length);
+    } catch(e) {
+      console.error('❌ Notifications error:', e);
+      NOTIFICATIONS = [];
+    }
+  }
+
+  // ========== توليد التنبيهات الذكية ==========
+  function getSmartAlerts() {
+    const alerts = [];
+    CHILDREN.forEach(child => {
+      const childName = child.users?.name || child.name || 'الطالب';
+      const data = CHILD_DATA[child.id] || {attendance: [], grades: [], fees: [], behavior: []};
+      
+      // تنبيه: غياب متكرر
+      const absent = data.attendance.filter(a => a.status === 'absent').length;
+      const total = data.attendance.length;
+      if(total > 0 && absent > 0) {
+        const rate = (absent/total) * 100;
+        if(rate > 20) {
+          alerts.push({
+            type: 'danger',
+            icon: '⚠️',
+            title: `غياب مرتفع لـ ${childName}`,
+            message: `نسبة الغياب ${Math.round(rate)}% (${absent} أيام من ${total})`
+          });
+        }
+      }
+      
+      // تنبيه: أقساط متأخرة
+      data.fees.forEach(f => {
+        const t = num(f.net_amount || f.base_amount);
+        const p = num(f.total_paid);
+        const r = t - p;
+        if(r > 0) {
+          alerts.push({
+            type: 'warning',
+            icon: '💰',
+            title: `قسط مستحق لـ ${childName}`,
+            message: `المبلغ المتبقي: ${money(r)}`
+          });
+        }
+      });
+      
+      // تنبيه: درجات منخفضة
+      const lowGrades = data.grades.filter(g => num(g.score || g.grade || g.mark) < 60);
+      if(lowGrades.length > 0) {
+        alerts.push({
+          type: 'warning',
+          icon: '📉',
+          title: `درجات تحتاج متابعة لـ ${childName}`,
+          message: `${lowGrades.length} مواد بدرجات أقل من 60`
+        });
+      }
+      
+      // تنبيه: سلوك سلبي
+      const negBehavior = data.behavior.filter(b => num(b.points) < 0);
+      if(negBehavior.length > 2) {
+        alerts.push({
+          type: 'info',
+          icon: '🌟',
+          title: `ملاحظات سلوكية لـ ${childName}`,
+          message: `${negBehavior.length} ملاحظات تحتاج اهتمامك`
+        });
+      }
+    });
+    return alerts;
+  }
+
+  // ========== إعداد قائمة اختيار الابن ==========
+  function setupChildSelector() {
+    const selector = $('#childSelector');
+    if(!selector) return;
+    
+    if(CHILDREN.length > 1) {
+      selector.style.display = 'block';
+      selector.innerHTML = CHILDREN.map(c => {
+        const childName = c.users?.name || c.name || 'طالب';
+        return `<option value="${c.id}">${esc(childName)}</option>`;
+      }).join('');
+      
+      selector.onchange = async (e) => {
+        currentChildId = e.target.value;
+        if(!CHILD_DATA[currentChildId]) {
+          await loadChildData(currentChildId);
+        }
+        const activeView = document.querySelector('.view.active')?.id.replace('view-', '') || 'overview';
+        showView(activeView);
+      };
+    } else if(CHILDREN.length === 1) {
+      currentChildId = CHILDREN[0].id;
+      selector.style.display = 'none';
+    }
+  }
+
+  // ========== جلب بيانات الطفل ==========
+  async function loadChildData(childId) {
+    if(!childId) return;
+    const c = client();
+    
+    try {
+      const [attRes, gradesRes, feesRes, behaviorRes] = await Promise.all([
+        c.from('attendance').select('*').eq('student_id', childId).order('date', {ascending: false}).limit(50),
+        c.from('grades').select('*').eq('student_id', childId),
+        c.from('student_fees').select('*').eq('student_id', childId),
+        c.from('behavior_records').select('*').eq('student_id', childId).order('created_at', {ascending: false}).limit(20)
+      ]);
+
+      CHILD_DATA[childId] = {
+        attendance: attRes.data || [],
+        grades: gradesRes.data || [],
+        fees: feesRes.data || [],
+        behavior: behaviorRes.data || []
+      };
+      
+      console.log('✅ Loaded data for child:', childId);
+    } catch(e) {
+      console.error('❌ Error loading child data:', e);
+      CHILD_DATA[childId] = {attendance: [], grades: [], fees: [], behavior: []};
+    }
+  }
+
+  // ========== التنقل بين الصفحات ==========
+  function showView(viewId) {
+    document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + viewId));
+    
+    if(viewId === 'overview') renderOverview();
+    else if(viewId === 'grades') renderGrades();
+    else if(viewId === 'attendance') renderAttendance();
+    else if(viewId === 'finance') renderFinance();
+    else if(viewId === 'behavior') renderBehavior();
+  }
+
+  // ========== الصفحة الرئيسية ==========
+  function renderOverview() {
+    const container = $('#view-overview');
+    if(!CHILDREN.length) return;
+
+    const alerts = getSmartAlerts();
+    const unreadNotifs = NOTIFICATIONS.filter(n => !n.read_at).length;
+
+    let html = `
+      <div class="page-head">
+        <div>
+          <h1>أهلاً بك، ${esc(ME.name)} 👋</h1>
+          <p>متابعة شاملة لأبنائك · عدد الأبناء: <b>${CHILDREN.length}</b> ${unreadNotifs > 0 ? `· <span class="badge red">${unreadNotifs} إشعار جديد</span>` : ''}</p>
+        </div>
+      </div>
+    `;
+    
+    // ===== التنبيهات الذكية =====
+    if(alerts.length > 0) {
+      html += `<div style="margin-bottom:20px;">`;
+      html += `<h3 style="margin-bottom:12px;">⚠️ تنبيهات تحتاج اهتمامك (${alerts.length})</h3>`;
+      html += `<div class="cards">`;
+      alerts.slice(0, 4).forEach(a => {
+        const bgColor = a.type === 'danger' ? '#fee2e2' : a.type === 'warning' ? '#fef3c7' : '#dbeafe';
+        const borderColor = a.type === 'danger' ? '#dc2626' : a.type === 'warning' ? '#d97706' : '#2563eb';
+        html += `
+          <div style="background:${bgColor};border-right:4px solid ${borderColor};padding:14px;border-radius:10px;color:#333;">
+            <div style="font-size:16px;font-weight:bold;margin-bottom:4px;">${a.icon} ${esc(a.title)}</div>
+            <div style="font-size:13px;opacity:0.85;">${esc(a.message)}</div>
+          </div>
+        `;
+      });
+      html += `</div></div>`;
+    }
+    
+    // ===== بطاقات الأبناء =====
+    html += `<h3 style="margin-bottom:12px;">🎓 أبناؤك</h3>`;
+    html += `<div class="cards">`;
+    CHILDREN.forEach(child => {
+      const childName = child.users?.name || child.name || 'طالب';
+      const data = CHILD_DATA[child.id] || {attendance: [], grades: [], fees: [], behavior: []};
+      
+      const presentCount = data.attendance.filter(a => a.status === 'present').length;
+      const absentCount = data.attendance.filter(a => a.status === 'absent').length;
+      const totalAtt = data.attendance.length;
+      const attRate = totalAtt ? Math.round((presentCount/totalAtt) * 100) : 0;
+      
+      const fee = data.fees[0];
+      const total = num(fee?.net_amount || fee?.base_amount || 0);
+      const paid = num(fee?.total_paid || 0);
+      const remaining = Math.max(total - paid, 0);
+      
+      const gradesAvg = data.grades.length 
+        ? Math.round(data.grades.reduce((s,g) => s + num(g.score || g.grade || g.mark), 0) / data.grades.length)
+        : 0;
+
+      const isActive = String(child.id) === String(currentChildId);
+      
+      html += `
+        <div class="card" style="${isActive ? 'border:2px solid #fbbf24;box-shadow:0 4px 20px rgba(251,191,36,0.2);' : ''}cursor:pointer;" 
+             onclick="ParentPortal.selectChild('${child.id}')">
+          <div class="card-head">
+            <h3>🎓 ${esc(childName)}</h3>
+            ${isActive ? '<span class="badge gold">👁️ المحدد</span>' : ''}
+          </div>
+          <div class="card-body">
+            <div class="kpis">
+              <div class="kpi green"><small>الحضور</small><b>${attRate}%</b></div>
+              <div class="kpi red"><small>الغياب</small><b>${absentCount} يوم</b></div>
+              <div class="kpi gold"><small>المعدل</small><b>${gradesAvg}%</b></div>
+              <div class="kpi ${remaining > 0 ? 'red' : 'green'}"><small>المتبقي</small><b>${money(remaining)}</b></div>
+            </div>
+            <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="btn small blue" onclick="event.stopPropagation();ParentPortal.viewChild('${child.id}','grades')">📊 الدرجات</button>
+              <button class="btn small green" onclick="event.stopPropagation();ParentPortal.viewChild('${child.id}','attendance')">📋 الحضور</button>
+              <button class="btn small gold" onclick="event.stopPropagation();ParentPortal.viewChild('${child.id}','finance')">💰 الأقساط</button>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+    html += `</div>`;
+
+    // ===== آخر الإشعارات =====
+    if(NOTIFICATIONS.length > 0) {
+      html += `<h3 style="margin:24px 0 12px;">🔔 آخر الإشعارات</h3>`;
+      html += `<div class="list">`;
+      NOTIFICATIONS.slice(0, 5).forEach(n => {
+        const isUnread = !n.read_at;
+        html += `
+          <div class="item" style="${isUnread ? 'background:#fef3c7;border-right:3px solid #f59e0b;' : ''}">
+            <div>
+              <b>${esc(n.title || 'إشعار')}</b>
+              <small>${esc(n.body || n.message || '')} · ${esc(String(n.created_at || '').slice(0,10))}</small>
+            </div>
+            <span class="badge ${isUnread ? 'gold' : 'blue'}">${isUnread ? 'جديد' : 'مقروء'}</span>
+          </div>
+        `;
+      });
+      html += `</div>`;
+    }
+
+    container.innerHTML = html;
+  }
+
+  // ========== صفحة الدرجات ==========
+  function renderGrades() {
+    const container = $('#view-grades');
+    const data = CHILD_DATA[currentChildId] || {grades: []};
+    const child = CHILDREN.find(c => c.id === currentChildId);
+    const childName = child?.users?.name || child?.name || 'الطالب';
+    
+    let html = `<div class="page-head"><div><h1>📊 درجات ${esc(childName)}</h1></div></div>`;
+    
+    if(!data.grades.length) {
+      html += '<div class="empty" style="text-align:center;padding:60px;">لا توجد درجات مسجلة بعد.</div>';
+    } else {
+      html += `
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>المادة</th><th>الدرجة</th><th>ملاحظة</th></tr></thead>
+            <tbody>
+      `;
+      data.grades.forEach(g => {
+        const score = num(g.score || g.grade || g.mark);
+        const color = score >= 85 ? 'green' : score >= 60 ? 'gold' : 'red';
+        html += `
+          <tr>
+            <td>${esc(g.subject_name || g.subject_id || 'مادة')}</td>
+            <td><span class="badge ${color}">${score}</span></td>
+            <td>${esc(g.notes || g.note || '—')}</td>
+          </tr>
+        `;
+      });
+      html += `</tbody></table></div>`;
+    }
+    
+    container.innerHTML = html;
+  }
+
+  // ========== صفحة الحضور ==========
+  function renderAttendance() {
+    const container = $('#view-attendance');
+    const data = CHILD_DATA[currentChildId] || {attendance: []};
+    const child = CHILDREN.find(c => c.id === currentChildId);
+    const childName = child?.users?.name || child?.name || 'الطالب';
+    
+    const present = data.attendance.filter(a => a.status === 'present').length;
+    const absent = data.attendance.filter(a => a.status === 'absent').length;
+    const late = data.attendance.filter(a => a.status === 'late').length;
+    
+    let html = `
+      <div class="page-head"><div><h1>📋 حضور ${esc(childName)}</h1></div></div>
+      <div class="kpis" style="margin-bottom:20px;">
+        <div class="kpi green"><small>أيام الحضور</small><b>${present}</b></div>
+        <div class="kpi red"><small>أيام الغياب</small><b>${absent}</b></div>
+        <div class="kpi gold"><small>أيام التأخير</small><b>${late}</b></div>
+        <div class="kpi blue"><small>الإجمالي</small><b>${data.attendance.length}</b></div>
+      </div>
+    `;
+    
+    if(!data.attendance.length) {
+      html += '<div class="empty" style="text-align:center;padding:60px;">لا توجد سجلات حضور.</div>';
+    } else {
+      html += `
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>التاريخ</th><th>الحالة</th><th>ملاحظة</th></tr></thead>
+            <tbody>
+      `;
+      data.attendance.slice(0, 50).forEach(a => {
+        const status = a.status || '—';
+        const color = status === 'present' ? 'green' : status === 'absent' ? 'red' : 'gold';
+        const label = status === 'present' ? 'حاضر' : status === 'absent' ? 'غائب' : status === 'late' ? 'متأخر' : status;
+        html += `
+          <tr>
+            <td>${esc(String(a.date).slice(0,10))}</td>
+            <td><span class="badge ${color}">${esc(label)}</span></td>
+            <td>${esc(a.note || '—')}</td>
+          </tr>
+        `;
+      });
+      html += `</tbody></table></div>`;
+    }
+    
+    container.innerHTML = html;
+  }
+
+  // ========== صفحة المالية ==========
+  function renderFinance() {
+    const container = $('#view-finance');
+    const data = CHILD_DATA[currentChildId] || {fees: []};
+    const child = CHILDREN.find(c => c.id === currentChildId);
+    const childName = child?.users?.name || child?.name || 'الطالب';
+    
+    let html = `<div class="page-head"><div><h1>💰 أقساط ${esc(childName)}</h1></div></div>`;
+    
+    if(!data.fees.length) {
+      html += '<div class="empty" style="text-align:center;padding:60px;">لا توجد بيانات مالية.</div>';
+    } else {
+      const totalAll = data.fees.reduce((s,f) => s + num(f.net_amount || f.base_amount), 0);
+      const paidAll = data.fees.reduce((s,f) => s + num(f.total_paid), 0);
+      const remainingAll = Math.max(totalAll - paidAll, 0);
+      
+      html += `
+        <div class="kpis" style="margin-bottom:20px;">
+          <div class="kpi blue"><small>إجمالي الرسوم</small><b>${money(totalAll)}</b></div>
+          <div class="kpi green"><small>المدفوع</small><b>${money(paidAll)}</b></div>
+          <div class="kpi ${remainingAll > 0 ? 'red' : 'green'}"><small>المتبقي</small><b>${money(remainingAll)}</b></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>الإجمالي</th><th>المدفوع</th><th>المتبقي</th><th>الحالة</th></tr></thead>
+            <tbody>
+      `;
+      data.fees.forEach(f => {
+        const total = num(f.net_amount || f.base_amount);
+        const paid = num(f.total_paid);
+        const remaining = Math.max(total - paid, 0);
+        const status = remaining === 0 ? '✅ مدفوع كاملاً' : paid > 0 ? '⏳ مدفوع جزئياً' : '❌ غير مدفوع';
+        const color = remaining === 0 ? 'green' : paid > 0 ? 'gold' : 'red';
+        html += `
+          <tr>
+            <td>${money(total)}</td>
+            <td>${money(paid)}</td>
+            <td>${money(remaining)}</td>
+            <td><span class="badge ${color}">${status}</span></td>
+          </tr>
+        `;
+      });
+      html += `</tbody></table></div>`;
+    }
+    
+    container.innerHTML = html;
+  }
+
+  // ========== صفحة السلوك ==========
+  function renderBehavior() {
+    const container = $('#view-behavior');
+    const data = CHILD_DATA[currentChildId] || {behavior: []};
+    const child = CHILDREN.find(c => c.id === currentChildId);
+    const childName = child?.users?.name || child?.name || 'الطالب';
+    
+    let html = `<div class="page-head"><div><h1>🌟 سلوك ${esc(childName)}</h1></div></div>`;
+    
+    if(!data.behavior.length) {
+      html += '<div class="empty" style="text-align:center;padding:60px;">لا توجد ملاحظات سلوكية.</div>';
+    } else {
+      const totalPoints = data.behavior.reduce((s,b) => s + num(b.points || 0), 0);
+      const color = totalPoints >= 0 ? 'green' : 'red';
+      
+      html += `
+        <div class="kpis" style="margin-bottom:20px;">
+          <div class="kpi ${color}"><small>مجموع النقاط</small><b>${totalPoints > 0 ? '+' : ''}${totalPoints}</b></div>
+          <div class="kpi blue"><small>عدد السجلات</small><b>${data.behavior.length}</b></div>
+        </div>
+        <div class="list">
+      `;
+      
+      data.behavior.forEach(b => {
+        const points = num(b.points || 0);
+        const pointColor = points >= 0 ? 'green' : 'red';
+        html += `
+          <div class="item">
+            <div>
+              <b>${esc(b.note || b.description || 'ملاحظة سلوك')}</b>
+              <small>${esc(String(b.created_at || b.date || '').slice(0,10))}</small>
+            </div>
+            <span class="badge ${pointColor}">${points > 0 ? '+' : ''}${points}</span>
+          </div>
+        `;
+      });
+      
+      html += `</div>`;
+    }
+    
+    container.innerHTML = html;
+  }
+
+  // ========== دوال للاستخدام من HTML ==========
+  async function selectChild(childId) {
+    currentChildId = childId;
+    const selector = $('#childSelector');
+    if(selector) selector.value = childId;
+    
+    if(!CHILD_DATA[childId]) {
+      await loadChildData(childId);
+    }
+    renderOverview();
+  }
+
+  async function viewChild(childId, view) {
+    currentChildId = childId;
+    const selector = $('#childSelector');
+    if(selector) selector.value = childId;
+    
+    if(!CHILD_DATA[childId]) {
+      await loadChildData(childId);
+    }
+    
+    showView(view);
+    document.querySelectorAll('.nav button[data-view]').forEach(b => {
+      b.classList.toggle('active', b.dataset.view === view);
+    });
+  }
+
+  // ========== التشغيل ==========
+  window.addEventListener('load', init);
+  
+  window.ParentPortal = {
+    init,
+    showView,
+    renderOverview,
+    loadChildData,
+    selectChild,
+    viewChild
+  };
+})();
+</script>
+
+<script src="assets/ux-enhancements.js"></script>
+</body>
+</html>
