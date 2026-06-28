@@ -89,6 +89,33 @@ const SmartAlerts = {
 
   // ========== تنبيهات المعلم ==========
   async loadTeacherAlerts() {
+    try {
+      const { data: schedule } = await this.sb.from('weekly_schedule')
+        .select('class_id, subject_id').eq('teacher_id', this.user.id);
+      
+      if(schedule && schedule.length) {
+        this.alerts.push({
+          type:'info', icon:'📅',
+          title:'جدولي اليوم',
+          msg:schedule.length + ' حصة',
+          link:'teacher.html'
+        });
+      }
+    } catch(e) { console.log('Teacher schedule alert skip'); }
+    
+    try {
+      const today = new Date().toISOString().slice(0,10);
+      const { data: att } = await this.sb.from('attendance').select('id').eq('date', today).limit(100);
+      if(att && att.length === 0) {
+        this.alerts.push({
+          type:'warning', icon:'📋',
+          title:'لم تسجل حضور اليوم',
+          msg:'سجل الحضور الآن',
+          link:'teacher.html'
+        });
+      }
+    } catch(e) { console.log('Teacher attendance alert skip'); }
+  },
     // طلاب لم يحضروا اليوم
     const today = new Date().toISOString().slice(0,10);
     const { data: schedule } = await this.sb.from('weekly_schedule')
