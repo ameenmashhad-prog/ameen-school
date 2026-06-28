@@ -805,7 +805,34 @@
     
     container.innerHTML = html;
   }
-
+  // ========== التواصل السريع ==========
+  function requestAppointment() {
+    const childName = CHILDREN.find(c => c.id === currentChildId)?.users?.name || CHILDREN[0]?.users?.name || 'ابني';
+    const date = prompt('متى تريد الموعد؟ (مثال: غداً الساعة 10 صباحاً)');
+    if(!date) return;
+    
+    const reason = prompt('ما سبب الموعد؟ (اختياري)');
+    
+    const msg = encodeURIComponent(`السلام عليكم،\nأنا ولي أمر الطالب: ${childName}\nأطلب موعداً في: ${date}\n${reason ? 'السبب: ' + reason : ''}`);
+    
+    if(confirm('سيتم فتح واتساب لإرسال الطلب للإدارة. متابعة؟')) {
+      window.open(`https://wa.me/9647700000000?text=${msg}`, '_blank');
+    }
+  }
+  
+  function sendMessage() {
+    const subject = prompt('موضوع الرسالة:');
+    if(!subject) return;
+    
+    const body = prompt('نص الرسالة:');
+    if(!body) return;
+    
+    const msg = encodeURIComponent(`السلام عليكم،\nأنا ولي أمر: ${ME.name}\n\nالموضوع: ${subject}\n\n${body}`);
+    
+    if(confirm('سيتم فتح واتساب لإرسال الرسالة. متابعة؟')) {
+      window.open(`https://wa.me/9647700000000?text=${msg}`, '_blank');
+    }
+  }
   // ========== دوال للاستخدام من HTML ==========
   async function selectChild(childId) {
     currentChildId = childId;
