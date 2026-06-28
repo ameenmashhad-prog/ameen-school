@@ -21,7 +21,6 @@
 <a class="skip-link" href="#mainContent">تخطي إلى المحتوى</a>
 
 <div class="shell">
-  <!-- الشريط الجانبي -->
   <aside class="sidebar" id="sidebar">
     <div class="brand">
       <div class="brand-mark">و</div>
@@ -42,14 +41,13 @@
     <nav class="nav">
       <button onclick="location.href='portal.html'">🏛️ البوابة الموحدة</button>
       <button data-view="overview" class="active">🏠 الرئيسية</button>
-      <button data-view="grades">📊 درجات الأبناء</button>
-      <button data-view="attendance">📋 حضور الأبناء</button>
-      <button data-view="finance">💰 أقساط الأبناء</button>
-      <button data-view="schedule">🗓️ جداول الأبناء</button>
-      <button data-view="behavior">🌟 سلوك الأبناء</button>
-      <button onclick="location.href='student-homeworks.html'">📚 واجبات الأبناء</button>
+      <button data-view="grades">📊 الدرجات</button>
+      <button data-view="attendance">📋 الحضور</button>
+      <button data-view="finance">💰 الأقساط</button>
+      <button data-view="behavior">🌟 السلوك</button>
+      <button onclick="location.href='student-homeworks.html'">📚 الواجبات</button>
       <button onclick="location.href='notifications.html'">🔔 الإشعارات</button>
-      <button onclick="location.href='smart-calendar.html'">📅 التقويم المدرسي</button>
+      <button onclick="location.href='smart-calendar.html'">📅 التقويم</button>
     </nav>
 
     <div class="side-footer">
@@ -57,174 +55,503 @@
     </div>
   </aside>
 
-  <!-- المحتوى الرئيسي -->
   <main class="main" id="mainContent" tabindex="-1">
     <header class="topbar">
       <button class="btn mobile-menu" id="mobileMenuBtn">☰</button>
       <h2>بوابة ولي الأمر</h2>
       <div class="top-actions">
-        <!-- زر تبديل الأبناء سيظهر هنا ديناميكياً إذا وجد أكثر من ابن -->
-        <select id="childSelector" class="select" style="display:none; min-width: 200px;" onchange="ParentPortal.switchChild(this.value)">
-          <option value="">اختر الابن...</option>
-        </select>
+        <select id="childSelector" class="select" style="display:none; min-width: 200px; padding:8px; border-radius:8px;"></select>
       </div>
     </header>
 
-    <!-- الأقسام (Views) -->
     <section id="view-overview" class="view active"></section>
     <section id="view-grades" class="view"></section>
     <section id="view-attendance" class="view"></section>
     <section id="view-finance" class="view"></section>
-    <section id="view-schedule" class="view"></section>
     <section id="view-behavior" class="view"></section>
   </main>
 </div>
 
 <div id="toast" class="toast"></div>
 
-<!-- المكتبات والسكريبتات -->
 <script src="libs/supabase.min.js"></script>
 <script src="assets/config.js"></script>
 <script src="assets/platform-modules.js"></script>
 <script src="assets/i18n.js"></script>
-<script src="assets/core.js"></script>
 
-<!-- سكريبت خاص ببوابة ولي الأمر -->
 <script>
 (function(){
   'use strict';
+
+  // ========== دوال مساعدة ==========
+  function $(s, r=document){return r.querySelector(s)}
+  function esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;')}
+  function num(v){const n=Number(v);return Number.isFinite(n)?n:0}
+  function money(v){return num(v).toLocaleString('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0})}
   
-  // دالة التهيئة الخاصة بولي الأمر
-  async function initParentPortal() {
-    // نستخدم نفس دالة bootPortal من core.js للتأكد من الجلسة وتحميل البيانات الأساسية
-    if(window.AminPortal && typeof window.AminPortal.bootPortal === 'function') {
-      await window.AminPortal.bootPortal();
+  // ========== متغيرات عامة ==========
+  let currentChildId = null;
+  let sb = null;
+  let ME = null;
+  let SESSION = null;
+  let CHILDREN = [];
+  let CHILD_DATA = {};
+
+  function cfg() { return window.AMIN_CONFIG || {}; }
+  
+  function client() {
+    if(sb) return sb;
+    if(!window.supabase) throw new Error('Supabase library not loaded');
+    sb = window.supabase.createClient(
+      cfg().supabaseUrl, 
+      cfg().supabaseAnonKey, 
+      {auth:{persistSession:true, autoRefreshToken:true, detectSessionInUrl:true, storageKey:(cfg().authStorageKey||'amin-ovcjzsrqqgjsbqswtkro-auth-v2')}}
+    );
+    return sb;
+  }
+
+  function toast(title, msg, type='') {
+    const t = $('#toast');
+    if(!t) return;
+    t.innerHTML = `<b>${esc(title)}</b><br><span class="muted">${esc(msg||'')}</span>`;
+    t.className = 'toast show ' + type;
+    clearTimeout(t._to);
+    t._to = setTimeout(() => t.classList.remove('show'), 4000);
+  }
+
+  // ========== التهيئة الأساسية ==========
+  async function init() {
+    try {
+      const c = client();
       
-      // بعد تحميل البيانات، نتحقق من وجود أبناء
-      if(window.DATA && window.DATA.students && window.DATA.students.length > 0) {
-        ParentPortal.setupChildSelector(window.DATA.students);
-        // تعيين الابن الأول افتراضياً إذا لم يكن محدداً
-        if(!window.CURRENT_CHILD_ID) {
-          window.CURRENT_CHILD_ID = window.DATA.students[0].id;
-        }
-        ParentPortal.renderOverview();
-      } else {
-        document.getElementById('view-overview').innerHTML = 
-          '<div class="empty"><h3>⚠️ تنبيه</h3><p>لا يوجد طلاب مسجلين تحت هذا الحساب. يرجى مراجعة الإدارة.</p></div>';
+      // 1. التحقق من الجلسة
+      const { data: { session } } = await c.auth.getSession();
+      if(!session) {
+        console.log('❌ No session - redirecting to login');
+        location.href = 'index.html';
+        return;
       }
+      SESSION = session;
+      console.log('✅ Session OK:', session.user.email);
+
+      // 2. جلب بيانات ولي الأمر
+      const { data: user, error } = await c.from('users').select('*').eq('id', session.user.id).maybeSingle();
+      if(error || !user) {
+        console.error('❌ Failed to load user:', error);
+        toast('خطأ', 'تعذر تحميل بيانات الحساب', 'red');
+        return;
+      }
+      ME = user;
+      window.ME = ME;
+      console.log('✅ User loaded:', ME.name, 'Role:', ME.role);
+
+      // 3. تحديث الواجهة العلوية
+      $('#profileName').textContent = ME.name || ME.email || 'ولي أمر';
+      $('#profileRole').textContent = 'ولي أمر';
+
+      // 4. زر تسجيل الخروج
+      $('#logoutBtn').onclick = async () => {
+        await c.auth.signOut({scope:'local'}).catch(()=>{});
+        location.href = 'index.html';
+      };
+
+      // 5. زر القائمة (جوال)
+      $('#mobileMenuBtn')?.addEventListener('click', () => {
+        $('#sidebar')?.classList.toggle('open');
+      });
+
+      // 6. ربط أزرار القائمة
+      document.querySelectorAll('.nav button[data-view]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const view = btn.dataset.view;
+          showView(view);
+          document.querySelectorAll('.nav button[data-view]').forEach(b => b.classList.toggle('active', b === btn));
+          $('#sidebar')?.classList.remove('open');
+        });
+      });
+
+      // 7. جلب الأبناء
+      console.log('🔍 Fetching children for parent_id:', ME.id);
+      const { data: children, error: childError } = await c
+        .from('students')
+        .select('*, users:user_id(name, email)')
+        .eq('parent_id', ME.id);
+
+      if(childError) {
+        console.error('❌ Error fetching children:', childError);
+        toast('خطأ', 'فشل جلب الأبناء: ' + childError.message, 'red');
+      }
+
+      CHILDREN = children || [];
+      window.CHILDREN = CHILDREN;
+      console.log('✅ Children count:', CHILDREN.length);
+      console.log('✅ Children data:', CHILDREN);
+
+      // 8. إعداد قائمة الأبناء
+      setupChildSelector();
+
+      // 9. التشغيل
+      if(CHILDREN.length > 0) {
+        currentChildId = CHILDREN[0].id;
+        await loadChildData(currentChildId);
+        renderOverview();
+      } else {
+        $('#view-overview').innerHTML = `
+          <div class="empty" style="text-align:center;padding:60px 20px;">
+            <div style="font-size:64px;margin-bottom:20px;">⚠️</div>
+            <h3>لا يوجد طلاب مسجلين تحت هذا الحساب</h3>
+            <p style="color:#999;margin-top:10px;">يرجى مراجعة الإدارة لربط الطلاب بحسابك.</p>
+            <p style="color:#666;font-size:12px;margin-top:20px;font-family:monospace;">معرف الحساب: ${esc(ME.id)}</p>
+          </div>
+        `;
+      }
+
+    } catch(e) {
+      console.error('❌ Init error:', e);
+      toast('خطأ في التحميل', e.message, 'red');
     }
   }
 
-  const ParentPortal = {
-    currentChildId: null,
-
-    // إعداد قائمة اختيار الأبناء
-    setupChildSelector: function(students) {
-      const selector = document.getElementById('childSelector');
-      if(students.length > 1) {
-        selector.style.display = 'block';
-        selector.innerHTML = '<option value="">اختر الابن...</option>' + 
-          students.map(s => `<option value="${s.id}">${esc(s.name || s.full_name || 'طالب')}</option>`).join('');
-        selector.value = this.currentChildId || students[0].id;
-      } else if (students.length === 1) {
-        this.currentChildId = students[0].id;
-        selector.style.display = 'none';
-      }
-    },
-
-    // تبديل الابن المحدد
-    switchChild: function(studentId) {
-      if(studentId) {
-        this.currentChildId = studentId;
-        // إعادة رسم الواجهة الحالية بناءً على الابن الجديد
-        const activeView = document.querySelector('.view.active').id.replace('view-', '');
-        if(activeView === 'overview') this.renderOverview();
-        else renderView(activeView); // نستخدم الدالة العامة من core.js إذا كانت متاحة أو نعيد البناء
-      }
-    },
-
-    // عرض الصفحة الرئيسية (نظرة عامة على جميع الأبناء أو الابن المحدد)
-    renderOverview: function() {
-      const container = document.getElementById('view-overview');
-      const students = window.DATA.students.filter(s => String(s.parent_id) === String(window.ME.id));
+  // ========== إعداد قائمة اختيار الابن ==========
+  function setupChildSelector() {
+    const selector = $('#childSelector');
+    if(!selector) return;
+    
+    if(CHILDREN.length > 1) {
+      selector.style.display = 'block';
+      selector.innerHTML = CHILDREN.map(c => {
+        const childName = c.users?.name || c.name || 'طالب';
+        return `<option value="${c.id}">${esc(childName)}</option>`;
+      }).join('');
       
-      if(!students.length) {
-        container.innerHTML = '<div class="empty">لا توجد بيانات للأبناء.</div>';
-        return;
-      }
+      selector.onchange = async (e) => {
+        currentChildId = e.target.value;
+        if(!CHILD_DATA[currentChildId]) {
+          await loadChildData(currentChildId);
+        }
+        const activeView = document.querySelector('.view.active')?.id.replace('view-', '') || 'overview';
+        showView(activeView);
+      };
+    } else if(CHILDREN.length === 1) {
+      currentChildId = CHILDREN[0].id;
+      selector.style.display = 'none';
+    }
+  }
 
-      let html = `<div class="page-head"><h1>أهلاً بك، ${esc(window.ME.name)}</h1><p>متابعة شاملة لأبنائك الطلاب</p></div>`;
+  // ========== جلب بيانات الطفل ==========
+  async function loadChildData(childId) {
+    if(!childId) return;
+    const c = client();
+    
+    try {
+      const [attRes, gradesRes, feesRes, behaviorRes] = await Promise.all([
+        c.from('attendance').select('*').eq('student_id', childId).order('date', {ascending: false}).limit(50),
+        c.from('grades').select('*').eq('student_id', childId),
+        c.from('student_fees').select('*').eq('student_id', childId),
+        c.from('behavior_records').select('*').eq('student_id', childId).order('created_at', {ascending: false}).limit(20)
+      ]);
+
+      CHILD_DATA[childId] = {
+        attendance: attRes.data || [],
+        grades: gradesRes.data || [],
+        fees: feesRes.data || [],
+        behavior: behaviorRes.data || []
+      };
       
-      // بطاقات سريعة لكل ابن
-      html += `<div class="cards-grid">`;
-      students.forEach(s => {
-        // حساب سريع للإحصائيات لهذا الطالب
-        const fees = window.DATA.fees.find(f => String(f.student_id) === String(s.id));
-        const paid = fees ? (fees.total_paid || 0) : 0;
-        const total = fees ? (fees.net_amount || fees.base_amount || 0) : 0;
-        const remaining = total - paid;
-        
-        const attCount = window.DATA.attendance.filter(a => String(a.student_id) === String(s.id) && a.status === 'present').length;
-        const absCount = window.DATA.attendance.filter(a => String(a.student_id) === String(s.id) && a.status === 'absent').length;
-        
-        const isActive = String(s.id) === String(this.currentChildId);
+      console.log('✅ Loaded data for child:', childId, CHILD_DATA[childId]);
+    } catch(e) {
+      console.error('❌ Error loading child data:', e);
+      CHILD_DATA[childId] = {attendance: [], grades: [], fees: [], behavior: []};
+    }
+  }
 
+  // ========== التنقل بين الصفحات ==========
+  function showView(viewId) {
+    document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + viewId));
+    
+    if(viewId === 'overview') renderOverview();
+    else if(viewId === 'grades') renderGrades();
+    else if(viewId === 'attendance') renderAttendance();
+    else if(viewId === 'finance') renderFinance();
+    else if(viewId === 'behavior') renderBehavior();
+  }
+
+  // ========== الصفحة الرئيسية ==========
+  function renderOverview() {
+    const container = $('#view-overview');
+    if(!CHILDREN.length) return;
+
+    let html = `
+      <div class="page-head">
+        <div>
+          <h1>أهلاً بك، ${esc(ME.name)} 👋</h1>
+          <p>متابعة شاملة لأبنائك الطلاب · عدد الأبناء: <b>${CHILDREN.length}</b></p>
+        </div>
+      </div>
+    `;
+    
+    html += `<div class="cards">`;
+    CHILDREN.forEach(child => {
+      const childName = child.users?.name || child.name || 'طالب';
+      const data = CHILD_DATA[child.id] || {attendance: [], grades: [], fees: [], behavior: []};
+      
+      const presentCount = data.attendance.filter(a => a.status === 'present').length;
+      const absentCount = data.attendance.filter(a => a.status === 'absent').length;
+      const totalAtt = data.attendance.length;
+      const attRate = totalAtt ? Math.round((presentCount/totalAtt) * 100) : 0;
+      
+      const fee = data.fees[0];
+      const total = num(fee?.net_amount || fee?.base_amount || 0);
+      const paid = num(fee?.total_paid || 0);
+      const remaining = Math.max(total - paid, 0);
+      
+      const gradesAvg = data.grades.length 
+        ? Math.round(data.grades.reduce((s,g) => s + num(g.score || g.grade || g.mark), 0) / data.grades.length)
+        : 0;
+
+      const isActive = String(child.id) === String(currentChildId);
+      
+      html += `
+        <div class="card" style="${isActive ? 'border:2px solid #fbbf24;box-shadow:0 4px 20px rgba(251,191,36,0.2);' : ''}cursor:pointer;" 
+             onclick="ParentPortal.selectChild('${child.id}')">
+          <div class="card-head">
+            <h3>🎓 ${esc(childName)}</h3>
+            ${isActive ? '<span class="badge gold">👁️ المحدد حالياً</span>' : ''}
+          </div>
+          <div class="card-body">
+            <div class="kpis">
+              <div class="kpi green"><small>الحضور</small><b>${attRate}%</b></div>
+              <div class="kpi red"><small>الغياب</small><b>${absentCount} يوم</b></div>
+              <div class="kpi gold"><small>المعدل</small><b>${gradesAvg}%</b></div>
+              <div class="kpi ${remaining > 0 ? 'red' : 'green'}"><small>المتبقي</small><b>${money(remaining)}</b></div>
+            </div>
+            <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="btn small blue" onclick="event.stopPropagation();ParentPortal.viewChild('${child.id}','grades')">📊 الدرجات</button>
+              <button class="btn small green" onclick="event.stopPropagation();ParentPortal.viewChild('${child.id}','attendance')">📋 الحضور</button>
+              <button class="btn small gold" onclick="event.stopPropagation();ParentPortal.viewChild('${child.id}','finance')">💰 الأقساط</button>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+    html += `</div>`;
+
+    container.innerHTML = html;
+  }
+
+  // ========== صفحة الدرجات ==========
+  function renderGrades() {
+    const container = $('#view-grades');
+    const data = CHILD_DATA[currentChildId] || {grades: []};
+    const child = CHILDREN.find(c => c.id === currentChildId);
+    const childName = child?.users?.name || child?.name || 'الطالب';
+    
+    let html = `<div class="page-head"><div><h1>📊 درجات ${esc(childName)}</h1></div></div>`;
+    
+    if(!data.grades.length) {
+      html += '<div class="empty" style="text-align:center;padding:60px;">لا توجد درجات مسجلة بعد.</div>';
+    } else {
+      html += `
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>المادة</th><th>الدرجة</th><th>ملاحظة</th></tr></thead>
+            <tbody>
+      `;
+      data.grades.forEach(g => {
+        const score = num(g.score || g.grade || g.mark);
+        const color = score >= 85 ? 'green' : score >= 60 ? 'gold' : 'red';
         html += `
-          <div class="card child-card ${isActive ? 'active-child' : ''}" onclick="ParentPortal.switchChild('${s.id}')">
-            <div class="card-head">
-              <h3>🎓 ${esc(s.name || 'طالب')}</h3>
-              <span class="badge blue">${esc(s.grade || s.class_name || '-')}</span>
+          <tr>
+            <td>${esc(g.subject_name || g.subject_id || 'مادة')}</td>
+            <td><span class="badge ${color}">${score}</span></td>
+            <td>${esc(g.notes || g.note || '—')}</td>
+          </tr>
+        `;
+      });
+      html += `</tbody></table></div>`;
+    }
+    
+    container.innerHTML = html;
+  }
+
+  // ========== صفحة الحضور ==========
+  function renderAttendance() {
+    const container = $('#view-attendance');
+    const data = CHILD_DATA[currentChildId] || {attendance: []};
+    const child = CHILDREN.find(c => c.id === currentChildId);
+    const childName = child?.users?.name || child?.name || 'الطالب';
+    
+    const present = data.attendance.filter(a => a.status === 'present').length;
+    const absent = data.attendance.filter(a => a.status === 'absent').length;
+    const late = data.attendance.filter(a => a.status === 'late').length;
+    
+    let html = `
+      <div class="page-head"><div><h1>📋 حضور ${esc(childName)}</h1></div></div>
+      <div class="kpis" style="margin-bottom:20px;">
+        <div class="kpi green"><small>أيام الحضور</small><b>${present}</b></div>
+        <div class="kpi red"><small>أيام الغياب</small><b>${absent}</b></div>
+        <div class="kpi gold"><small>أيام التأخير</small><b>${late}</b></div>
+        <div class="kpi blue"><small>الإجمالي</small><b>${data.attendance.length}</b></div>
+      </div>
+    `;
+    
+    if(!data.attendance.length) {
+      html += '<div class="empty" style="text-align:center;padding:60px;">لا توجد سجلات حضور.</div>';
+    } else {
+      html += `
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>التاريخ</th><th>الحالة</th><th>ملاحظة</th></tr></thead>
+            <tbody>
+      `;
+      data.attendance.slice(0, 50).forEach(a => {
+        const status = a.status || '—';
+        const color = status === 'present' ? 'green' : status === 'absent' ? 'red' : 'gold';
+        const label = status === 'present' ? 'حاضر' : status === 'absent' ? 'غائب' : status === 'late' ? 'متأخر' : status;
+        html += `
+          <tr>
+            <td>${esc(String(a.date).slice(0,10))}</td>
+            <td><span class="badge ${color}">${esc(label)}</span></td>
+            <td>${esc(a.note || '—')}</td>
+          </tr>
+        `;
+      });
+      html += `</tbody></table></div>`;
+    }
+    
+    container.innerHTML = html;
+  }
+
+  // ========== صفحة المالية ==========
+  function renderFinance() {
+    const container = $('#view-finance');
+    const data = CHILD_DATA[currentChildId] || {fees: []};
+    const child = CHILDREN.find(c => c.id === currentChildId);
+    const childName = child?.users?.name || child?.name || 'الطالب';
+    
+    let html = `<div class="page-head"><div><h1>💰 أقساط ${esc(childName)}</h1></div></div>`;
+    
+    if(!data.fees.length) {
+      html += '<div class="empty" style="text-align:center;padding:60px;">لا توجد بيانات مالية.</div>';
+    } else {
+      const totalAll = data.fees.reduce((s,f) => s + num(f.net_amount || f.base_amount), 0);
+      const paidAll = data.fees.reduce((s,f) => s + num(f.total_paid), 0);
+      const remainingAll = Math.max(totalAll - paidAll, 0);
+      
+      html += `
+        <div class="kpis" style="margin-bottom:20px;">
+          <div class="kpi blue"><small>إجمالي الرسوم</small><b>${money(totalAll)}</b></div>
+          <div class="kpi green"><small>المدفوع</small><b>${money(paidAll)}</b></div>
+          <div class="kpi ${remainingAll > 0 ? 'red' : 'green'}"><small>المتبقي</small><b>${money(remainingAll)}</b></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>الإجمالي</th><th>المدفوع</th><th>المتبقي</th><th>الحالة</th></tr></thead>
+            <tbody>
+      `;
+      data.fees.forEach(f => {
+        const total = num(f.net_amount || f.base_amount);
+        const paid = num(f.total_paid);
+        const remaining = Math.max(total - paid, 0);
+        const status = remaining === 0 ? '✅ مدفوع كاملاً' : paid > 0 ? '⏳ مدفوع جزئياً' : '❌ غير مدفوع';
+        const color = remaining === 0 ? 'green' : paid > 0 ? 'gold' : 'red';
+        html += `
+          <tr>
+            <td>${money(total)}</td>
+            <td>${money(paid)}</td>
+            <td>${money(remaining)}</td>
+            <td><span class="badge ${color}">${status}</span></td>
+          </tr>
+        `;
+      });
+      html += `</tbody></table></div>`;
+    }
+    
+    container.innerHTML = html;
+  }
+
+  // ========== صفحة السلوك ==========
+  function renderBehavior() {
+    const container = $('#view-behavior');
+    const data = CHILD_DATA[currentChildId] || {behavior: []};
+    const child = CHILDREN.find(c => c.id === currentChildId);
+    const childName = child?.users?.name || child?.name || 'الطالب';
+    
+    let html = `<div class="page-head"><div><h1>🌟 سلوك ${esc(childName)}</h1></div></div>`;
+    
+    if(!data.behavior.length) {
+      html += '<div class="empty" style="text-align:center;padding:60px;">لا توجد ملاحظات سلوكية.</div>';
+    } else {
+      const totalPoints = data.behavior.reduce((s,b) => s + num(b.points || 0), 0);
+      const color = totalPoints >= 0 ? 'green' : 'red';
+      
+      html += `
+        <div class="kpis" style="margin-bottom:20px;">
+          <div class="kpi ${color}"><small>مجموع النقاط</small><b>${totalPoints > 0 ? '+' : ''}${totalPoints}</b></div>
+          <div class="kpi blue"><small>عدد السجلات</small><b>${data.behavior.length}</b></div>
+        </div>
+        <div class="list">
+      `;
+      
+      data.behavior.forEach(b => {
+        const points = num(b.points || 0);
+        const pointColor = points >= 0 ? 'green' : 'red';
+        html += `
+          <div class="item">
+            <div>
+              <b>${esc(b.note || b.description || 'ملاحظة سلوك')}</b>
+              <small>${esc(String(b.created_at || b.date || '').slice(0,10))}</small>
             </div>
-            <div class="card-body">
-              <div class="stats-row">
-                <div class="stat-item">
-                  <span class="label">الحضور</span>
-                  <span class="value green">${attCount} يوم</span>
-                </div>
-                <div class="stat-item">
-                  <span class="label">الغياب</span>
-                  <span class="value red">${absCount} يوم</span>
-                </div>
-              </div>
-              <div class="finance-mini">
-                <span>المالي: </span>
-                <span class="${remaining > 0 ? 'red' : 'green'}">${remaining > 0 ? 'متبقي ' + remaining : 'مسدد'}</span>
-              </div>
-              ${isActive ? '<div class="active-indicator">👁️ جاري العرض</div>' : ''}
-            </div>
+            <span class="badge ${pointColor}">${points > 0 ? '+' : ''}${points}</span>
           </div>
         `;
       });
+      
       html += `</div>`;
-
-      // قسم التنبيهات العامة
-      html += `<div class="card" style="margin-top:20px"><div class="card-head"><h3>🔔 آخر التنبيهات</h3></div><div class="card-body">${this.renderNotificationsPreview()}</div></div>`;
-
-      container.innerHTML = html;
-    },
-
-    renderNotificationsPreview: function() {
-      const notifs = window.DATA.notifications || [];
-      if(!notifs.length) return '<div class="empty">لا توجد إشعارات جديدة.</div>';
-      return notifs.slice(0, 3).map(n => `
-        <div class="notification-item">
-          <b>${esc(n.title)}</b>
-          <small>${esc(n.created_at ? new Date(n.created_at).toLocaleDateString('ar-IQ') : '')}</small>
-          <p class="muted">${esc(n.body || n.message || '')}</p>
-        </div>
-      `).join('');
     }
+    
+    container.innerHTML = html;
+  }
+
+  // ========== دوال للاستخدام من HTML ==========
+  async function selectChild(childId) {
+    currentChildId = childId;
+    const selector = $('#childSelector');
+    if(selector) selector.value = childId;
+    
+    if(!CHILD_DATA[childId]) {
+      await loadChildData(childId);
+    }
+    renderOverview();
+  }
+
+  async function viewChild(childId, view) {
+    currentChildId = childId;
+    const selector = $('#childSelector');
+    if(selector) selector.value = childId;
+    
+    if(!CHILD_DATA[childId]) {
+      await loadChildData(childId);
+    }
+    
+    showView(view);
+    document.querySelectorAll('.nav button[data-view]').forEach(b => {
+      b.classList.toggle('active', b.dataset.view === view);
+    });
+  }
+
+  // ========== التشغيل ==========
+  window.addEventListener('load', init);
+  
+  // تصدير للنافذة
+  window.ParentPortal = {
+    init,
+    showView,
+    renderOverview,
+    loadChildData,
+    selectChild,
+    viewChild
   };
-
-  // دوال مساعدة
-  function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));}
-
-  // ربط الدوال بالنافذة العالمية لاستخدامها في HTML
-  window.ParentPortal = ParentPortal;
-
-  // بدء التشغيل عند تحميل الصفحة
-  window.addEventListener('load', initParentPortal);
-
 })();
 </script>
 
