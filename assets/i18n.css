@@ -1,0 +1,16 @@
+/* Amin Al-Ridha — Lightweight local i18n layer (AR/EN/FA), no CDN */
+.lang-switcher{position:fixed;inset-block-start:14px;inset-inline-end:14px;z-index:2200;display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.55);background:linear-gradient(145deg,rgba(255,255,255,.88),rgba(248,255,255,.68));box-shadow:0 8px 22px rgba(15,23,42,.14);backdrop-filter:blur(14px)}
+.lang-switcher label{font-size:12px;font-weight:900;color:var(--deep-royal-blue,#0D47A1)}
+.lang-switcher select{border:0;background:transparent;font-weight:900;color:var(--navy-950,#061426);outline:0;min-height:28px;cursor:pointer}
+html[dir="ltr"] body{direction:ltr;text-align:left}
+html[dir="ltr"] .shell,html[dir="ltr"] .unified-shell{direction:ltr}
+html[dir="ltr"] .sidebar,html[dir="ltr"] .unified-side{direction:ltr;text-align:left}
+html[dir="ltr"] .nav button,html[dir="ltr"] .nav-child-btn,html[dir="ltr"] .nav-group-card{text-align:left;justify-content:flex-start}
+html[dir="ltr"] table th,html[dir="ltr"] table td{text-align:left}
+html[dir="ltr"] .brand,html[dir="ltr"] .profile-mini,html[dir="ltr"] .hero-content{direction:ltr}
+html[dir="ltr"] .top-actions,html[dir="ltr"] .form-actions{direction:ltr}
+html[dir="ltr"] .page-head{direction:ltr}
+html[dir="ltr"] .field label{text-align:left}
+html[lang="fa"] body{font-family:"Tajawal","IBM Plex Sans Arabic",Tahoma,Arial,sans-serif}
+@media(max-width:700px){.lang-switcher{inset-block-start:auto;inset-block-end:12px;inset-inline-end:12px}.lang-switcher label{display:none}}
+@media print{.lang-switcher{display:none!important}}
