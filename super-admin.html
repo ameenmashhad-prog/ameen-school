@@ -44,18 +44,12 @@
       <button data-view="students">🎓 الطلاب</button>
       <button data-view="teachers">👨‍🏫 المعلمون</button>
       <button data-view="parents">👨‍👩‍👧 أولياء الأمور</button>
+      <button data-view="registrations">📝 التسجيلات الجديدة</button>
       <button data-view="finance">💰 المالية</button>
       <button data-view="academic">📚 الأكاديمي</button>
+      <button data-view="resources">📦 الموارد</button>
       <button data-view="reports">📈 التقارير</button>
-      <hr style="border:none;border-top:1px solid rgba(255,255,255,0.1);margin:8px 0;">
-      <button onclick="location.href='finance-pro.html'">💵 النظام المالي</button>
-      <button onclick="location.href='academic-pro.html'">📖 النظام الأكاديمي</button>
-      <button onclick="location.href='registrations-admin.html'">📋 التسجيلات</button>
-      <button onclick="location.href='permissions-management.html'">🔑 الصلاحيات</button>
-      <button onclick="location.href='analytics-center.html'">📊 التحليلات</button>
-      <button onclick="location.href='announcements.html'">📢 الإعلانات</button>
-      <button onclick="location.href='system-maintenance.html'">⚙️ الصيانة</button>
-      <button onclick="location.href='security-governance.html'">🛡️ حوكمة الأمن</button>
+      <button data-view="system">⚙️ النظام</button>
     </nav>
 
     <div class="side-footer">
@@ -76,9 +70,12 @@
     <section id="view-students" class="view"></section>
     <section id="view-teachers" class="view"></section>
     <section id="view-parents" class="view"></section>
+    <section id="view-registrations" class="view"></section>
     <section id="view-finance" class="view"></section>
     <section id="view-academic" class="view"></section>
+    <section id="view-resources" class="view"></section>
     <section id="view-reports" class="view"></section>
+    <section id="view-system" class="view"></section>
   </main>
 </div>
 
@@ -107,18 +104,9 @@
   let sb = null;
   let ME = null;
   let DATA = {
-    students: [],
-    teachers: [],
-    parents: [],
-    users: [],
-    classes: [],
-    subjects: [],
-    attendance: [],
-    grades: [],
-    fees: [],
-    payments: [],
-    behavior: [],
-    notifications: []
+    students: [], teachers: [], parents: [], users: [],
+    classes: [], subjects: [], attendance: [], grades: [],
+    fees: [], payments: [], behavior: [], notifications: []
   };
   let SUBJECTS_MAP = {};
   let CLASSES_MAP = {};
@@ -151,13 +139,9 @@
   async function init() {
     try {
       const c = client();
-      
       const sessionRes = await c.auth.getSession();
       const session = sessionRes.data.session;
-      if(!session) {
-        location.href = 'index.html';
-        return;
-      }
+      if(!session) { location.href = 'index.html'; return; }
 
       const userRes = await c.from('users').select('*').eq('id', session.user.id).maybeSingle();
       if(userRes.error || !userRes.data) {
@@ -167,9 +151,8 @@
       ME = userRes.data;
       window.ME = ME;
       
-      // تأكد أنه مسؤول
       if(!ME.is_super_admin && ME.role !== 'admin') {
-        toast('ممنوع', 'ليس لديك صلاحية الوصول لهذه الصفحة', 'red');
+        toast('ممنوع', 'ليس لديك صلاحية الوصول', 'red');
         setTimeout(function(){ location.href = 'portal.html'; }, 2000);
         return;
       }
@@ -210,7 +193,6 @@
 
   async function loadAllData() {
     const c = client();
-    
     try {
       const results = await Promise.all([
         c.from('users').select('*'),
@@ -236,15 +218,13 @@
       DATA.behavior = results[8].data || [];
       DATA.notifications = results[9].data || [];
       
-      // تصنيف المستخدمين
       DATA.teachers = DATA.users.filter(function(u){ return u.role === 'teacher'; });
       DATA.parents = DATA.users.filter(function(u){ return u.role === 'parent'; });
       
-      // المواد والصفوف
       DATA.subjects.forEach(function(s) { SUBJECTS_MAP[s.id] = s.name; });
       DATA.classes.forEach(function(c) { CLASSES_MAP[c.id] = c.name; });
       
-      console.log('✅ Super Admin Data loaded:', DATA);
+      console.log('✅ Data loaded:', DATA);
     } catch(e) {
       console.error('Data load error:', e);
     }
@@ -255,37 +235,26 @@
     const todayAtt = DATA.attendance.filter(function(a){ return String(a.date).slice(0,10) === today; });
     const presentToday = todayAtt.filter(function(a){ return a.status === 'present'; }).length;
     const absentToday = todayAtt.filter(function(a){ return a.status === 'absent'; }).length;
-    
     const totalFees = DATA.fees.reduce(function(s,f){ return s + num(f.net_amount || f.base_amount); }, 0);
     const totalPaid = DATA.fees.reduce(function(s,f){ return s + num(f.total_paid); }, 0);
     const totalRemaining = Math.max(totalFees - totalPaid, 0);
-    
     const overdueStudents = DATA.fees.filter(function(f){
-      const remaining = num(f.net_amount || f.base_amount) - num(f.total_paid);
-      return remaining > 0;
+      return num(f.net_amount || f.base_amount) - num(f.total_paid) > 0;
     }).length;
-    
     const gradesAvg = DATA.grades.length 
       ? Math.round(DATA.grades.reduce(function(s,g){ return s + num(g.score || g.grade || g.mark); }, 0) / DATA.grades.length)
       : 0;
     
     return {
-      totalStudents: DATA.students.length,
-      totalTeachers: DATA.teachers.length,
-      totalParents: DATA.parents.length,
-      totalClasses: DATA.classes.length,
-      totalSubjects: DATA.subjects.length,
-      todayAttendance: todayAtt.length,
-      presentToday: presentToday,
-      absentToday: absentToday,
+      totalStudents: DATA.students.length, totalTeachers: DATA.teachers.length,
+      totalParents: DATA.parents.length, totalClasses: DATA.classes.length,
+      totalSubjects: DATA.subjects.length, todayAttendance: todayAtt.length,
+      presentToday: presentToday, absentToday: absentToday,
       attRate: todayAtt.length ? Math.round((presentToday/todayAtt.length)*100) : 0,
-      totalFees: totalFees,
-      totalPaid: totalPaid,
-      totalRemaining: totalRemaining,
+      totalFees: totalFees, totalPaid: totalPaid, totalRemaining: totalRemaining,
       overdueStudents: overdueStudents,
       collectionRate: totalFees ? Math.round((totalPaid/totalFees)*100) : 0,
-      gradesAvg: gradesAvg,
-      totalGrades: DATA.grades.length,
+      gradesAvg: gradesAvg, totalGrades: DATA.grades.length,
       totalBehavior: DATA.behavior.length
     };
   }
@@ -297,20 +266,20 @@
     if(stats.todayAttendance === 0 && stats.totalStudents > 0) {
       alerts.push({type:'danger',icon:'📋',title:'لم يتم تسجيل حضور اليوم',message:'لا توجد سجلات حضور لهذا اليوم'});
     } else if(stats.absentToday > stats.totalStudents * 0.2) {
-      alerts.push({type:'warning',icon:'⚠️',title:'نسبة غياب مرتفعة اليوم',message:stats.absentToday+' طالب غائب من أصل '+stats.todayAttendance});
+      alerts.push({type:'warning',icon:'⚠️',title:'نسبة غياب مرتفعة',message:stats.absentToday+' طالب غائب'});
     }
     
     if(stats.overdueStudents > 0) {
-      alerts.push({type:'warning',icon:'💰',title:stats.overdueStudents+' طالب لديهم متأخرات',message:'إجمالي المتأخرات: '+money(stats.totalRemaining)});
+      alerts.push({type:'warning',icon:'💰',title:stats.overdueStudents+' طالب لديهم متأخرات',message:'الإجمالي: '+money(stats.totalRemaining)});
     }
     
     if(stats.collectionRate < 50 && stats.totalFees > 0) {
-      alerts.push({type:'danger',icon:'📉',title:'نسبة التحصيل منخفضة',message:'فقط '+stats.collectionRate+'% من الرسوم محصّلة'});
+      alerts.push({type:'danger',icon:'📉',title:'نسبة التحصيل منخفضة',message:'فقط '+stats.collectionRate+'% محصّلة'});
     }
     
     const studentsWithoutParent = DATA.students.filter(function(s){ return !s.parent_id; }).length;
     if(studentsWithoutParent > 0) {
-      alerts.push({type:'info',icon:'👨‍👩‍👧',title:studentsWithoutParent+' طالب بدون ولي أمر',message:'يحتاج ربطهم بأولياء أمور'});
+      alerts.push({type:'info',icon:'👨‍👩‍👧',title:studentsWithoutParent+' طالب بدون ولي أمر',message:'يحتاج ربطهم'});
     }
     
     return alerts;
@@ -325,11 +294,15 @@
     else if(viewId === 'students') renderStudents();
     else if(viewId === 'teachers') renderTeachers();
     else if(viewId === 'parents') renderParents();
+    else if(viewId === 'registrations') renderRegistrations();
     else if(viewId === 'finance') renderFinance();
     else if(viewId === 'academic') renderAcademic();
+    else if(viewId === 'resources') renderResources();
     else if(viewId === 'reports') renderReports();
+    else if(viewId === 'system') renderSystem();
   }
 
+  // ========== لوحة القيادة ==========
   function renderOverview() {
     const container = $('#view-overview');
     const stats = getStats();
@@ -337,7 +310,6 @@
     
     let html = '<div class="page-head"><div><h1>👑 لوحة القيادة الشاملة</h1><p>'+SCHOOL_NAME+' · إدارة شاملة لكل أقسام المدرسة</p></div></div>';
 
-    // الإحصائيات الرئيسية
     html += '<h3 style="margin-bottom:12px;">📊 إحصائيات النظام</h3>';
     html += '<div class="kpis" style="margin-bottom:24px;">';
     html += '<div class="kpi blue"><small>الطلاب</small><b>'+stats.totalStudents+'</b></div>';
@@ -346,7 +318,6 @@
     html += '<div class="kpi"><small>الصفوف</small><b>'+stats.totalClasses+'</b></div>';
     html += '</div>';
     
-    // إحصائيات اليوم
     html += '<h3 style="margin-bottom:12px;">📅 إحصائيات اليوم</h3>';
     html += '<div class="kpis" style="margin-bottom:24px;">';
     html += '<div class="kpi green"><small>حضور اليوم</small><b>'+stats.presentToday+'</b></div>';
@@ -355,7 +326,6 @@
     html += '<div class="kpi gold"><small>المعدل العام</small><b>'+stats.gradesAvg+'%</b></div>';
     html += '</div>';
     
-    // المالية
     html += '<h3 style="margin-bottom:12px;">💰 الملخص المالي</h3>';
     html += '<div class="kpis" style="margin-bottom:24px;">';
     html += '<div class="kpi blue"><small>إجمالي الرسوم</small><b>'+money(stats.totalFees)+'</b></div>';
@@ -364,7 +334,6 @@
     html += '<div class="kpi gold"><small>نسبة التحصيل</small><b>'+stats.collectionRate+'%</b></div>';
     html += '</div>';
     
-    // التنبيهات الذكية
     if(alerts.length > 0) {
       html += '<h3 style="margin-bottom:12px;">⚠️ تنبيهات تحتاج اهتمامك ('+alerts.length+')</h3>';
       html += '<div class="cards" style="margin-bottom:24px;">';
@@ -376,31 +345,140 @@
       html += '</div>';
     }
     
-    // إجراءات سريعة
-    html += '<h3 style="margin-bottom:12px;">⚡ روابط سريعة</h3>';
-    html += '<div class="cards">';
+    // التسجيلات الجديدة - مهم جداً!
+    html += '<h3 style="margin-bottom:12px;">📝 التسجيلات وإضافة المستخدمين</h3>';
+    html += '<div class="cards" style="margin-bottom:24px;">';
+    html += '<div onclick="location.href=\'family-registration.html\'" class="card" style="background:linear-gradient(135deg,#10b981,#059669);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">👨‍👩‍👧</div><div style="font-weight:bold;margin-top:8px;">تسجيل ولي أمر/طالب</div></div>';
+    html += '<div onclick="location.href=\'teacher-registration.html\'" class="card" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">👨‍🏫</div><div style="font-weight:bold;margin-top:8px;">تسجيل معلم</div></div>';
+    html += '<div onclick="location.href=\'registrations-admin.html\'" class="card" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📋</div><div style="font-weight:bold;margin-top:8px;">مراجعة التسجيلات</div></div>';
+    html += '<div onclick="location.href=\'permissions-management.html\'" class="card" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">🔑</div><div style="font-weight:bold;margin-top:8px;">إدارة الصلاحيات</div></div>';
+    html += '</div>';
+    
+    // المالية
+    html += '<h3 style="margin-bottom:12px;">💰 الأنظمة المالية</h3>';
+    html += '<div class="cards" style="margin-bottom:24px;">';
     html += '<div onclick="location.href=\'finance-pro.html\'" class="card" style="background:linear-gradient(135deg,#10b981,#059669);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">💰</div><div style="font-weight:bold;margin-top:8px;">النظام المالي</div></div>';
+    html += '<div onclick="location.href=\'finance-cashbox.html\'" class="card" style="background:linear-gradient(135deg,#06b6d4,#0891b2);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">💵</div><div style="font-weight:bold;margin-top:8px;">صندوق اليومية</div></div>';
+    html += '<div onclick="location.href=\'finance-collections.html\'" class="card" style="background:linear-gradient(135deg,#dc2626,#991b1b);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📞</div><div style="font-weight:bold;margin-top:8px;">التحصيل والمتابعة</div></div>';
+    html += '<div onclick="location.href=\'finance-executive.html\'" class="card" style="background:linear-gradient(135deg,#7c3aed,#5b21b6);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📊</div><div style="font-weight:bold;margin-top:8px;">المركز المالي التنفيذي</div></div>';
+    html += '<div onclick="location.href=\'finance-credit-report.html\'" class="card" style="background:linear-gradient(135deg,#0891b2,#0e7490);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">💳</div><div style="font-weight:bold;margin-top:8px;">الرصيد الدائن</div></div>';
+    html += '<div onclick="location.href=\'finance-receiver-reports.html\'" class="card" style="background:linear-gradient(135deg,#be185d,#9f1239);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📈</div><div style="font-weight:bold;margin-top:8px;">تقارير المستلمين</div></div>';
+    html += '<div onclick="location.href=\'admin-finance-rules.html\'" class="card" style="background:linear-gradient(135deg,#6b7280,#4b5563);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">⚙️</div><div style="font-weight:bold;margin-top:8px;">قواعد المالية</div></div>';
+    html += '</div>';
+    
+    // الأكاديمي
+    html += '<h3 style="margin-bottom:12px;">📚 الأنظمة الأكاديمية</h3>';
+    html += '<div class="cards" style="margin-bottom:24px;">';
     html += '<div onclick="location.href=\'academic-pro.html\'" class="card" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📚</div><div style="font-weight:bold;margin-top:8px;">النظام الأكاديمي</div></div>';
-    html += '<div onclick="location.href=\'registrations-admin.html\'" class="card" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📋</div><div style="font-weight:bold;margin-top:8px;">التسجيلات</div></div>';
-    html += '<div onclick="location.href=\'permissions-management.html\'" class="card" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">🔑</div><div style="font-weight:bold;margin-top:8px;">الصلاحيات</div></div>';
-    html += '<div onclick="location.href=\'analytics-center.html\'" class="card" style="background:linear-gradient(135deg,#ec4899,#be185d);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📊</div><div style="font-weight:bold;margin-top:8px;">التحليلات</div></div>';
-    html += '<div onclick="location.href=\'announcements.html\'" class="card" style="background:linear-gradient(135deg,#06b6d4,#0891b2);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📢</div><div style="font-weight:bold;margin-top:8px;">الإعلانات</div></div>';
-    html += '<div onclick="location.href=\'system-maintenance.html\'" class="card" style="background:linear-gradient(135deg,#6b7280,#4b5563);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">⚙️</div><div style="font-weight:bold;margin-top:8px;">الصيانة</div></div>';
-    html += '<div onclick="location.href=\'security-governance.html\'" class="card" style="background:linear-gradient(135deg,#dc2626,#991b1b);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">🛡️</div><div style="font-weight:bold;margin-top:8px;">الأمن</div></div>';
+    html += '<div onclick="location.href=\'schedule-management.html\'" class="card" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📅</div><div style="font-weight:bold;margin-top:8px;">إدارة الجداول</div></div>';
+    html += '<div onclick="location.href=\'section-assignment-management.html\'" class="card" style="background:linear-gradient(135deg,#06b6d4,#0891b2);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">🎯</div><div style="font-weight:bold;margin-top:8px;">الشعب والإسنادات</div></div>';
+    html += '<div onclick="location.href=\'curriculum-planner.html\'" class="card" style="background:linear-gradient(135deg,#10b981,#059669);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📖</div><div style="font-weight:bold;margin-top:8px;">مخطط المنهج</div></div>';
+    html += '<div onclick="location.href=\'teacher-exams.html\'" class="card" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📝</div><div style="font-weight:bold;margin-top:8px;">بنك الأسئلة</div></div>';
+    html += '<div onclick="location.href=\'online-exams.html\'" class="card" style="background:linear-gradient(135deg,#ec4899,#be185d);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">💻</div><div style="font-weight:bold;margin-top:8px;">الاختبارات الإلكترونية</div></div>';
+    html += '<div onclick="location.href=\'exam-integrity.html\'" class="card" style="background:linear-gradient(135deg,#dc2626,#991b1b);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">🛡️</div><div style="font-weight:bold;margin-top:8px;">نزاهة الاختبارات</div></div>';
+    html += '<div onclick="location.href=\'homework-reports.html\'" class="card" style="background:linear-gradient(135deg,#0891b2,#0e7490);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📊</div><div style="font-weight:bold;margin-top:8px;">تقارير الواجبات</div></div>';
+    html += '<div onclick="location.href=\'homework-audit.html\'" class="card" style="background:linear-gradient(135deg,#7c3aed,#5b21b6);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📋</div><div style="font-weight:bold;margin-top:8px;">سجل الواجبات</div></div>';
+    html += '</div>';
+    
+    // الموارد والمرافق
+    html += '<h3 style="margin-bottom:12px;">📦 الموارد والمرافق</h3>';
+    html += '<div class="cards" style="margin-bottom:24px;">';
+    html += '<div onclick="location.href=\'library.html\'" class="card" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📚</div><div style="font-weight:bold;margin-top:8px;">المكتبة</div></div>';
+    html += '<div onclick="location.href=\'inventory.html\'" class="card" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📦</div><div style="font-weight:bold;margin-top:8px;">المخزون</div></div>';
+    html += '<div onclick="location.href=\'fixed-assets.html\'" class="card" style="background:linear-gradient(135deg,#06b6d4,#0891b2);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">🏢</div><div style="font-weight:bold;margin-top:8px;">الأصول والعهد</div></div>';
+    html += '<div onclick="location.href=\'labs-activities.html\'" class="card" style="background:linear-gradient(135deg,#10b981,#059669);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">🔬</div><div style="font-weight:bold;margin-top:8px;">المختبرات والأنشطة</div></div>';
+    html += '<div onclick="location.href=\'transportation.html\'" class="card" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">🚌</div><div style="font-weight:bold;margin-top:8px;">النقل المدرسي</div></div>';
+    html += '<div onclick="location.href=\'documents.html\'" class="card" style="background:linear-gradient(135deg,#6b7280,#4b5563);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📄</div><div style="font-weight:bold;margin-top:8px;">الوثائق والأرشيف</div></div>';
+    html += '</div>';
+    
+    // الإرشاد والموارد البشرية
+    html += '<h3 style="margin-bottom:12px;">👥 الإرشاد والموارد البشرية</h3>';
+    html += '<div class="cards" style="margin-bottom:24px;">';
+    html += '<div onclick="location.href=\'counselor.html\'" class="card" style="background:linear-gradient(135deg,#ec4899,#be185d);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">💚</div><div style="font-weight:bold;margin-top:8px;">الإرشاد النفسي</div></div>';
+    html += '<div onclick="location.href=\'counseling-report.html\'" class="card" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📊</div><div style="font-weight:bold;margin-top:8px;">تقارير الإرشاد</div></div>';
+    html += '<div onclick="location.href=\'hr.html\'" class="card" style="background:linear-gradient(135deg,#0891b2,#0e7490);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">👔</div><div style="font-weight:bold;margin-top:8px;">الموارد البشرية</div></div>';
+    html += '<div onclick="location.href=\'staff.html\'" class="card" style="background:linear-gradient(135deg,#10b981,#059669);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">👥</div><div style="font-weight:bold;margin-top:8px;">الموظفون</div></div>';
+    html += '</div>';
+    
+    // الأنظمة والإدارة
+    html += '<h3 style="margin-bottom:12px;">⚙️ الأنظمة والإدارة</h3>';
+    html += '<div class="cards" style="margin-bottom:24px;">';
+    html += '<div onclick="location.href=\'analytics-center.html\'" class="card" style="background:linear-gradient(135deg,#ec4899,#be185d);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📊</div><div style="font-weight:bold;margin-top:8px;">مركز التحليلات</div></div>';
+    html += '<div onclick="location.href=\'announcements.html\'" class="card" style="background:linear-gradient(135deg,#06b6d4,#0891b2);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📢</div><div style="font-weight:bold;margin-top:8px;">الإعلانات الجماعية</div></div>';
+    html += '<div onclick="location.href=\'notifications.html\'" class="card" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">🔔</div><div style="font-weight:bold;margin-top:8px;">الإشعارات</div></div>';
+    html += '<div onclick="location.href=\'smart-calendar.html\'" class="card" style="background:linear-gradient(135deg,#10b981,#059669);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📅</div><div style="font-weight:bold;margin-top:8px;">التقويم الذكي</div></div>';
+    html += '<div onclick="location.href=\'achievements.html\'" class="card" style="background:linear-gradient(135deg,#fbbf24,#f59e0b);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">🏆</div><div style="font-weight:bold;margin-top:8px;">الإنجازات والشارات</div></div>';
+    html += '<div onclick="location.href=\'system-maintenance.html\'" class="card" style="background:linear-gradient(135deg,#6b7280,#4b5563);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">⚙️</div><div style="font-weight:bold;margin-top:8px;">صيانة النظام</div></div>';
+    html += '<div onclick="location.href=\'security-governance.html\'" class="card" style="background:linear-gradient(135deg,#dc2626,#991b1b);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">🛡️</div><div style="font-weight:bold;margin-top:8px;">حوكمة الأمن</div></div>';
+    html += '<div onclick="location.href=\'final-readiness.html\'" class="card" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">✅</div><div style="font-weight:bold;margin-top:8px;">الجاهزية النهائية</div></div>';
+    html += '<div onclick="location.href=\'deployment-check.html\'" class="card" style="background:linear-gradient(135deg,#7c3aed,#5b21b6);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">🚀</div><div style="font-weight:bold;margin-top:8px;">فحص النشر</div></div>';
     html += '</div>';
     
     container.innerHTML = html;
   }
 
+  // ========== التسجيلات الجديدة ==========
+  function renderRegistrations() {
+    const container = $('#view-registrations');
+    
+    let html = '<div class="page-head"><div><h1>📝 التسجيلات وإضافة مستخدمين</h1><p>أضف طلاباً ومعلمين وأولياء أمور جدد</p></div></div>';
+    
+    html += '<div class="cards" style="margin-bottom:24px;">';
+    
+    html += '<div onclick="location.href=\'family-registration.html\'" class="card" style="background:linear-gradient(135deg,#10b981,#059669);color:white;cursor:pointer;padding:30px;border:none;">';
+    html += '<div style="text-align:center;"><div style="font-size:64px;">👨‍👩‍👧</div>';
+    html += '<h2 style="margin:12px 0;">تسجيل ولي أمر/طالب</h2>';
+    html += '<p style="opacity:0.95;">سجّل عائلة جديدة (ولي أمر + أبناءه)</p>';
+    html += '<div style="margin-top:16px;padding:8px 16px;background:rgba(255,255,255,0.2);border-radius:8px;display:inline-block;">📝 ابدأ التسجيل</div>';
+    html += '</div></div>';
+    
+    html += '<div onclick="location.href=\'teacher-registration.html\'" class="card" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:white;cursor:pointer;padding:30px;border:none;">';
+    html += '<div style="text-align:center;"><div style="font-size:64px;">👨‍🏫</div>';
+    html += '<h2 style="margin:12px 0;">تسجيل معلم جديد</h2>';
+    html += '<p style="opacity:0.95;">أضف معلم/معلمة جديد للنظام</p>';
+    html += '<div style="margin-top:16px;padding:8px 16px;background:rgba(255,255,255,0.2);border-radius:8px;display:inline-block;">📝 ابدأ التسجيل</div>';
+    html += '</div></div>';
+    
+    html += '<div onclick="location.href=\'registrations-admin.html\'" class="card" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:white;cursor:pointer;padding:30px;border:none;">';
+    html += '<div style="text-align:center;"><div style="font-size:64px;">📋</div>';
+    html += '<h2 style="margin:12px 0;">مراجعة التسجيلات</h2>';
+    html += '<p style="opacity:0.95;">راجع طلبات التسجيل الجديدة</p>';
+    html += '<div style="margin-top:16px;padding:8px 16px;background:rgba(255,255,255,0.2);border-radius:8px;display:inline-block;">📋 المراجعة</div>';
+    html += '</div></div>';
+    
+    html += '<div onclick="location.href=\'permissions-management.html\'" class="card" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:white;cursor:pointer;padding:30px;border:none;">';
+    html += '<div style="text-align:center;"><div style="font-size:64px;">🔑</div>';
+    html += '<h2 style="margin:12px 0;">إدارة الصلاحيات</h2>';
+    html += '<p style="opacity:0.95;">امنح أو الغ صلاحيات المستخدمين</p>';
+    html += '<div style="margin-top:16px;padding:8px 16px;background:rgba(255,255,255,0.2);border-radius:8px;display:inline-block;">🔧 الإدارة</div>';
+    html += '</div></div>';
+    
+    html += '</div>';
+    
+    // إحصائيات سريعة
+    html += '<h3 style="margin:24px 0 12px;">📊 إحصائيات سريعة</h3>';
+    html += '<div class="kpis">';
+    html += '<div class="kpi blue"><small>الطلاب</small><b>'+DATA.students.length+'</b></div>';
+    html += '<div class="kpi green"><small>المعلمون</small><b>'+DATA.teachers.length+'</b></div>';
+    html += '<div class="kpi gold"><small>أولياء الأمور</small><b>'+DATA.parents.length+'</b></div>';
+    html += '<div class="kpi"><small>الإجمالي</small><b>'+DATA.users.length+'</b></div>';
+    html += '</div>';
+    
+    container.innerHTML = html;
+  }
+
+  // ========== الطلاب ==========
   function renderStudents() {
     const container = $('#view-students');
     
-    let html = '<div class="page-head"><div><h1>🎓 إدارة الطلاب</h1><p>إجمالي: <b>'+DATA.students.length+'</b> طالب</p></div></div>';
+    let html = '<div class="page-head" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">';
+    html += '<div><h1>🎓 إدارة الطلاب</h1><p>إجمالي: <b>'+DATA.students.length+'</b> طالب</p></div>';
+    html += '<button class="btn" style="background:#10b981;color:white;padding:12px 24px;" onclick="location.href=\'family-registration.html\'">➕ إضافة طالب جديد</button>';
+    html += '</div>';
     
     if(!DATA.students.length) {
       html += '<div class="empty" style="text-align:center;padding:60px;">لا يوجد طلاب مسجلين.</div>';
     } else {
-      // فلاتر
       const classCounts = {};
       DATA.students.forEach(function(s){
         const cn = getClassName(s.class_id);
@@ -418,7 +496,7 @@
       DATA.students.forEach(function(s, i) {
         const studentName = (s.users && s.users.name) || s.name || 'طالب';
         const parentInfo = DATA.parents.find(function(p){ return p.id === s.parent_id; });
-        const parentName = parentInfo ? parentInfo.name : '—';
+        const parentName = parentInfo ? parentInfo.name : '<span style="color:#dc2626;">⚠️ غير مرتبط</span>';
         
         const studentAtt = DATA.attendance.filter(function(a){ return String(a.student_id) === String(s.id); });
         const present = studentAtt.filter(function(a){ return a.status === 'present'; }).length;
@@ -440,7 +518,7 @@
         html += '<td>'+(i+1)+'</td>';
         html += '<td><b>'+esc(studentName)+'</b></td>';
         html += '<td>'+esc(getClassName(s.class_id))+'</td>';
-        html += '<td>'+esc(parentName)+'</td>';
+        html += '<td>'+parentName+'</td>';
         html += '<td><span class="badge '+attColor+'">'+attRate+'%</span></td>';
         html += '<td>'+(studentGrades.length ? '<span class="badge '+gradeColor+'">'+avg+'%</span>' : '—')+'</td>';
         html += '<td><span class="badge '+feeColor+'">'+(remaining === 0 ? 'مدفوع' : money(remaining))+'</span></td>';
@@ -453,16 +531,19 @@
     container.innerHTML = html;
   }
 
+  // ========== المعلمون ==========
   function renderTeachers() {
     const container = $('#view-teachers');
     
-    let html = '<div class="page-head"><div><h1>👨‍🏫 المعلمون</h1><p>إجمالي: <b>'+DATA.teachers.length+'</b> معلم</p></div></div>';
+    let html = '<div class="page-head" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">';
+    html += '<div><h1>👨‍🏫 المعلمون</h1><p>إجمالي: <b>'+DATA.teachers.length+'</b> معلم</p></div>';
+    html += '<button class="btn" style="background:#3b82f6;color:white;padding:12px 24px;" onclick="location.href=\'teacher-registration.html\'">➕ إضافة معلم جديد</button>';
+    html += '</div>';
     
     if(!DATA.teachers.length) {
       html += '<div class="empty" style="text-align:center;padding:60px;">لا يوجد معلمون مسجلون.</div>';
     } else {
       html += '<div class="table-wrap"><table><thead><tr><th>#</th><th>الاسم</th><th>البريد</th><th>الهاتف</th><th>الحالة</th></tr></thead><tbody>';
-      
       DATA.teachers.forEach(function(t, i) {
         html += '<tr>';
         html += '<td>'+(i+1)+'</td>';
@@ -472,49 +553,47 @@
         html += '<td><span class="badge '+(t.active !== false ? 'green' : 'red')+'">'+(t.active !== false ? 'نشط' : 'غير نشط')+'</span></td>';
         html += '</tr>';
       });
-      
       html += '</tbody></table></div>';
     }
     
     container.innerHTML = html;
   }
 
+  // ========== أولياء الأمور ==========
   function renderParents() {
     const container = $('#view-parents');
     
-    let html = '<div class="page-head"><div><h1>👨‍👩‍👧 أولياء الأمور</h1><p>إجمالي: <b>'+DATA.parents.length+'</b> ولي أمر</p></div></div>';
+    let html = '<div class="page-head" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">';
+    html += '<div><h1>👨‍👩‍👧 أولياء الأمور</h1><p>إجمالي: <b>'+DATA.parents.length+'</b> ولي أمر</p></div>';
+    html += '<button class="btn" style="background:#10b981;color:white;padding:12px 24px;" onclick="location.href=\'family-registration.html\'">➕ إضافة ولي أمر جديد</button>';
+    html += '</div>';
     
     if(!DATA.parents.length) {
       html += '<div class="empty" style="text-align:center;padding:60px;">لا يوجد أولياء أمور مسجلون.</div>';
     } else {
       html += '<div class="table-wrap"><table><thead><tr><th>#</th><th>الاسم</th><th>البريد</th><th>الهاتف</th><th>عدد الأبناء</th></tr></thead><tbody>';
-      
       DATA.parents.forEach(function(p, i) {
         const childrenCount = DATA.students.filter(function(s){ return String(s.parent_id) === String(p.id); }).length;
-        
         html += '<tr>';
         html += '<td>'+(i+1)+'</td>';
         html += '<td><b>'+esc(p.name || '—')+'</b></td>';
         html += '<td>'+esc(p.email || '—')+'</td>';
         html += '<td>'+esc(p.phone || '—')+'</td>';
-        html += '<td><span class="badge blue">'+childrenCount+' أبناء</span></td>';
+        html += '<td><span class="badge '+(childrenCount > 0 ? 'blue' : 'red')+'">'+childrenCount+' أبناء</span></td>';
         html += '</tr>';
       });
-      
       html += '</tbody></table></div>';
     }
     
     container.innerHTML = html;
   }
 
+  // ========== المالية ==========
   function renderFinance() {
     const container = $('#view-finance');
     const stats = getStats();
     
-    let html = '<div class="page-head" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">';
-    html += '<div><h1>💰 المالية الشاملة</h1></div>';
-    html += '<button class="btn" style="background:#10b981;color:white;" onclick="location.href=\'finance-pro.html\'">📊 النظام المالي الكامل</button>';
-    html += '</div>';
+    let html = '<div class="page-head"><div><h1>💰 المالية الشاملة</h1></div></div>';
     
     html += '<div class="kpis" style="margin-bottom:24px;">';
     html += '<div class="kpi blue"><small>إجمالي الرسوم</small><b>'+money(stats.totalFees)+'</b></div>';
@@ -523,7 +602,14 @@
     html += '<div class="kpi gold"><small>نسبة التحصيل</small><b>'+stats.collectionRate+'%</b></div>';
     html += '</div>';
     
-    // الطلاب المتأخرين
+    html += '<h3 style="margin-bottom:12px;">🔗 الوصول للأنظمة المالية</h3>';
+    html += '<div class="cards" style="margin-bottom:24px;">';
+    html += '<div onclick="location.href=\'finance-pro.html\'" class="card" style="background:linear-gradient(135deg,#10b981,#059669);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">💰</div><div style="font-weight:bold;margin-top:8px;">النظام المالي</div></div>';
+    html += '<div onclick="location.href=\'finance-cashbox.html\'" class="card" style="background:linear-gradient(135deg,#06b6d4,#0891b2);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">💵</div><div style="font-weight:bold;margin-top:8px;">صندوق اليومية</div></div>';
+    html += '<div onclick="location.href=\'finance-collections.html\'" class="card" style="background:linear-gradient(135deg,#dc2626,#991b1b);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📞</div><div style="font-weight:bold;margin-top:8px;">التحصيل</div></div>';
+    html += '<div onclick="location.href=\'finance-executive.html\'" class="card" style="background:linear-gradient(135deg,#7c3aed,#5b21b6);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📊</div><div style="font-weight:bold;margin-top:8px;">التنفيذي</div></div>';
+    html += '</div>';
+    
     const overdueFees = DATA.fees.filter(function(f){
       return num(f.net_amount || f.base_amount) - num(f.total_paid) > 0;
     }).sort(function(a,b){
@@ -535,36 +621,26 @@
     if(overdueFees.length > 0) {
       html += '<h3 style="margin:24px 0 12px;">⚠️ الطلاب المتأخرين ('+overdueFees.length+')</h3>';
       html += '<div class="table-wrap"><table><thead><tr><th>الطالب</th><th>الإجمالي</th><th>المدفوع</th><th>المتبقي</th></tr></thead><tbody>';
-      
       overdueFees.slice(0, 20).forEach(function(f) {
         const student = DATA.students.find(function(s){ return String(s.id) === String(f.student_id); });
         const studentName = student ? ((student.users && student.users.name) || student.name) : 'طالب';
         const total = num(f.net_amount || f.base_amount);
         const paid = num(f.total_paid);
         const remaining = total - paid;
-        
-        html += '<tr>';
-        html += '<td><b>'+esc(studentName)+'</b></td>';
-        html += '<td>'+money(total)+'</td>';
-        html += '<td>'+money(paid)+'</td>';
-        html += '<td><span class="badge red">'+money(remaining)+'</span></td>';
-        html += '</tr>';
+        html += '<tr><td><b>'+esc(studentName)+'</b></td><td>'+money(total)+'</td><td>'+money(paid)+'</td><td><span class="badge red">'+money(remaining)+'</span></td></tr>';
       });
-      
       html += '</tbody></table></div>';
     }
     
     container.innerHTML = html;
   }
 
+  // ========== الأكاديمي ==========
   function renderAcademic() {
     const container = $('#view-academic');
     const stats = getStats();
     
-    let html = '<div class="page-head" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">';
-    html += '<div><h1>📚 الشؤون الأكاديمية</h1></div>';
-    html += '<button class="btn" style="background:#3b82f6;color:white;" onclick="location.href=\'academic-pro.html\'">📖 النظام الأكاديمي الكامل</button>';
-    html += '</div>';
+    let html = '<div class="page-head"><div><h1>📚 الشؤون الأكاديمية</h1></div></div>';
     
     html += '<div class="kpis" style="margin-bottom:24px;">';
     html += '<div class="kpi blue"><small>إجمالي الدرجات</small><b>'+stats.totalGrades+'</b></div>';
@@ -573,39 +649,57 @@
     html += '<div class="kpi"><small>الصفوف</small><b>'+stats.totalClasses+'</b></div>';
     html += '</div>';
     
-    // أفضل الطلاب
+    html += '<h3 style="margin-bottom:12px;">🔗 الأنظمة الأكاديمية</h3>';
+    html += '<div class="cards" style="margin-bottom:24px;">';
+    html += '<div onclick="location.href=\'academic-pro.html\'" class="card" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📚</div><div style="font-weight:bold;margin-top:8px;">النظام الأكاديمي</div></div>';
+    html += '<div onclick="location.href=\'schedule-management.html\'" class="card" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📅</div><div style="font-weight:bold;margin-top:8px;">إدارة الجداول</div></div>';
+    html += '<div onclick="location.href=\'curriculum-planner.html\'" class="card" style="background:linear-gradient(135deg,#10b981,#059669);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📖</div><div style="font-weight:bold;margin-top:8px;">مخطط المنهج</div></div>';
+    html += '<div onclick="location.href=\'teacher-exams.html\'" class="card" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📝</div><div style="font-weight:bold;margin-top:8px;">بنك الأسئلة</div></div>';
+    html += '</div>';
+    
     const studentAverages = DATA.students.map(function(s) {
       const grades = DATA.grades.filter(function(g){ return String(g.student_id) === String(s.id); });
       const avg = grades.length ? Math.round(grades.reduce(function(sum,g){ return sum + num(g.score || g.grade || g.mark); }, 0) / grades.length) : 0;
       return {
         name: (s.users && s.users.name) || s.name || 'طالب',
         className: getClassName(s.class_id),
-        avg: avg,
-        count: grades.length
+        avg: avg, count: grades.length
       };
     }).filter(function(x){ return x.count > 0; }).sort(function(a,b){ return b.avg - a.avg; });
     
     if(studentAverages.length > 0) {
       html += '<h3 style="margin:24px 0 12px;">🏆 أفضل 10 طلاب</h3>';
       html += '<div class="table-wrap"><table><thead><tr><th>الترتيب</th><th>الطالب</th><th>الصف</th><th>المعدل</th></tr></thead><tbody>';
-      
       studentAverages.slice(0, 10).forEach(function(s, i) {
         const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i+1);
         const color = s.avg >= 85 ? 'green' : s.avg >= 60 ? 'gold' : 'red';
-        html += '<tr>';
-        html += '<td>'+medal+'</td>';
-        html += '<td><b>'+esc(s.name)+'</b></td>';
-        html += '<td>'+esc(s.className)+'</td>';
-        html += '<td><span class="badge '+color+'">'+s.avg+'%</span></td>';
-        html += '</tr>';
+        html += '<tr><td>'+medal+'</td><td><b>'+esc(s.name)+'</b></td><td>'+esc(s.className)+'</td><td><span class="badge '+color+'">'+s.avg+'%</span></td></tr>';
       });
-      
       html += '</tbody></table></div>';
     }
     
     container.innerHTML = html;
   }
 
+  // ========== الموارد ==========
+  function renderResources() {
+    const container = $('#view-resources');
+    
+    let html = '<div class="page-head"><div><h1>📦 الموارد والمرافق</h1></div></div>';
+    
+    html += '<div class="cards">';
+    html += '<div onclick="location.href=\'library.html\'" class="card" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:white;cursor:pointer;padding:30px;border:none;text-align:center;"><div style="font-size:64px;">📚</div><h2 style="margin-top:12px;">المكتبة</h2><p style="opacity:0.95;">فهرس الكتب والإعارة</p></div>';
+    html += '<div onclick="location.href=\'inventory.html\'" class="card" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:white;cursor:pointer;padding:30px;border:none;text-align:center;"><div style="font-size:64px;">📦</div><h2 style="margin-top:12px;">المخزون والمشتريات</h2><p style="opacity:0.95;">إدارة الأصناف والموردين</p></div>';
+    html += '<div onclick="location.href=\'fixed-assets.html\'" class="card" style="background:linear-gradient(135deg,#06b6d4,#0891b2);color:white;cursor:pointer;padding:30px;border:none;text-align:center;"><div style="font-size:64px;">🏢</div><h2 style="margin-top:12px;">الأصول والعهد</h2><p style="opacity:0.95;">إدارة الأصول الثابتة</p></div>';
+    html += '<div onclick="location.href=\'labs-activities.html\'" class="card" style="background:linear-gradient(135deg,#10b981,#059669);color:white;cursor:pointer;padding:30px;border:none;text-align:center;"><div style="font-size:64px;">🔬</div><h2 style="margin-top:12px;">المختبرات والأنشطة</h2><p style="opacity:0.95;">إدارة المختبرات والأنشطة</p></div>';
+    html += '<div onclick="location.href=\'transportation.html\'" class="card" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:white;cursor:pointer;padding:30px;border:none;text-align:center;"><div style="font-size:64px;">🚌</div><h2 style="margin-top:12px;">النقل المدرسي</h2><p style="opacity:0.95;">الحافلات والمسارات</p></div>';
+    html += '<div onclick="location.href=\'documents.html\'" class="card" style="background:linear-gradient(135deg,#6b7280,#4b5563);color:white;cursor:pointer;padding:30px;border:none;text-align:center;"><div style="font-size:64px;">📄</div><h2 style="margin-top:12px;">الوثائق والأرشيف</h2><p style="opacity:0.95;">ملفات الطلاب والموظفين</p></div>';
+    html += '</div>';
+    
+    container.innerHTML = html;
+  }
+
+  // ========== التقارير ==========
   function renderReports() {
     const container = $('#view-reports');
     const stats = getStats();
@@ -613,20 +707,46 @@
     let html = '<div class="page-head"><div><h1>📈 التقارير الشاملة</h1></div></div>';
     
     html += '<div class="cards">';
-    html += '<div class="card"><div class="card-head"><h3>📊 التقرير العام</h3></div><div class="card-body"><p>إجمالي الطلاب: <b>'+stats.totalStudents+'</b></p><p>المعلمون: <b>'+stats.totalTeachers+'</b></p><p>أولياء الأمور: <b>'+stats.totalParents+'</b></p><button class="btn blue" style="margin-top:12px;" onclick="SuperAdmin.printGeneralReport()">🖨️ طباعة</button></div></div>';
-    html += '<div class="card"><div class="card-head"><h3>💰 التقرير المالي</h3></div><div class="card-body"><p>إجمالي الرسوم: <b>'+money(stats.totalFees)+'</b></p><p>المحصّل: <b style="color:#10b981;">'+money(stats.totalPaid)+'</b></p><p>المتأخرات: <b style="color:#dc2626;">'+money(stats.totalRemaining)+'</b></p><button class="btn gold" style="margin-top:12px;" onclick="SuperAdmin.printFinanceReport()">🖨️ طباعة</button></div></div>';
-    html += '<div class="card"><div class="card-head"><h3>📚 التقرير الأكاديمي</h3></div><div class="card-body"><p>إجمالي الدرجات: <b>'+stats.totalGrades+'</b></p><p>المعدل العام: <b>'+stats.gradesAvg+'%</b></p><button class="btn green" style="margin-top:12px;" onclick="SuperAdmin.printAcademicReport()">🖨️ طباعة</button></div></div>';
-    html += '<div class="card"><div class="card-head"><h3>📋 تقرير الحضور</h3></div><div class="card-body"><p>سجلات الحضور: <b>'+DATA.attendance.length+'</b></p><p>حضور اليوم: <b>'+stats.attRate+'%</b></p><button class="btn" style="background:#8b5cf6;color:white;margin-top:12px;" onclick="SuperAdmin.printAttendanceReport()">🖨️ طباعة</button></div></div>';
+    html += '<div class="card"><div class="card-head"><h3>📊 التقرير العام</h3></div><div class="card-body"><p>الطلاب: <b>'+stats.totalStudents+'</b></p><p>المعلمون: <b>'+stats.totalTeachers+'</b></p><p>أولياء الأمور: <b>'+stats.totalParents+'</b></p><button class="btn blue" style="margin-top:12px;" onclick="SuperAdmin.printGeneralReport()">🖨️ طباعة</button></div></div>';
+    html += '<div class="card"><div class="card-head"><h3>💰 التقرير المالي</h3></div><div class="card-body"><p>الرسوم: <b>'+money(stats.totalFees)+'</b></p><p>المحصّل: <b style="color:#10b981;">'+money(stats.totalPaid)+'</b></p><p>المتأخرات: <b style="color:#dc2626;">'+money(stats.totalRemaining)+'</b></p><button class="btn gold" style="margin-top:12px;" onclick="SuperAdmin.printFinanceReport()">🖨️ طباعة</button></div></div>';
+    html += '<div class="card"><div class="card-head"><h3>📚 التقرير الأكاديمي</h3></div><div class="card-body"><p>الدرجات: <b>'+stats.totalGrades+'</b></p><p>المعدل: <b>'+stats.gradesAvg+'%</b></p><button class="btn green" style="margin-top:12px;" onclick="SuperAdmin.printAcademicReport()">🖨️ طباعة</button></div></div>';
+    html += '<div class="card"><div class="card-head"><h3>📋 تقرير الحضور</h3></div><div class="card-body"><p>السجلات: <b>'+DATA.attendance.length+'</b></p><p>حضور اليوم: <b>'+stats.attRate+'%</b></p><button class="btn" style="background:#8b5cf6;color:white;margin-top:12px;" onclick="SuperAdmin.printAttendanceReport()">🖨️ طباعة</button></div></div>';
+    html += '</div>';
+    
+    html += '<h3 style="margin:24px 0 12px;">🔗 صفحات التقارير المتقدمة</h3>';
+    html += '<div class="cards">';
+    html += '<div onclick="location.href=\'analytics-center.html\'" class="card" style="background:linear-gradient(135deg,#ec4899,#be185d);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📊</div><div style="font-weight:bold;margin-top:8px;">مركز التحليلات</div></div>';
+    html += '<div onclick="location.href=\'finance-receiver-reports.html\'" class="card" style="background:linear-gradient(135deg,#10b981,#059669);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">💰</div><div style="font-weight:bold;margin-top:8px;">تقارير المالية</div></div>';
+    html += '<div onclick="location.href=\'homework-reports.html\'" class="card" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📚</div><div style="font-weight:bold;margin-top:8px;">تقارير الواجبات</div></div>';
+    html += '<div onclick="location.href=\'counseling-report.html\'" class="card" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">💚</div><div style="font-weight:bold;margin-top:8px;">تقارير الإرشاد</div></div>';
     html += '</div>';
     
     container.innerHTML = html;
   }
 
+  // ========== النظام ==========
+  function renderSystem() {
+    const container = $('#view-system');
+    
+    let html = '<div class="page-head"><div><h1>⚙️ إدارة النظام</h1><p>صيانة وفحص النظام والأمن</p></div></div>';
+    
+    html += '<div class="cards">';
+    html += '<div onclick="location.href=\'system-maintenance.html\'" class="card" style="background:linear-gradient(135deg,#6b7280,#4b5563);color:white;cursor:pointer;padding:30px;border:none;text-align:center;"><div style="font-size:64px;">⚙️</div><h2 style="margin-top:12px;">صيانة النظام</h2><p style="opacity:0.95;">فحص صحة النظام والتنظيف</p></div>';
+    html += '<div onclick="location.href=\'security-governance.html\'" class="card" style="background:linear-gradient(135deg,#dc2626,#991b1b);color:white;cursor:pointer;padding:30px;border:none;text-align:center;"><div style="font-size:64px;">🛡️</div><h2 style="margin-top:12px;">حوكمة الأمن</h2><p style="opacity:0.95;">فحص الصلاحيات وRLS</p></div>';
+    html += '<div onclick="location.href=\'final-readiness.html\'" class="card" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:white;cursor:pointer;padding:30px;border:none;text-align:center;"><div style="font-size:64px;">✅</div><h2 style="margin-top:12px;">الجاهزية النهائية</h2><p style="opacity:0.95;">فحص نهائي للوحدات</p></div>';
+    html += '<div onclick="location.href=\'deployment-check.html\'" class="card" style="background:linear-gradient(135deg,#7c3aed,#5b21b6);color:white;cursor:pointer;padding:30px;border:none;text-align:center;"><div style="font-size:64px;">🚀</div><h2 style="margin-top:12px;">فحص النشر</h2><p style="opacity:0.95;">تحقق من حالة النشر</p></div>';
+    html += '<div onclick="location.href=\'permissions-management.html\'" class="card" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:white;cursor:pointer;padding:30px;border:none;text-align:center;"><div style="font-size:64px;">🔑</div><h2 style="margin-top:12px;">إدارة الصلاحيات</h2><p style="opacity:0.95;">منح وإلغاء الصلاحيات</p></div>';
+    html += '<div onclick="location.href=\'clear-session.html\'" class="card" style="background:linear-gradient(135deg,#0891b2,#0e7490);color:white;cursor:pointer;padding:30px;border:none;text-align:center;"><div style="font-size:64px;">🔄</div><h2 style="margin-top:12px;">مسح الجلسات</h2><p style="opacity:0.95;">إعادة تعيين الجلسات</p></div>';
+    html += '</div>';
+    
+    container.innerHTML = html;
+  }
+
+  // ========== الطباعة ==========
   function printReport(title, content) {
     const today = new Date().toLocaleDateString('ar-IQ');
     const html = '<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>'+title+'</title>'+
-      '<style>'+
-      '* { margin: 0; padding: 0; box-sizing: border-box; }'+
+      '<style>* { margin: 0; padding: 0; box-sizing: border-box; }'+
       'body { font-family: "Cairo", "Segoe UI", Tahoma, sans-serif; padding: 30px; color: #333; line-height: 1.6; }'+
       '.print-header { text-align: center; padding-bottom: 20px; border-bottom: 3px double #1e40af; margin-bottom: 30px; }'+
       '.print-header h1 { color: #1e40af; font-size: 28px; margin-bottom: 8px; }'+
@@ -644,8 +764,7 @@
       '</style></head><body>'+
       '<button class="print-btn no-print" onclick="window.print()">🖨️ طباعة</button>'+
       '<div class="print-header"><h1>'+SCHOOL_LOGO+' '+SCHOOL_NAME+'</h1><h2>'+title+'</h2><div>📅 '+today+'</div></div>'+
-      content+
-      '</body></html>';
+      content+'</body></html>';
     
     const w = window.open('', '_blank', 'width=900,height=700');
     w.document.write(html);
@@ -655,65 +774,55 @@
 
   function printGeneralReport() {
     const stats = getStats();
-    let content = '<div class="section-title">📊 الإحصائيات العامة</div>';
-    content += '<div class="stat-grid">';
+    let content = '<div class="section-title">📊 الإحصائيات العامة</div><div class="stat-grid">';
     content += '<div class="stat-card"><div class="label">الطلاب</div><div class="value">'+stats.totalStudents+'</div></div>';
     content += '<div class="stat-card"><div class="label">المعلمون</div><div class="value">'+stats.totalTeachers+'</div></div>';
     content += '<div class="stat-card"><div class="label">أولياء الأمور</div><div class="value">'+stats.totalParents+'</div></div>';
-    content += '<div class="stat-card"><div class="label">الصفوف</div><div class="value">'+stats.totalClasses+'</div></div>';
-    content += '</div>';
+    content += '<div class="stat-card"><div class="label">الصفوف</div><div class="value">'+stats.totalClasses+'</div></div></div>';
     printReport('التقرير العام للمدرسة', content);
   }
 
   function printFinanceReport() {
     const stats = getStats();
-    let content = '<div class="section-title">💰 الملخص المالي</div>';
-    content += '<div class="stat-grid">';
+    let content = '<div class="section-title">💰 الملخص المالي</div><div class="stat-grid">';
     content += '<div class="stat-card"><div class="label">إجمالي الرسوم</div><div class="value">'+money(stats.totalFees)+'</div></div>';
     content += '<div class="stat-card"><div class="label">المحصّل</div><div class="value">'+money(stats.totalPaid)+'</div></div>';
     content += '<div class="stat-card"><div class="label">المتأخرات</div><div class="value">'+money(stats.totalRemaining)+'</div></div>';
-    content += '<div class="stat-card"><div class="label">نسبة التحصيل</div><div class="value">'+stats.collectionRate+'%</div></div>';
-    content += '</div>';
+    content += '<div class="stat-card"><div class="label">نسبة التحصيل</div><div class="value">'+stats.collectionRate+'%</div></div></div>';
     printReport('التقرير المالي الشامل', content);
   }
 
   function printAcademicReport() {
     const stats = getStats();
-    let content = '<div class="section-title">📚 ملخص الأداء الأكاديمي</div>';
-    content += '<div class="stat-grid">';
-    content += '<div class="stat-card"><div class="label">إجمالي الدرجات</div><div class="value">'+stats.totalGrades+'</div></div>';
+    let content = '<div class="section-title">📚 الأداء الأكاديمي</div><div class="stat-grid">';
+    content += '<div class="stat-card"><div class="label">الدرجات</div><div class="value">'+stats.totalGrades+'</div></div>';
     content += '<div class="stat-card"><div class="label">المعدل العام</div><div class="value">'+stats.gradesAvg+'%</div></div>';
     content += '<div class="stat-card"><div class="label">المواد</div><div class="value">'+stats.totalSubjects+'</div></div>';
-    content += '<div class="stat-card"><div class="label">الصفوف</div><div class="value">'+stats.totalClasses+'</div></div>';
-    content += '</div>';
+    content += '<div class="stat-card"><div class="label">الصفوف</div><div class="value">'+stats.totalClasses+'</div></div></div>';
     printReport('التقرير الأكاديمي', content);
   }
 
   function printAttendanceReport() {
     const stats = getStats();
-    let content = '<div class="section-title">📋 الحضور</div>';
-    content += '<div class="stat-grid">';
+    let content = '<div class="section-title">📋 الحضور</div><div class="stat-grid">';
     content += '<div class="stat-card"><div class="label">حضور اليوم</div><div class="value">'+stats.presentToday+'</div></div>';
     content += '<div class="stat-card"><div class="label">غياب اليوم</div><div class="value">'+stats.absentToday+'</div></div>';
     content += '<div class="stat-card"><div class="label">نسبة الحضور</div><div class="value">'+stats.attRate+'%</div></div>';
-    content += '<div class="stat-card"><div class="label">إجمالي السجلات</div><div class="value">'+DATA.attendance.length+'</div></div>';
-    content += '</div>';
-    printReport('تقرير الحضور والغياب', content);
+    content += '<div class="stat-card"><div class="label">إجمالي السجلات</div><div class="value">'+DATA.attendance.length+'</div></div></div>';
+    printReport('تقرير الحضور', content);
   }
 
   async function refresh() {
     toast('🔄 تحديث', 'جاري تحديث البيانات...', 'blue');
     await loadAllData();
     renderOverview();
-    toast('✅ تم', 'تم تحديث البيانات بنجاح', 'green');
+    toast('✅ تم', 'تم تحديث البيانات', 'green');
   }
 
   window.addEventListener('load', init);
   
   window.SuperAdmin = {
-    init: init,
-    showView: showView,
-    refresh: refresh,
+    init: init, showView: showView, refresh: refresh,
     printGeneralReport: printGeneralReport,
     printFinanceReport: printFinanceReport,
     printAcademicReport: printAcademicReport,
