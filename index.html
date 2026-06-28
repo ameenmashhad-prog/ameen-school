@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#081426">
+<title>مجمع أمين الرضا التعليمي — تسجيل الدخول</title>
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="stylesheet" href="assets/portal.css">
+<link rel="stylesheet" href="assets/amin-identity.css">
+<link rel="stylesheet" href="assets/brand-redesign.css"><link rel="stylesheet" href="assets/amin-v3.css">
+<link rel="stylesheet" href="assets/i18n.css">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/amin-logo-small.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="أمين الرضا">
+</head>
+<body class="amin-login-body">
+<a class="skip-link" href="#mainContent">تخطي إلى نموذج الدخول</a>
+<main class="amin-login-shell" id="mainContent" tabindex="-1">
+  <section class="amin-login-card" aria-labelledby="loginTitle">
+    <!-- Brand section -->
+    <header class="amin-login-brand">
+      <div class="amin-login-logo" aria-hidden="true">ع</div>
+      <h1 class="amin-login-title" id="loginTitle">مجمع أمين الرضا التعليمي</h1>
+      <p class="amin-login-subtitle">دخول موحّد وآمن — تظهر بعد الدخول الواجهات المفوضة لك فقط</p>
+    </header>
+
+    <!-- Form section -->
+    <form class="amin-login-form" id="loginForm" novalidate>
+      <div class="amin-field" data-field="username">
+        <label for="username">اسم المستخدم أو البريد الإلكتروني</label>
+        <div class="amin-input-wrap">
+          <input id="username" class="amin-input" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="اسم المستخدم أو البريد الإلكتروني" aria-describedby="usernameError">
+        </div>
+        <div class="amin-field-error" id="usernameError" role="alert"></div>
+      </div>
+      <div class="amin-field" data-field="password">
+        <label for="password">كلمة المرور</label>
+        <div class="amin-input-wrap">
+          <input id="password" class="amin-input" type="password" autocomplete="current-password" placeholder="كلمة المرور" aria-describedby="passwordError">
+          <button class="amin-pass-toggle" id="togglePassword" type="button" aria-label="إظهار كلمة المرور">👁</button>
+        </div>
+        <div class="amin-field-error" id="passwordError" role="alert"></div>
+      </div>
+      <div class="amin-login-row">
+        <label class="amin-check"><input id="rememberMe" type="checkbox" checked> <span>تذكرني</span></label>
+        <a class="amin-forgot" href="#" id="forgotPassword">نسيت كلمة المرور؟</a>
+      </div>
+      <div class="amin-attempts" id="attemptsBox" role="alert"></div>
+      <button id="loginBtn" class="amin-login-btn" type="submit" aria-label="تسجيل الدخول إلى النظام">
+        <span class="btn-label">دخول إلى النظام</span>
+        <span class="btn-spinner" aria-hidden="true"></span>
+      </button>
+    </form>
+
+    <!-- Secondary links section -->
+    <nav class="amin-login-secondary" aria-label="روابط التسجيل">
+      <a href="family-registration.html">تسجيل ولي أمر/طالب</a>
+      <span aria-hidden="true">•</span>
+      <a href="teacher-registration.html">تسجيل معلم</a>
+    </nav>
+
+    <!-- Footer section -->
+    <footer class="amin-login-footer">
+      <div id="sessionHint">لا توجد فئة مستخدم في الواجهة؛ الصلاحيات تُقرأ من قاعدة البيانات بعد الدخول.</div>
+      <div>© 2026 مجمع أمين الرضا التعليمي</div>
+    </footer>
+  </section>
+</main>
+<div id="toast" class="toast" aria-live="polite"></div>
+<script src="libs/supabase.min.js"></script>
+<script src="assets/config.js"></script><script src="assets/platform-modules.js"></script><script src="assets/i18n.js"></script>
+<script src="assets/core.js"></script>
+<script>window.addEventListener('load',()=>AminPortal.bootLogin());</script>
+<script src="assets/ux-enhancements.js"></script>
+</body>
+</html>

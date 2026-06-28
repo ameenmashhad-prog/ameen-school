@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#081426">
+<title>إدارة الشعب والإسنادات — مدارس أمين الرضا</title>
+<link rel="icon" href="/favicon.ico" sizes="any"><link rel="stylesheet" href="assets/portal.css"><link rel="stylesheet" href="assets/amin-identity.css"><link rel="stylesheet" href="assets/section-assignment.css">
+<link rel="stylesheet" href="assets/brand-redesign.css"><link rel="stylesheet" href="assets/amin-v3.css">
+<link rel="stylesheet" href="assets/i18n.css">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/amin-logo-small.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="أمين الرضا">
+</head>
+<body data-portal="super">
+<a class="skip-link" href="#mainContent">تخطي إلى المحتوى</a>
+<div class="shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><div class="brand-mark">ش</div><div><h1>الشعب والإسنادات</h1><small>صف · شعبة · مادة · معلم</small></div></div>
+    <div class="profile-mini"><div class="avatar">🧩</div><div><b id="profileName">...</b><small id="profileRole">...</small></div></div>
+    <nav class="nav"><div class="side-grid">
+      <button class="nav-group-card active" onclick="document.getElementById('sectionsCard').scrollIntoView({behavior:'smooth'})"><span class="icon-badge">🏫</span><span class="nav-group-title">الشعب</span></button>
+      <button class="nav-group-card" onclick="document.getElementById('rosterCard').scrollIntoView({behavior:'smooth'})"><span class="icon-badge">🎓</span><span class="nav-group-title">نقل الطلاب</span></button>
+      <button class="nav-group-card" onclick="document.getElementById('assignCard').scrollIntoView({behavior:'smooth'})"><span class="icon-badge">👩‍🏫</span><span class="nav-group-title">إسناد المعلمين</span></button>
+      <button class="nav-group-card" onclick="location.href='schedule-management.html'"><span class="icon-badge">🗓️</span><span class="nav-group-title">إدارة الجدول</span></button>
+    </div></nav>
+    <div class="side-footer"><button id="logoutBtn" class="btn red block">تسجيل الخروج</button></div>
+  </aside>
+  <main class="main" id="mainContent" tabindex="-1">
+    <header class="topbar"><button class="btn mobile-menu" id="mobileMenuBtn">☰</button><h2>إدارة الشعب والإسنادات</h2><div class="top-actions"><button class="btn blue" onclick="SectionAssignment.reload()">تحديث</button><button class="btn gold" onclick="window.print()">طباعة</button></div></header>
+    <section class="page-head"><div><h1>بنية أكاديمية دقيقة</h1><p>إدارة الشعب، نقل الطلاب جماعياً، وإسناد المعلمين حسب الصف والشعبة والمادة والفصل الدراسي.</p></div></section>
+
+    <section class="card" id="sectionsCard">
+      <div class="card-head"><h3>1) الشعب الدراسية</h3></div>
+      <div class="card-body">
+        <div class="section-toolbar">
+          <select id="sectionClassFilter" class="select" onchange="SectionAssignment.renderSections()"></select>
+          <select id="newSectionClass" class="select"></select>
+          <select id="newSectionCode" class="select"><option value="أ">شعبة أ</option><option value="ب">شعبة ب</option><option value="ج">شعبة ج</option><option value="د">شعبة د</option></select>
+          <input id="newSectionCapacity" class="input compact-input" type="number" min="0" placeholder="السعة">
+          <select id="newSectionGender" class="select"><option value="mixed">مختلط</option><option value="male">ذكور</option><option value="female">إناث</option></select>
+          <button class="btn gold" onclick="SectionAssignment.createSection()">إنشاء شعبة</button>
+        </div>
+        <div id="sectionsBox"></div>
+      </div>
+    </section>
+
+    <section class="card" id="rosterCard">
+      <div class="card-head"><h3>2) طلاب الشعبة والنقل الجماعي</h3></div>
+      <div class="card-body">
+        <div class="section-toolbar">
+          <select id="rosterSection" class="select" onchange="SectionAssignment.renderRoster()"></select>
+          <select id="moveTargetSection" class="select"></select>
+          <button class="btn" onclick="SectionAssignment.selectAllRoster(true)">تحديد الكل</button>
+          <button class="btn" onclick="SectionAssignment.selectAllRoster(false)">إلغاء التحديد</button>
+          <button class="btn gold" onclick="SectionAssignment.bulkMoveSelected()">نقل المحددين</button>
+        </div>
+        <div class="notice">حددي الطلاب من القائمة ثم اختاري الشعبة الهدف. النقل يحدّث جدول الطلاب وجدول الالتحاق معاً.</div>
+        <div id="rosterBox"></div>
+      </div>
+    </section>
+
+    <section class="card" id="assignCard">
+      <div class="card-head"><h3>3) إسنادات المعلمين</h3></div>
+      <div class="card-body">
+        <input type="hidden" id="editingAssignmentId">
+        <div class="assignment-form">
+          <div class="field"><label>المعلم</label><select id="assignTeacher" class="select"></select></div>
+          <div class="field"><label>الشعبة</label><select id="assignSection" class="select"></select></div>
+          <div class="field"><label>المادة</label><select id="assignSubject" class="select"></select></div>
+          <div class="field"><label>الفصل الدراسي</label><select id="assignPeriod" class="select"></select></div>
+          <div class="field"><label>تحديث الحصص المرتبطة</label><label class="inline-check"><input id="updateLinkedSchedule" type="checkbox" checked> نعم</label></div>
+          <div class="field"><label>&nbsp;</label><button id="saveAssignmentBtn" class="btn gold block" onclick="SectionAssignment.saveAssignment()">حفظ الإسناد</button></div>
+          <div class="field"><label>&nbsp;</label><button class="btn block" onclick="SectionAssignment.cancelAssignmentEdit()">إلغاء التعديل</button></div>
+        </div>
+        <div id="assignmentsBox"></div>
+      </div>
+    </section>
+  </main>
+</div>
+<div id="toast" class="toast"></div>
+<script src="libs/supabase.min.js"></script><script src="assets/config.js"></script><script src="assets/platform-modules.js"></script><script src="assets/i18n.js"></script><script src="assets/section-assignment.js"></script>
+<script>window.addEventListener('load',()=>SectionAssignment.init());</script>
+<script src="assets/ux-enhancements.js"></script>
+</body></html>

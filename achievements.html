@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#081426">
+<title>الإنجازات والشارات — مدارس أمين الرضا</title>
+<link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="stylesheet" href="assets/portal.css"><link rel="stylesheet" href="assets/amin-identity.css"><link rel="stylesheet" href="assets/achievements.css?v=20260626-runtime3">
+<link rel="stylesheet" href="assets/brand-redesign.css"><link rel="stylesheet" href="assets/amin-v3.css">
+<link rel="stylesheet" href="assets/i18n.css">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/amin-logo-small.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="أمين الرضا">
+</head>
+<body data-portal="achievements">
+<a class="skip-link" href="#mainContent">تخطي إلى المحتوى</a>
+<div class="shell achievements-shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><div class="brand-mark">ن</div><div><h1>الإنجازات</h1><small>شارات · نقاط · تحفيز</small></div></div>
+    <div class="profile-mini"><div class="avatar">🏆</div><div><b id="profileName">...</b><small id="profileRole">...</small></div></div>
+    <nav class="nav achievements-nav">
+      <button onclick="location.href='portal.html'">البوابة الموحدة</button>
+      <button data-view="overview" class="active">لوحة الإنجازات</button>
+      <button data-view="mine">شاراتي</button>
+      <button data-view="badges">مكتبة الشارات</button>
+      <button data-view="leaderboard">لوحة الصدارة</button>
+      <button data-view="award" class="manager-only">منح شارة</button>
+      <button onclick="location.href='smart-calendar.html?lite=1'">التقويم الذكي</button>
+      <button onclick="location.href='notifications.html?lite=1'">الإشعارات</button>
+    </nav>
+    <div class="side-footer"><button id="logoutBtn" class="btn red block">تسجيل الخروج</button></div>
+  </aside>
+  <main class="main" id="mainContent" tabindex="-1">
+    <header class="topbar"><button class="btn mobile-menu" id="mobileMenuBtn">☰</button><h2>الإنجازات والشارات</h2><div class="top-actions"><button id="autoAwardBtn" class="btn gold manager-only">منح تلقائي</button><button id="refreshBtn" class="btn blue">تحديث</button></div></header>
+    <section id="view-overview" class="view active"><div class="achievement-skeleton"></div></section>
+    <section id="view-mine" class="view"></section>
+    <section id="view-badges" class="view"></section>
+    <section id="view-leaderboard" class="view"></section>
+    <section id="view-award" class="view"></section>
+  </main>
+</div>
+<div id="toast" class="toast"></div>
+<script src="libs/supabase.min.js"></script><script src="assets/config.js"></script><script src="assets/platform-modules.js"></script><script src="assets/i18n.js"></script><script src="assets/achievements.js?v=20260626-currhw2"></script>
+<script>window.addEventListener('load',()=>Achievements.init());</script>
+<script src="assets/ux-enhancements.js"></script>
+</body></html>

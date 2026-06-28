@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#081426">
+<title>لوحة المعلم — مدارس أمين الرضا</title>
+<link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="stylesheet" href="assets/portal.css"><link rel="stylesheet" href="assets/amin-identity.css"><link rel="stylesheet" href="assets/teacher-dashboard.css?v=20260626-currhw2">
+<link rel="stylesheet" href="assets/brand-redesign.css"><link rel="stylesheet" href="assets/amin-v3.css">
+<link rel="stylesheet" href="assets/i18n.css">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/amin-logo-small.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="أمين الرضا">
+</head>
+<body data-portal="teacher">
+<a class="skip-link" href="#mainContent">تخطي إلى المحتوى</a>
+<div class="shell teacher-shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><div class="brand-mark">م</div><div><h1>لوحة المعلم</h1><small>طلابك · حضور · واجبات · درجات</small></div></div>
+    <div class="profile-mini"><div class="avatar">م</div><div><b id="profileName">...</b><small id="profileRole">...</small></div></div>
+    <nav class="nav teacher-nav"><button onclick="location.href='portal.html'">🏛️ البوابة الموحدة</button>
+      <button data-view="overview" class="active">الرئيسية</button>
+      <button data-view="attendance">الحضور والغياب</button>
+      <button onclick="location.href='curriculum-planner.html'">مخطط المنهج</button>
+      <button data-view="homework">الواجبات</button><button data-view="plan">تحضير الدروس</button>
+      <button data-view="grades">إدخال الدرجات</button><button onclick="location.href='teacher-exams.html'">بنك الأسئلة والاختبارات</button><button onclick="location.href='homework-reports.html'">تقارير الواجبات</button><button onclick="location.href='library.html'">المكتبة</button><button onclick="location.href='homework-audit.html'">سجل الواجبات</button><button onclick="location.href='labs-activities.html'">المختبرات والأنشطة</button><button onclick="location.href='documents.html'">الوثائق</button><button onclick="location.href='smart-calendar.html'">التقويم الذكي</button><button onclick="location.href='achievements.html'">الإنجازات والشارات</button><button onclick="location.href='notifications.html'">الإشعارات</button>
+      <button data-view="students">طلابي</button>
+      <button data-view="schedule">جدولي</button>
+    </nav>
+    <div class="side-footer"><button id="logoutBtn" class="btn red block">تسجيل الخروج</button></div>
+  </aside>
+  <main class="main" id="mainContent" tabindex="-1">
+    <header class="topbar"><button class="btn mobile-menu" id="mobileMenuBtn">☰</button><h2>لوحة المعلم</h2><div class="top-actions"><button class="btn gold" onclick="TeacherDashboard.show('attendance')">تحضير الحضور</button><button class="btn blue" onclick="TeacherDashboard.reload()">تحديث</button></div></header>
+    <section id="view-overview" class="view active"></section>
+    <section id="view-attendance" class="view"></section>
+    <section id="view-homework" class="view"></section><section id="view-plan" class="view"></section>
+    <section id="view-grades" class="view"></section>
+    <section id="view-students" class="view"></section>
+    <section id="view-schedule" class="view"></section>
+  </main>
+</div>
+<div id="toast" class="toast"></div>
+<script src="libs/supabase.min.js"></script><script src="assets/config.js"></script><script src="assets/platform-modules.js"></script><script src="assets/i18n.js"></script><script src="assets/teacher-dashboard.js?v=20260626-currhw2"></script>
+<script>window.addEventListener('load',()=>TeacherDashboard.init());</script>
+<script src="assets/ux-enhancements.js"></script>
+</body></html>

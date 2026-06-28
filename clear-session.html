@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>تصفير الجلسة — مدارس أمين الرضا</title>
+<style>
+body{font-family:Tahoma,Arial,sans-serif;background:#f6f7fb;color:#0f172a;display:grid;place-items:center;min-height:100vh;margin:0;direction:rtl}.card{background:#fff;border:1px solid #e5e7eb;border-radius:24px;box-shadow:0 16px 40px rgba(15,23,42,.12);padding:28px;max-width:520px;text-align:center}.btn{border:0;border-radius:14px;padding:12px 18px;font-weight:900;cursor:pointer;background:#0f2a4a;color:#fff}.muted{color:#64748b;line-height:1.8}
+</style>
+<link rel="stylesheet" href="assets/brand-redesign.css"><link rel="stylesheet" href="assets/amin-v3.css">
+<link rel="stylesheet" href="assets/i18n.css">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/amin-logo-small.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="أمين الرضا">
+</head>
+<body>
+<section class="card">
+<h1>تصفير الجلسة</h1>
+<p class="muted">تستخدم هذه الصفحة عند ظهور خطأ JWT failed verification أو JWT expired. سيتم حذف الجلسة المحلية فقط ثم الرجوع لصفحة الدخول.</p>
+<button class="btn" id="clearBtn">تصفير الجلسة والعودة للدخول</button>
+<p id="msg" class="muted"></p>
+</section>
+<script>
+function clearSession(){
+  try{
+    Object.keys(localStorage).forEach(k=>{ if(k.includes('supabase')||k.includes('sb-')||k.includes('amin-')) localStorage.removeItem(k); });
+    Object.keys(sessionStorage).forEach(k=>{ if(k.includes('supabase')||k.includes('sb-')||k.includes('amin-')) sessionStorage.removeItem(k); });
+  }catch(e){}
+  document.getElementById('msg').textContent='تم تصفير الجلسة. سيتم التحويل...';
+  setTimeout(()=>location.href='index.html',700);
+}
+document.getElementById('clearBtn').addEventListener('click',clearSession);
+</script>
+<script src="assets/platform-modules.js"></script><script src="assets/i18n.js"></script>
+<script src="assets/ux-enhancements.js"></script>
+</body>
+</html>

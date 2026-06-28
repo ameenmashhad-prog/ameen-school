@@ -1,0 +1,18 @@
+{
+  "name": "مجمع أمين الرضا التعليمي",
+  "short_name": "أمين الرضا",
+  "description": "منصة تعليمية مدرسية موحدة لإدارة الطلاب والمعلمين والمالية والواجبات والاختبارات.",
+  "start_url": "/portal.html",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "dir": "rtl",
+  "lang": "ar",
+  "background_color": "#F8FFFF",
+  "theme_color": "#0D47A1",
+  "categories": ["education", "productivity"],
+  "icons": [
+    {"src": "/assets/amin-logo-small.png", "sizes": "256x256", "type": "image/png", "purpose": "any maskable"},
+    {"src": "/assets/amin-logo.png", "sizes": "720x720", "type": "image/png", "purpose": "any"}
+  ]
+}

@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#081426">
+<title>البوابة الموحدة — مجمع أمين الرضا التعليمي</title>
+<link rel="icon" href="/favicon.ico" sizes="any"><link rel="stylesheet" href="assets/portal.css"><link rel="stylesheet" href="assets/amin-identity.css"><link rel="stylesheet" href="assets/brand-redesign.css"><link rel="stylesheet" href="assets/amin-v3.css?v=20260626-landingfix1"><link rel="stylesheet" href="assets/unified-portal.css?v=20260626-landingfix1">
+<link rel="stylesheet" href="assets/i18n.css">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/amin-logo-small.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="أمين الرضا">
+</head>
+<body data-portal="unified">
+<a class="skip-link" href="#mainContent">تخطي إلى المحتوى</a>
+<div class="unified-shell">
+  <aside class="unified-side" id="sidebar">
+    <div class="brand"><div class="brand-mark">ا</div><div><h1>البوابة الموحدة</h1><small>كل واجهاتك حسب الصلاحية</small></div></div>
+    <div class="profile-mini"><div class="avatar">👤</div><div><b id="profileName">...</b><small id="profileRole">...</small></div></div>
+    <div class="side-search"><input id="moduleSearch" placeholder="بحث في الواجهات..."></div>
+    <nav class="nav" id="quickNav"></nav>
+    <div class="side-footer"><button id="logoutBtn" class="btn red block">تسجيل الخروج</button></div>
+  </aside>
+  <main class="unified-main" id="mainContent" tabindex="-1">
+    <header class="unified-hero">
+      <div class="hero-content">
+        <div class="hero-logo"><img src="assets/amin-logo-small.png" alt="شعار مجمع أمين الرضا التعليمي"></div>
+        <div><h1>مجمع أمين الرضا التعليمي</h1><p>واجهة دخول واحدة، وصلاحيات مفوضة، وإشعارات خاصة بكل مستخدم.</p></div>
+      </div>
+      <div class="hero-actions"><button id="commandOpenBtn" class="btn">بحث سريع Ctrl+K</button><button class="btn gold" onclick="UnifiedPortal.openNotifications()">الإشعارات <span id="unreadBadge" class="mini-badge">0</span></button><button id="refreshBtn" class="btn blue">تحديث</button></div>
+    </header>
+    <nav class="portal-tabs" aria-label="تبويبات الصفحة الرئيسية"><button class="active" data-portal-tab="home">الرئيسية الذكية</button><button data-portal-tab="modules">الواجهات</button><button data-portal-tab="notifications">الإشعارات</button></nav>
+    <section class="portal-section portal-tab-panel active" id="tab-home"><div id="homeDashboard" class="home-dashboard"><div class="empty">جاري تحميل الصفحة الرئيسية الذكية...</div></div></section>
+    <section class="portal-section portal-tab-panel" id="tab-modules"><div class="section-title"><h2>واجهاتك المتاحة</h2><p>لا تظهر هنا إلا الأقسام المسموحة لحسابك.</p></div><div id="modulesGrid" class="modules-grid"></div></section>
+    <section class="portal-section portal-tab-panel" id="tab-notifications"><div class="section-title"><h2>إشعاراتك</h2><p>آخر التنبيهات الخاصة بحسابك فقط.</p></div><div id="notificationsList" class="portal-notifications"></div></section>
+  </main>
+</div>
+<div id="toast" class="toast"></div>
+<script>window.$$=window.$$||((s,r=document)=>Array.from(r.querySelectorAll(s)));</script>
+<script src="libs/supabase.min.js"></script><script src="assets/config.js"></script><script src="assets/platform-modules.js?v=20260626-landingfix1"></script><script src="assets/i18n.js?v=20260626-landingfix1"></script><script src="assets/unified-portal.js?v=20260626-landingfix1"></script><script src="assets/ux-enhancements.js?v=20260626-landingfix1"></script>
+<script>window.addEventListener('load',()=>UnifiedPortal.init());</script>
+</body></html>

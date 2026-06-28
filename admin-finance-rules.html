@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#F9FAFB">
+<title>إعدادات الأجور والرسوم — مدارس أمين الرضا</title>
+<link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="stylesheet" href="assets/portal.css"><link rel="stylesheet" href="assets/amin-identity.css">
+<style>
+.secret-banner{padding:18px;border-radius:28px;background:linear-gradient(145deg,#fff4f4,var(--error));border:1px solid rgba(244,168,168,.9);box-shadow:var(--e2);margin-bottom:18px;color:#822323}.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.settings-card{background:linear-gradient(145deg,#fff,var(--surface));border:1px solid rgba(255,255,255,.94);border-radius:28px;box-shadow:var(--neu);overflow:hidden}.settings-card .card-body{padding:20px}.rule-row{display:grid;grid-template-columns:minmax(210px,1fr) minmax(140px,170px) minmax(96px,120px) minmax(90px,auto);gap:12px;align-items:end;padding:12px;border-bottom:1px solid var(--line)}.rule-row .input,.rule-row .select{min-width:0;width:100%}.rule-row:last-child{border-bottom:0}.rule-row b{display:block}.rule-row small{color:var(--muted)}.money-input{direction:ltr;text-align:left}.summary-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}@media(max-width:1000px){.settings-grid,.summary-strip{grid-template-columns:1fr}.rule-row{grid-template-columns:1fr}.rule-row .btn{width:100%}}</style>
+<link rel="stylesheet" href="assets/brand-redesign.css"><link rel="stylesheet" href="assets/amin-v3.css">
+<link rel="stylesheet" href="assets/i18n.css">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/amin-logo-small.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="أمين الرضا">
+</head>
+<body>
+<a class="skip-link" href="#mainContent">تخطي إلى المحتوى</a>
+<div class="shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><div class="brand-mark">$</div><div><h1>إعدادات سرية</h1><small>أجور المعلمات ورسوم الصفوف</small></div></div>
+    <div class="profile-mini"><div class="avatar">👑</div><div><b id="profileName">...</b><small id="profileRole">...</small></div></div>
+    <nav class="nav">
+      <button class="active" onclick="document.getElementById('teacherRules').scrollIntoView({behavior:'smooth'})">💵 أجر الحصة للمعلمات</button>
+      <button onclick="document.getElementById('classFees').scrollIntoView({behavior:'smooth'})">🏫 أقساط الصفوف</button>
+      <div class="nav-section">روابط</div>
+      <button onclick="location.href='portal.html'">واجهة البوابة الموحدة</button>
+      <button onclick="location.href='schedule-management.html'">إدارة الجدول</button>
+      <button onclick="location.href='finance.html'">النظام المالي التفصيلي</button>
+    </nav>
+    <div class="side-footer"><button id="logoutBtn" class="btn red block">تسجيل الخروج</button></div>
+  </aside>
+  <main class="main" id="mainContent" tabindex="-1">
+    <header class="topbar"><button class="btn mobile-menu" id="mobileMenuBtn">☰</button><h2>إعدادات الأجور والرسوم</h2><div class="top-actions"><button class="btn blue" id="refreshBtn">تحديث</button></div></header>
+    <div class="secret-banner"><b>سري — المدير فقط</b><br>هذه الصفحة تتحكم في سعر حصة كل معلمة والرسوم السنوية لكل صف. لا تظهر للمسؤول المالي أو الانضباطي أو العلمي.</div>
+    <div class="summary-strip" id="summaryStrip"></div>
+    <section class="settings-grid">
+      <div class="settings-card" id="teacherRules"><div class="card-head"><h3>💵 سعر حصة كل معلمة</h3></div><div class="card-body"><div id="teacherRulesBox" class="list"><div class="empty">جاري التحميل...</div></div></div></div>
+      <div class="settings-card" id="classFees"><div class="card-head"><h3>🏫 الرسوم السنوية لكل صف</h3></div><div class="card-body"><div class="notice" style="margin-bottom:12px">أدخلي الرسوم السنوية المعتمدة للصف. خطة الدفع، كامل أو أقساط، تُحدد لاحقاً عند إنشاء الملف المالي للطالب.</div><div id="classFeesBox" class="list"><div class="empty">جاري التحميل...</div></div></div></div>
+    </section>
+  </main>
+</div>
+<div id="toast" class="toast"></div>
+<script src="libs/supabase.min.js"></script><script src="assets/config.js"></script><script src="assets/platform-modules.js"></script><script src="assets/i18n.js"></script><script src="assets/admin-finance-rules.js"></script>
+<script>window.addEventListener('load',()=>AdminFinanceRules.init());</script>
+<script src="assets/ux-enhancements.js"></script>
+</body></html>

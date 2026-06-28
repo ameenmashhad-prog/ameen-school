@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>فحص النسخة المنشورة — أمين الرضا</title>
+<link rel="stylesheet" href="assets/brand-redesign.css"><link rel="stylesheet" href="assets/amin-v3.css"><link rel="stylesheet" href="assets/i18n.css">
+<style>.check-wrap{max-width:980px;margin:40px auto;padding:20px}.check-card{padding:18px;border-radius:24px;background:var(--c-surface,#fff);border:1px solid var(--c-border,#ddd);box-shadow:var(--sh-out,0 8px 24px #ddd);margin-bottom:14px}.ok{color:#2D9D6B;font-weight:900}.bad{color:#C0392B;font-weight:900}.code{direction:ltr;display:block;background:rgba(0,0,0,.06);padding:10px;border-radius:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<main class="check-wrap">
+  <h1>فحص النسخة المنشورة</h1>
+  <div class="check-card"><b>الإصدار المتوقع:</b> <span class="code">2026-06-26-runtime3</span></div>
+  <div class="check-card"><h2>نتائج الملفات</h2><div id="results">جاري الفحص...</div></div>
+  <div class="check-card"><h2>ماذا أفعل إذا ظهر خطأ؟</h2><p>إذا فشل فحص achievements.js أو curriculum-planner.js فهذا يعني أن Vercel أو المتصفح ما زال يقدم نسخة قديمة. ارفعي آخر zip، ثم اعملي Unregister للـ Service Worker و Clear Site Data.</p></div>
+</main>
+<script src="assets/platform-modules.js"></script><script src="assets/i18n.js"></script>
+<script>
+(async function(){
+  const checks = [
+    ['assets/achievements.js?v=20260626-runtime3', txt => !txt.includes('.rpc(\'get_my_badge_progress\').catch') && txt.includes('try{const prog=await client().rpc')],
+    ['assets/curriculum-planner.js?v=20260626-runtime3', txt => !txt.includes('get_curriculum_holiday_context',{p_plan_id:CURRENT_PLAN}).catch') && txt.includes('let ctx={data:null}')],
+    ['sql/113_runtime_fix_achievements_curriculum.sql', txt => txt.includes('runtime_fix_achievements_curriculum_health_check')],
+    ['assets/amin-v3.css?v=20260626-runtime3', txt => txt.includes('--c-primary:#6B2D6B')]
+  ];
+  const out=[];
+  for(const [url,test] of checks){
+    try{
+      const res=await fetch(url,{cache:'no-store'});
+      const txt=await res.text();
+      out.push(`<div><span class="${res.ok&&test(txt)?'ok':'bad'}">${res.ok&&test(txt)?'✓':'✗'}</span> ${url} — HTTP ${res.status}</div>`);
+    }catch(e){out.push(`<div><span class="bad">✗</span> ${url} — ${e.message}</div>`)}
+  }
+  document.getElementById('results').innerHTML=out.join('');
+})();
+</script>
+</body>
+</html>

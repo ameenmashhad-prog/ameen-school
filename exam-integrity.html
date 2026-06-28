@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#081426">
+<title>كشف نزاهة الاختبارات — مدارس أمين الرضا</title>
+<link rel="icon" href="/favicon.ico" sizes="any"><link rel="stylesheet" href="assets/portal.css"><link rel="stylesheet" href="assets/amin-identity.css"><link rel="stylesheet" href="assets/exams.css">
+<link rel="stylesheet" href="assets/brand-redesign.css"><link rel="stylesheet" href="assets/amin-v3.css">
+<link rel="stylesheet" href="assets/i18n.css">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/amin-logo-small.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="أمين الرضا">
+</head>
+<body data-portal="staff">
+<a class="skip-link" href="#mainContent">تخطي إلى المحتوى</a>
+<div class="shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><div class="brand-mark">ا</div><div><h1>نزاهة الاختبارات</h1><small>تطابق · مصادر · مؤشرات AI</small></div></div>
+    <div class="profile-mini"><div class="avatar">🛡️</div><div><b id="profileName">...</b><small id="profileRole">...</small></div></div>
+    <nav class="nav integrity-nav">
+      <button data-view="overview" class="active">الرئيسية</button>
+      <button data-view="flags">الإنذارات</button>
+      <button data-view="pairs">تطابق الطلاب</button>
+      <button data-view="sourceMatches">مطابقة المصادر</button>
+      <button data-view="ai">مؤشرات الذكاء الاصطناعي</button>
+      <button data-view="sources">مصادر المقارنة</button>
+      <div class="nav-section">روابط</div>
+      <button onclick="location.href='teacher-exams.html'">بنك الأسئلة</button>
+      <button onclick="location.href='portal.html'">لوحة الإدارة</button>
+    </nav>
+    <div class="side-footer"><button id="logoutBtn" class="btn red block">تسجيل الخروج</button></div>
+  </aside>
+  <main class="main" id="mainContent" tabindex="-1">
+    <header class="topbar"><button class="btn mobile-menu" id="mobileMenuBtn">☰</button><h2>كشف تطابق الإجابات ومؤشرات النسخ</h2><div class="top-actions"><button id="refreshBtn" class="btn blue">تحديث</button><button id="exportBtn" class="btn gold">تصدير CSV</button></div></header>
+    <section id="view-overview" class="view active"></section>
+    <section id="view-flags" class="view"></section>
+    <section id="view-pairs" class="view"></section>
+    <section id="view-sourceMatches" class="view"></section>
+    <section id="view-ai" class="view"></section>
+    <section id="view-sources" class="view"></section>
+  </main>
+</div>
+<div id="toast" class="toast"></div>
+<script src="libs/supabase.min.js"></script><script src="assets/config.js"></script><script src="assets/platform-modules.js"></script><script src="assets/i18n.js"></script><script src="assets/exam-integrity.js"></script>
+<script>window.addEventListener('load',()=>ExamIntegrity.init());</script>
+<script src="assets/ux-enhancements.js"></script>
+</body></html>

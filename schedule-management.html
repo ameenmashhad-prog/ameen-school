@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#F9FAFB">
+<title>إدارة الجدول المدرسي — مدارس أمين الرضا</title>
+<link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="stylesheet" href="assets/portal.css"><link rel="stylesheet" href="assets/amin-identity.css"><link rel="stylesheet" href="assets/schedule.css">
+<link rel="stylesheet" href="assets/brand-redesign.css"><link rel="stylesheet" href="assets/amin-v3.css">
+<link rel="stylesheet" href="assets/i18n.css">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/amin-logo-small.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="أمين الرضا">
+</head>
+<body>
+<a class="skip-link" href="#mainContent">تخطي إلى المحتوى</a>
+<div class="shell schedule-shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><div class="brand-mark">ج</div><div><h1>الجدول المدرسي</h1><small>استيراد · عرض · تعديل · عطل</small></div></div>
+    <div class="profile-mini"><div class="avatar">🗓️</div><div><b id="profileName">...</b><small id="profileRole">...</small></div></div>
+    <nav class="nav">
+      <button class="active" onclick="document.getElementById('setupCard').scrollIntoView({behavior:'smooth'})">⚙️ الإعدادات</button>
+      <button onclick="document.getElementById('importCard').scrollIntoView({behavior:'smooth'})">📤 الاستيراد</button>
+      <button onclick="document.getElementById('displayCard').scrollIntoView({behavior:'smooth'})">🖨️ العرض والطباعة</button>
+      <button onclick="document.getElementById('manualCard').scrollIntoView({behavior:'smooth'})">✏️ تعديل حصة</button>
+      <button onclick="document.getElementById('holidayCard').scrollIntoView({behavior:'smooth'})">🗓️ العطل</button>
+      <div class="nav-section">روابط</div>
+      <button onclick="location.href='portal.html'">البوابة الموحدة</button>
+    </nav>
+    <div class="side-footer"><button id="logoutBtn" class="btn red block">تسجيل الخروج</button></div>
+  </aside>
+
+  <main class="main schedule-main clean-schedule" id="mainContent" tabindex="-1">
+    <header class="topbar"><button class="btn mobile-menu" id="mobileMenuBtn">☰</button><h2>إدارة الجدول المدرسي</h2><div class="top-actions"><button class="btn blue" id="refreshBtn">تحديث</button><button class="btn gold" onclick="ScheduleManager.printCurrent()">طباعة الجدول</button></div></header>
+
+    <section class="schedule-hero-compact">
+      <div><h1>إدارة الجدول المدرسي</h1><p>ارفعي ملف aSc، اعرضي جدول الصف أو المعلمة أو الطالب، وعدّلي الحصص والعطل من نفس الصفحة.</p></div>
+      <div class="hero-badges"><span class="badge blue">aSc XML</span><span class="badge green">طباعة HTML</span><span class="badge gold">عطل وتقويم</span></div>
+    </section>
+
+    <section class="card" id="setupCard">
+      <div class="card-head"><h3>1) إعدادات أساسية</h3></div>
+      <div class="card-body">
+        <div class="compact-form">
+          <div class="field"><label>بداية العام الدراسي</label><input id="academicYearStart" class="input" type="date"></div>
+          <div class="field"><label>أسبوع العرض يبدأ من</label><input id="weekStart" class="input" type="date"></div>
+          <div class="field"><label>بداية الابتدائي</label><input id="primaryStart" class="input" type="time" value="12:45"></div>
+          <div class="field"><label>بداية المتوسط/الإعدادي</label><input id="secondaryStart" class="input" type="time" value="13:00"></div>
+          <div class="field"><label>&nbsp;</label><button id="saveCalendarSettings" class="btn gold block">حفظ الإعدادات</button></div>
+        </div>
+        <details class="advanced-details">
+          <summary>تعديل مدة الحصص والاستراحات</summary>
+          <div class="compact-form" style="margin-top:12px">
+            <div class="field"><label>مدة حصة الابتدائي</label><input id="primaryDuration" class="input" type="number" value="45"></div>
+            <div class="field"><label>استراحة الابتدائي</label><input id="primaryBreak" class="input" type="number" value="10"></div>
+            <div class="field"><label>مدة حصة المتوسط/الإعدادي</label><input id="secondaryDuration" class="input" type="number" value="75"></div>
+            <div class="field"><label>استراحة المتوسط/الإعدادي</label><input id="secondaryBreak" class="input" type="number" value="10"></div>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <section class="card" id="importCard">
+      <div class="card-head"><h3>2) استيراد من aSc Timetables</h3></div>
+      <div class="card-body">
+        <div class="compact-form">
+          <div class="field"><label>الفصل الدراسي</label><select id="importPeriod" class="select"></select></div>
+          <div class="field"><label>الشعبة الافتراضية للملف</label><select id="importSectionCode" class="select"><option value="auto" selected>اكتشاف تلقائي من اسم الصف</option><option value="أ">افتراض شعبة أ</option><option value="ب">افتراض شعبة ب</option><option value="ج">افتراض شعبة ج</option><option value="د">افتراض شعبة د</option></select></div>
+          <div class="field"><label>طريقة الاستيراد</label><select id="importMode" class="select"><option value="upsert">تحديث وإضافة</option><option value="replace_period">استبدال الفصل بالكامل</option><option value="replace_classes">استبدال صفوف الملف فقط</option></select></div>
+        </div>
+        <label class="schedule-drop" id="dropZone"><input id="importFile" type="file" accept=".xml,.txt,.csv"><div><b>اختيار ملف XML أو سحبه هنا</b><small>يقرأ ملف aSc بترميز Windows-1256، ويعرض الأخطاء قبل الحفظ.</small></div></label>
+        <div id="analysisBox"></div>
+      </div>
+    </section>
+
+    <section class="card" id="missingSubjectsCard">
+      <div class="card-head"><h3>تقرير المواد الناقصة</h3></div>
+      <div class="card-body">
+        <div class="compact-form">
+          <div class="field"><label>الفصل</label><select id="missingPeriod" class="select"></select></div>
+          <div class="field"><label>الصف</label><select id="missingClass" class="select"></select></div>
+          <div class="field"><label>عرض</label><select id="missingStatus" class="select"><option value="missing">الناقصة فقط</option><option value="all">الكل</option><option value="subject_not_in_db">مواد غير موجودة بقاعدة البيانات</option></select></div>
+          <div class="field"><label>&nbsp;</label><button class="btn gold block" onclick="ScheduleManager.renderMissingSubjectsReport()">عرض التقرير</button></div><div class="field"><label>&nbsp;</label><button class="btn blue block" onclick="ScheduleManager.renderMissingSubjectSuggestions()">اقتراح حصص تلقائياً</button></div>
+        </div>
+        <div id="missingSubjectsBox"></div>
+      </div>
+    </section>
+
+    <section class="card" id="displayCard">
+      <div class="card-head"><h3>3) العرض والطباعة</h3></div>
+      <div class="card-body">
+        <div class="display-tabs"><button class="btn gold" onclick="ScheduleManager.showDisplay('class')">جدول الصف</button><button class="btn" onclick="ScheduleManager.showDisplay('teacher')">جدول المعلمة</button><button class="btn" onclick="ScheduleManager.showDisplay('student')">جدول الطالب</button></div>
+        <div id="display-class" class="display-panel active"><div class="compact-form"><div class="field"><label>الفصل</label><select id="classPeriod" class="select"></select></div><div class="field"><label>الصف</label><select id="classSelect" class="select"></select></div><div class="field"><label>&nbsp;</label><button class="btn gold block" onclick="ScheduleManager.renderClassView()">عرض</button></div></div><div id="classScheduleBox"></div></div>
+        <div id="display-teacher" class="display-panel"><div class="compact-form"><div class="field"><label>الفصل</label><select id="teacherPeriod" class="select"></select></div><div class="field"><label>المعلمة</label><select id="teacherSelect" class="select"></select></div><div class="field"><label>&nbsp;</label><button class="btn gold block" onclick="ScheduleManager.renderTeacherView()">عرض</button></div></div><div id="teacherScheduleBox"></div></div>
+        <div id="display-student" class="display-panel"><div class="compact-form"><div class="field"><label>الفصل</label><select id="studentPeriod" class="select"></select></div><div class="field"><label>الطالب</label><select id="studentSelect" class="select"></select></div><div class="field"><label>&nbsp;</label><button class="btn gold block" onclick="ScheduleManager.renderStudentView()">عرض</button></div></div><div id="studentScheduleBox"></div></div>
+      </div>
+    </section>
+
+    <section class="card" id="manualCard">
+      <div class="card-head"><h3>4) تعديل يدوي سريع</h3></div>
+      <div class="card-body">
+        <div class="manual-form compact-manual">
+          <div class="field"><label>الفصل</label><select id="mPeriod" class="select"></select></div>
+          <div class="field"><label>الصف</label><select id="mClass" class="select"></select></div>
+          <div class="field"><label>الشعبة</label><select id="mSection" class="select"></select></div>
+          <div class="field"><label>اليوم</label><select id="mDay" class="select"></select></div>
+          <div class="field"><label>الحصة</label><select id="mSlot" class="select"></select></div>
+          <div class="field"><label>المادة</label><select id="mSubject" class="select"></select></div>
+          <div class="field"><label>المعلمة</label><select id="mTeacher" class="select"></select></div>
+        </div>
+        <div class="toolbar"><div class="filters"><button id="saveManual" class="btn gold">حفظ الحصة</button><button id="deleteManual" class="btn red">حذف الحصة</button></div><span class="muted">قائمة المواد تتغير حسب الصف.</span></div>
+      </div>
+    </section>
+
+    <section class="card" id="holidayCard">
+      <div class="card-head"><h3>5) العطل الرسمية والتقويم</h3></div>
+      <div class="card-body">
+        <div class="compact-form">
+          <div class="field"><label>اسم العطلة</label><input id="holidayName" class="input" placeholder="مثال: عطلة رسمية"></div>
+          <div class="field"><label>التاريخ</label><input id="holidayDate" class="input" type="date"></div>
+          <div class="field"><label>النوع</label><select id="holidayType" class="select"><option value="official">رسمية</option><option value="school">مدرسية</option><option value="exam">امتحانات</option></select></div>
+          <div class="field"><label>تكرار سنوي</label><select id="holidayRecurring" class="select"><option value="false">لا</option><option value="true">نعم</option></select></div>
+          <div class="field"><label>&nbsp;</label><button id="addHolidayBtn" class="btn blue block">إضافة</button></div>
+        </div>
+        <div id="holidaysBox" class="list"></div>
+        <details class="advanced-details" style="margin-top:14px">
+          <summary>مقترحات العطل الشهرية قبل النشر</summary>
+          <div class="toolbar" style="margin-top:12px"><div class="filters"><input id="holidayMonth" class="input" type="month"><button id="generateHolidayCandidates" class="btn blue">توليد المقترحات</button><button id="refreshHolidayCandidates" class="btn">عرض</button></div></div>
+          <div id="holidayCandidatesBox" class="list"></div>
+        </details>
+      </div>
+    </section>
+
+    <details class="advanced-details card advanced-card">
+      <summary>تشغيل متقدم: توليد جلسات، واجبات، ورواتب</summary>
+      <div class="card-body">
+        <div class="compact-form"><div class="field"><label>من تاريخ</label><input id="sessionsStart" class="input" type="date"></div><div class="field"><label>إلى تاريخ</label><input id="sessionsEnd" class="input" type="date"></div><div class="field"><label>الفصل</label><select id="sessionsPeriod" class="select"></select></div><div class="field"><label>&nbsp;</label><button id="generateSessionsBtn" class="btn gold block">توليد الجلسات</button></div><div class="field"><label>&nbsp;</label><button id="regenerateSessionsBtn" class="btn red block">إعادة توليد جلسات هذا الفصل</button></div></div>
+        <div class="notice">إعادة التوليد تحذف الجلسات غير المثبتة فقط ثم تعيد بناءها من الجدول الأسبوعي. الجلسات التي عليها واجب أو نشاط معلمة تبقى محفوظة.</div>
+        <div class="compact-form"><div class="field"><label>تاريخ الحصص</label><input id="sessionDate" class="input" type="date"></div><div class="field"><label>المعلمة</label><select id="sessionTeacher" class="select"></select></div><div class="field"><label>شهر الرواتب</label><input id="payrollMonth" class="input" type="month"></div><div class="field"><label>&nbsp;</label><button id="loadSessionsBtn" class="btn blue block">عرض الحصص</button></div><div class="field"><label>&nbsp;</label><button id="loadPayrollBtn" class="btn gold block">حساب الرواتب</button></div></div>
+        <div id="sessionsBox"></div><div id="payrollBox" style="margin-top:16px"></div>
+      </div>
+    </details>
+  </main>
+</div>
+<div id="toast" class="toast"></div>
+<script src="libs/supabase.min.js"></script><script src="libs/calendar-lib.js"></script><script src="assets/config.js"></script><script src="assets/platform-modules.js"></script><script src="assets/i18n.js"></script><script src="assets/schedule.js"></script>
+<script>window.addEventListener('load',()=>ScheduleManager.init());</script>
+<script src="assets/ux-enhancements.js"></script>
+</body></html>

@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#081426">
+<title>التحصيل والمتابعة — مدارس أمين الرضا</title>
+<link rel="icon" href="/favicon.ico" sizes="any"><link rel="stylesheet" href="assets/portal.css"><link rel="stylesheet" href="assets/amin-identity.css"><link rel="stylesheet" href="assets/brand-redesign.css"><link rel="stylesheet" href="assets/amin-v3.css"><link rel="stylesheet" href="assets/finance-collections.css">
+<link rel="stylesheet" href="assets/i18n.css">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/amin-logo-small.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="أمين الرضا">
+</head>
+<body data-portal="finance-collections">
+<a class="skip-link" href="#mainContent">تخطي إلى المحتوى</a>
+<div class="shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><div class="brand-mark">ت</div><div><h1>التحصيل</h1><small>متأخرات · وعود · تذكير</small></div></div>
+    <div class="profile-mini"><div class="avatar">📞</div><div><b id="profileName">...</b><small id="profileRole">...</small></div></div>
+    <nav class="nav">
+      <button data-view="overview" class="active">الرئيسية</button>
+      <button data-view="students">الطلاب المتأخرون</button>
+      <button data-view="followups">المتابعات والوعود</button>
+      <button data-view="statement">كشف حساب سريع</button>
+      <div class="nav-section">روابط</div>
+      <button onclick="location.href='finance-executive.html'">المركز المالي التنفيذي</button>
+      <button onclick="location.href='finance-pro.html'">النظام المالي</button>
+      <button onclick="location.href='finance-cashbox.html'">صندوق اليومية</button>
+      <button onclick="location.href='finance-credit-report.html'">الرصيد الدائن</button><button onclick="location.href='portal.html'">البوابة الموحدة</button>
+    </nav>
+    <div class="side-footer"><button id="logoutBtn" class="btn red block">تسجيل الخروج</button></div>
+  </aside>
+  <main class="main" id="mainContent" tabindex="-1">
+    <header class="topbar"><button class="btn mobile-menu" id="mobileMenuBtn">☰</button><h2>مركز التحصيل والمتابعة</h2><div class="top-actions"><select id="classFilter" class="select" style="width:auto;min-width:180px"></select><input id="minDaysLate" type="number" class="input" value="0" min="0" placeholder="أيام التأخير" style="width:120px"><button id="remindAllBtn" class="btn gold">تذكير الكل</button><button id="exportBtn" class="btn">تصدير CSV</button><button id="refreshBtn" class="btn blue">تحديث</button></div></header>
+    <section id="view-overview" class="view active"></section>
+    <section id="view-students" class="view"></section>
+    <section id="view-followups" class="view"></section>
+    <section id="view-statement" class="view"></section>
+  </main>
+</div>
+<div id="toast" class="toast"></div>
+<script src="libs/supabase.min.js"></script><script src="assets/config.js"></script><script src="assets/platform-modules.js"></script><script src="assets/i18n.js"></script><script src="assets/finance-collections.js"></script><script src="assets/ux-enhancements.js"></script>
+<script>window.addEventListener('load',()=>FinanceCollections.init());</script>
+</body></html>

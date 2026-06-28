@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#081426">
+<title>المختبرات والأنشطة — مدارس أمين الرضا</title>
+<link rel="icon" href="/favicon.ico" sizes="any"><link rel="stylesheet" href="assets/portal.css"><link rel="stylesheet" href="assets/amin-identity.css"><link rel="stylesheet" href="assets/labs-activities.css"><link rel="stylesheet" href="assets/brand-redesign.css"><link rel="stylesheet" href="assets/amin-v3.css">
+<link rel="stylesheet" href="assets/i18n.css">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/amin-logo-small.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="أمين الرضا">
+</head>
+<body data-portal="labs-activities">
+<a class="skip-link" href="#mainContent">تخطي إلى المحتوى</a>
+<div class="shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><div class="brand-mark">م</div><div><h1>المختبرات والأنشطة</h1><small>تجارب · سلامة · نشاطات</small></div></div>
+    <div class="profile-mini"><div class="avatar">🧪</div><div><b id="profileName">...</b><small id="profileRole">...</small></div></div>
+    <nav class="nav">
+      <button data-view="overview" class="active">الرئيسية</button>
+      <button data-view="labs">المختبرات</button>
+      <button data-view="experiments">التجارب</button>
+      <button data-view="incidents">السلامة والحوادث</button>
+      <button data-view="activities">الأنشطة</button>
+      <button data-view="participants">المشاركون والحضور</button>
+      <div class="nav-section">روابط</div>
+      <button onclick="location.href='portal.html'">البوابة الموحدة</button>
+      <button onclick="history.back()">رجوع</button>
+    </nav>
+    <div class="side-footer"><button id="logoutBtn" class="btn red block">تسجيل الخروج</button></div>
+  </aside>
+  <main class="main" id="mainContent" tabindex="-1">
+    <header class="topbar"><button class="btn mobile-menu" id="mobileMenuBtn">☰</button><h2>المختبرات والأنشطة</h2><div class="top-actions"><button id="seedBtn" class="btn gold manage-only">تهيئة عينة</button><button id="refreshBtn" class="btn blue">تحديث</button></div></header>
+    <section id="view-overview" class="view active"></section>
+    <section id="view-labs" class="view"></section>
+    <section id="view-experiments" class="view"></section>
+    <section id="view-incidents" class="view"></section>
+    <section id="view-activities" class="view"></section>
+    <section id="view-participants" class="view"></section>
+  </main>
+</div>
+<div id="toast" class="toast"></div>
+<script src="libs/supabase.min.js"></script><script src="assets/config.js"></script><script src="assets/platform-modules.js"></script><script src="assets/i18n.js"></script><script src="assets/labs-activities.js"></script><script src="assets/ux-enhancements.js"></script>
+<script>window.addEventListener('load',()=>LabsActivitiesApp.init());</script>
+</body></html>

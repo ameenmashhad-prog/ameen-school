@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>طلبات التسجيل — مدارس أمين الرضا</title>
+<link rel="icon" href="/favicon.ico" sizes="any"><link rel="stylesheet" href="assets/portal.css"><link rel="stylesheet" href="assets/amin-identity.css"><link rel="stylesheet" href="assets/registration.css">
+<link rel="stylesheet" href="assets/brand-redesign.css"><link rel="stylesheet" href="assets/amin-v3.css">
+<link rel="stylesheet" href="assets/i18n.css">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/amin-logo-small.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="أمين الرضا">
+</head>
+<body>
+<a class="skip-link" href="#mainContent">تخطي إلى المحتوى</a>
+<main class="reg-shell" id="mainContent" tabindex="-1"><div class="reg-container">
+<header class="reg-header"><div class="reg-brand"><div class="reg-logo">ع</div><div><h1>طلبات التسجيل</h1><small>مراجعة طلبات أولياء الأمور والطلاب والمعلمين للعام 2026-2027</small></div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn" href="portal.html">البوابة الموحدة</a><button class="btn blue" onclick="loadAll()">تحديث</button></div></header>
+<section class="reg-hero"><div class="reg-title"><h2>مركز مراجعة طلبات التسجيل</h2><p>هذه الصفحة تقرأ طلبات التسجيل الجديدة وتسمح بتغيير الحالة إلى reviewed / approved / rejected. التحويل النهائي إلى حسابات users/students يتم لاحقاً بخطوة اعتماد مستقلة.</p></div><aside class="reg-side"><div class="steps"><div class="step"><b>1</b><span>استلام الطلب</span></div><div class="step"><b>2</b><span>مراجعة البيانات والصور</span></div><div class="step"><b>3</b><span>اعتماد أو رفض</span></div></div></aside></section>
+<section class="reg-card"><div class="card-head"><h3>طلبات الأسر والطلاب</h3></div><div class="card-body" id="familiesBox"><div class="empty">جاري التحميل...</div></div></section>
+<section class="reg-card"><div class="card-head"><h3>طلبات المعلمين</h3></div><div class="card-body" id="teachersBox"><div class="empty">جاري التحميل...</div></div></section>
+</div></main><div id="toast" class="toast"></div>
+<script src="libs/supabase.min.js"></script><script src="assets/config.js"></script><script src="assets/platform-modules.js"></script><script src="assets/i18n.js"></script>
+<script>
+'use strict';
+const sb=supabase.createClient(AMIN_CONFIG.supabaseUrl,AMIN_CONFIG.supabaseAnonKey,{auth:{persistSession:true,autoRefreshToken:true,storageKey:(AMIN_CONFIG.authStorageKey||'amin-ovcjzsrqqgjsbqswtkro-auth-v2')}});
+const $=s=>document.querySelector(s);function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}function toast(t,m){const el=$('#toast');el.innerHTML='<b>'+esc(t)+'</b><br><span class="muted">'+esc(m||'')+'</span>';el.className='toast show';clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),3500)}
+async function ensure(){const {data:{session}}=await sb.auth.getSession();if(!session){location.href='index.html';return false}const {data:u}=await sb.from('users').select('role,is_super_admin').eq('id',session.user.id).maybeSingle();if(!u||!(u.is_super_admin||['admin','academic','academic_admin'].includes(u.role))){$('#familiesBox').innerHTML='<div class="empty">ليست لديك صلاحية مراجعة الطلبات</div>';return false}return true}
+function table(headers,rows){return rows.length?'<div class="table-wrap"><table><thead><tr>'+headers.map(h=>'<th>'+esc(h)+'</th>').join('')+'</tr></thead><tbody>'+rows.join('')+'</tbody></table></div>':'<div class="empty">لا توجد طلبات</div>'}
+async function setStatus(table,id,status){const {error}=await sb.from(table).update({status}).eq('id',id);if(error)toast('خطأ',error.message);else{toast('تم التحديث',status);loadAll()}}
+async function loadFamilies(){const {data,error}=await sb.from('v_registration_family_students').select('*').order('created_at',{ascending:false});if(error){$('#familiesBox').innerHTML='<div class="empty">'+esc(error.message)+'</div>';return}const rows=(data||[]).map(r=>'<tr><td>'+esc(r.guardian_name)+'</td><td>'+esc(r.phone_primary||'—')+'</td><td>'+esc(r.student_name||'—')+'</td><td>'+esc(r.class_name||'—')+'</td><td>'+esc(r.section||'—')+'</td><td><span class="badge gold">'+esc(r.family_status)+'</span></td><td><button class="btn green" onclick="setStatus(\'registration_families\',\''+r.family_id+'\',\'approved\')">اعتماد</button> <button class="btn red" onclick="setStatus(\'registration_families\',\''+r.family_id+'\',\'rejected\')">رفض</button></td></tr>');$('#familiesBox').innerHTML=table(['ولي الأمر','الهاتف','الطالب','الصف','الشعبة','الحالة','إجراء'],rows)}
+async function loadTeachers(){const {data,error}=await sb.from('registration_teachers').select('*').order('created_at',{ascending:false});if(error){$('#teachersBox').innerHTML='<div class="empty">'+esc(error.message)+'</div>';return}const rows=(data||[]).map(r=>'<tr><td>'+esc(r.full_name)+'</td><td>'+esc(r.qualification||'—')+'</td><td>'+esc(r.specialization||'—')+'</td><td>'+esc(r.phone||'—')+'</td><td>'+esc(r.email||'—')+'</td><td><span class="badge gold">'+esc(r.status)+'</span></td><td><button class="btn green" onclick="setStatus(\'registration_teachers\',\''+r.id+'\',\'approved\')">اعتماد</button> <button class="btn red" onclick="setStatus(\'registration_teachers\',\''+r.id+'\',\'rejected\')">رفض</button></td></tr>');$('#teachersBox').innerHTML=table(['المعلم','المؤهل','التخصص','الهاتف','البريد','الحالة','إجراء'],rows)}
+async function loadAll(){if(!await ensure())return;await Promise.all([loadFamilies(),loadTeachers()])}
+window.addEventListener('load',loadAll);
+</script><script src="assets/ux-enhancements.js"></script>
+</body></html>

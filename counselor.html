@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090E1A">
+<title>الإرشاد النفسي — مدارس أمين الرضا</title>
+<link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="stylesheet" href="assets/portal.css"><link rel="stylesheet" href="assets/amin-identity.css"><link rel="stylesheet" href="assets/counselor.css">
+<link rel="stylesheet" href="assets/brand-redesign.css"><link rel="stylesheet" href="assets/amin-v3.css">
+<link rel="stylesheet" href="assets/i18n.css">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/amin-logo-small.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="أمين الرضا">
+</head>
+<body data-portal="counselor">
+<a class="skip-link" href="#mainContent">تخطي إلى المحتوى</a>
+<div class="counselor-app">
+  <header class="counselor-topbar">
+    <button class="btn mobile-menu" id="mobileMenuBtn">☰</button>
+    <div class="counselor-identity"><div class="counselor-avatar">ن</div><div><b id="profileName">...</b><small id="profileRole">المرشد النفسي</small></div></div>
+    <nav class="counselor-mode-tabs" aria-label="أقسام الإرشاد">
+      <button data-view="cases" class="active">قائمة الحالات</button>
+      <button data-view="schedule">جدول الجلسات</button>
+      <button data-view="analytics">التحليلات</button>
+      <button data-view="alerts">التنبيهات</button><button data-view="handover">تسليم الحالات</button>
+    </nav>
+    <div class="counselor-search"><input id="globalSearch" placeholder="ابحث عن طالب بالاسم أو الرقم..."><span class="command-shortcut">Ctrl K</span></div>
+    <div class="counselor-actions"><span id="offlineStatus" class="sync-status online">متصل</span><button id="draftsBtn" class="btn">المسودات <span id="draftCount" class="mini-badge">0</span></button><button id="newSessionBtn" class="btn blue">+ جلسة جديدة</button><button id="newCaseBtn" class="btn gold">+ حالة</button><button id="privacyLockBtn" class="btn">قفل الشاشة</button><button onclick="location.href='portal.html'" class="btn">البوابة</button></div>
+  </header>
+  <aside class="counselor-left" id="sidebar">
+    <div class="caseload-head"><div><h2>حالاتي النشطة</h2><small id="caseCount">0</small></div><button class="btn small gold" onclick="Counselor.openNewCase()">إضافة حالة</button></div>
+    <div class="case-filters" id="caseFilters"></div>
+    <div class="case-list" id="caseList"></div>
+  </aside>
+  <main class="counselor-main" id="mainContent" tabindex="-1">
+    <section id="centerView" class="counselor-center-card"><div class="counselor-skeleton"></div></section>
+  </main>
+  <aside class="counselor-right" id="rightPanel">
+    <div id="dailyCompanion"></div>
+  </aside>
+</div>
+<div id="counselorSlide" class="counselor-slide" hidden></div>
+<div id="privacyOverlay" class="privacy-overlay" hidden></div>
+<div id="toast" class="toast"></div>
+<script src="libs/supabase.min.js"></script><script src="assets/config.js"></script><script src="assets/platform-modules.js"></script><script src="assets/i18n.js"></script><script src="assets/counselor.js"></script>
+<script>window.addEventListener('load',()=>Counselor.init());</script>
+<script src="assets/ux-enhancements.js"></script>
+</body></html>

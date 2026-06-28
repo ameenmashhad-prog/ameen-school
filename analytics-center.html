@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#081426">
+<title>مركز التحليلات — مدارس أمين الرضا</title>
+<link rel="icon" href="/favicon.ico" sizes="any"><link rel="stylesheet" href="assets/portal.css"><link rel="stylesheet" href="assets/amin-identity.css"><link rel="stylesheet" href="assets/brand-redesign.css"><link rel="stylesheet" href="assets/amin-v3.css"><link rel="stylesheet" href="assets/analytics-center.css">
+<link rel="stylesheet" href="assets/i18n.css">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/amin-logo-small.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="أمين الرضا">
+</head>
+<body data-portal="analytics-center">
+<a class="skip-link" href="#mainContent">تخطي إلى المحتوى</a>
+<div class="shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><div class="brand-mark">ت</div><div><h1>مركز التحليلات</h1><small>مؤشرات · تنبيهات · تصدير</small></div></div>
+    <div class="profile-mini"><div class="avatar">📊</div><div><b id="profileName">...</b><small id="profileRole">...</small></div></div>
+    <nav class="nav">
+      <button data-view="overview" class="active">الرئيسية</button>
+      <button data-view="academic">الأكاديمي</button>
+      <button data-view="finance">المالي</button>
+      <button data-view="operations">التشغيلي</button>
+      <button data-view="insights">التنبيهات الذكية</button>
+      <div class="nav-section">روابط</div>
+      <button onclick="location.href='portal.html'">البوابة الموحدة</button>
+      <button onclick="location.href='announcements.html'">الإعلانات</button>
+      <button onclick="history.back()">رجوع</button>
+    </nav>
+    <div class="side-footer"><button id="logoutBtn" class="btn red block">تسجيل الخروج</button></div>
+  </aside>
+  <main class="main" id="mainContent" tabindex="-1">
+    <header class="topbar"><button class="btn mobile-menu" id="mobileMenuBtn">☰</button><h2>مركز التحليلات المؤسسية</h2><div class="top-actions"><button id="exportBtn" class="btn gold">تصدير CSV</button><button id="refreshBtn" class="btn blue">تحديث</button></div></header>
+    <section id="view-overview" class="view active"></section>
+    <section id="view-academic" class="view"></section>
+    <section id="view-finance" class="view"></section>
+    <section id="view-operations" class="view"></section>
+    <section id="view-insights" class="view"></section>
+  </main>
+</div>
+<div id="toast" class="toast"></div>
+<script src="libs/supabase.min.js"></script><script src="assets/config.js"></script><script src="assets/platform-modules.js"></script><script src="assets/i18n.js"></script><script src="assets/analytics-center.js"></script><script src="assets/ux-enhancements.js"></script>
+<script>window.addEventListener('load',()=>AnalyticsCenter.init());</script>
+</body></html>
