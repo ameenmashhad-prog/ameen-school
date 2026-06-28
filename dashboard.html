@@ -4,260 +4,415 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>مدرسة أمين الرضا - لوحة التحكم</title>
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Google Fonts (Cairo) -->
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- Supabase JS Library -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: 'Cairo', sans-serif;
-      background: radial-gradient(circle at top left, #1e293b, #0f172a);
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: #f1f5f9;
+      min-height: 100vh;
+      padding-bottom: 40px;
     }
-    .glass-card {
+    header {
+      background: rgba(30, 41, 59, 0.8);
+      backdrop-filter: blur(10px);
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .logo-icon {
+      background: linear-gradient(135deg, #3b82f6, #10b981);
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: bold;
+    }
+    .logo h1 {
+      font-size: 20px;
+      background: linear-gradient(90deg, #60a5fa, #34d399);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: bold;
+    }
+    .logo p { font-size: 11px; color: #94a3b8; }
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .user-details { text-align: left; }
+    .user-details p { font-weight: bold; font-size: 14px; }
+    .role-badge {
+      background: rgba(59, 130, 246, 0.15);
+      color: #60a5fa;
+      padding: 2px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      display: inline-block;
+      margin-top: 2px;
+    }
+    .logout-btn {
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s;
+    }
+    .logout-btn:hover {
+      background: #ef4444;
+      color: white;
+    }
+    main {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    .welcome-banner {
       background: rgba(30, 41, 59, 0.7);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 24px;
+      border-radius: 16px;
+      margin-bottom: 32px;
+      border: 1px solid rgba(255,255,255,0.08);
+      position: relative;
+      overflow: hidden;
+    }
+    .welcome-banner h2 {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+    .welcome-banner p {
+      color: #cbd5e1;
+      font-size: 14px;
+    }
+    .category-section { margin-bottom: 40px; }
+    .category-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .category-title .bar {
+      width: 4px;
+      height: 24px;
+      background: #3b82f6;
+      border-radius: 2px;
+    }
+    .category-title h3 {
+      font-size: 18px;
+      font-weight: bold;
+    }
+    .count-badge {
+      background: rgba(100, 116, 139, 0.2);
+      color: #94a3b8;
+      padding: 2px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+    }
+    .modules-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
     }
     .module-card {
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      background: rgba(30, 41, 59, 0.7);
+      padding: 20px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      gap: 16px;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-decoration: none;
+      color: inherit;
     }
     .module-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.2);
+      transform: translateY(-4px);
       border-color: rgba(59, 130, 246, 0.4);
+      box-shadow: 0 10px 30px rgba(59, 130, 246, 0.15);
+    }
+    .module-icon {
+      background: rgba(59, 130, 246, 0.1);
+      color: #60a5fa;
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+    .module-content { flex: 1; min-width: 0; }
+    .module-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+    .module-title {
+      font-weight: bold;
+      font-size: 15px;
+    }
+    .module-badge {
+      background: rgba(245, 158, 11, 0.15);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: bold;
+    }
+    .module-desc {
+      color: #94a3b8;
+      font-size: 12px;
+      line-height: 1.5;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+    .loader, .empty {
+      text-align: center;
+      padding: 60px 20px;
+      color: #94a3b8;
+    }
+    .empty-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+      opacity: 0.5;
+    }
+    .error-box {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #f87171;
+      padding: 24px;
+      border-radius: 12px;
+      text-align: center;
     }
   </style>
 </head>
-<body class="text-slate-100 min-h-screen pb-12">
-
-  <!-- شريط التنقل العلوي -->
-  <header class="w-full glass-card sticky top-0 z-50 px-6 py-4 flex justify-between items-center shadow-lg">
-    <div class="flex items-center gap-3">
-      <div class="bg-blue-600 p-2 rounded-lg text-white">
-        <i data-lucide="graduation-cap" class="w-8 h-8"></i>
-      </div>
+<body>
+  <header>
+    <div class="logo">
+      <div class="logo-icon">🎓</div>
       <div>
-        <h1 class="font-extrabold text-xl tracking-wide bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">
-          مدرسة أمين الرضا
-        </h1>
-        <p class="text-xs text-slate-400">نظام الإدارة المدرسية المتكامل</p>
+        <h1>مدرسة أمين الرضا</h1>
+        <p>نظام الإدارة المدرسية المتكامل</p>
       </div>
     </div>
-    
-    <div class="flex items-center gap-4">
-      <div class="text-left hidden md:block">
-        <p class="font-bold text-sm" id="user-display-name">جاري التحميل...</p>
-        <span class="text-xs bg-slate-800 text-blue-400 px-2 py-0.5 rounded-full" id="user-display-role">...</span>
+    <div class="user-info">
+      <div class="user-details">
+        <p id="user-display-name">جاري التحميل...</p>
+        <span class="role-badge" id="user-display-role">...</span>
       </div>
-      <button onclick="handleLogout()" class="bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white p-2.5 rounded-lg transition-all duration-200" title="تسجيل الخروج">
-        <i data-lucide="log-out" class="w-5 h-5"></i>
-      </button>
+      <button class="logout-btn" onclick="handleLogout()">خروج</button>
     </div>
   </header>
 
-  <!-- المحتوى الرئيسي -->
-  <main class="max-w-7xl mx-auto px-6 mt-8">
-    
-    <!-- واجهات مخصصة ترحيبية -->
-    <div class="mb-8 p-6 rounded-2xl glass-card relative overflow-hidden">
-      <div class="absolute right-0 top-0 w-1/3 h-full bg-gradient-to-l from-blue-600/10 to-transparent pointer-events-none"></div>
-      <h2 class="text-2xl font-black mb-2" id="welcome-title">أهلاً بك في نظام أمين الرضا الذكي</h2>
-      <p class="text-slate-300 text-sm max-w-2xl">
-        لا تظهر هنا إلا الأقسام المسموحة لحسابك وصلاحياتك الحالية. يمكنك التنقل بين الخدمات التشغيلية اليومية أدناه.
-      </p>
+  <main>
+    <div class="welcome-banner">
+      <h2 id="welcome-title">أهلاً بك في نظام أمين الرضا</h2>
+      <p>لا تظهر هنا إلا الأقسام المسموحة لحسابك وصلاحياتك الحالية.</p>
     </div>
 
-    <!-- مكان تحميل وتوزيع الموديلات ديناميكياً -->
-    <div id="categories-container" class="space-y-12">
-      <!-- جاري التحميل Skeleton -->
-      <div class="animate-pulse space-y-4">
-        <div class="h-6 bg-slate-700 rounded w-1/4"></div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div class="h-32 bg-slate-800 rounded-xl"></div>
-          <div class="h-32 bg-slate-800 rounded-xl"></div>
-          <div class="h-32 bg-slate-800 rounded-xl"></div>
-        </div>
-      </div>
+    <div id="categories-container">
+      <div class="loader">⏳ جاري تحميل الواجهات...</div>
     </div>
-
   </main>
 
   <script>
-    // الإعدادات الأساسية للاتصال بالبروكسي
     const SUPABASE_URL = window.location.origin + '/api';
-    // مفتاح الـ Anon Key الخاص بمشروعك
- const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im92Y2p6c3JxcWdqc2Jxc3d0a3JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2MjIxNjIsImV4cCI6MjA5NjE5ODE2Mn0._sPE8K26oTCEGlxBaG_vBk-U2yDNKFV1por5YIv8xko";
-    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im92Y2p6c3JxcWdqc2Jxc3d0a3JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2MjIxNjIsImV4cCI6MjA5NjE5ODE2Mn0._sPE8K26oTCEGlxBaG_vBk-U2yDNKFV1por5YIv8xko";
 
-    // تسميات الأقسام العربية والترتيب
     const CATEGORY_NAMES = {
-      'main': 'الواجهات الرئيسية',
-      'hr_services': 'الموارد البشرية والخدمات',
-      'finance': 'المالية والمصروفات',
-      'academic': 'الأكاديمي والجداول',
-      'exams': 'الواجبات والاختبارات',
-      'resources': 'الموارد والمرافق'
+      'main': '🏠 الواجهات الرئيسية',
+      'hr_services': '👥 الموارد البشرية والخدمات',
+      'analytics': '📊 التحليلات وإدارة النظام',
+      'finance': '💰 المالية',
+      'academic': '📚 الأكاديمي والجداول',
+      'exams': '✍️ الواجبات والاختبارات',
+      'resources': '📦 الموارد والمرافق'
     };
 
-    // التحقق من وجود الجلسة والبدء
+    const MODULE_ICONS = {
+      'calendar': '📅', 'award': '🏆', 'settings': '⚙️',
+      'briefcase': '💼', 'user': '👤', 'shield': '🛡️',
+      'users': '👥', 'file-text': '📄', 'key': '🔑',
+      'bell': '🔔', 'bar-chart': '📊', 'trending-up': '📈',
+      'megaphone': '📢', 'check-circle': '✅', 'shield-check': '🔒',
+      'tool': '🔧', 'dollar-sign': '💵', 'archive': '📦',
+      'printer': '🖨️', 'activity': '📉', 'phone-call': '📞',
+      'credit-card': '💳', 'sliders': '🎚️', 'book-open': '📖',
+      'map': '🗺️', 'clock': '🕐', 'layers': '🗂️',
+      'edit-3': '✏️', 'bar-chart-2': '📊', 'list': '📋',
+      'database': '🗄️', 'monitor': '🖥️', 'eye': '👁️',
+      'book': '📚', 'shopping-cart': '🛒', 'package': '📦',
+      'flask': '🧪', 'truck': '🚌', 'folder': '📁'
+    };
+
+    function getToken() {
+      try {
+        const session = localStorage.getItem('sb_session');
+        if (!session) return null;
+        return JSON.parse(session).access_token;
+      } catch { return null; }
+    }
+
+    function getUserId() {
+      try {
+        const session = localStorage.getItem('sb_session');
+        if (!session) return null;
+        const parsed = JSON.parse(session);
+        return parsed.user?.id || parsed.user_id;
+      } catch { return null; }
+    }
+
+    async function apiGet(path) {
+      const token = getToken();
+      const res = await fetch(SUPABASE_URL + path, {
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': 'Bearer ' + (token || SUPABASE_KEY),
+          'Content-Type': 'application/json'
+        }
+      });
+      if (!res.ok) throw new Error('فشل الاتصال: ' + res.status);
+      return await res.json();
+    }
+
     async function initDashboard() {
-      const { data: { session }, error: sessionError } = await sb.auth.getSession();
-      
-      if (sessionError || !session) {
-        console.log("لا توجد جلسة نشطة، إعادة توجيه...");
+      const userId = getUserId();
+      if (!userId) {
         window.location.href = 'index.html';
         return;
       }
 
       try {
-        const userId = session.user.id;
-
-        // جلب معلومات الملف الشخصي والدور من جدول users
-        const { data: profile, error: profileError } = await sb
-          .from('users')
-          .select('full_name, role')
-          .eq('id', userId)
-          .single();
-
-        if (profileError || !profile) {
-          throw new Error("فشل جلب بيانات المستخدم الشخصية");
+        // جلب بيانات المستخدم
+        const users = await apiGet(`/rest/v1/users?id=eq.${userId}&select=name,role`);
+        
+        if (!users || users.length === 0) {
+          throw new Error('لم يتم العثور على بيانات المستخدم');
         }
 
-        // تحديث واجهة المستخدم العلوية باسم المستخدم ودوره
-        document.getElementById('user-display-name').innerText = profile.full_name;
-        document.getElementById('user-display-role').innerText = translateRole(profile.role);
-        document.getElementById('welcome-title').innerText = `أهلاً بك مجدداً، ${profile.full_name.split(' ')[0]} 👋`;
+        const profile = users[0];
+        document.getElementById('user-display-name').textContent = profile.name || 'مستخدم';
+        document.getElementById('user-display-role').textContent = translateRole(profile.role);
+        document.getElementById('welcome-title').textContent = `أهلاً بك، ${(profile.name || '').split(' ')[0]} 👋`;
 
-        // جلب الصلاحيات والصفحات المسموحة لهذا الدور (Role)
-        await loadAllowedModules(profile.role);
+        // جلب الصلاحيات
+        const permissions = await apiGet(
+          `/rest/v1/role_module_permissions?role=eq.${profile.role}&can_view=eq.true&select=module_key,app_modules!inner(title,description,category,icon,route,sort_order,badge_text,is_active)`
+        );
+
+        const modules = permissions
+          .map(p => p.app_modules)
+          .filter(m => m && m.is_active)
+          .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+
+        renderModules(modules);
 
       } catch (err) {
         console.error(err);
         document.getElementById('categories-container').innerHTML = `
-          <div class="bg-red-500/10 border border-red-500/20 p-6 rounded-xl text-red-400 text-center">
-             فشل تحميل لوحة التحكم: ${err.message}. يرجى محاولة تسجيل الدخول مرة أخرى.
+          <div class="error-box">
+            ❌ فشل تحميل لوحة التحكم<br>
+            <small>${err.message}</small>
           </div>
         `;
       }
     }
 
-    // جلب الوحدات المسموحة للدور الحالي
-    async function loadAllowedModules(role) {
-      const { data: permissions, error: permError } = await sb
-        .from('role_module_permissions')
-        .select(`
-          module_key,
-          app_modules:module_key (
-            title,
-            description,
-            category,
-            icon,
-            route,
-            sort_order,
-            badge_text,
-            is_active
-          )
-        `)
-        .eq('role', role)
-        .eq('can_view', true);
-
-      if (permError) throw permError;
-
-      // تصفية وتجهيز البيانات
-      const allowedModules = permissions
-        .map(p => p.app_modules)
-        .filter(m => m && m.is_active)
-        .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
-
-      renderModules(allowedModules);
-    }
-
-    // عرض وتوزيع الكروت ديناميكياً بالمجموعات والألوان
     function renderModules(modules) {
       const container = document.getElementById('categories-container');
-      container.innerHTML = '';
-
+      
       if (modules.length === 0) {
         container.innerHTML = `
-          <div class="text-center py-12 text-slate-400">
-            <i data-lucide="lock" class="w-12 h-12 mx-auto mb-3 opacity-50"></i>
-            <p>لا توجد واجهات مفعلة لحسابك حالياً. يرجى مراجعة إدارة النظام.</p>
+          <div class="empty">
+            <div class="empty-icon">🔒</div>
+            <p>لا توجد واجهات مفعلة لحسابك حالياً.</p>
           </div>
         `;
-        lucide.createIcons();
         return;
       }
 
-      // تقسيم الموديلات حسب المجموعة (Category)
       const grouped = {};
       modules.forEach(m => {
         if (!grouped[m.category]) grouped[m.category] = [];
         grouped[m.category].push(m);
       });
 
-      // رندرة المجموعات في الصفحة
+      let html = '';
       for (const [catKey, catModules] of Object.entries(grouped)) {
         const catTitle = CATEGORY_NAMES[catKey] || catKey;
-        
-        const section = document.createElement('section');
-        section.className = 'space-y-4';
-        
-        section.innerHTML = `
-          <div class="flex items-center gap-3 border-b border-slate-800 pb-2">
-            <span class="w-1 h-6 bg-blue-500 rounded"></span>
-            <h3 class="text-lg font-extrabold text-slate-200">${catTitle}</h3>
-            <span class="text-xs bg-slate-800 text-slate-400 px-2.5 py-0.5 rounded-full">${catModules.length}</span>
-          </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            ${catModules.map(m => `
-              <a href="${m.route}" class="module-card glass-card p-5 rounded-2xl flex items-start gap-4 cursor-pointer hover:border-blue-500/40">
-                <div class="p-3 bg-blue-500/10 text-blue-400 rounded-xl">
-                  <i data-lucide="${m.icon || 'arrow-up-right'}" class="w-6 h-6"></i>
-                </div>
-                <div class="flex-1 min-w-0">
-                  <div class="flex items-center justify-between gap-2 mb-1">
-                    <h4 class="font-bold text-slate-100 truncate text-sm md:text-base">${m.title}</h4>
-                    ${m.badge_text ? `<span class="text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded font-bold">${m.badge_text}</span>` : ''}
+        html += `
+          <section class="category-section">
+            <div class="category-title">
+              <span class="bar"></span>
+              <h3>${catTitle}</h3>
+              <span class="count-badge">${catModules.length}</span>
+            </div>
+            <div class="modules-grid">
+              ${catModules.map(m => `
+                <a href="${m.route}" class="module-card">
+                  <div class="module-icon">${MODULE_ICONS[m.icon] || '📌'}</div>
+                  <div class="module-content">
+                    <div class="module-header">
+                      <span class="module-title">${m.title}</span>
+                      ${m.badge_text ? `<span class="module-badge">${m.badge_text}</span>` : ''}
+                    </div>
+                    <p class="module-desc">${m.description || ''}</p>
                   </div>
-                  <p class="text-xs text-slate-400 line-clamp-2 leading-relaxed">${m.description || ''}</p>
-                </div>
-              </a>
-            `).join('')}
-          </div>
+                </a>
+              `).join('')}
+            </div>
+          </section>
         `;
-        container.appendChild(section);
       }
-
-      // تفعيل الأيقونات ديناميكياً
-      lucide.createIcons();
+      container.innerHTML = html;
     }
 
-    // ترجمة الأدوار للعربية لجمال المظهر
     function translateRole(role) {
       const roles = {
         'admin': 'مدير النظام',
         'teacher': 'معلم',
         'student': 'طالب',
         'parent': 'ولي أمر',
-        'finance': 'المسؤول المالي',
-        'discipline': 'المشرف التربوي'
+        'finance': 'مالية',
+        'discipline': 'مشرف تربوي',
+        'counselor': 'مرشد نفسي'
       };
       return roles[role] || role;
     }
 
-    // تسجيل الخروج
-    async function handleLogout() {
-      if (confirm("هل تريد تسجيل الخروج بالفعل؟")) {
-        await sb.auth.signOut();
+    function handleLogout() {
+      if (confirm("هل تريد تسجيل الخروج؟")) {
+        localStorage.removeItem('sb_session');
         window.location.href = 'index.html';
       }
     }
 
-    // بدء التشغيل
     window.onload = initDashboard;
   </script>
 </body>
