@@ -83,6 +83,9 @@
 (function(){
   'use strict';
 
+  // ========== إعدادات المدرسة ==========
+  const SCHOOL_PHONE = '+9647700000000'; // 🔧 غيّر رقم المدرسة هنا
+
   // ========== دوال مساعدة ==========
   function $(s, r=document){return r.querySelector(s)}
   function esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;')}
@@ -179,17 +182,12 @@
       CHILDREN = children || [];
       window.CHILDREN = CHILDREN;
       console.log('✅ Children count:', CHILDREN.length);
-      console.log('✅ Children data:', CHILDREN);
 
-      // جلب الإشعارات
       await loadNotifications();
-
-      // إعداد قائمة الأبناء
       setupChildSelector();
 
       if(CHILDREN.length > 0) {
         currentChildId = CHILDREN[0].id;
-        // جلب بيانات كل الأبناء (للإحصائيات)
         await Promise.all(CHILDREN.map(c => loadChildData(c.id)));
         renderOverview();
       } else {
@@ -233,7 +231,6 @@
       const childName = child.users?.name || child.name || 'الطالب';
       const data = CHILD_DATA[child.id] || {attendance: [], grades: [], fees: [], behavior: []};
       
-      // تنبيه: غياب متكرر
       const absent = data.attendance.filter(a => a.status === 'absent').length;
       const total = data.attendance.length;
       if(total > 0 && absent > 0) {
@@ -248,7 +245,6 @@
         }
       }
       
-      // تنبيه: أقساط متأخرة
       data.fees.forEach(f => {
         const t = num(f.net_amount || f.base_amount);
         const p = num(f.total_paid);
@@ -263,7 +259,6 @@
         }
       });
       
-      // تنبيه: درجات منخفضة
       const lowGrades = data.grades.filter(g => num(g.score || g.grade || g.mark) < 60);
       if(lowGrades.length > 0) {
         alerts.push({
@@ -274,7 +269,6 @@
         });
       }
       
-      // تنبيه: سلوك سلبي
       const negBehavior = data.behavior.filter(b => num(b.points) < 0);
       if(negBehavior.length > 2) {
         alerts.push({
@@ -359,8 +353,8 @@
 
     const alerts = getSmartAlerts();
     const unreadNotifs = NOTIFICATIONS.filter(n => !n.read_at).length;
-    const schoolPhone = '+989000000000'; // غيّر رقم المدرسة هنا
     const whatsappMsg = encodeURIComponent(`السلام عليكم، أنا ولي أمر ${ME.name||''}، أحتاج للتواصل معكم`);
+    const phoneClean = SCHOOL_PHONE.replace('+','');
 
     let html = `
       <div class="page-head">
@@ -369,10 +363,11 @@
           <p>متابعة شاملة لأبنائك · عدد الأبناء: <b>${CHILDREN.length}</b> ${unreadNotifs > 0 ? `· <span class="badge red">${unreadNotifs} إشعار جديد</span>` : ''}</p>
         </div>
       </div>
-      
-      <h3 style="margin-bottom:12px;">📞 تواصل سريع</h3>
+
+      <!-- ===== شريط التواصل السريع ===== -->
+      <h3 style="margin-bottom:12px;">📞 تواصل سريع مع المدرسة</h3>
       <div class="cards" style="margin-bottom:24px;">
-        <a href="tel:${schoolPhone}" style="text-decoration:none;color:inherit;">
+        <a href="tel:${SCHOOL_PHONE}" style="text-decoration:none;color:inherit;">
           <div class="card" style="background:linear-gradient(135deg,#10b981,#059669);color:white;cursor:pointer;text-align:center;padding:20px;border:none;">
             <div style="font-size:36px;">📞</div>
             <div style="font-weight:bold;margin-top:8px;font-size:15px;">اتصال بالمدرسة</div>
@@ -380,7 +375,7 @@
           </div>
         </a>
         
-        <a href="https://wa.me/${schoolPhone.replace('+','')}?text=${whatsappMsg}" target="_blank" style="text-decoration:none;color:inherit;">
+        <a href="https://wa.me/${phoneClean}?text=${whatsappMsg}" target="_blank" style="text-decoration:none;color:inherit;">
           <div class="card" style="background:linear-gradient(135deg,#25d366,#128c7e);color:white;cursor:pointer;text-align:center;padding:20px;border:none;">
             <div style="font-size:36px;">💬</div>
             <div style="font-weight:bold;margin-top:8px;font-size:15px;">واتساب الإدارة</div>
@@ -398,148 +393,6 @@
           <div style="font-size:36px;">✉️</div>
           <div style="font-weight:bold;margin-top:8px;font-size:15px;">رسالة للمدرسة</div>
           <small style="opacity:0.9;">عبر النظام</small>
-        </div>
-      </div>
-    `;
-    
-    // ===== التنبيهات الذكية =====
-    if(alerts.length > 0) {
-      html += `<div style="margin-bottom:20px;">`;
-      html += `<h3 style="margin-bottom:12px;">⚠️ تنبيهات تحتاج اهتمامك (${alerts.length})</h3>`;
-      html += `<div class="cards">`;
-      alerts.slice(0, 4).forEach(a => {
-        const bgColor = a.type === 'danger' ? '#fee2e2' : a.type === 'warning' ? '#fef3c7' : '#dbeafe';
-        const borderColor = a.type === 'danger' ? '#dc2626' : a.type === 'warning' ? '#d97706' : '#2563eb';
-        html += `
-          <div style="background:${bgColor};border-right:4px solid ${borderColor};padding:14px;border-radius:10px;color:#333;">
-            <div style="font-size:16px;font-weight:bold;margin-bottom:4px;">${a.icon} ${esc(a.title)}</div>
-            <div style="font-size:13px;opacity:0.85;">${esc(a.message)}</div>
-          </div>
-        `;
-      });
-      html += `</div></div>`;
-    }
-    
-    // ===== بطاقات الأبناء =====
-    html += `<h3 style="margin-bottom:12px;">🎓 أبناؤك</h3>`;
-    html += `<div class="cards">`;
-    CHILDREN.forEach(child => {
-      const childName = child.users?.name || child.name || 'طالب';
-      const data = CHILD_DATA[child.id] || {attendance: [], grades: [], fees: [], behavior: []};
-      
-      const presentCount = data.attendance.filter(a => a.status === 'present').length;
-      const absentCount = data.attendance.filter(a => a.status === 'absent').length;
-      const totalAtt = data.attendance.length;
-      const attRate = totalAtt ? Math.round((presentCount/totalAtt) * 100) : 0;
-      
-      const fee = data.fees[0];
-      const total = num(fee?.net_amount || fee?.base_amount || 0);
-      const paid = num(fee?.total_paid || 0);
-      const remaining = Math.max(total - paid, 0);
-      
-      const gradesAvg = data.grades.length 
-        ? Math.round(data.grades.reduce((s,g) => s + num(g.score || g.grade || g.mark), 0) / data.grades.length)
-        : 0;
-
-      const isActive = String(child.id) === String(currentChildId);
-      
-      html += `
-        <div class="card" style="${isActive ? 'border:2px solid #fbbf24;box-shadow:0 4px 20px rgba(251,191,36,0.2);' : ''}cursor:pointer;" 
-             onclick="ParentPortal.selectChild('${child.id}')">
-          <div class="card-head">
-            <h3>🎓 ${esc(childName)}</h3>
-            ${isActive ? '<span class="badge gold">👁️ المحدد</span>' : ''}
-          </div>
-          <div class="card-body">
-            <div class="kpis">
-              <div class="kpi green"><small>الحضور</small><b>${attRate}%</b></div>
-              <div class="kpi red"><small>الغياب</small><b>${absentCount} يوم</b></div>
-              <div class="kpi gold"><small>المعدل</small><b>${gradesAvg}%</b></div>
-              <div class="kpi ${remaining > 0 ? 'red' : 'green'}"><small>المتبقي</small><b>${money(remaining)}</b></div>
-            </div>
-            <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
-              <button class="btn small blue" onclick="event.stopPropagation();ParentPortal.viewChild('${child.id}','grades')">📊 الدرجات</button>
-              <button class="btn small green" onclick="event.stopPropagation();ParentPortal.viewChild('${child.id}','attendance')">📋 الحضور</button>
-              <button class="btn small gold" onclick="event.stopPropagation();ParentPortal.viewChild('${child.id}','finance')">💰 الأقساط</button>
-            </div>
-          </div>
-        </div>
-      `;
-    });
-    html += `</div>`;
-
-    // ===== آخر الإشعارات =====
-    if(NOTIFICATIONS.length > 0) {
-      html += `<h3 style="margin:24px 0 12px;">🔔 آخر الإشعارات</h3>`;
-      html += `<div class="list">`;
-      NOTIFICATIONS.slice(0, 5).forEach(n => {
-        const isUnread = !n.read_at;
-        html += `
-          <div class="item" style="${isUnread ? 'background:#fef3c7;border-right:3px solid #f59e0b;' : ''}">
-            <div>
-              <b>${esc(n.title || 'إشعار')}</b>
-              <small>${esc(n.body || n.message || '')} · ${esc(String(n.created_at || '').slice(0,10))}</small>
-            </div>
-            <span class="badge ${isUnread ? 'gold' : 'blue'}">${isUnread ? 'جديد' : 'مقروء'}</span>
-          </div>
-        `;
-      });
-      html += `</div>`;
-    }
-
-    container.innerHTML = html;
-  }
-    const container = $('#view-overview');
-    if(!CHILDREN.length) return;
-
-    const alerts = getSmartAlerts();
-    const unreadNotifs = NOTIFICATIONS.filter(n => !n.read_at).length;
-
-      let html = `
-      <div class="page-head">
-        <div>
-          <h1>أهلاً بك، ${esc(ME.name)} 👋</h1>
-          <p>متابعة شاملة لأبنائك · عدد الأبناء: <b>${CHILDREN.length}</b> ${unreadNotifs > 0 ? `· <span class="badge red">${unreadNotifs} إشعار جديد</span>` : ''}</p>
-        </div>
-      </div>
-      
-      <!-- شريط التواصل السريع -->
-      <div class="cards" style="margin-bottom:20px;">
-        <a href="tel:+989000000000" style="text-decoration:none;">
-          <div class="card" style="background:linear-gradient(135deg,#10b981,#059669);color:white;cursor:pointer;text-align:center;padding:16px;">
-            <div style="font-size:32px;">📞</div>
-            <div style="font-weight:bold;margin-top:8px;">اتصال بالمدرسة</div>
-            <small style="opacity:0.9;">للتواصل المباشر</small>
-          </div>
-        </a>
-        
-        <a href="https://wa.me/9647700000000?text=السلام%20عليكم،%20أنا%20ولي%20أمر%20${encodeURIComponent(ME.name||'')}،%20أحتاج%20للتواصل%20معكم" target="_blank" style="text-decoration:none;">
-          <div class="card" style="background:linear-gradient(135deg,#25d366,#128c7e);color:white;cursor:pointer;text-align:center;padding:16px;">
-            <div style="font-size:32px;">💬</div>
-            <div style="font-weight:bold;margin-top:8px;">واتساب الإدارة</div>
-            <small style="opacity:0.9;">رد سريع</small>
-          </div>
-        </a>
-        
-        <div onclick="ParentPortal.requestAppointment()" class="card" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:white;cursor:pointer;text-align:center;padding:16px;">
-          <div style="font-size:32px;">📅</div>
-          <div style="font-weight:bold;margin-top:8px;">طلب موعد</div>
-          <small style="opacity:0.9;">مع المرشد/الإدارة</small>
-        </div>
-        
-        <div onclick="ParentPortal.sendMessage()" class="card" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:white;cursor:pointer;text-align:center;padding:16px;">
-          <div style="font-size:32px;">✉️</div>
-          <div style="font-weight:bold;margin-top:8px;">رسالة للمدرسة</div>
-          <small style="opacity:0.9;">عبر النظام</small>
-        </div>
-      </div>
-    `;
-    
-    // إخفاء السطر القديم
-    html = html.replace(`<p>متابعة شاملة لأبنائك · عدد الأبناء: <b>${CHILDREN.length}</b> ${unreadNotifs > 0 ? `· <span class="badge red">${unreadNotifs} إشعار جديد</span>` : ''}</p>
-        </div>
-      </div>`, '');
-          <p>متابعة شاملة لأبنائك · عدد الأبناء: <b>${CHILDREN.length}</b> ${unreadNotifs > 0 ? `· <span class="badge red">${unreadNotifs} إشعار جديد</span>` : ''}</p>
         </div>
       </div>
     `;
@@ -805,6 +658,7 @@
     
     container.innerHTML = html;
   }
+
   // ========== التواصل السريع ==========
   function requestAppointment() {
     const childName = CHILDREN.find(c => c.id === currentChildId)?.users?.name || CHILDREN[0]?.users?.name || 'ابني';
@@ -814,9 +668,10 @@
     const reason = prompt('ما سبب الموعد؟ (اختياري)');
     
     const msg = encodeURIComponent(`السلام عليكم،\nأنا ولي أمر الطالب: ${childName}\nأطلب موعداً في: ${date}\n${reason ? 'السبب: ' + reason : ''}`);
+    const phoneClean = SCHOOL_PHONE.replace('+','');
     
     if(confirm('سيتم فتح واتساب لإرسال الطلب للإدارة. متابعة؟')) {
-      window.open(`https://wa.me/9647700000000?text=${msg}`, '_blank');
+      window.open(`https://wa.me/${phoneClean}?text=${msg}`, '_blank');
     }
   }
   
@@ -828,11 +683,13 @@
     if(!body) return;
     
     const msg = encodeURIComponent(`السلام عليكم،\nأنا ولي أمر: ${ME.name}\n\nالموضوع: ${subject}\n\n${body}`);
+    const phoneClean = SCHOOL_PHONE.replace('+','');
     
     if(confirm('سيتم فتح واتساب لإرسال الرسالة. متابعة؟')) {
-      window.open(`https://wa.me/9647700000000?text=${msg}`, '_blank');
+      window.open(`https://wa.me/${phoneClean}?text=${msg}`, '_blank');
     }
   }
+
   // ========== دوال للاستخدام من HTML ==========
   async function selectChild(childId) {
     currentChildId = childId;
@@ -861,7 +718,9 @@
   }
 
   // ========== التشغيل ==========
-   window.ParentPortal = {
+  window.addEventListener('load', init);
+  
+  window.ParentPortal = {
     init,
     showView,
     renderOverview,
