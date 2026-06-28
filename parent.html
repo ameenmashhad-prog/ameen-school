@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>بوابة ولي الأمر — مدارس أمين الرضا</title>
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="stylesheet" href="assets/portal.css">
+<link rel="stylesheet" href="assets/amin-identity.css">
+<link rel="stylesheet" href="assets/brand-redesign.css">
+<link rel="stylesheet" href="assets/amin-v3.css">
+<link rel="stylesheet" href="assets/i18n.css">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/amin-logo-small.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="أمين الرضا">
+</head>
+<body data-portal="parent">
+<a class="skip-link" href="#mainContent">تخطي إلى المحتوى</a>
+
+<div class="shell">
+  <!-- الشريط الجانبي -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-mark">و</div>
+      <div>
+        <h1>بوابة ولي الأمر</h1>
+        <small>متابعة الأبناء · درجات · أقساط</small>
+      </div>
+    </div>
+    
+    <div class="profile-mini">
+      <div class="avatar">👨‍👩‍👧</div>
+      <div>
+        <b id="profileName">...</b>
+        <small id="profileRole">...</small>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <button onclick="location.href='portal.html'">🏛️ البوابة الموحدة</button>
+      <button data-view="overview" class="active">🏠 الرئيسية</button>
+      <button data-view="grades">📊 درجات الأبناء</button>
+      <button data-view="attendance">📋 حضور الأبناء</button>
+      <button data-view="finance">💰 أقساط الأبناء</button>
+      <button data-view="schedule">🗓️ جداول الأبناء</button>
+      <button data-view="behavior">🌟 سلوك الأبناء</button>
+      <button onclick="location.href='student-homeworks.html'">📚 واجبات الأبناء</button>
+      <button onclick="location.href='notifications.html'">🔔 الإشعارات</button>
+      <button onclick="location.href='smart-calendar.html'">📅 التقويم المدرسي</button>
+    </nav>
+
+    <div class="side-footer">
+      <button id="logoutBtn" class="btn red block">تسجيل الخروج</button>
+    </div>
+  </aside>
+
+  <!-- المحتوى الرئيسي -->
+  <main class="main" id="mainContent" tabindex="-1">
+    <header class="topbar">
+      <button class="btn mobile-menu" id="mobileMenuBtn">☰</button>
+      <h2>بوابة ولي الأمر</h2>
+      <div class="top-actions">
+        <!-- زر تبديل الأبناء سيظهر هنا ديناميكياً إذا وجد أكثر من ابن -->
+        <select id="childSelector" class="select" style="display:none; min-width: 200px;" onchange="ParentPortal.switchChild(this.value)">
+          <option value="">اختر الابن...</option>
+        </select>
+      </div>
+    </header>
+
+    <!-- الأقسام (Views) -->
+    <section id="view-overview" class="view active"></section>
+    <section id="view-grades" class="view"></section>
+    <section id="view-attendance" class="view"></section>
+    <section id="view-finance" class="view"></section>
+    <section id="view-schedule" class="view"></section>
+    <section id="view-behavior" class="view"></section>
+  </main>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<!-- المكتبات والسكريبتات -->
+<script src="libs/supabase.min.js"></script>
+<script src="assets/config.js"></script>
+<script src="assets/platform-modules.js"></script>
+<script src="assets/i18n.js"></script>
+<script src="assets/core.js"></script>
+
+<!-- سكريبت خاص ببوابة ولي الأمر -->
+<script>
+(function(){
+  'use strict';
+  
+  // دالة التهيئة الخاصة بولي الأمر
+  async function initParentPortal() {
+    // نستخدم نفس دالة bootPortal من core.js للتأكد من الجلسة وتحميل البيانات الأساسية
+    if(window.AminPortal && typeof window.AminPortal.bootPortal === 'function') {
+      await window.AminPortal.bootPortal();
+      
+      // بعد تحميل البيانات، نتحقق من وجود أبناء
+      if(window.DATA && window.DATA.students && window.DATA.students.length > 0) {
+        ParentPortal.setupChildSelector(window.DATA.students);
+        // تعيين الابن الأول افتراضياً إذا لم يكن محدداً
+        if(!window.CURRENT_CHILD_ID) {
+          window.CURRENT_CHILD_ID = window.DATA.students[0].id;
+        }
+        ParentPortal.renderOverview();
+      } else {
+        document.getElementById('view-overview').innerHTML = 
+          '<div class="empty"><h3>⚠️ تنبيه</h3><p>لا يوجد طلاب مسجلين تحت هذا الحساب. يرجى مراجعة الإدارة.</p></div>';
+      }
+    }
+  }
+
+  const ParentPortal = {
+    currentChildId: null,
+
+    // إعداد قائمة اختيار الأبناء
+    setupChildSelector: function(students) {
+      const selector = document.getElementById('childSelector');
+      if(students.length > 1) {
+        selector.style.display = 'block';
+        selector.innerHTML = '<option value="">اختر الابن...</option>' + 
+          students.map(s => `<option value="${s.id}">${esc(s.name || s.full_name || 'طالب')}</option>`).join('');
+        selector.value = this.currentChildId || students[0].id;
+      } else if (students.length === 1) {
+        this.currentChildId = students[0].id;
+        selector.style.display = 'none';
+      }
+    },
+
+    // تبديل الابن المحدد
+    switchChild: function(studentId) {
+      if(studentId) {
+        this.currentChildId = studentId;
+        // إعادة رسم الواجهة الحالية بناءً على الابن الجديد
+        const activeView = document.querySelector('.view.active').id.replace('view-', '');
+        if(activeView === 'overview') this.renderOverview();
+        else renderView(activeView); // نستخدم الدالة العامة من core.js إذا كانت متاحة أو نعيد البناء
+      }
+    },
+
+    // عرض الصفحة الرئيسية (نظرة عامة على جميع الأبناء أو الابن المحدد)
+    renderOverview: function() {
+      const container = document.getElementById('view-overview');
+      const students = window.DATA.students.filter(s => String(s.parent_id) === String(window.ME.id));
+      
+      if(!students.length) {
+        container.innerHTML = '<div class="empty">لا توجد بيانات للأبناء.</div>';
+        return;
+      }
+
+      let html = `<div class="page-head"><h1>أهلاً بك، ${esc(window.ME.name)}</h1><p>متابعة شاملة لأبنائك الطلاب</p></div>`;
+      
+      // بطاقات سريعة لكل ابن
+      html += `<div class="cards-grid">`;
+      students.forEach(s => {
+        // حساب سريع للإحصائيات لهذا الطالب
+        const fees = window.DATA.fees.find(f => String(f.student_id) === String(s.id));
+        const paid = fees ? (fees.total_paid || 0) : 0;
+        const total = fees ? (fees.net_amount || fees.base_amount || 0) : 0;
+        const remaining = total - paid;
+        
+        const attCount = window.DATA.attendance.filter(a => String(a.student_id) === String(s.id) && a.status === 'present').length;
+        const absCount = window.DATA.attendance.filter(a => String(a.student_id) === String(s.id) && a.status === 'absent').length;
+        
+        const isActive = String(s.id) === String(this.currentChildId);
+
+        html += `
+          <div class="card child-card ${isActive ? 'active-child' : ''}" onclick="ParentPortal.switchChild('${s.id}')">
+            <div class="card-head">
+              <h3>🎓 ${esc(s.name || 'طالب')}</h3>
+              <span class="badge blue">${esc(s.grade || s.class_name || '-')}</span>
+            </div>
+            <div class="card-body">
+              <div class="stats-row">
+                <div class="stat-item">
+                  <span class="label">الحضور</span>
+                  <span class="value green">${attCount} يوم</span>
+                </div>
+                <div class="stat-item">
+                  <span class="label">الغياب</span>
+                  <span class="value red">${absCount} يوم</span>
+                </div>
+              </div>
+              <div class="finance-mini">
+                <span>المالي: </span>
+                <span class="${remaining > 0 ? 'red' : 'green'}">${remaining > 0 ? 'متبقي ' + remaining : 'مسدد'}</span>
+              </div>
+              ${isActive ? '<div class="active-indicator">👁️ جاري العرض</div>' : ''}
+            </div>
+          </div>
+        `;
+      });
+      html += `</div>`;
+
+      // قسم التنبيهات العامة
+      html += `<div class="card" style="margin-top:20px"><div class="card-head"><h3>🔔 آخر التنبيهات</h3></div><div class="card-body">${this.renderNotificationsPreview()}</div></div>`;
+
+      container.innerHTML = html;
+    },
+
+    renderNotificationsPreview: function() {
+      const notifs = window.DATA.notifications || [];
+      if(!notifs.length) return '<div class="empty">لا توجد إشعارات جديدة.</div>';
+      return notifs.slice(0, 3).map(n => `
+        <div class="notification-item">
+          <b>${esc(n.title)}</b>
+          <small>${esc(n.created_at ? new Date(n.created_at).toLocaleDateString('ar-IQ') : '')}</small>
+          <p class="muted">${esc(n.body || n.message || '')}</p>
+        </div>
+      `).join('');
+    }
+  };
+
+  // دوال مساعدة
+  function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));}
+
+  // ربط الدوال بالنافذة العالمية لاستخدامها في HTML
+  window.ParentPortal = ParentPortal;
+
+  // بدء التشغيل عند تحميل الصفحة
+  window.addEventListener('load', initParentPortal);
+
+})();
+</script>
+
+<script src="assets/ux-enhancements.js"></script>
+</body>
+</html>
