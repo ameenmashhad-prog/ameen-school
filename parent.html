@@ -96,6 +96,7 @@
   let SESSION = null;
   let CHILDREN = [];
   let CHILD_DATA = {};
+  let NOTIFICATIONS = [];
 
   function cfg() { return window.AMIN_CONFIG || {}; }
   
@@ -124,17 +125,15 @@
     try {
       const c = client();
       
-      // 1. التحقق من الجلسة
       const { data: { session } } = await c.auth.getSession();
       if(!session) {
-        console.log('❌ No session - redirecting to login');
+        console.log('❌ No session - redirecting');
         location.href = 'index.html';
         return;
       }
       SESSION = session;
       console.log('✅ Session OK:', session.user.email);
 
-      // 2. جلب بيانات ولي الأمر
       const { data: user, error } = await c.from('users').select('*').eq('id', session.user.id).maybeSingle();
       if(error || !user) {
         console.error('❌ Failed to load user:', error);
@@ -145,22 +144,18 @@
       window.ME = ME;
       console.log('✅ User loaded:', ME.name, 'Role:', ME.role);
 
-      // 3. تحديث الواجهة العلوية
       $('#profileName').textContent = ME.name || ME.email || 'ولي أمر';
       $('#profileRole').textContent = 'ولي أمر';
 
-      // 4. زر تسجيل الخروج
       $('#logoutBtn').onclick = async () => {
         await c.auth.signOut({scope:'local'}).catch(()=>{});
         location.href = 'index.html';
       };
 
-      // 5. زر القائمة (جوال)
       $('#mobileMenuBtn')?.addEventListener('click', () => {
         $('#sidebar')?.classList.toggle('open');
       });
 
-      // 6. ربط أزرار القائمة
       document.querySelectorAll('.nav button[data-view]').forEach(btn => {
         btn.addEventListener('click', () => {
           const view = btn.dataset.view;
@@ -170,7 +165,6 @@
         });
       });
 
-      // 7. جلب الأبناء
       console.log('🔍 Fetching children for parent_id:', ME.id);
       const { data: children, error: childError } = await c
         .from('students')
@@ -187,13 +181,16 @@
       console.log('✅ Children count:', CHILDREN.length);
       console.log('✅ Children data:', CHILDREN);
 
-      // 8. إعداد قائمة الأبناء
+      // جلب الإشعارات
+      await loadNotifications();
+
+      // إعداد قائمة الأبناء
       setupChildSelector();
 
-      // 9. التشغيل
       if(CHILDREN.length > 0) {
         currentChildId = CHILDREN[0].id;
-        await loadChildData(currentChildId);
+        // جلب بيانات كل الأبناء (للإحصائيات)
+        await Promise.all(CHILDREN.map(c => loadChildData(c.id)));
         renderOverview();
       } else {
         $('#view-overview').innerHTML = `
@@ -210,6 +207,85 @@
       console.error('❌ Init error:', e);
       toast('خطأ في التحميل', e.message, 'red');
     }
+  }
+
+  // ========== جلب الإشعارات ==========
+  async function loadNotifications() {
+    const c = client();
+    try {
+      const { data } = await c.from('school_notifications')
+        .select('*')
+        .eq('recipient_user_id', ME.id)
+        .order('created_at', {ascending: false})
+        .limit(10);
+      NOTIFICATIONS = data || [];
+      console.log('✅ Notifications loaded:', NOTIFICATIONS.length);
+    } catch(e) {
+      console.error('❌ Notifications error:', e);
+      NOTIFICATIONS = [];
+    }
+  }
+
+  // ========== توليد التنبيهات الذكية ==========
+  function getSmartAlerts() {
+    const alerts = [];
+    CHILDREN.forEach(child => {
+      const childName = child.users?.name || child.name || 'الطالب';
+      const data = CHILD_DATA[child.id] || {attendance: [], grades: [], fees: [], behavior: []};
+      
+      // تنبيه: غياب متكرر
+      const absent = data.attendance.filter(a => a.status === 'absent').length;
+      const total = data.attendance.length;
+      if(total > 0 && absent > 0) {
+        const rate = (absent/total) * 100;
+        if(rate > 20) {
+          alerts.push({
+            type: 'danger',
+            icon: '⚠️',
+            title: `غياب مرتفع لـ ${childName}`,
+            message: `نسبة الغياب ${Math.round(rate)}% (${absent} أيام من ${total})`
+          });
+        }
+      }
+      
+      // تنبيه: أقساط متأخرة
+      data.fees.forEach(f => {
+        const t = num(f.net_amount || f.base_amount);
+        const p = num(f.total_paid);
+        const r = t - p;
+        if(r > 0) {
+          alerts.push({
+            type: 'warning',
+            icon: '💰',
+            title: `قسط مستحق لـ ${childName}`,
+            message: `المبلغ المتبقي: ${money(r)}`
+          });
+        }
+      });
+      
+      // تنبيه: درجات منخفضة
+      const lowGrades = data.grades.filter(g => num(g.score || g.grade || g.mark) < 60);
+      if(lowGrades.length > 0) {
+        alerts.push({
+          type: 'warning',
+          icon: '📉',
+          title: `درجات تحتاج متابعة لـ ${childName}`,
+          message: `${lowGrades.length} مواد بدرجات أقل من 60`
+        });
+      }
+      
+      // تنبيه: سلوك سلبي
+      const negBehavior = data.behavior.filter(b => num(b.points) < 0);
+      if(negBehavior.length > 2) {
+        alerts.push({
+          type: 'info',
+          icon: '🌟',
+          title: `ملاحظات سلوكية لـ ${childName}`,
+          message: `${negBehavior.length} ملاحظات تحتاج اهتمامك`
+        });
+      }
+    });
+    return alerts;
   }
 
   // ========== إعداد قائمة اختيار الابن ==========
@@ -258,7 +334,7 @@
         behavior: behaviorRes.data || []
       };
       
-      console.log('✅ Loaded data for child:', childId, CHILD_DATA[childId]);
+      console.log('✅ Loaded data for child:', childId);
     } catch(e) {
       console.error('❌ Error loading child data:', e);
       CHILD_DATA[childId] = {attendance: [], grades: [], fees: [], behavior: []};
@@ -281,15 +357,38 @@
     const container = $('#view-overview');
     if(!CHILDREN.length) return;
 
+    const alerts = getSmartAlerts();
+    const unreadNotifs = NOTIFICATIONS.filter(n => !n.read_at).length;
+
     let html = `
       <div class="page-head">
         <div>
           <h1>أهلاً بك، ${esc(ME.name)} 👋</h1>
-          <p>متابعة شاملة لأبنائك الطلاب · عدد الأبناء: <b>${CHILDREN.length}</b></p>
+          <p>متابعة شاملة لأبنائك · عدد الأبناء: <b>${CHILDREN.length}</b> ${unreadNotifs > 0 ? `· <span class="badge red">${unreadNotifs} إشعار جديد</span>` : ''}</p>
         </div>
       </div>
     `;
     
+    // ===== التنبيهات الذكية =====
+    if(alerts.length > 0) {
+      html += `<div style="margin-bottom:20px;">`;
+      html += `<h3 style="margin-bottom:12px;">⚠️ تنبيهات تحتاج اهتمامك (${alerts.length})</h3>`;
+      html += `<div class="cards">`;
+      alerts.slice(0, 4).forEach(a => {
+        const bgColor = a.type === 'danger' ? '#fee2e2' : a.type === 'warning' ? '#fef3c7' : '#dbeafe';
+        const borderColor = a.type === 'danger' ? '#dc2626' : a.type === 'warning' ? '#d97706' : '#2563eb';
+        html += `
+          <div style="background:${bgColor};border-right:4px solid ${borderColor};padding:14px;border-radius:10px;color:#333;">
+            <div style="font-size:16px;font-weight:bold;margin-bottom:4px;">${a.icon} ${esc(a.title)}</div>
+            <div style="font-size:13px;opacity:0.85;">${esc(a.message)}</div>
+          </div>
+        `;
+      });
+      html += `</div></div>`;
+    }
+    
+    // ===== بطاقات الأبناء =====
+    html += `<h3 style="margin-bottom:12px;">🎓 أبناؤك</h3>`;
     html += `<div class="cards">`;
     CHILDREN.forEach(child => {
       const childName = child.users?.name || child.name || 'طالب';
@@ -316,7 +415,7 @@
              onclick="ParentPortal.selectChild('${child.id}')">
           <div class="card-head">
             <h3>🎓 ${esc(childName)}</h3>
-            ${isActive ? '<span class="badge gold">👁️ المحدد حالياً</span>' : ''}
+            ${isActive ? '<span class="badge gold">👁️ المحدد</span>' : ''}
           </div>
           <div class="card-body">
             <div class="kpis">
@@ -335,6 +434,25 @@
       `;
     });
     html += `</div>`;
+
+    // ===== آخر الإشعارات =====
+    if(NOTIFICATIONS.length > 0) {
+      html += `<h3 style="margin:24px 0 12px;">🔔 آخر الإشعارات</h3>`;
+      html += `<div class="list">`;
+      NOTIFICATIONS.slice(0, 5).forEach(n => {
+        const isUnread = !n.read_at;
+        html += `
+          <div class="item" style="${isUnread ? 'background:#fef3c7;border-right:3px solid #f59e0b;' : ''}">
+            <div>
+              <b>${esc(n.title || 'إشعار')}</b>
+              <small>${esc(n.body || n.message || '')} · ${esc(String(n.created_at || '').slice(0,10))}</small>
+            </div>
+            <span class="badge ${isUnread ? 'gold' : 'blue'}">${isUnread ? 'جديد' : 'مقروء'}</span>
+          </div>
+        `;
+      });
+      html += `</div>`;
+    }
 
     container.innerHTML = html;
   }
@@ -543,7 +661,6 @@
   // ========== التشغيل ==========
   window.addEventListener('load', init);
   
-  // تصدير للنافذة
   window.ParentPortal = {
     init,
     showView,
