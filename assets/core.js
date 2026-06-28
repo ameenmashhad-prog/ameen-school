@@ -14,7 +14,7 @@ let LAST_ATTENDANCE_ROWS = [];
 
 const ROLE_LABELS = {
   admin:'مدير', finance:'مسؤول مالي', discipline:'مسؤول انضباط', counselor:'مرشد نفسي', psychologist:'مرشد نفسي',
-  teacher:'معلم', parent:'ولي أمر', student:'طالب', counselor:'مرشد نفسي', psychologist:'مرشد نفسي', academic:'مسؤول علمي', scientific:'مسؤول علمي', academic_supervisor:'مسؤول علمي', academic_admin:'مسؤول علمي', educational:'مسؤول علمي', education:'مسؤول علمي', supervisor:'مسؤول علمي'
+  teacher:'معلم', parent:'ولي أمر', student:'طالب', academic:'مسؤول علمي', scientific:'مسؤول علمي', academic_supervisor:'مسؤول علمي', academic_admin:'مسؤول علمي', educational:'مسؤول علمي', education:'مسؤول علمي', supervisor:'مسؤول علمي'
 };
 const MONTHS = {9:'سبتمبر',10:'أكتوبر',11:'نوفمبر',12:'ديسمبر',1:'يناير',2:'فبراير',3:'مارس',4:'أبريل',5:'مايو'};
 const DAYS = ['السبت','الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة'];
@@ -151,8 +151,6 @@ async function loadData(){
 
   let students = await q('students',{order:'name',filters:studentFilters});
 
-  // If a teacher has a schedule, scope students to the teacher classes on the client side.
-  // Backend RLS remains the real authority; this is only to avoid visual clutter.
   if(role==='teacher' && schedule.length){
     const teacherClassIds = new Set(schedule.map(x=>String(x.class_id)).filter(Boolean));
     if(teacherClassIds.size) students = students.filter(s=>teacherClassIds.has(String(s.class_id)));
@@ -199,7 +197,6 @@ async function loadData(){
       exemptions = exemptions.filter(e=>studentIds.has(String(e.student_id)));
     }
   }
-
 
   let notifications=[], achievements=[], studentHomeworks=[], onlineExams=[];
   notifications = await q('school_notifications',{filters:[{op:'eq',col:'recipient_user_id',val:ME.id}],order:'created_at',ascending:false,limit:20});
@@ -423,7 +420,6 @@ function renderStudentPortal(id){
   if(id==='schedule') root.innerHTML=`<div class="page-head"><div><h1>جدولي</h1></div>${switcher}</div>${table(['اليوم','الحصة','الصف','المادة','المعلم'],scheduleRows({classId:selected&&selected.class_id}))}`;
   if(id==='behavior') root.innerHTML=`<div class="page-head"><div><h1>السلوك والملاحظات</h1></div>${switcher}</div>${behaviorPanel(one)}`;
 }
-
 
 function dueText(d){if(!d)return'بدون موعد';const x=new Date(String(d).slice(0,10)+'T00:00:00'),t=new Date(iso()+'T00:00:00');const diff=Math.round((x-t)/86400000);if(diff<0)return 'متأخر '+Math.abs(diff)+' يوم';if(diff===0)return 'اليوم';if(diff===1)return 'غداً';return 'بعد '+diff+' يوم'}
 function itemPriorityBadge(kind,d){const txt=dueText(d);const urgent=txt.includes('متأخر')||txt==='اليوم';return `<span class="badge ${urgent?'red':kind==='exam'?'gold':'blue'}">${esc(txt)}</span>`}
