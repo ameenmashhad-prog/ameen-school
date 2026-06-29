@@ -1,11 +1,15 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090E1A">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>الإرشاد النفسي — مدارس أمين الرضا</title>
-<link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<link rel="stylesheet" href="assets/portal.css"><link rel="stylesheet" href="assets/amin-identity.css"><link rel="stylesheet" href="assets/counselor.css">
-<link rel="stylesheet" href="assets/brand-redesign.css"><link rel="stylesheet" href="assets/amin-v3.css">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="stylesheet" href="assets/portal.css">
+<link rel="stylesheet" href="assets/amin-identity.css">
+<link rel="stylesheet" href="assets/brand-redesign.css">
+<link rel="stylesheet" href="assets/amin-v3.css">
 <link rel="stylesheet" href="assets/i18n.css">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="assets/amin-logo-small.png">
@@ -15,39 +19,760 @@
 </head>
 <body data-portal="counselor">
 <a class="skip-link" href="#mainContent">تخطي إلى المحتوى</a>
-<div class="counselor-app">
-  <header class="counselor-topbar">
-    <button class="btn mobile-menu" id="mobileMenuBtn">☰</button>
-    <div class="counselor-identity"><div class="counselor-avatar">ن</div><div><b id="profileName">...</b><small id="profileRole">المرشد النفسي</small></div></div>
-    <nav class="counselor-mode-tabs" aria-label="أقسام الإرشاد">
-      <button data-view="cases" class="active">قائمة الحالات</button>
-      <button data-view="schedule">جدول الجلسات</button>
-      <button data-view="analytics">التحليلات</button>
-      <button data-view="alerts">التنبيهات</button><button data-view="handover">تسليم الحالات</button>
+
+<div class="shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-mark">💚</div>
+      <div>
+        <h1>الإرشاد النفسي</h1>
+        <small>متابعة · توجيه · رعاية</small>
+      </div>
+    </div>
+    
+    <div class="profile-mini">
+      <div class="avatar">🧠</div>
+      <div>
+        <b id="profileName">...</b>
+        <small id="profileRole">المرشد النفسي</small>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <button onclick="location.href='portal.html'">🏛️ البوابة الموحدة</button>
+      <button data-view="overview" class="active">🏠 الرئيسية</button>
+      <button data-view="students">👥 الطلاب المتابعون</button>
+      <button data-view="behavior">🌟 السلوك والملاحظات</button>
+      <button data-view="attendance">📋 متابعة الغياب</button>
+      <button data-view="cases">📁 الحالات</button>
+      <button data-view="sessions">📅 الجلسات</button>
+      <button data-view="reports">📈 التقارير</button>
+      <hr style="border:none;border-top:1px solid rgba(255,255,255,0.1);margin:8px 0;">
+      <button onclick="location.href='counseling-report.html'">📊 تقارير الإرشاد</button>
+      <button onclick="location.href='notifications.html'">🔔 الإشعارات</button>
+      <button onclick="location.href='smart-calendar.html'">📅 التقويم</button>
     </nav>
-    <div class="counselor-search"><input id="globalSearch" placeholder="ابحث عن طالب بالاسم أو الرقم..."><span class="command-shortcut">Ctrl K</span></div>
-    <div class="counselor-actions"><span id="offlineStatus" class="sync-status online">متصل</span><button id="draftsBtn" class="btn">المسودات <span id="draftCount" class="mini-badge">0</span></button><button id="newSessionBtn" class="btn blue">+ جلسة جديدة</button><button id="newCaseBtn" class="btn gold">+ حالة</button><button id="privacyLockBtn" class="btn">قفل الشاشة</button><button onclick="location.href='portal.html'" class="btn">البوابة</button></div>
-  </header>
-  <aside class="counselor-left" id="sidebar">
-    <div class="caseload-head"><div><h2>حالاتي النشطة</h2><small id="caseCount">0</small></div><button class="btn small gold" onclick="Counselor.openNewCase()">إضافة حالة</button></div>
-    <div class="case-filters" id="caseFilters"></div>
-    <div class="case-list" id="caseList"></div>
+
+    <div class="side-footer">
+      <button id="logoutBtn" class="btn red block">تسجيل الخروج</button>
+    </div>
   </aside>
-  <main class="counselor-main" id="mainContent" tabindex="-1">
-    <section id="centerView" class="counselor-center-card"><div class="counselor-skeleton"></div></section>
+
+  <main class="main" id="mainContent" tabindex="-1">
+    <header class="topbar">
+      <button class="btn mobile-menu" id="mobileMenuBtn">☰</button>
+      <h2>💚 الإرشاد النفسي والمتابعة</h2>
+      <div class="top-actions">
+        <button class="btn" style="background:#3b82f6;color:white;" onclick="CounselorPortal.refresh()">🔄 تحديث</button>
+      </div>
+    </header>
+
+    <section id="view-overview" class="view active"></section>
+    <section id="view-students" class="view"></section>
+    <section id="view-behavior" class="view"></section>
+    <section id="view-attendance" class="view"></section>
+    <section id="view-cases" class="view"></section>
+    <section id="view-sessions" class="view"></section>
+    <section id="view-reports" class="view"></section>
   </main>
-  <aside class="counselor-right" id="rightPanel">
-    <div id="dailyCompanion"></div>
-  </aside>
 </div>
-<div id="counselorSlide" class="counselor-slide" hidden></div>
-<div id="privacyOverlay" class="privacy-overlay" hidden></div>
+
 <div id="toast" class="toast"></div>
-<script src="libs/supabase.min.js"></script><script src="assets/config.js"></script><script src="assets/platform-modules.js"></script><script src="assets/i18n.js"></script><script src="assets/counselor.js"></script>
-<script>window.addEventListener('load',()=>Counselor.init());</script>
+
+<script src="libs/supabase.min.js"></script>
+<script src="assets/config.js"></script>
+<script src="assets/platform-modules.js"></script>
+<script src="assets/i18n.js"></script>
+
+<script>
+(function(){
+  'use strict';
+
+  const SCHOOL_PHONE = '+9647700000000';
+  const SCHOOL_NAME = 'مدرسة أمين الرضا';
+  const SCHOOL_LOGO = '💚';
+
+  function $(s, r){r=r||document;return r.querySelector(s)}
+  function $$(s, r){r=r||document;return Array.from(r.querySelectorAll(s))}
+  function esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;')}
+  function num(v){var n=Number(v);return Number.isFinite(n)?n:0}
+  function iso(){return new Date().toISOString().slice(0,10)}
+  
+  let sb = null;
+  let ME = null;
+  let DATA = {
+    students: [],
+    behavior: [],
+    attendance: [],
+    grades: [],
+    classes: [],
+    notifications: []
+  };
+  let CLASSES_MAP = {};
+
+  function cfg() { return window.AMIN_CONFIG || {}; }
+  
+  function client() {
+    if(sb) return sb;
+    if(!window.supabase) throw new Error('Supabase library not loaded');
+    sb = window.supabase.createClient(
+      cfg().supabaseUrl, 
+      cfg().supabaseAnonKey, 
+      {auth:{persistSession:true, autoRefreshToken:true, detectSessionInUrl:true, storageKey:(cfg().authStorageKey||'amin-ovcjzsrqqgjsbqswtkro-auth-v2')}}
+    );
+    return sb;
+  }
+
+  function toast(title, msg, type) {
+    const t = $('#toast');
+    if(!t) return;
+    t.innerHTML = '<b>'+esc(title)+'</b><br><span class="muted">'+esc(msg||'')+'</span>';
+    t.className = 'toast show ' + (type||'');
+    clearTimeout(t._to);
+    t._to = setTimeout(function(){t.classList.remove('show')}, 4000);
+  }
+
+  function getClassName(id) { return CLASSES_MAP[id] || 'صف'; }
+
+  async function init() {
+    try {
+      const c = client();
+      const sessionRes = await c.auth.getSession();
+      if(!sessionRes.data.session) { location.href = 'index.html'; return; }
+
+      const userRes = await c.from('users').select('*').eq('id', sessionRes.data.session.user.id).maybeSingle();
+      if(!userRes.data) {
+        toast('خطأ', 'تعذر تحميل بيانات الحساب', 'red');
+        return;
+      }
+      ME = userRes.data;
+      window.ME = ME;
+      
+      // التأكد من الصلاحية
+      if(ME.role !== 'counselor' && ME.role !== 'psychologist' && ME.role !== 'admin' && !ME.is_super_admin) {
+        toast('ممنوع', 'هذه الصفحة للمرشدين النفسيين فقط', 'red');
+        setTimeout(function(){ location.href = 'portal.html'; }, 2000);
+        return;
+      }
+
+      $('#profileName').textContent = ME.name || ME.email || 'مرشد';
+      $('#profileRole').textContent = ME.role === 'psychologist' ? 'أخصائي نفسي' : 'مرشد نفسي';
+
+      $('#logoutBtn').onclick = async function() {
+        await c.auth.signOut({scope:'local'}).catch(function(){});
+        location.href = 'index.html';
+      };
+
+      const mobileBtn = $('#mobileMenuBtn');
+      if(mobileBtn) mobileBtn.addEventListener('click', function() {
+        const sb = $('#sidebar');
+        if(sb) sb.classList.toggle('open');
+      });
+
+      const navBtns = document.querySelectorAll('.nav button[data-view]');
+      navBtns.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          const view = btn.dataset.view;
+          showView(view);
+          navBtns.forEach(function(b) { b.classList.toggle('active', b === btn); });
+          const sb = $('#sidebar');
+          if(sb) sb.classList.remove('open');
+        });
+      });
+
+      await loadAllData();
+      renderOverview();
+
+    } catch(e) {
+      console.error('❌ Init error:', e);
+      toast('خطأ', e.message, 'red');
+    }
+  }
+
+  async function loadAllData() {
+    const c = client();
+    try {
+      const results = await Promise.all([
+        c.from('students').select('*, users:user_id(name, email)'),
+        c.from('behavior_records').select('*').order('created_at', {ascending: false}).limit(200),
+        c.from('attendance').select('*').order('date', {ascending: false}).limit(500),
+        c.from('grades').select('*'),
+        c.from('classes').select('id, name'),
+        c.from('school_notifications').select('*').eq('recipient_user_id', ME.id).order('created_at', {ascending: false}).limit(10).then(function(r){ return r; }).catch(function(){ return {data: []}; })
+      ]);
+      
+      DATA.students = results[0].data || [];
+      DATA.behavior = results[1].data || [];
+      DATA.attendance = results[2].data || [];
+      DATA.grades = results[3].data || [];
+      DATA.classes = results[4].data || [];
+      DATA.notifications = results[5].data || [];
+      
+      DATA.classes.forEach(function(c) { CLASSES_MAP[c.id] = c.name; });
+      
+      console.log('✅ Counselor Data loaded:', DATA);
+    } catch(e) {
+      console.error('Data load error:', e);
+    }
+  }
+
+  function getStats() {
+    const today = iso();
+    const totalStudents = DATA.students.length;
+    
+    // الطلاب الذين يحتاجون متابعة
+    const needAttention = DATA.students.filter(function(s){
+      const att = DATA.attendance.filter(function(a){ return String(a.student_id) === String(s.id); });
+      const absent = att.filter(function(a){ return a.status === 'absent'; }).length;
+      const absRate = att.length ? (absent/att.length)*100 : 0;
+      
+      const negBehavior = DATA.behavior.filter(function(b){ 
+        return String(b.student_id) === String(s.id) && num(b.points) < 0; 
+      }).length;
+      
+      const grades = DATA.grades.filter(function(g){ return String(g.student_id) === String(s.id); });
+      const avg = grades.length ? grades.reduce(function(sum,g){ return sum + num(g.score || g.grade || g.mark); }, 0) / grades.length : 100;
+      
+      return absRate > 20 || negBehavior >= 2 || avg < 60;
+    });
+    
+    const positiveBehavior = DATA.behavior.filter(function(b){ return num(b.points) > 0; }).length;
+    const negativeBehavior = DATA.behavior.filter(function(b){ return num(b.points) < 0; }).length;
+    const totalAbsent = DATA.attendance.filter(function(a){ return a.status === 'absent'; }).length;
+    
+    return {
+      totalStudents: totalStudents,
+      needAttention: needAttention.length,
+      needAttentionList: needAttention,
+      positiveBehavior: positiveBehavior,
+      negativeBehavior: negativeBehavior,
+      totalBehaviorRecords: DATA.behavior.length,
+      totalAbsent: totalAbsent,
+      todayBehavior: DATA.behavior.filter(function(b){ 
+        return String(b.created_at || '').slice(0,10) === today; 
+      }).length
+    };
+  }
+
+  function getSmartAlerts() {
+    const alerts = [];
+    const stats = getStats();
+    
+    if(stats.needAttention > 0) {
+      alerts.push({
+        type:'danger', icon:'⚠️',
+        title: stats.needAttention + ' طالب يحتاج متابعة عاجلة',
+        message:'يوجد طلاب لديهم مشاكل في الحضور أو السلوك أو الدرجات'
+      });
+    }
+    
+    if(stats.negativeBehavior > stats.positiveBehavior * 2) {
+      alerts.push({
+        type:'warning', icon:'📉',
+        title:'السلوك السلبي مرتفع',
+        message: stats.negativeBehavior + ' سجل سلبي مقابل ' + stats.positiveBehavior + ' إيجابي'
+      });
+    }
+    
+    // طلاب بدون أي سجل
+    const studentsWithoutRecords = DATA.students.filter(function(s){
+      const behavior = DATA.behavior.filter(function(b){ return String(b.student_id) === String(s.id); }).length;
+      return behavior === 0;
+    }).length;
+    
+    if(studentsWithoutRecords > 0) {
+      alerts.push({
+        type:'info', icon:'📝',
+        title: studentsWithoutRecords + ' طالب بدون أي ملاحظات',
+        message:'يفضل إضافة ملاحظات متابعة لهم'
+      });
+    }
+    
+    return alerts;
+  }
+
+  function showView(viewId) {
+    document.querySelectorAll('.view').forEach(function(v) {
+      v.classList.toggle('active', v.id === 'view-' + viewId);
+    });
+    
+    if(viewId === 'overview') renderOverview();
+    else if(viewId === 'students') renderStudents();
+    else if(viewId === 'behavior') renderBehavior();
+    else if(viewId === 'attendance') renderAttendance();
+    else if(viewId === 'cases') renderCases();
+    else if(viewId === 'sessions') renderSessions();
+    else if(viewId === 'reports') renderReports();
+  }
+
+  // ========== الصفحة الرئيسية ==========
+  function renderOverview() {
+    const container = $('#view-overview');
+    const stats = getStats();
+    const alerts = getSmartAlerts();
+    const unreadNotifs = DATA.notifications.filter(function(n){ return !n.read_at; }).length;
+    
+    let html = '<div class="page-head"><div><h1>أهلاً بك، ' + esc(ME.name) + ' 💚</h1><p>لوحة معلومات الإرشاد النفسي والمتابعة' + (unreadNotifs > 0 ? ' · <span class="badge red">' + unreadNotifs + ' إشعار</span>' : '') + '</p></div></div>';
+
+    // تنبيه خصوصية
+    html += '<div style="background:linear-gradient(135deg,#fef3c7,#fde68a);border-right:4px solid #f59e0b;padding:16px;border-radius:10px;margin-bottom:24px;color:#78350f;"><b>🔒 تنبيه خصوصية:</b> جميع البيانات هنا محمية ومخصصة للمرشد فقط. لا يمكن مشاركتها بدون إذن.</div>';
+
+    // الإحصائيات
+    html += '<h3 style="margin-bottom:12px;">📊 الإحصائيات</h3>';
+    html += '<div class="kpis" style="margin-bottom:24px;">';
+    html += '<div class="kpi blue"><small>إجمالي الطلاب</small><b>' + stats.totalStudents + '</b></div>';
+    html += '<div class="kpi red"><small>يحتاجون متابعة</small><b>' + stats.needAttention + '</b></div>';
+    html += '<div class="kpi green"><small>سجلات إيجابية</small><b>' + stats.positiveBehavior + '</b></div>';
+    html += '<div class="kpi gold"><small>سجلات سلبية</small><b>' + stats.negativeBehavior + '</b></div>';
+    html += '</div>';
+
+    // التنبيهات
+    if(alerts.length > 0) {
+      html += '<h3 style="margin-bottom:12px;">⚠️ تنبيهات تحتاج اهتمامك (' + alerts.length + ')</h3>';
+      html += '<div class="cards" style="margin-bottom:24px;">';
+      alerts.forEach(function(a) {
+        const bgColor = a.type === 'danger' ? '#fee2e2' : a.type === 'warning' ? '#fef3c7' : '#dbeafe';
+        const borderColor = a.type === 'danger' ? '#dc2626' : a.type === 'warning' ? '#d97706' : '#2563eb';
+        html += '<div style="background:' + bgColor + ';border-right:4px solid ' + borderColor + ';padding:14px;border-radius:10px;color:#333;"><div style="font-size:16px;font-weight:bold;margin-bottom:4px;">' + a.icon + ' ' + esc(a.title) + '</div><div style="font-size:13px;opacity:0.85;">' + esc(a.message) + '</div></div>';
+      });
+      html += '</div>';
+    }
+
+    // إجراءات سريعة
+    html += '<h3 style="margin-bottom:12px;">⚡ إجراءات سريعة</h3>';
+    html += '<div class="cards" style="margin-bottom:24px;">';
+    html += '<div onclick="CounselorPortal.showView(\'students\')" class="card" style="background:linear-gradient(135deg,#ec4899,#be185d);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">👥</div><div style="font-weight:bold;margin-top:8px;">الطلاب المتابعون</div></div>';
+    html += '<div onclick="CounselorPortal.showView(\'behavior\')" class="card" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">🌟</div><div style="font-weight:bold;margin-top:8px;">سجل السلوك</div></div>';
+    html += '<div onclick="CounselorPortal.showView(\'attendance\')" class="card" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📋</div><div style="font-weight:bold;margin-top:8px;">متابعة الغياب</div></div>';
+    html += '<div onclick="CounselorPortal.showView(\'reports\')" class="card" style="background:linear-gradient(135deg,#10b981,#059669);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📈</div><div style="font-weight:bold;margin-top:8px;">التقارير</div></div>';
+    html += '</div>';
+
+    // الطلاب الذين يحتاجون متابعة عاجلة
+    if(stats.needAttentionList.length > 0) {
+      html += '<h3 style="margin-bottom:12px;">🚨 الطلاب الذين يحتاجون متابعة عاجلة</h3>';
+      html += '<div class="table-wrap"><table><thead><tr><th>الطالب</th><th>الصف</th><th>الحضور</th><th>السلوك السلبي</th><th>المعدل</th><th>إجراء</th></tr></thead><tbody>';
+      
+      stats.needAttentionList.slice(0, 10).forEach(function(s) {
+        const studentName = (s.users && s.users.name) || s.name || 'طالب';
+        const att = DATA.attendance.filter(function(a){ return String(a.student_id) === String(s.id); });
+        const absent = att.filter(function(a){ return a.status === 'absent'; }).length;
+        const absRate = att.length ? Math.round((absent/att.length)*100) : 0;
+        
+        const negBehavior = DATA.behavior.filter(function(b){ 
+          return String(b.student_id) === String(s.id) && num(b.points) < 0; 
+        }).length;
+        
+        const grades = DATA.grades.filter(function(g){ return String(g.student_id) === String(s.id); });
+        const avg = grades.length ? Math.round(grades.reduce(function(sum,g){ return sum + num(g.score || g.grade || g.mark); }, 0) / grades.length) : 0;
+        
+        html += '<tr>';
+        html += '<td><b>' + esc(studentName) + '</b></td>';
+        html += '<td>' + esc(getClassName(s.class_id)) + '</td>';
+        html += '<td><span class="badge ' + (absRate > 20 ? 'red' : 'gold') + '">' + absRate + '%</span></td>';
+        html += '<td><span class="badge ' + (negBehavior > 0 ? 'red' : 'green') + '">' + negBehavior + '</span></td>';
+        html += '<td>' + (grades.length ? '<span class="badge ' + (avg < 60 ? 'red' : avg < 85 ? 'gold' : 'green') + '">' + avg + '%</span>' : '—') + '</td>';
+        html += '<td><button class="btn small" style="background:#8b5cf6;color:white;" onclick="CounselorPortal.showStudentCase(\'' + s.id + '\')">👁️ متابعة</button></td>';
+        html += '</tr>';
+      });
+      
+      html += '</tbody></table></div>';
+    }
+    
+    container.innerHTML = html;
+  }
+
+  // ========== الطلاب المتابعون ==========
+  function renderStudents() {
+    const container = $('#view-students');
+    
+    let html = '<div class="page-head"><div><h1>👥 الطلاب المتابعون</h1><p>عرض كل الطلاب مع مؤشرات المتابعة</p></div></div>';
+    
+    if(!DATA.students.length) {
+      html += '<div class="empty" style="text-align:center;padding:60px;">لا يوجد طلاب مسجلون.</div>';
+    } else {
+      html += '<div class="table-wrap"><table><thead><tr><th>#</th><th>الطالب</th><th>الصف</th><th>الحضور</th><th>السلوك</th><th>المعدل</th><th>الحالة</th><th>إجراء</th></tr></thead><tbody>';
+      
+      DATA.students.forEach(function(s, i) {
+        const studentName = (s.users && s.users.name) || s.name || 'طالب';
+        const att = DATA.attendance.filter(function(a){ return String(a.student_id) === String(s.id); });
+        const present = att.filter(function(a){ return a.status === 'present'; }).length;
+        const attRate = att.length ? Math.round((present/att.length)*100) : 0;
+        
+        const behavior = DATA.behavior.filter(function(b){ return String(b.student_id) === String(s.id); });
+        const totalPoints = behavior.reduce(function(sum,b){ return sum + num(b.points || 0); }, 0);
+        
+        const grades = DATA.grades.filter(function(g){ return String(g.student_id) === String(s.id); });
+        const avg = grades.length ? Math.round(grades.reduce(function(sum,g){ return sum + num(g.score || g.grade || g.mark); }, 0) / grades.length) : 0;
+        
+        const needsAttention = attRate < 80 || totalPoints < 0 || (avg && avg < 60);
+        
+        const attColor = attRate >= 90 ? 'green' : attRate >= 75 ? 'gold' : 'red';
+        const behaviorColor = totalPoints >= 0 ? 'green' : 'red';
+        const gradeColor = avg >= 85 ? 'green' : avg >= 60 ? 'gold' : 'red';
+        
+        html += '<tr ' + (needsAttention ? 'style="background:#fef3c7;"' : '') + '>';
+        html += '<td>' + (i+1) + '</td>';
+        html += '<td><b>' + esc(studentName) + '</b></td>';
+        html += '<td>' + esc(getClassName(s.class_id)) + '</td>';
+        html += '<td><span class="badge ' + attColor + '">' + attRate + '%</span></td>';
+        html += '<td><span class="badge ' + behaviorColor + '">' + (totalPoints > 0 ? '+' : '') + totalPoints + '</span></td>';
+        html += '<td>' + (grades.length ? '<span class="badge ' + gradeColor + '">' + avg + '%</span>' : '—') + '</td>';
+        html += '<td>' + (needsAttention ? '<span class="badge red">⚠️ متابعة</span>' : '<span class="badge green">✅ طبيعي</span>') + '</td>';
+        html += '<td><button class="btn small" style="background:#8b5cf6;color:white;" onclick="CounselorPortal.showStudentCase(\'' + s.id + '\')">👁️ تفاصيل</button></td>';
+        html += '</tr>';
+      });
+      
+      html += '</tbody></table></div>';
+    }
+    
+    container.innerHTML = html;
+  }
+
+  // ========== السلوك ==========
+  function renderBehavior() {
+    const container = $('#view-behavior');
+    
+    let html = '<div class="page-head" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">';
+    html += '<div><h1>🌟 سجل السلوك والملاحظات</h1></div>';
+    html += '<button class="btn" style="background:#1e40af;color:white;" onclick="CounselorPortal.printBehaviorReport()">🖨️ طباعة التقرير</button>';
+    html += '</div>';
+    
+    const positive = DATA.behavior.filter(function(b){ return num(b.points) > 0; }).length;
+    const negative = DATA.behavior.filter(function(b){ return num(b.points) < 0; }).length;
+    
+    html += '<div class="kpis" style="margin-bottom:20px;">';
+    html += '<div class="kpi blue"><small>الإجمالي</small><b>' + DATA.behavior.length + '</b></div>';
+    html += '<div class="kpi green"><small>إيجابي</small><b>' + positive + '</b></div>';
+    html += '<div class="kpi red"><small>سلبي</small><b>' + negative + '</b></div>';
+    html += '</div>';
+    
+    if(!DATA.behavior.length) {
+      html += '<div class="empty" style="text-align:center;padding:60px;">لا توجد سجلات سلوكية.</div>';
+    } else {
+      html += '<div class="table-wrap"><table><thead><tr><th>التاريخ</th><th>الطالب</th><th>الملاحظة</th><th>النقاط</th></tr></thead><tbody>';
+      
+      DATA.behavior.slice(0, 100).forEach(function(b) {
+        const student = DATA.students.find(function(s){ return String(s.id) === String(b.student_id); });
+        const studentName = student ? ((student.users && student.users.name) || student.name) : 'طالب';
+        const points = num(b.points || 0);
+        const color = points >= 0 ? 'green' : 'red';
+        
+        html += '<tr>';
+        html += '<td>' + esc(String(b.created_at || b.date || '').slice(0,10)) + '</td>';
+        html += '<td><b>' + esc(studentName) + '</b></td>';
+        html += '<td>' + esc(b.note || b.description || '—') + '</td>';
+        html += '<td><span class="badge ' + color + '">' + (points > 0 ? '+' : '') + points + '</span></td>';
+        html += '</tr>';
+      });
+      
+      html += '</tbody></table></div>';
+    }
+    
+    container.innerHTML = html;
+  }
+
+  // ========== الحضور ==========
+  function renderAttendance() {
+    const container = $('#view-attendance');
+    
+    let html = '<div class="page-head"><div><h1>📋 متابعة الحضور والغياب</h1></div></div>';
+    
+    // الطلاب الأكثر غياباً
+    const studentsAbsences = {};
+    DATA.attendance.filter(function(a){ return a.status === 'absent'; }).forEach(function(a) {
+      studentsAbsences[a.student_id] = (studentsAbsences[a.student_id] || 0) + 1;
+    });
+    
+    const sortedAbsences = Object.keys(studentsAbsences)
+      .map(function(sid){ return {id: sid, count: studentsAbsences[sid]}; })
+      .sort(function(a,b){ return b.count - a.count; })
+      .slice(0, 20);
+    
+    if(sortedAbsences.length === 0) {
+      html += '<div class="empty" style="text-align:center;padding:60px;">🎉 لا توجد حالات غياب!</div>';
+    } else {
+      html += '<h3 style="margin-bottom:12px;">⚠️ الطلاب الأكثر غياباً</h3>';
+      html += '<div class="table-wrap"><table><thead><tr><th>#</th><th>الطالب</th><th>الصف</th><th>أيام الغياب</th><th>الحالة</th></tr></thead><tbody>';
+      
+      sortedAbsences.forEach(function(item, i) {
+        const student = DATA.students.find(function(s){ return String(s.id) === String(item.id); });
+        const studentName = student ? ((student.users && student.users.name) || student.name) : 'طالب';
+        const className = student ? getClassName(student.class_id) : '—';
+        const severity = item.count >= 10 ? 'red' : item.count >= 5 ? 'gold' : 'blue';
+        const status = item.count >= 10 ? '🔴 خطير' : item.count >= 5 ? '🟡 متوسط' : '🔵 طبيعي';
+        
+        html += '<tr>';
+        html += '<td>' + (i+1) + '</td>';
+        html += '<td><b>' + esc(studentName) + '</b></td>';
+        html += '<td>' + esc(className) + '</td>';
+        html += '<td><span class="badge ' + severity + '">' + item.count + ' يوم</span></td>';
+        html += '<td>' + status + '</td>';
+        html += '</tr>';
+      });
+      
+      html += '</tbody></table></div>';
+    }
+    
+    container.innerHTML = html;
+  }
+
+  // ========== الحالات ==========
+  function renderCases() {
+    const container = $('#view-cases');
+    
+    let html = '<div class="page-head"><div><h1>📁 ملفات الحالات</h1><p>الحالات النفسية والسلوكية المتابعة</p></div></div>';
+    
+    const stats = getStats();
+    const cases = stats.needAttentionList;
+    
+    if(cases.length === 0) {
+      html += '<div class="empty" style="text-align:center;padding:60px;"><div style="font-size:64px;">😊</div><h3 style="margin-top:16px;">لا توجد حالات تحتاج متابعة!</h3><p style="color:#666;margin-top:8px;">كل الطلاب في حالة جيدة.</p></div>';
+    } else {
+      html += '<div class="kpis" style="margin-bottom:24px;">';
+      html += '<div class="kpi red"><small>حالات مفتوحة</small><b>' + cases.length + '</b></div>';
+      html += '<div class="kpi gold"><small>الإجمالي</small><b>' + DATA.students.length + '</b></div>';
+      html += '<div class="kpi blue"><small>نسبة الحالات</small><b>' + Math.round((cases.length/DATA.students.length)*100) + '%</b></div>';
+      html += '</div>';
+      
+      html += '<div class="cards">';
+      cases.forEach(function(s) {
+        const studentName = (s.users && s.users.name) || s.name || 'طالب';
+        const att = DATA.attendance.filter(function(a){ return String(a.student_id) === String(s.id); });
+        const absent = att.filter(function(a){ return a.status === 'absent'; }).length;
+        const absRate = att.length ? Math.round((absent/att.length)*100) : 0;
+        
+        const behavior = DATA.behavior.filter(function(b){ return String(b.student_id) === String(s.id); });
+        const negBehavior = behavior.filter(function(b){ return num(b.points) < 0; }).length;
+        
+        const grades = DATA.grades.filter(function(g){ return String(g.student_id) === String(s.id); });
+        const avg = grades.length ? Math.round(grades.reduce(function(sum,g){ return sum + num(g.score || g.grade || g.mark); }, 0) / grades.length) : 0;
+        
+        const issues = [];
+        if(absRate > 20) issues.push('غياب مرتفع (' + absRate + '%)');
+        if(negBehavior > 0) issues.push(negBehavior + ' ملاحظة سلبية');
+        if(avg && avg < 60) issues.push('درجات منخفضة (' + avg + '%)');
+        
+        html += '<div class="card" style="border:2px solid #fbbf24;">';
+        html += '<div class="card-head"><h3>🎓 ' + esc(studentName) + '</h3><span class="badge red">⚠️ حالة</span></div>';
+        html += '<div class="card-body">';
+        html += '<p><b>الصف:</b> ' + esc(getClassName(s.class_id)) + '</p>';
+        html += '<p><b>المشاكل المرصودة:</b></p>';
+        html += '<ul style="padding-right:20px;margin:8px 0;color:#dc2626;">';
+        issues.forEach(function(iss){ html += '<li>' + esc(iss) + '</li>'; });
+        html += '</ul>';
+        html += '<button class="btn small" style="background:#8b5cf6;color:white;margin-top:8px;" onclick="CounselorPortal.showStudentCase(\'' + s.id + '\')">📋 فتح الملف</button>';
+        html += '</div></div>';
+      });
+      html += '</div>';
+    }
+    
+    container.innerHTML = html;
+  }
+
+  // ========== الجلسات ==========
+  function renderSessions() {
+    const container = $('#view-sessions');
+    
+    let html = '<div class="page-head"><div><h1>📅 الجلسات الإرشادية</h1><p>إدارة المواعيد والجلسات</p></div></div>';
+    
+    html += '<div class="empty" style="text-align:center;padding:60px;background:#f0fdf4;border-radius:12px;">';
+    html += '<div style="font-size:64px;">📅</div>';
+    html += '<h3 style="margin-top:16px;">نظام الجلسات قيد التطوير</h3>';
+    html += '<p style="color:#666;margin-top:8px;">سيتم إضافة:</p>';
+    html += '<ul style="text-align:right;display:inline-block;padding-right:20px;margin-top:12px;color:#444;">';
+    html += '<li>📅 جدولة المواعيد</li>';
+    html += '<li>📝 تسجيل جلسات SOAP</li>';
+    html += '<li>🎯 وضع الأهداف</li>';
+    html += '<li>📊 متابعة التقدم</li>';
+    html += '<li>🔔 تذكيرات بالمواعيد</li>';
+    html += '</ul>';
+    html += '<div style="margin-top:20px;">';
+    html += '<button class="btn blue" onclick="location.href=\'smart-calendar.html\'">📅 افتح التقويم</button>';
+    html += '</div></div>';
+    
+    container.innerHTML = html;
+  }
+
+  // ========== التقارير ==========
+  function renderReports() {
+    const container = $('#view-reports');
+    const stats = getStats();
+    
+    let html = '<div class="page-head"><div><h1>📈 تقارير الإرشاد</h1></div></div>';
+    
+    html += '<div class="cards">';
+    html += '<div class="card"><div class="card-head"><h3>📊 التقرير العام</h3></div><div class="card-body">';
+    html += '<p>إجمالي الطلاب: <b>' + stats.totalStudents + '</b></p>';
+    html += '<p>يحتاجون متابعة: <b style="color:#dc2626;">' + stats.needAttention + '</b></p>';
+    html += '<p>نسبة الحالات: <b>' + Math.round((stats.needAttention/stats.totalStudents)*100) + '%</b></p>';
+    html += '<button class="btn blue" style="margin-top:12px;" onclick="CounselorPortal.printGeneralReport()">🖨️ طباعة</button>';
+    html += '</div></div>';
+    
+    html += '<div class="card"><div class="card-head"><h3>🌟 تقرير السلوك</h3></div><div class="card-body">';
+    html += '<p>إجمالي السجلات: <b>' + stats.totalBehaviorRecords + '</b></p>';
+    html += '<p>إيجابي: <b style="color:#10b981;">' + stats.positiveBehavior + '</b></p>';
+    html += '<p>سلبي: <b style="color:#dc2626;">' + stats.negativeBehavior + '</b></p>';
+    html += '<button class="btn green" style="margin-top:12px;" onclick="CounselorPortal.printBehaviorReport()">🖨️ طباعة</button>';
+    html += '</div></div>';
+    
+    html += '<div class="card"><div class="card-head"><h3>📋 تقرير الغياب</h3></div><div class="card-body">';
+    html += '<p>إجمالي الغيابات: <b>' + stats.totalAbsent + '</b></p>';
+    html += '<button class="btn gold" style="margin-top:12px;" onclick="CounselorPortal.printAttendanceReport()">🖨️ طباعة</button>';
+    html += '</div></div>';
+    
+    html += '<div class="card" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:white;cursor:pointer;" onclick="location.href=\'counseling-report.html\'"><div class="card-body" style="text-align:center;">';
+    html += '<div style="font-size:48px;">📊</div>';
+    html += '<h3 style="margin-top:12px;">تقارير الإرشاد المتقدمة</h3>';
+    html += '<p style="opacity:0.95;">فتح صفحة التقارير الكاملة</p>';
+    html += '</div></div>';
+    
+    html += '</div>';
+    
+    container.innerHTML = html;
+  }
+
+  // ========== عرض ملف طالب ==========
+  function showStudentCase(sid) {
+    const s = DATA.students.find(function(x){ return String(x.id) === String(sid); });
+    if(!s) return;
+    
+    const studentName = (s.users && s.users.name) || s.name || 'طالب';
+    const att = DATA.attendance.filter(function(a){ return String(a.student_id) === String(sid); });
+    const behavior = DATA.behavior.filter(function(b){ return String(b.student_id) === String(sid); });
+    const grades = DATA.grades.filter(function(g){ return String(g.student_id) === String(sid); });
+    
+    const present = att.filter(function(a){ return a.status === 'present'; }).length;
+    const absent = att.filter(function(a){ return a.status === 'absent'; }).length;
+    const late = att.filter(function(a){ return a.status === 'late'; }).length;
+    
+    const positive = behavior.filter(function(b){ return num(b.points) > 0; }).length;
+    const negative = behavior.filter(function(b){ return num(b.points) < 0; }).length;
+    
+    const avg = grades.length ? Math.round(grades.reduce(function(sum,g){ return sum + num(g.score || g.grade || g.mark); }, 0) / grades.length) : 0;
+    
+    let msg = '📋 ملف الطالب: ' + studentName + '\n\n';
+    msg += '📚 الصف: ' + getClassName(s.class_id) + '\n\n';
+    msg += '📋 الحضور:\n';
+    msg += '   ✅ حاضر: ' + present + '\n';
+    msg += '   ❌ غائب: ' + absent + '\n';
+    msg += '   ⏰ متأخر: ' + late + '\n\n';
+    msg += '🌟 السلوك:\n';
+    msg += '   ➕ إيجابي: ' + positive + '\n';
+    msg += '   ➖ سلبي: ' + negative + '\n\n';
+    msg += '📊 الدرجات:\n';
+    msg += '   📚 عدد المواد: ' + grades.length + '\n';
+    if(grades.length > 0) msg += '   📈 المعدل: ' + avg + '%\n';
+    
+    alert(msg);
+  }
+
+  // ========== الطباعة ==========
+  function printReport(title, content) {
+    const today = new Date().toLocaleDateString('ar-IQ');
+    const html = '<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>'+title+'</title>'+
+      '<style>* { margin: 0; padding: 0; box-sizing: border-box; }'+
+      'body { font-family: "Cairo", "Segoe UI", Tahoma, sans-serif; padding: 30px; color: #333; line-height: 1.6; }'+
+      '.print-header { text-align: center; padding-bottom: 20px; border-bottom: 3px double #8b5cf6; margin-bottom: 30px; }'+
+      '.print-header h1 { color: #6d28d9; font-size: 28px; margin-bottom: 8px; }'+
+      '.confidential { background: #fee2e2; color: #991b1b; padding: 10px; border-radius: 8px; text-align: center; margin-bottom: 20px; font-weight: bold; }'+
+      'table { width: 100%; border-collapse: collapse; margin: 20px 0; }'+
+      'table th { background: #6d28d9; color: white; padding: 12px; text-align: right; }'+
+      'table td { padding: 10px 12px; border-bottom: 1px solid #e5e7eb; }'+
+      'table tr:nth-child(even) td { background: #f9fafb; }'+
+      '.stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin: 20px 0; }'+
+      '.stat-card { background: #f3f4f6; padding: 15px; border-radius: 8px; text-align: center; }'+
+      '.stat-card .label { color: #6b7280; font-size: 13px; }'+
+      '.stat-card .value { color: #6d28d9; font-size: 24px; font-weight: bold; }'+
+      '.section-title { color: #6d28d9; font-size: 18px; margin: 25px 0 12px; padding-bottom: 8px; border-bottom: 2px solid #6d28d9; }'+
+      '@media print { @page { size: A4; margin: 1cm; } .no-print { display: none !important; } }'+
+      '.print-btn { position: fixed; top: 20px; left: 20px; background: #6d28d9; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; }'+
+      '</style></head><body>'+
+      '<button class="print-btn no-print" onclick="window.print()">🖨️ طباعة</button>'+
+      '<div class="confidential">🔒 سري - مخصص للإرشاد النفسي فقط</div>'+
+      '<div class="print-header"><h1>'+SCHOOL_LOGO+' '+SCHOOL_NAME+'</h1><h2>'+title+'</h2><div>📅 '+today+'</div></div>'+
+      content+
+      '</body></html>';
+    
+    const w = window.open('', '_blank', 'width=900,height=700');
+    w.document.write(html);
+    w.document.close();
+    setTimeout(function(){ w.print(); }, 500);
+  }
+
+  function printGeneralReport() {
+    const stats = getStats();
+    let content = '<div class="section-title">📊 الإحصائيات العامة</div><div class="stat-grid">';
+    content += '<div class="stat-card"><div class="label">إجمالي الطلاب</div><div class="value">' + stats.totalStudents + '</div></div>';
+    content += '<div class="stat-card"><div class="label">يحتاجون متابعة</div><div class="value">' + stats.needAttention + '</div></div>';
+    content += '<div class="stat-card"><div class="label">سجلات إيجابية</div><div class="value">' + stats.positiveBehavior + '</div></div>';
+    content += '<div class="stat-card"><div class="label">سجلات سلبية</div><div class="value">' + stats.negativeBehavior + '</div></div></div>';
+    
+    if(stats.needAttentionList.length > 0) {
+      content += '<div class="section-title">🚨 الحالات التي تحتاج متابعة</div>';
+      content += '<table><thead><tr><th>#</th><th>الطالب</th><th>الصف</th></tr></thead><tbody>';
+      stats.needAttentionList.forEach(function(s, i) {
+        const studentName = (s.users && s.users.name) || s.name || 'طالب';
+        content += '<tr><td>' + (i+1) + '</td><td><b>' + esc(studentName) + '</b></td><td>' + esc(getClassName(s.class_id)) + '</td></tr>';
+      });
+      content += '</tbody></table>';
+    }
+    
+    printReport('التقرير العام للإرشاد', content);
+  }
+
+  function printBehaviorReport() {
+    const stats = getStats();
+    let content = '<div class="section-title">🌟 إحصائيات السلوك</div><div class="stat-grid">';
+    content += '<div class="stat-card"><div class="label">إجمالي السجلات</div><div class="value">' + stats.totalBehaviorRecords + '</div></div>';
+    content += '<div class="stat-card"><div class="label">إيجابي</div><div class="value">' + stats.positiveBehavior + '</div></div>';
+    content += '<div class="stat-card"><div class="label">سلبي</div><div class="value">' + stats.negativeBehavior + '</div></div>';
+    content += '<div class="stat-card"><div class="label">اليوم</div><div class="value">' + stats.todayBehavior + '</div></div></div>';
+    
+    if(DATA.behavior.length > 0) {
+      content += '<div class="section-title">📋 آخر السجلات</div>';
+      content += '<table><thead><tr><th>#</th><th>التاريخ</th><th>الطالب</th><th>الملاحظة</th><th>النقاط</th></tr></thead><tbody>';
+      DATA.behavior.slice(0, 50).forEach(function(b, i) {
+        const student = DATA.students.find(function(s){ return String(s.id) === String(b.student_id); });
+        const studentName = student ? ((student.users && student.users.name) || student.name) : 'طالب';
+        content += '<tr><td>' + (i+1) + '</td><td>' + esc(String(b.created_at || b.date || '').slice(0,10)) + '</td><td>' + esc(studentName) + '</td><td>' + esc(b.note || b.description || '—') + '</td><td>' + num(b.points || 0) + '</td></tr>';
+      });
+      content += '</tbody></table>';
+    }
+    
+    printReport('تقرير السلوك والملاحظات', content);
+  }
+
+  function printAttendanceReport() {
+    const stats = getStats();
+    let content = '<div class="section-title">📋 إحصائيات الحضور</div><div class="stat-grid">';
+    content += '<div class="stat-card"><div class="label">إجمالي الغيابات</div><div class="value">' + stats.totalAbsent + '</div></div>';
+    content += '<div class="stat-card"><div class="label">السجلات</div><div class="value">' + DATA.attendance.length + '</div></div></div>';
+    
+    printReport('تقرير الحضور للإرشاد', content);
+  }
+
+  async function refresh() {
+    toast('🔄 تحديث', 'جاري تحديث البيانات...', 'blue');
+    await loadAllData();
+    renderOverview();
+    toast('✅ تم', 'تم تحديث البيانات', 'green');
+  }
+
+  window.addEventListener('load', init);
+  
+  window.CounselorPortal = {
+    init: init,
+    showView: showView,
+    refresh: refresh,
+    showStudentCase: showStudentCase,
+    printGeneralReport: printGeneralReport,
+    printBehaviorReport: printBehaviorReport,
+    printAttendanceReport: printAttendanceReport
+  };
+})();
+</script>
+
 <script src="assets/ux-enhancements.js"></script>
-  <script src="assets/smart-alerts.js"></script>
-</body></html>
-
-
-
+<script src="assets/smart-alerts.js"></script>
+</body>
+</html>
