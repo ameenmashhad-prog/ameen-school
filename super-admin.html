@@ -345,11 +345,12 @@
       html += '</div>';
     }
     
-    // التسجيلات الجديدة - مهم جداً!
+    // التسجيلات الجديدة - مع زر استيراد Excel
     html += '<h3 style="margin-bottom:12px;">📝 التسجيلات وإضافة المستخدمين</h3>';
     html += '<div class="cards" style="margin-bottom:24px;">';
     html += '<div onclick="location.href=\'family-registration.html\'" class="card" style="background:linear-gradient(135deg,#10b981,#059669);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">👨‍👩‍👧</div><div style="font-weight:bold;margin-top:8px;">تسجيل ولي أمر/طالب</div></div>';
     html += '<div onclick="location.href=\'teacher-registration.html\'" class="card" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">👨‍🏫</div><div style="font-weight:bold;margin-top:8px;">تسجيل معلم</div></div>';
+    html += '<div onclick="location.href=\'import-students.html\'" class="card" style="background:linear-gradient(135deg,#06b6d4,#0e7490);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📥</div><div style="font-weight:bold;margin-top:8px;">استيراد من Excel</div><small style="opacity:0.9;display:block;margin-top:4px;">Google Forms</small></div>';
     html += '<div onclick="location.href=\'registrations-admin.html\'" class="card" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📋</div><div style="font-weight:bold;margin-top:8px;">مراجعة التسجيلات</div></div>';
     html += '<div onclick="location.href=\'permissions-management.html\'" class="card" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">🔑</div><div style="font-weight:bold;margin-top:8px;">إدارة الصلاحيات</div></div>';
     html += '</div>';
@@ -439,6 +440,13 @@
     html += '<div style="margin-top:16px;padding:8px 16px;background:rgba(255,255,255,0.2);border-radius:8px;display:inline-block;">📝 ابدأ التسجيل</div>';
     html += '</div></div>';
     
+    html += '<div onclick="location.href=\'import-students.html\'" class="card" style="background:linear-gradient(135deg,#06b6d4,#0e7490);color:white;cursor:pointer;padding:30px;border:none;">';
+    html += '<div style="text-align:center;"><div style="font-size:64px;">📥</div>';
+    html += '<h2 style="margin:12px 0;">استيراد من Excel</h2>';
+    html += '<p style="opacity:0.95;">رفع نتائج Google Forms جماعياً</p>';
+    html += '<div style="margin-top:16px;padding:8px 16px;background:rgba(255,255,255,0.2);border-radius:8px;display:inline-block;">📊 ارفع الملف</div>';
+    html += '</div></div>';
+    
     html += '<div onclick="location.href=\'registrations-admin.html\'" class="card" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:white;cursor:pointer;padding:30px;border:none;">';
     html += '<div style="text-align:center;"><div style="font-size:64px;">📋</div>';
     html += '<h2 style="margin:12px 0;">مراجعة التسجيلات</h2>';
@@ -473,8 +481,10 @@
     
     let html = '<div class="page-head" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">';
     html += '<div><h1>🎓 إدارة الطلاب</h1><p>إجمالي: <b>'+DATA.students.length+'</b> طالب</p></div>';
+    html += '<div style="display:flex;gap:8px;flex-wrap:wrap;">';
     html += '<button class="btn" style="background:#10b981;color:white;padding:12px 24px;" onclick="location.href=\'family-registration.html\'">➕ إضافة طالب جديد</button>';
-    html += '</div>';
+    html += '<button class="btn" style="background:#06b6d4;color:white;padding:12px 24px;" onclick="location.href=\'import-students.html\'">📥 استيراد جماعي</button>';
+    html += '</div></div>';
     
     if(!DATA.students.length) {
       html += '<div class="empty" style="text-align:center;padding:60px;">لا يوجد طلاب مسجلين.</div>';
@@ -565,8 +575,10 @@
     
     let html = '<div class="page-head" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">';
     html += '<div><h1>👨‍👩‍👧 أولياء الأمور</h1><p>إجمالي: <b>'+DATA.parents.length+'</b> ولي أمر</p></div>';
-    html += '<button class="btn" style="background:#10b981;color:white;padding:12px 24px;" onclick="location.href=\'family-registration.html\'">➕ إضافة ولي أمر جديد</button>';
-    html += '</div>';
+    html += '<div style="display:flex;gap:8px;flex-wrap:wrap;">';
+    html += '<button class="btn" style="background:#10b981;color:white;padding:12px 24px;" onclick="location.href=\'family-registration.html\'">➕ إضافة ولي أمر</button>';
+    html += '<button class="btn" style="background:#06b6d4;color:white;padding:12px 24px;" onclick="location.href=\'import-students.html\'">📥 استيراد جماعي</button>';
+    html += '</div></div>';
     
     if(!DATA.parents.length) {
       html += '<div class="empty" style="text-align:center;padding:60px;">لا يوجد أولياء أمور مسجلون.</div>';
