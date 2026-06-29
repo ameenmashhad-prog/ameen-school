@@ -1,9 +1,16 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#081426">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#081426">
 <title>البوابة الموحدة — مجمع أمين الرضا التعليمي</title>
-<link rel="icon" href="/favicon.ico" sizes="any"><link rel="stylesheet" href="assets/portal.css"><link rel="stylesheet" href="assets/amin-identity.css"><link rel="stylesheet" href="assets/brand-redesign.css"><link rel="stylesheet" href="assets/amin-v3.css?v=20260626-landingfix1"><link rel="stylesheet" href="assets/unified-portal.css?v=20260626-landingfix1">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="stylesheet" href="assets/portal.css">
+<link rel="stylesheet" href="assets/amin-identity.css">
+<link rel="stylesheet" href="assets/brand-redesign.css">
+<link rel="stylesheet" href="assets/amin-v3.css">
 <link rel="stylesheet" href="assets/i18n.css">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="assets/amin-logo-small.png">
@@ -13,37 +20,588 @@
 </head>
 <body data-portal="unified">
 <a class="skip-link" href="#mainContent">تخطي إلى المحتوى</a>
+
 <div class="unified-shell">
   <aside class="unified-side" id="sidebar">
-    <div class="brand"><div class="brand-mark">ا</div><div><h1>البوابة الموحدة</h1><small>كل واجهاتك حسب الصلاحية</small></div></div>
-    <div class="profile-mini"><div class="avatar">👤</div><div><b id="profileName">...</b><small id="profileRole">...</small></div></div>
-    <div class="side-search"><input id="moduleSearch" placeholder="بحث في الواجهات..."></div>
+    <div class="brand">
+      <div class="brand-mark">ا</div>
+      <div>
+        <h1>البوابة الموحدة</h1>
+        <small>كل خدماتك في مكان واحد</small>
+      </div>
+    </div>
+    
+    <div class="profile-mini">
+      <div class="avatar">👤</div>
+      <div>
+        <b id="profileName">...</b>
+        <small id="profileRole">...</small>
+      </div>
+    </div>
+
+    <div class="side-search">
+      <input id="moduleSearch" placeholder="🔍 بحث في الواجهات..." oninput="UnifiedPortal.search(this.value)">
+    </div>
+
     <nav class="nav" id="quickNav"></nav>
-    <div class="side-footer"><button id="logoutBtn" class="btn red block">تسجيل الخروج</button></div>
+
+    <div class="side-footer">
+      <button id="logoutBtn" class="btn red block">تسجيل الخروج</button>
+    </div>
   </aside>
+
   <main class="unified-main" id="mainContent" tabindex="-1">
+    
+    <!-- Hero Section -->
     <header class="unified-hero">
       <div class="hero-content">
-        <div class="hero-logo"><img src="assets/amin-logo-small.png" alt="شعار مجمع أمين الرضا التعليمي"></div>
-        <div><h1>مجمع أمين الرضا التعليمي</h1><p>واجهة دخول واحدة، وصلاحيات مفوضة، وإشعارات خاصة بكل مستخدم.</p></div>
+        <div class="hero-logo">
+          <div style="background:linear-gradient(135deg,#fbbf24,#f59e0b);width:80px;height:80px;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:48px;box-shadow:0 8px 24px rgba(251,191,36,0.4);">🎓</div>
+        </div>
+        <div>
+          <h1 id="welcomeTitle">أهلاً بك في مجمع أمين الرضا التعليمي</h1>
+          <p id="welcomeSubtitle">بوابتك الموحدة لكل خدمات المدرسة</p>
+        </div>
       </div>
-      <div class="hero-actions"><button id="commandOpenBtn" class="btn">بحث سريع Ctrl+K</button><button class="btn gold" onclick="UnifiedPortal.openNotifications()">الإشعارات <span id="unreadBadge" class="mini-badge">0</span></button><button id="refreshBtn" class="btn blue">تحديث</button></div>
+      <div class="hero-actions">
+        <button id="myPortalBtn" class="btn gold" style="display:none;">🏠 لوحتي الشخصية</button>
+        <button class="btn" style="background:#3b82f6;color:white;" onclick="UnifiedPortal.refresh()">🔄 تحديث</button>
+      </div>
     </header>
-    <nav class="portal-tabs" aria-label="تبويبات الصفحة الرئيسية"><button class="active" data-portal-tab="home">الرئيسية الذكية</button><button data-portal-tab="modules">الواجهات</button><button data-portal-tab="notifications">الإشعارات</button></nav>
-    <section class="portal-section portal-tab-panel active" id="tab-home"><div id="homeDashboard" class="home-dashboard"><div class="empty">جاري تحميل الصفحة الرئيسية الذكية...</div></div></section>
-    <section class="portal-section portal-tab-panel" id="tab-modules"><div class="section-title"><h2>واجهاتك المتاحة</h2><p>لا تظهر هنا إلا الأقسام المسموحة لحسابك.</p></div><div id="modulesGrid" class="modules-grid"></div></section>
-    <section class="portal-section portal-tab-panel" id="tab-notifications"><div class="section-title"><h2>إشعاراتك</h2><p>آخر التنبيهات الخاصة بحسابك فقط.</p></div><div id="notificationsList" class="portal-notifications"></div></section>
+
+    <!-- Tabs -->
+    <nav class="portal-tabs" aria-label="تبويبات الصفحة الرئيسية">
+      <button class="active" data-portal-tab="home">🏠 الرئيسية</button>
+      <button data-portal-tab="modules">📋 كل الواجهات</button>
+      <button data-portal-tab="notifications">🔔 الإشعارات <span id="unreadBadge" class="mini-badge" style="display:none;">0</span></button>
+    </nav>
+
+    <!-- Tab: Home -->
+    <section class="portal-section portal-tab-panel active" id="tab-home">
+      <div id="homeDashboard" class="home-dashboard">
+        <div class="empty" style="text-align:center;padding:60px;">⏳ جاري التحميل...</div>
+      </div>
+    </section>
+
+    <!-- Tab: Modules -->
+    <section class="portal-section portal-tab-panel" id="tab-modules" style="display:none;">
+      <div class="section-title">
+        <h2>📋 كل الواجهات المتاحة</h2>
+        <p>تظهر فقط الأقسام المسموحة لحسابك</p>
+      </div>
+      <div id="modulesGrid" class="modules-grid"></div>
+    </section>
+
+    <!-- Tab: Notifications -->
+    <section class="portal-section portal-tab-panel" id="tab-notifications" style="display:none;">
+      <div class="section-title">
+        <h2>🔔 إشعاراتك</h2>
+        <p>آخر التنبيهات الخاصة بحسابك فقط</p>
+      </div>
+      <div id="notificationsList" class="portal-notifications"></div>
+    </section>
+
   </main>
 </div>
+
 <div id="toast" class="toast"></div>
-<script>window.$$=window.$$||((s,r=document)=>Array.from(r.querySelectorAll(s)));</script>
-<script src="libs/supabase.min.js"></script><script src="assets/config.js"></script><script src="assets/platform-modules.js?v=20260626-landingfix1"></script><script src="assets/i18n.js?v=20260626-landingfix1"></script><script src="assets/unified-portal.js?v=20260626-landingfix1"></script><script src="assets/ux-enhancements.js?v=20260626-landingfix1"></script>
-<script>window.addEventListener('load',()=>UnifiedPortal.init());</script>
+
+<script src="libs/supabase.min.js"></script>
+<script src="assets/config.js"></script>
+<script src="assets/platform-modules.js"></script>
+<script src="assets/i18n.js"></script>
+
+<script>
+(function(){
+  'use strict';
+
+  function $(s, r){r=r||document;return r.querySelector(s)}
+  function $$(s, r){r=r||document;return Array.from(r.querySelectorAll(s))}
+  function esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;')}
+  function num(v){var n=Number(v);return Number.isFinite(n)?n:0}
+  function money(v){return '$'+num(v).toLocaleString('en-US',{maximumFractionDigits:0})}
+  function iso(){return new Date().toISOString().slice(0,10)}
+  
+  const SCHOOL_NAME = 'مجمع أمين الرضا التعليمي';
+
+  const ROLE_LABELS = {
+    admin: '👑 مدير النظام',
+    super_admin: '👑 المسؤول الأعلى',
+    finance: '💰 المسؤول المالي',
+    discipline: '🛡️ مسؤول الانضباط',
+    counselor: '💚 المرشد النفسي',
+    psychologist: '🧠 أخصائي نفسي',
+    teacher: '👨‍🏫 معلم',
+    parent: '👨‍👩‍👧 ولي أمر',
+    student: '🎓 طالب',
+    academic: '📚 المسؤول العلمي',
+    scientific: '🔬 المسؤول العلمي',
+    supervisor: '👔 مشرف'
+  };
+
+  const ROLE_HOME_PAGES = {
+    admin: 'super-admin.html',
+    super_admin: 'super-admin.html',
+    parent: 'parent.html',
+    teacher: 'teacher.html',
+    student: 'student.html',
+    counselor: 'counselor.html',
+    psychologist: 'counselor.html',
+    finance: 'finance-pro.html'
+  };
+
+  // كل الواجهات المتاحة
+  const ALL_MODULES = [
+    // الواجهات الرئيسية
+    {key:'super_admin', title:'لوحة المسؤول الأعلى', desc:'إدارة شاملة للنظام', icon:'👑', href:'super-admin.html', category:'main', roles:['admin','super_admin']},
+    {key:'parent_portal', title:'بوابة ولي الأمر', desc:'متابعة الأبناء', icon:'👨‍👩‍👧', href:'parent.html', category:'main', roles:['parent']},
+    {key:'teacher_portal', title:'لوحة المعلم', desc:'الحضور والدرجات والواجبات', icon:'👨‍🏫', href:'teacher.html', category:'main', roles:['teacher']},
+    {key:'student_portal', title:'بوابة الطالب', desc:'الدرجات والواجبات والاختبارات', icon:'🎓', href:'student.html', category:'main', roles:['student']},
+    {key:'counselor_portal', title:'الإرشاد النفسي', desc:'متابعة الحالات والجلسات', icon:'💚', href:'counselor.html', category:'main', roles:['counselor','psychologist']},
+    
+    // المالية
+    {key:'finance_pro', title:'النظام المالي', desc:'الرسوم والأقساط', icon:'💰', href:'finance-pro.html', category:'finance', roles:['admin','finance']},
+    {key:'finance_cashbox', title:'صندوق اليومية', desc:'إغلاق يومي حسب المستلم', icon:'💵', href:'finance-cashbox.html', category:'finance', roles:['admin','finance']},
+    {key:'finance_collections', title:'التحصيل والمتابعة', desc:'متأخرات ووعود دفع', icon:'📞', href:'finance-collections.html', category:'finance', roles:['admin','finance']},
+    {key:'finance_executive', title:'المركز المالي التنفيذي', desc:'لوحة مالية شاملة', icon:'📊', href:'finance-executive.html', category:'finance', roles:['admin','finance']},
+    {key:'finance_credit', title:'الرصيد الدائن', desc:'تقرير المدفوعات الزائدة', icon:'💳', href:'finance-credit-report.html', category:'finance', roles:['admin','finance']},
+    {key:'finance_receiver', title:'تقارير المستلمين', desc:'تدقيق حسب المستلم', icon:'🧾', href:'finance-receiver-reports.html', category:'finance', roles:['admin','finance']},
+    {key:'admin_finance_rules', title:'قواعد المالية', desc:'رسوم الصفوف وأسعار المعلمين', icon:'⚙️', href:'admin-finance-rules.html', category:'finance', roles:['admin']},
+    
+    // الأكاديمي
+    {key:'academic_pro', title:'النظام الأكاديمي', desc:'الدرجات والإعفاءات', icon:'📚', href:'academic-pro.html', category:'academic', roles:['admin','academic','scientific','teacher']},
+    {key:'curriculum_planner', title:'مخطط المنهج الذكي', desc:'استيراد وتوزيع المنهج', icon:'📖', href:'curriculum-planner.html', category:'academic', roles:['admin','teacher','academic']},
+    {key:'schedule_management', title:'إدارة الجدول المدرسي', desc:'إدارة الجدول والجلسات', icon:'📅', href:'schedule-management.html', category:'academic', roles:['admin','academic']},
+    {key:'sections', title:'الشعب والإسنادات', desc:'إسناد المعلمين والطلاب', icon:'🎯', href:'section-assignment-management.html', category:'academic', roles:['admin','academic']},
+    {key:'teacher_exams', title:'بنك الأسئلة', desc:'أسئلة واختبارات', icon:'📝', href:'teacher-exams.html', category:'academic', roles:['admin','teacher']},
+    {key:'online_exams', title:'الاختبارات الإلكترونية', desc:'دخول الطالب للاختبارات', icon:'💻', href:'online-exams.html', category:'academic', roles:['student','teacher','admin']},
+    {key:'exam_integrity', title:'نزاهة الاختبارات', desc:'كشف التشابه والنسخ', icon:'🛡️', href:'exam-integrity.html', category:'academic', roles:['admin','teacher','academic']},
+    {key:'homework_reports', title:'تقارير الواجبات', desc:'إنجاز ومتأخرون', icon:'📊', href:'homework-reports.html', category:'academic', roles:['admin','teacher','academic']},
+    {key:'homework_audit', title:'سجل الواجبات', desc:'عمليات وأخطاء', icon:'📋', href:'homework-audit.html', category:'academic', roles:['admin','teacher']},
+    {key:'student_homeworks', title:'الواجبات', desc:'تسليم الواجبات', icon:'✏️', href:'student-homeworks.html', category:'academic', roles:['student','parent','teacher']},
+    
+    // الموارد البشرية والخدمات
+    {key:'hr', title:'الموارد البشرية', desc:'موظفون وإجازات', icon:'👔', href:'hr.html', category:'hr', roles:['admin']},
+    {key:'staff', title:'الموظفون', desc:'إدارة الموظفين', icon:'👥', href:'staff.html', category:'hr', roles:['admin']},
+    {key:'family_registration', title:'تسجيل ولي أمر/طالب', desc:'تسجيل عائلة جديدة', icon:'📝', href:'family-registration.html', category:'hr', roles:['admin','parent']},
+    {key:'teacher_registration', title:'تسجيل معلم', desc:'تسجيل معلم جديد', icon:'👨‍🏫', href:'teacher-registration.html', category:'hr', roles:['admin']},
+    {key:'registrations_admin', title:'مراجعة التسجيلات', desc:'الطلبات الجديدة', icon:'📋', href:'registrations-admin.html', category:'hr', roles:['admin','academic']},
+    {key:'import_students', title:'استيراد من Excel', desc:'رفع نتائج Google Forms', icon:'📥', href:'import-students.html', category:'hr', roles:['admin']},
+    {key:'permissions', title:'إدارة الصلاحيات', desc:'منح وإلغاء الصلاحيات', icon:'🔑', href:'permissions-management.html', category:'hr', roles:['admin']},
+    {key:'counseling_report', title:'تقارير الإرشاد', desc:'تقارير البرنامج التربوي', icon:'📊', href:'counseling-report.html', category:'hr', roles:['admin','counselor']},
+    
+    // الموارد والمرافق
+    {key:'library', title:'المكتبة', desc:'فهرس وإعارة وحجز', icon:'📚', href:'library.html', category:'resources', roles:['admin','student','teacher']},
+    {key:'inventory', title:'المخزون والمشتريات', desc:'أصناف وموردون', icon:'📦', href:'inventory.html', category:'resources', roles:['admin']},
+    {key:'fixed_assets', title:'الأصول والعهد', desc:'إدارة الأصول الثابتة', icon:'🏢', href:'fixed-assets.html', category:'resources', roles:['admin']},
+    {key:'labs_activities', title:'المختبرات والأنشطة', desc:'مختبرات وتجارب', icon:'🔬', href:'labs-activities.html', category:'resources', roles:['admin','teacher','student']},
+    {key:'transportation', title:'النقل المدرسي', desc:'حافلات ومسارات', icon:'🚌', href:'transportation.html', category:'resources', roles:['admin','parent','student']},
+    {key:'documents', title:'الوثائق والأرشيف', desc:'ملفات الطلاب والموظفين', icon:'📄', href:'documents.html', category:'resources', roles:['admin']},
+    
+    // التحليلات وإدارة النظام
+    {key:'analytics', title:'مركز التحليلات', desc:'مؤشرات وتنبيهات ذكية', icon:'📊', href:'analytics-center.html', category:'analytics', roles:['admin']},
+    {key:'announcements', title:'الإعلانات الجماعية', desc:'نشر إعلان', icon:'📢', href:'announcements.html', category:'analytics', roles:['admin']},
+    {key:'notifications', title:'الإشعارات', desc:'إشعاراتك الخاصة', icon:'🔔', href:'notifications.html', category:'analytics', roles:['admin','parent','teacher','student','counselor','finance']},
+    {key:'smart_calendar', title:'التقويم الذكي', desc:'تقويم ثلاثي وأجندة', icon:'📅', href:'smart-calendar.html', category:'analytics', roles:['admin','parent','teacher','student','counselor']},
+    {key:'achievements', title:'الإنجازات والشارات', desc:'شارات تحفيزية', icon:'🏆', href:'achievements.html', category:'analytics', roles:['admin','student','teacher']},
+    {key:'final_readiness', title:'الجاهزية النهائية', desc:'فحص نهائي للوحدات', icon:'✅', href:'final-readiness.html', category:'analytics', roles:['admin']},
+    {key:'security_governance', title:'حوكمة الأمن', desc:'فحص الصلاحيات وRLS', icon:'🛡️', href:'security-governance.html', category:'analytics', roles:['admin']},
+    {key:'system_maintenance', title:'صيانة النظام', desc:'فحص صحة النظام', icon:'⚙️', href:'system-maintenance.html', category:'analytics', roles:['admin']},
+    {key:'deployment_check', title:'فحص النشر', desc:'تحقق من حالة النشر', icon:'🚀', href:'deployment-check.html', category:'analytics', roles:['admin']}
+  ];
+
+  const CATEGORY_NAMES = {
+    main: '🏠 الواجهات الرئيسية',
+    finance: '💰 المالية',
+    academic: '📚 الأكاديمي والجداول',
+    hr: '👥 الموارد البشرية والخدمات',
+    resources: '📦 الموارد والمرافق',
+    analytics: '📊 التحليلات وإدارة النظام'
+  };
+
+  let sb = null;
+  let ME = null;
+  let MY_MODULES = [];
+  let NOTIFICATIONS = [];
+
+  function cfg() { return window.AMIN_CONFIG || {}; }
+  
+  function client() {
+    if(sb) return sb;
+    if(!window.supabase) throw new Error('Supabase library not loaded');
+    sb = window.supabase.createClient(
+      cfg().supabaseUrl, 
+      cfg().supabaseAnonKey, 
+      {auth:{persistSession:true, autoRefreshToken:true, detectSessionInUrl:true, storageKey:(cfg().authStorageKey||'amin-ovcjzsrqqgjsbqswtkro-auth-v2')}}
+    );
+    return sb;
+  }
+
+  function toast(title, msg, type) {
+    const t = $('#toast');
+    if(!t) return;
+    t.innerHTML = '<b>'+esc(title)+'</b><br><span class="muted">'+esc(msg||'')+'</span>';
+    t.className = 'toast show ' + (type||'');
+    clearTimeout(t._to);
+    t._to = setTimeout(function(){t.classList.remove('show')}, 4000);
+  }
+
+  function getUserRole() {
+    if(!ME) return 'guest';
+    if(ME.is_super_admin) return 'super_admin';
+    return ME.role || 'guest';
+  }
+
+  function getRoleLabel() {
+    return ROLE_LABELS[getUserRole()] || ME.role || 'مستخدم';
+  }
+
+  function getMyHomePage() {
+    return ROLE_HOME_PAGES[getUserRole()] || null;
+  }
+
+  async function init() {
+    try {
+      const c = client();
+      const sessionRes = await c.auth.getSession();
+      if(!sessionRes.data.session) { location.href = 'index.html'; return; }
+
+      const userRes = await c.from('users').select('*').eq('id', sessionRes.data.session.user.id).maybeSingle();
+      if(!userRes.data) {
+        toast('خطأ', 'تعذر تحميل بيانات الحساب', 'red');
+        return;
+      }
+      ME = userRes.data;
+      window.ME = ME;
+      console.log('✅ User loaded:', ME.name, 'Role:', getUserRole());
+
+      $('#profileName').textContent = ME.name || ME.email || 'مستخدم';
+      $('#profileRole').textContent = getRoleLabel();
+      $('#welcomeTitle').textContent = 'أهلاً بك، ' + (ME.name || 'مستخدم') + ' 👋';
+      $('#welcomeSubtitle').textContent = getRoleLabel() + ' · ' + SCHOOL_NAME;
+
+      $('#logoutBtn').onclick = async function() {
+        await c.auth.signOut({scope:'local'}).catch(function(){});
+        location.href = 'index.html';
+      };
+
+      // زر اللوحة الشخصية
+      const myHome = getMyHomePage();
+      if(myHome) {
+        const myBtn = $('#myPortalBtn');
+        myBtn.style.display = '';
+        myBtn.onclick = function() { location.href = myHome; };
+      }
+
+      // فلترة الموديلات حسب الدور
+      filterMyModules();
+
+      // إعداد التبويبات
+      setupTabs();
+
+      // بناء القائمة الجانبية
+      buildSidebarNav();
+
+      // جلب الإشعارات
+      await loadNotifications();
+
+      // عرض الصفحة الرئيسية
+      renderHome();
+      renderModules();
+      renderNotifications();
+
+    } catch(e) {
+      console.error('❌ Init error:', e);
+      toast('خطأ', e.message, 'red');
+    }
+  }
+
+  function filterMyModules() {
+    const role = getUserRole();
+    MY_MODULES = ALL_MODULES.filter(function(m) {
+      if(!m.roles || !m.roles.length) return true;
+      // المسؤول الأعلى يرى كل شيء
+      if(role === 'admin' || role === 'super_admin') return true;
+      return m.roles.includes(role);
+    });
+    console.log('✅ My modules:', MY_MODULES.length);
+  }
+
+  function setupTabs() {
+    $$('.portal-tabs button[data-portal-tab]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        const tab = btn.dataset.portalTab;
+        $$('.portal-tabs button').forEach(function(b) { b.classList.toggle('active', b === btn); });
+        $$('.portal-tab-panel').forEach(function(p) {
+          p.style.display = p.id === 'tab-' + tab ? '' : 'none';
+        });
+      });
+    });
+  }
+
+  function buildSidebarNav() {
+    const nav = $('#quickNav');
+    if(!nav) return;
+    
+    // عرض البوابة الشخصية أولاً
+    const myHome = getMyHomePage();
+    let html = '';
+    
+    if(myHome) {
+      html += '<button onclick="location.href=\'' + myHome + '\'" style="background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#7c2d12;font-weight:bold;">🏠 لوحتي الشخصية</button>';
+    }
+    
+    // أهم الموديلات حسب الدور
+    const topModules = MY_MODULES.filter(function(m){ return m.category === 'main'; }).slice(0, 5);
+    topModules.forEach(function(m) {
+      if(m.href === myHome) return; // تجنب التكرار
+      html += '<button onclick="location.href=\'' + m.href + '\'">' + m.icon + ' ' + esc(m.title) + '</button>';
+    });
+    
+    // فاصل
+    html += '<hr style="border:none;border-top:1px solid rgba(255,255,255,0.1);margin:8px 0;">';
+    
+    // روابط سريعة
+    html += '<button onclick="location.href=\'notifications.html\'">🔔 الإشعارات</button>';
+    html += '<button onclick="location.href=\'smart-calendar.html\'">📅 التقويم</button>';
+    
+    if(getUserRole() === 'student' || getUserRole() === 'parent') {
+      html += '<button onclick="location.href=\'achievements.html\'">🏆 الإنجازات</button>';
+    }
+    
+    nav.innerHTML = html;
+  }
+
+  async function loadNotifications() {
+    try {
+      const res = await client().from('school_notifications')
+        .select('*')
+        .eq('recipient_user_id', ME.id)
+        .order('created_at', {ascending: false})
+        .limit(20);
+      NOTIFICATIONS = res.data || [];
+      
+      const unread = NOTIFICATIONS.filter(function(n){ return !n.read_at; }).length;
+      const badge = $('#unreadBadge');
+      if(badge && unread > 0) {
+        badge.textContent = unread;
+        badge.style.display = '';
+      }
+    } catch(e) {
+      NOTIFICATIONS = [];
+    }
+  }
+
+  function renderHome() {
+    const container = $('#homeDashboard');
+    const role = getUserRole();
+    const myHome = getMyHomePage();
+    const mainModules = MY_MODULES.filter(function(m){ return m.category === 'main'; });
+    
+    let html = '';
+    
+    // بطاقة الترحيب الكبيرة
+    html += '<div style="background:linear-gradient(135deg,#1e40af,#3b82f6);color:white;padding:30px;border-radius:16px;margin-bottom:24px;box-shadow:0 10px 30px rgba(30,64,175,0.3);">';
+    html += '<h2 style="font-size:24px;margin-bottom:8px;">مرحباً بك في بوابتك الموحدة! 🌟</h2>';
+    html += '<p style="opacity:0.95;font-size:16px;">من هنا تقدر تصل لكل خدمات المدرسة المتاحة لحسابك. اختر من الواجهات أدناه أو استخدم البحث.</p>';
+    html += '<div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap;">';
+    if(myHome) {
+      html += '<button class="btn gold" onclick="location.href=\'' + myHome + '\'" style="padding:12px 24px;">🏠 اذهب للوحتي الشخصية</button>';
+    }
+    html += '<button class="btn" style="background:white;color:#1e40af;padding:12px 24px;font-weight:bold;" onclick="UnifiedPortal.switchTab(\'modules\')">📋 عرض كل الواجهات (' + MY_MODULES.length + ')</button>';
+    html += '</div></div>';
+    
+    // الواجهات الرئيسية
+    if(mainModules.length > 0) {
+      html += '<h3 style="margin-bottom:12px;font-size:18px;">🎯 واجهاتك الرئيسية</h3>';
+      html += '<div class="cards" style="margin-bottom:24px;">';
+      mainModules.forEach(function(m) {
+        html += '<div onclick="location.href=\'' + m.href + '\'" class="card" style="cursor:pointer;background:linear-gradient(135deg,#10b981,#059669);color:white;padding:24px;border:none;text-align:center;transition:transform 0.2s;" onmouseover="this.style.transform=\'translateY(-4px)\'" onmouseout="this.style.transform=\'translateY(0)\'">';
+        html += '<div style="font-size:48px;margin-bottom:8px;">' + m.icon + '</div>';
+        html += '<h3 style="margin-bottom:6px;font-size:16px;">' + esc(m.title) + '</h3>';
+        html += '<p style="opacity:0.9;font-size:13px;">' + esc(m.desc) + '</p>';
+        html += '</div>';
+      });
+      html += '</div>';
+    }
+    
+    // إحصائيات سريعة (للمدير فقط)
+    if(role === 'admin' || role === 'super_admin') {
+      html += '<h3 style="margin-bottom:12px;font-size:18px;">⚡ روابط سريعة للمدير</h3>';
+      html += '<div class="cards" style="margin-bottom:24px;">';
+      
+      const adminLinks = [
+        {icon:'📥', title:'استيراد طلاب', href:'import-students.html', color:'#06b6d4,#0891b2'},
+        {icon:'👨‍👩‍👧', title:'تسجيل عائلة', href:'family-registration.html', color:'#10b981,#059669'},
+        {icon:'👨‍🏫', title:'تسجيل معلم', href:'teacher-registration.html', color:'#3b82f6,#1d4ed8'},
+        {icon:'📋', title:'مراجعة التسجيلات', href:'registrations-admin.html', color:'#8b5cf6,#6d28d9'},
+        {icon:'🔑', title:'الصلاحيات', href:'permissions-management.html', color:'#f59e0b,#d97706'},
+        {icon:'📢', title:'إعلانات', href:'announcements.html', color:'#06b6d4,#0891b2'},
+        {icon:'📊', title:'التحليلات', href:'analytics-center.html', color:'#ec4899,#be185d'},
+        {icon:'⚙️', title:'صيانة', href:'system-maintenance.html', color:'#6b7280,#4b5563'}
+      ];
+      
+      adminLinks.forEach(function(l) {
+        html += '<div onclick="location.href=\'' + l.href + '\'" class="card" style="cursor:pointer;background:linear-gradient(135deg,' + l.color + ');color:white;padding:20px;border:none;text-align:center;">';
+        html += '<div style="font-size:36px;">' + l.icon + '</div>';
+        html += '<div style="font-weight:bold;margin-top:8px;">' + l.title + '</div>';
+        html += '</div>';
+      });
+      
+      html += '</div>';
+    }
+    
+    // الإشعارات الأخيرة
+    if(NOTIFICATIONS.length > 0) {
+      const unread = NOTIFICATIONS.filter(function(n){ return !n.read_at; });
+      if(unread.length > 0) {
+        html += '<h3 style="margin-bottom:12px;font-size:18px;">🔔 إشعارات جديدة (' + unread.length + ')</h3>';
+        html += '<div class="list">';
+        unread.slice(0, 5).forEach(function(n) {
+          html += '<div class="item" style="background:#fef3c7;border-right:3px solid #f59e0b;">';
+          html += '<div><b>' + esc(n.title || 'إشعار') + '</b><small>' + esc(n.body || n.message || '') + ' · ' + esc(String(n.created_at || '').slice(0,10)) + '</small></div>';
+          html += '<span class="badge gold">جديد</span>';
+          html += '</div>';
+        });
+        html += '</div>';
+        if(unread.length > 5) {
+          html += '<div style="text-align:center;margin-top:12px;"><button class="btn blue" onclick="UnifiedPortal.switchTab(\'notifications\')">عرض كل الإشعارات</button></div>';
+        }
+      }
+    }
+    
+    container.innerHTML = html;
+  }
+
+  function renderModules() {
+    const container = $('#modulesGrid');
+    
+    if(!MY_MODULES.length) {
+      container.innerHTML = '<div class="empty" style="text-align:center;padding:60px;">لا توجد واجهات متاحة لحسابك حالياً.</div>';
+      return;
+    }
+    
+    // تجميع حسب الفئة
+    const byCategory = {};
+    MY_MODULES.forEach(function(m) {
+      if(!byCategory[m.category]) byCategory[m.category] = [];
+      byCategory[m.category].push(m);
+    });
+    
+    let html = '';
+    
+    Object.keys(CATEGORY_NAMES).forEach(function(cat) {
+      const modules = byCategory[cat];
+      if(!modules || !modules.length) return;
+      
+      html += '<div class="category-section" style="margin-bottom:32px;">';
+      html += '<h3 style="margin-bottom:16px;font-size:18px;color:#1e40af;border-bottom:2px solid #e5e7eb;padding-bottom:8px;">' + CATEGORY_NAMES[cat] + ' (' + modules.length + ')</h3>';
+      html += '<div class="cards">';
+      
+      modules.forEach(function(m) {
+        html += '<div onclick="location.href=\'' + m.href + '\'" class="card" style="cursor:pointer;padding:20px;border:1px solid #e5e7eb;text-align:center;background:white;transition:all 0.2s;" onmouseover="this.style.transform=\'translateY(-2px)\';this.style.boxShadow=\'0 8px 24px rgba(0,0,0,0.1)\';" onmouseout="this.style.transform=\'translateY(0)\';this.style.boxShadow=\'none\';">';
+        html += '<div style="font-size:40px;margin-bottom:8px;">' + m.icon + '</div>';
+        html += '<h4 style="margin-bottom:4px;font-size:15px;color:#1f2937;">' + esc(m.title) + '</h4>';
+        html += '<p style="color:#6b7280;font-size:12px;">' + esc(m.desc) + '</p>';
+        html += '</div>';
+      });
+      
+      html += '</div></div>';
+    });
+    
+    container.innerHTML = html;
+  }
+
+  function renderNotifications() {
+    const container = $('#notificationsList');
+    
+    if(!NOTIFICATIONS.length) {
+      container.innerHTML = '<div class="empty" style="text-align:center;padding:60px;"><div style="font-size:64px;">🔔</div><h3 style="margin-top:16px;">لا توجد إشعارات</h3><p style="color:#666;margin-top:8px;">ستظهر هنا إشعاراتك الجديدة.</p></div>';
+      return;
+    }
+    
+    let html = '<div class="list">';
+    NOTIFICATIONS.forEach(function(n) {
+      const isUnread = !n.read_at;
+      html += '<div class="item" style="' + (isUnread ? 'background:#fef3c7;border-right:3px solid #f59e0b;' : '') + '">';
+      html += '<div><b>' + esc(n.title || 'إشعار') + '</b><small>' + esc(n.body || n.message || '') + ' · ' + esc(String(n.created_at || '').slice(0,10)) + '</small></div>';
+      html += '<span class="badge ' + (isUnread ? 'gold' : 'blue') + '">' + (isUnread ? 'جديد' : 'مقروء') + '</span>';
+      html += '</div>';
+    });
+    html += '</div>';
+    
+    container.innerHTML = html;
+  }
+
+  function switchTab(tab) {
+    $$('.portal-tabs button[data-portal-tab]').forEach(function(btn) {
+      btn.classList.toggle('active', btn.dataset.portalTab === tab);
+    });
+    $$('.portal-tab-panel').forEach(function(p) {
+      p.style.display = p.id === 'tab-' + tab ? '' : 'none';
+    });
+  }
+
+  function search(query) {
+    query = (query || '').toLowerCase().trim();
+    
+    if(!query) {
+      renderModules();
+      return;
+    }
+    
+    // الانتقال لتبويب الواجهات
+    switchTab('modules');
+    
+    const filtered = MY_MODULES.filter(function(m) {
+      return m.title.toLowerCase().includes(query) || 
+             m.desc.toLowerCase().includes(query) || 
+             m.key.toLowerCase().includes(query);
+    });
+    
+    const container = $('#modulesGrid');
+    
+    if(!filtered.length) {
+      container.innerHTML = '<div class="empty" style="text-align:center;padding:60px;"><div style="font-size:64px;">🔍</div><h3 style="margin-top:16px;">لا توجد نتائج</h3><p style="color:#666;">جرّب كلمة بحث أخرى.</p></div>';
+      return;
+    }
+    
+    let html = '<div style="margin-bottom:16px;background:#dbeafe;padding:12px;border-radius:8px;color:#1e40af;"><b>🔍 نتائج البحث عن "' + esc(query) + '":</b> ' + filtered.length + ' نتيجة</div>';
+    html += '<div class="cards">';
+    
+    filtered.forEach(function(m) {
+      html += '<div onclick="location.href=\'' + m.href + '\'" class="card" style="cursor:pointer;padding:20px;border:1px solid #e5e7eb;text-align:center;background:white;">';
+      html += '<div style="font-size:40px;margin-bottom:8px;">' + m.icon + '</div>';
+      html += '<h4 style="margin-bottom:4px;font-size:15px;">' + esc(m.title) + '</h4>';
+      html += '<p style="color:#6b7280;font-size:12px;">' + esc(m.desc) + '</p>';
+      html += '</div>';
+    });
+    
+    html += '</div>';
+    container.innerHTML = html;
+  }
+
+  async function refresh() {
+    toast('🔄 تحديث', 'جاري تحديث البيانات...', 'blue');
+    await loadNotifications();
+    renderHome();
+    renderModules();
+    renderNotifications();
+    toast('✅ تم', 'تم التحديث', 'green');
+  }
+
+  window.addEventListener('load', init);
+  
+  window.UnifiedPortal = {
+    init: init,
+    switchTab: switchTab,
+    search: search,
+    refresh: refresh
+  };
+})();
+</script>
+
 <script src="assets/ux-enhancements.js"></script>
-  <script src="assets/smart-alerts.js"></script>
-</body></html>
-
-
-
-
-
+<script src="assets/smart-alerts.js"></script>
+</body>
+</html>
