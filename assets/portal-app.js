@@ -1,5 +1,5 @@
 /* ================================================================
-   AMIN PORTAL APP - منطق البوابة الموحدة
+   AMIN PORTAL APP - منطق البوابة الموحدة (مُصلَح)
    ================================================================ */
 (function(){
 'use strict';
@@ -32,16 +32,16 @@ var SECTIONS_META = {
 };
 
 var ROLE_LABELS = {
-  super_admin: '👑 المسؤول الأعلى',
-  admin: '👑 مدير النظام',
-  finance: '💰 المسؤول المالي',
-  academic: '📚 المسؤول العلمي',
-  counselor: '💚 المرشد النفسي',
-  psychologist: '🧠 أخصائي نفسي',
-  discipline: '🛡️ مسؤول الانضباط',
-  teacher: '👨‍🏫 معلم',
-  parent: '👨‍👩‍👧 ولي أمر',
-  student: '🎓 طالب'
+  super_admin: 'المسؤول الأعلى',
+  admin: 'مدير النظام',
+  finance: 'المسؤول المالي',
+  academic: 'المسؤول العلمي',
+  counselor: 'المرشد النفسي',
+  psychologist: 'أخصائي نفسي',
+  discipline: 'مسؤول الانضباط',
+  teacher: 'معلم',
+  parent: 'ولي أمر',
+  student: 'طالب'
 };
 
 window.currentSection = null;
@@ -56,10 +56,18 @@ window.escapeHtml = esc;
 window.formatNumber = function(n){ return Number(n||0).toLocaleString('ar-IQ'); };
 window.formatMoney = function(n){ return '$' + Number(n||0).toLocaleString('ar-IQ', {maximumFractionDigits:0}); };
 
+function getIcon(name, size) {
+  size = size || 28;
+  if (window.AminIcons && window.AminIcons.create) {
+    return window.AminIcons.create(name, size);
+  }
+  return '<span style="font-size:' + size + 'px;">•</span>';
+}
+
 window.renderLoading = function(containerId, message) {
   var c = document.getElementById(containerId) || document.getElementById('main-content');
   if (!c) return;
-  var starHTML = window.AminStar ? window.AminStar.createStar({variant:'spinning', size:48, color:'var(--primary)'}) : '⏳';
+  var starHTML = window.AminStar ? window.AminStar.createStar({variant:'spinning', size:48, color:'var(--primary)'}) : '<div style="font-size:48px;">⏳</div>';
   c.innerHTML = '<div class="amin-loading-state">' + starHTML + '<div class="amin-loading-text">' + esc(message || 'جاري التحميل...') + '</div></div>';
 };
 
@@ -164,17 +172,28 @@ function buildSidebar() {
   var role = window.currentUserRole;
   var allowed = ROLE_SECTIONS[role] || [];
   var nav = document.getElementById('sidebarNav');
-  if (!allowed.length) { nav.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-tertiary);">لا توجد أقسام</div>'; return; }
+  if (!allowed.length) {
+    nav.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-tertiary);">لا توجد أقسام</div>';
+    return;
+  }
   var sorted = allowed.filter(function(s){ return SECTIONS_META[s]; }).sort(function(a,b){ return SECTIONS_META[a].order - SECTIONS_META[b].order; });
   var html = '';
   sorted.forEach(function(id){
     var m = SECTIONS_META[id];
-    var iconHTML = window.AminIcons ? window.AminIcons.create(m.icon, 28) : m.icon;
-    html += '<button class="sidebar-nav-item" data-section="' + id + '" onclick="navigate(\'' + id + '\')"><span class="nav-icon-wrap">' + iconHTML + '</span><span class="sidebar-nav-label">' + m.title + '</span></button>';
+    var iconHTML = getIcon(m.icon, 28);
+    html += '<button class="sidebar-nav-item" data-section="' + id + '" onclick="navigate(\'' + id + '\')">';
+    html += '<span class="nav-icon-wrap">' + iconHTML + '</span>';
+    html += '<span class="sidebar-nav-label">' + m.title + '</span>';
+    html += '</button>';
+  });
   nav.innerHTML = html;
+  
   var logoEl = document.getElementById('sidebarLogo');
-  if (logoEl && window.AminStar) logoEl.innerHTML = window.AminStar.createStar({variant:'filled', size:28, color:'white'});
-  else if (logoEl) logoEl.innerHTML = '🎓';
+  if (logoEl && window.AminStar) {
+    logoEl.innerHTML = window.AminStar.createStar({variant:'filled', size:28, color:'white'});
+  } else if (logoEl) {
+    logoEl.innerHTML = '<span style="color:white;font-size:24px;">★</span>';
+  }
 }
 
 function buildBottomNav() {
@@ -185,8 +204,11 @@ function buildBottomNav() {
   var html = '';
   top5.forEach(function(id){
     var m = SECTIONS_META[id];
-      var iconHTML = window.AminIcons ? window.AminIcons.create(m.icon, 24) : m.icon;
-    html += '<button class="bottom-nav-item" data-section="' + id + '" onclick="navigate(\'' + id + '\')"><span class="bottom-nav-icon">' + iconHTML + '</span><span>' + m.title + '</span></button>';
+    var iconHTML = getIcon(m.icon, 24);
+    html += '<button class="bottom-nav-item" data-section="' + id + '" onclick="navigate(\'' + id + '\')">';
+    html += '<span class="bottom-nav-icon">' + iconHTML + '</span>';
+    html += '<span>' + m.title + '</span>';
+    html += '</button>';
   });
   nav.innerHTML = html;
 }
@@ -197,15 +219,29 @@ window.navigate = function(sectionId) {
   if (!sectionId || allowed.indexOf(sectionId) === -1) sectionId = allowed[0] || 'overview';
   if (location.hash !== '#' + sectionId) location.hash = sectionId;
   window.currentSection = sectionId;
-  document.querySelectorAll('.sidebar-nav-item[data-section]').forEach(function(i){ i.classList.toggle('active', i.dataset.section === sectionId); });
-  document.querySelectorAll('.bottom-nav-item[data-section]').forEach(function(i){ i.classList.toggle('active', i.dataset.section === sectionId); });
+  
+  document.querySelectorAll('.sidebar-nav-item[data-section]').forEach(function(i){
+    i.classList.toggle('active', i.dataset.section === sectionId);
+  });
+  document.querySelectorAll('.bottom-nav-item[data-section]').forEach(function(i){
+    i.classList.toggle('active', i.dataset.section === sectionId);
+  });
+  
   var meta = SECTIONS_META[sectionId];
-   if (meta) {     var titleEl = document.getElementById('pageTitle');     var iconHTML = window.AminIcons ? window.AminIcons.create(meta.icon, 28) : '';     titleEl.innerHTML = iconHTML + ' <span style="vertical-align:middle;">' + meta.title + '</span>'; document.title = meta.title + ' — البوابة الموحدة'; }
+  if (meta) {
+    var titleEl = document.getElementById('pageTitle');
+    var iconHTML = getIcon(meta.icon, 28);
+    titleEl.innerHTML = iconHTML + ' <span style="vertical-align:middle;">' + meta.title + '</span>';
+    document.title = meta.title + ' — البوابة الموحدة';
+  }
+  
   if (window.innerWidth <= 639) {
     document.getElementById('appSidebar').classList.remove('open');
     document.getElementById('sidebarBackdrop').classList.remove('active');
   }
+  
   window.renderLoading('main-content', 'جاري تحميل ' + (meta ? meta.title : 'القسم') + '...');
+  
   var section = window.SECTIONS[sectionId];
   if (section && typeof section.load === 'function') {
     Promise.resolve(section.load()).catch(function(err){
@@ -221,19 +257,26 @@ window.toggleSidebar = function() {
   document.getElementById('appSidebar').classList.toggle('open');
   document.getElementById('sidebarBackdrop').classList.toggle('active');
 };
-   
+
 window.toggleDarkMode = function() {
   document.body.classList.toggle('dark');
   var dark = document.body.classList.contains('dark');
   localStorage.setItem('darkMode', dark ? '1' : '0');
   var btn = document.getElementById('darkModeBtn');
-  if (btn && window.AminIcons) btn.innerHTML = window.AminIcons.create(dark ? 'lightmode' : 'darkmode', 24);
+  if (btn) {
+    btn.innerHTML = getIcon(dark ? 'lightmode' : 'darkmode', 24);
+  }
   window.showToast(dark ? 'الوضع الليلي' : 'الوضع النهاري', null, 'success');
 };
+
 window.handleLogout = async function() {
   if (!confirm('هل تريد تسجيل الخروج؟')) return;
-  try { if (window.sbClient) await window.sbClient.auth.signOut({scope:'local'}); location.href = 'index.html'; }
-  catch (e) { location.href = 'index.html'; }
+  try {
+    if (window.sbClient) await window.sbClient.auth.signOut({scope:'local'});
+    location.href = 'index.html';
+  } catch (e) {
+    location.href = 'index.html';
+  }
 };
 
 // ====================================
@@ -264,52 +307,59 @@ window.SECTIONS.overview = {
       var studentsMap = await fetchStudentsByIds(allIds);
       
       var ae = (er[0].data || []).map(function(e){
-        return { type: '❌ غياب', tc: 'danger', name: (studentsMap[e.student_id] && studentsMap[e.student_id].name) || 'طالب', detail: 'تاريخ: ' + String(e.date || '').slice(0,10), created_at: e.created_at };
+        return { type: 'غياب', tc: 'danger', name: (studentsMap[e.student_id] && studentsMap[e.student_id].name) || 'طالب', detail: 'تاريخ: ' + String(e.date || '').slice(0,10), created_at: e.created_at };
       });
       var be = (er[1].data || []).map(function(e){
         var p = Number(e.points || 0);
-        return { type: p >= 0 ? '🌟 إيجابي' : '⚠️ سلبي', tc: p >= 0 ? 'success' : 'warning', name: (studentsMap[e.student_id] && studentsMap[e.student_id].name) || 'طالب', detail: e.note || 'ملاحظة', created_at: e.created_at };
+        return { type: p >= 0 ? 'إيجابي' : 'سلبي', tc: p >= 0 ? 'success' : 'warning', name: (studentsMap[e.student_id] && studentsMap[e.student_id].name) || 'طالب', detail: e.note || 'ملاحظة', created_at: e.created_at };
       });
       var all = ae.concat(be).sort(function(a,b){ return new Date(b.created_at) - new Date(a.created_at); }).slice(0, 10);
       
       var cards = [];
       if (role === 'super_admin' || role === 'admin') {
         cards = [
-          { label: 'إجمالي الطلاب', value: window.formatNumber(so.total || 0), icon: '🎓', kind: 'primary' },
-          { label: 'حضور اليوم', value: window.formatNumber(at.present || 0) + ' / ' + window.formatNumber(at.total || 0), icon: '✓', kind: 'success' },
-          { label: 'المحصّل', value: window.formatMoney(fs.collected || 0), icon: '💰', kind: 'secondary' },
-          { label: 'المتأخرات', value: window.formatMoney(fs.overdue || 0), icon: '⚠', kind: 'danger' }
+          { label: 'إجمالي الطلاب', value: window.formatNumber(so.total || 0), iconName: 'students', kind: 'primary' },
+          { label: 'حضور اليوم', value: window.formatNumber(at.present || 0) + ' / ' + window.formatNumber(at.total || 0), iconName: 'attendance', kind: 'success' },
+          { label: 'المحصّل', value: window.formatMoney(fs.collected || 0), iconName: 'finance', kind: 'secondary' },
+          { label: 'المتأخرات', value: window.formatMoney(fs.overdue || 0), iconName: 'finance', kind: 'danger' }
         ];
       } else if (role === 'finance') {
         var tot = (fs.collected || 0) + (fs.overdue || 0);
         var rt = tot > 0 ? Math.round(((fs.collected || 0) / tot) * 100) : 0;
         cards = [
-          { label: 'المحصّل', value: window.formatMoney(fs.collected || 0), icon: '💰', kind: 'success' },
-          { label: 'المتأخرات', value: window.formatMoney(fs.overdue || 0), icon: '⚠', kind: 'danger' },
-          { label: 'الرصيد الدائن', value: window.formatMoney(fs.credit || 0), icon: '💳', kind: 'info' },
-          { label: 'نسبة التحصيل', value: rt + '%', icon: '📊', kind: 'secondary' }
+          { label: 'المحصّل', value: window.formatMoney(fs.collected || 0), iconName: 'finance', kind: 'success' },
+          { label: 'المتأخرات', value: window.formatMoney(fs.overdue || 0), iconName: 'finance', kind: 'danger' },
+          { label: 'الرصيد الدائن', value: window.formatMoney(fs.credit || 0), iconName: 'payroll', kind: 'info' },
+          { label: 'نسبة التحصيل', value: rt + '%', iconName: 'finance', kind: 'secondary' }
         ];
       } else {
         cards = [
-          { label: 'الطلاب', value: window.formatNumber(so.total || 0), icon: '🎓', kind: 'primary' },
-          { label: 'الحضور', value: window.formatNumber(at.present || 0), icon: '✓', kind: 'success' },
-          { label: 'الغياب', value: window.formatNumber(at.absent || 0), icon: '❌', kind: 'danger' },
-          { label: 'المتأخرون', value: window.formatNumber(at.late || 0), icon: '⏰', kind: 'warning' }
+          { label: 'الطلاب', value: window.formatNumber(so.total || 0), iconName: 'students', kind: 'primary' },
+          { label: 'الحضور', value: window.formatNumber(at.present || 0), iconName: 'attendance', kind: 'success' },
+          { label: 'الغياب', value: window.formatNumber(at.absent || 0), iconName: 'attendance', kind: 'danger' },
+          { label: 'المتأخرون', value: window.formatNumber(at.late || 0), iconName: 'schedule', kind: 'warning' }
         ];
       }
       
-      var html = '<div class="section-page-head"><h1>👋 مرحباً، ' + esc(window.currentUser.name || 'مستخدم') + '</h1><p>إليك نظرة سريعة على ما يحدث اليوم</p></div>';
+      var html = '<div class="section-page-head"><h1>مرحباً، ' + esc(window.currentUser.name || 'مستخدم') + '</h1><p>إليك نظرة سريعة على ما يحدث اليوم</p></div>';
       html += '<div id="clockWidgetContainer" style="margin-block-end:var(--space-5);"></div>';
       html += '<div class="kpi-grid">';
       cards.forEach(function(c){
-        html += '<div class="kpi-card kpi-' + c.kind + '"><div class="kpi-label">' + esc(c.label) + '</div><div class="kpi-value">' + c.value + '</div><div class="kpi-icon">' + c.icon + '</div></div>';
+        var cardIcon = getIcon(c.iconName, 40);
+        html += '<div class="kpi-card kpi-' + c.kind + '">';
+        html += '<div class="kpi-label">' + esc(c.label) + '</div>';
+        html += '<div class="kpi-value">' + c.value + '</div>';
+        html += '<div class="kpi-icon">' + cardIcon + '</div>';
+        html += '</div>';
       });
       html += '</div>';
-      html += '<div class="card-soft"><div class="card-soft-header"><div class="card-soft-title">📋 آخر الأحداث</div></div><div id="recentEventsContainer"></div></div>';
+      html += '<div class="card-soft"><div class="card-soft-header"><div class="card-soft-title">آخر الأحداث</div></div><div id="recentEventsContainer"></div></div>';
       
       document.getElementById('main-content').innerHTML = html;
       
-      if (window.renderClockWidget) window.renderClockWidget(document.getElementById('clockWidgetContainer'));
+      if (window.renderClockWidget) {
+        window.renderClockWidget(document.getElementById('clockWidgetContainer'));
+      }
       
       var eventsEl = document.getElementById('recentEventsContainer');
       if (all.length === 0) {
@@ -339,11 +389,13 @@ window.SECTIONS.students = {
       window._studentsData = r[0].data || [];
       var classes = r[1].data || [];
       
-      var html = '<div class="section-page-head"><h1>🎓 الطلاب</h1><p>إدارة بيانات الطلاب والبحث السريع</p></div>';
+      var html = '<div class="section-page-head"><h1>الطلاب</h1><p>إدارة بيانات الطلاب والبحث السريع</p></div>';
       html += '<div class="amin-filter-bar">';
-      html += '<div class="amin-filter-field"><label>🔍 بحث</label><input type="text" id="studentSearch" class="amin-input" placeholder="اسم الطالب..."></div>';
-      html += '<div class="amin-filter-field"><label>📚 الصف</label><select id="classFilter" class="amin-select" onchange="window._filterStudents()"><option value="">كل الصفوف</option>';
-      classes.forEach(function(c){ html += '<option value="' + esc(c.name) + '">' + esc(c.name) + '</option>'; });
+      html += '<div class="amin-filter-field"><label>بحث</label><input type="text" id="studentSearch" class="amin-input" placeholder="اسم الطالب..."></div>';
+      html += '<div class="amin-filter-field"><label>الصف</label><select id="classFilter" class="amin-select" onchange="window._filterStudents()"><option value="">كل الصفوف</option>';
+      classes.forEach(function(c){
+        html += '<option value="' + esc(c.name) + '">' + esc(c.name) + '</option>';
+      });
       html += '</select></div></div>';
       html += '<div id="studentsTable" class="card-soft"></div>';
       
@@ -355,7 +407,9 @@ window.SECTIONS.students = {
         clearTimeout(st);
         st = setTimeout(window._filterStudents, 400);
       });
-    } catch (e) { window.renderError('main-content', e.message); }
+    } catch (e) {
+      window.renderError('main-content', e.message);
+    }
   }
 };
 
@@ -369,11 +423,15 @@ window._renderStudentsTable = function(s) {
     window.renderResponsiveTable(c, s, [
       { key: 'full_name', label: 'الاسم' },
       { key: 'class_name', label: 'الصف' },
-      { key: 'attendance_rate', label: 'الحضور%', render: function(v) {
-        var r = Number(v || 0);
-        var color = r >= 90 ? 'success' : r >= 75 ? 'warning' : 'danger';
-        return '<span class="badge-flat ' + color + '">' + Math.round(r) + '%</span>';
-      }}
+      { 
+        key: 'attendance_rate', 
+        label: 'الحضور%', 
+        render: function(v) {
+          var r = Number(v || 0);
+          var color = r >= 90 ? 'success' : r >= 75 ? 'warning' : 'danger';
+          return '<span class="badge-flat ' + color + '">' + Math.round(r) + '%</span>';
+        }
+      }
     ], {
       primaryFields: ['full_name', 'class_name'],
       mobileExpandable: ['attendance_rate']
@@ -393,11 +451,21 @@ window._filterStudents = function() {
 };
 
 // باقي الأقسام كـ placeholders
-['academic','finance','attendance','discipline','registrations','schedule','payroll','settings','system'].forEach(function(sectionId){
+var placeholderSections = ['academic','finance','attendance','discipline','registrations','schedule','payroll','settings','system'];
+placeholderSections.forEach(function(sectionId){
   window.SECTIONS[sectionId] = {
     title: SECTIONS_META[sectionId].title,
     load: async function() {
-      document.getElementById('main-content').innerHTML = '<div class="section-page-head"><h1>' + SECTIONS_META[sectionId].icon + ' ' + SECTIONS_META[sectionId].title + '</h1></div><div class="amin-empty-state"><div class="amin-empty-watermark"></div><h3 class="amin-empty-title">قيد التطوير - سيتم إضافة الميزات قريباً</h3></div>';
+      var iconHTML = getIcon(SECTIONS_META[sectionId].icon, 64);
+      var html = '<div class="section-page-head">';
+      html += '<h1>' + SECTIONS_META[sectionId].title + '</h1>';
+      html += '</div>';
+      html += '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 20px;text-align:center;">';
+      html += '<div style="margin-block-end:20px;">' + iconHTML + '</div>';
+      html += '<h3 style="color:var(--text-secondary);margin-block-end:8px;">قيد التطوير</h3>';
+      html += '<p style="color:var(--text-tertiary);">سيتم إضافة الميزات قريباً</p>';
+      html += '</div>';
+      document.getElementById('main-content').innerHTML = html;
     }
   };
 });
@@ -409,22 +477,21 @@ async function initPage() {
   // تطبيق الأيقونات على الـ topbar
   if (window.AminIcons) {
     var menuBtn = document.getElementById('menuIcon');
-    if (menuBtn) menuBtn.innerHTML = window.AminIcons.create('menu', 24);
+    if (menuBtn) menuBtn.innerHTML = getIcon('menu', 24);
     
     var refreshBtn = document.getElementById('refreshBtn');
-    if (refreshBtn) refreshBtn.innerHTML = window.AminIcons.create('refresh', 24);
+    if (refreshBtn) refreshBtn.innerHTML = getIcon('refresh', 24);
     
     var logoutIcon = document.getElementById('logoutIcon');
-    if (logoutIcon) logoutIcon.innerHTML = window.AminIcons.create('logout', 20);
+    if (logoutIcon) logoutIcon.innerHTML = getIcon('logout', 20);
   }
   
+  var darkBtn = document.getElementById('darkModeBtn');
   if (localStorage.getItem('darkMode') === '1') {
     document.body.classList.add('dark');
-    var btn = document.getElementById('darkModeBtn');
-    if (btn && window.AminIcons) btn.innerHTML = window.AminIcons.create('lightmode', 24);
+    if (darkBtn) darkBtn.innerHTML = getIcon('lightmode', 24);
   } else {
-    var btn2 = document.getElementById('darkModeBtn');
-    if (btn2 && window.AminIcons) btn2.innerHTML = window.AminIcons.create('darkmode', 24);
+    if (darkBtn) darkBtn.innerHTML = getIcon('darkmode', 24);
   }
   
   var user = await checkAuth();
