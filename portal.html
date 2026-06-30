@@ -280,8 +280,25 @@ overview: {
           studentsMap[s.id] = (s.users && s.users.name) || s.name || 'طالب';
         });
       }
-      var ae = (er[0].data || []).map(function(e){ return { type: '❌ غياب', tc: 'red', name: (e.students && e.students.users && e.students.users.name) || (e.students && e.students.name) || 'طالب', detail: 'تاريخ: ' + String(e.date || '').slice(0,10), created_at: e.created_at }; });
-      var be = (er[1].data || []).map(function(e){ var p = Number(e.points || 0); return { type: p >= 0 ? '🌟 إيجابي' : '⚠️ سلبي', tc: p >= 0 ? 'green' : 'orange', name: (e.students && e.students.users && e.students.users.name) || (e.students && e.students.name) || 'طالب', detail: e.note || e.description || 'ملاحظة', created_at: e.created_at }; });
+     var ae = (er[0].data || []).map(function(e){ 
+        return { 
+          type: '❌ غياب', 
+          tc: 'red', 
+          name: studentsMap[e.student_id] || 'طالب', 
+          detail: 'تاريخ: ' + String(e.date || '').slice(0,10), 
+          created_at: e.created_at 
+        }; 
+      });
+      var be = (er[1].data || []).map(function(e){ 
+        var p = Number(e.points || 0); 
+        return { 
+          type: p >= 0 ? '🌟 إيجابي' : '⚠️ سلبي', 
+          tc: p >= 0 ? 'green' : 'orange', 
+          name: studentsMap[e.student_id] || 'طالب', 
+          detail: e.note || e.description || 'ملاحظة', 
+          created_at: e.created_at 
+        }; 
+      });
       var all = ae.concat(be).sort(function(a,b){ return new Date(b.created_at) - new Date(a.created_at); }).slice(0, 10);
       
       var cards = [];
