@@ -399,4 +399,439 @@ students: {
       html += '<div style="min-width:180px;"><label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:4px;">📚 الصف</label><select id="classFilter" style="width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;" onchange="window._filterStudents()"><option value="">كل الصفوف</option>';
       classes.forEach(function(c){ html += '<option value="' + window.escapeHtml(c.name) + '">' + window.escapeHtml(c.name) + '</option>'; });
       html += '</select></div>';
-      html += '<
+      html += '<div style="min-width:140px;"><label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:4px;">🔄 الحالة</label><select id="statusFilter" style="width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;" onchange="window._filterStudents()"><option value="">الكل</option><option value="active">نشط</option><option value="inactive">غير نشط</option></select></div>';
+      html += '</div><div id="studentsTableContainer" style="background:white;border-radius:12px;padding:20px;box-shadow:var(--shadow-sm);"></div>';
+      
+      document.getElementById('main-content').innerHTML = html;
+      window._renderStudentsTable(students);
+      
+      var st;
+      document.getElementById('studentSearch').addEventListener('input', function(){
+        clearTimeout(st);
+        st = setTimeout(window._filterStudents, 400);
+      });
+    } catch (e) {
+      window.renderError('main-content', 'فشل تحميل الطلاب: ' + e.message);
+    }
+  }
+},
+
+finance: {
+  title: 'المالية',
+  load: async function() {
+    var html = '<div class="tabs-container" id="finance-tabs" style="background:white;border-radius:12px;overflow:hidden;box-shadow:var(--shadow-sm);">';
+    html += '<div class="tabs-nav"><button class="tab-btn" data-tab="overview">📊 نظرة عامة</button><button class="tab-btn" data-tab="files">📁 الملفات</button><button class="tab-btn" data-tab="collections">📞 التحصيل</button><button class="tab-btn" data-tab="credit">💳 الرصيد الدائن</button><button class="tab-btn" data-tab="reports">📈 التقارير</button></div>';
+    html += '<div class="tab-content" data-tab-content="overview"><div id="finOverview"><div class="skeleton skeleton-card"></div></div></div>';
+    html += '<div class="tab-content" data-tab-content="files"><div id="finFiles"><div class="skeleton skeleton-card"></div></div></div>';
+    html += '<div class="tab-content" data-tab-content="collections"><div id="finCollections"><div class="skeleton skeleton-card"></div></div></div>';
+    html += '<div class="tab-content" data-tab-content="credit"><div id="finCredit"><div class="skeleton skeleton-card"></div></div></div>';
+    html += '<div class="tab-content" data-tab-content="reports"><div id="finReports"></div></div>';
+    html += '</div>';
+    document.getElementById('main-content').innerHTML = html;
+    window.initTabs('finance-tabs');
+    window._loadFinanceOverview();
+    window._loadFinanceFiles();
+    window._loadFinanceCollections();
+    window._loadFinanceCredit();
+    window._loadFinanceReports();
+  }
+},
+
+attendance: {
+  title: 'الحضور',
+  load: async function() {
+    try {
+      var results = await Promise.all([
+        window.sbClient.from('v_clean_attendance_today').select('*').limit(1).maybeSingle(),
+        window.sbClient.from('attendance').select('student_id, date, status, students(name, class_id, users(name))').eq('status', 'absent').gte('date', new Date().toISOString().slice(0,10)).limit(100),
+        window.sbClient.from('classes').select('id, name')
+      ]);
+      var ts = results[0].data || {};
+      var abs = results[1].data || [];
+      var classes = results[2].data || [];
+      var cm = {};
+      classes.forEach(function(c){ cm[c.id] = c.name; });
+      
+      var html = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:20px;">';
+      html += '<div style="background:#d1fae5;padding:16px;border-radius:10px;text-align:center;"><div style="font-size:32px;color:#065f46;font-weight:700;">' + (ts.present || 0) + '</div><div style="color:#065f46;font-weight:600;">✅ حاضر</div></div>';
+      html += '<div style="background:#fee2e2;padding:16px;border-radius:10px;text-align:center;"><div style="font-size:32px;color:#991b1b;font-weight:700;">' + (ts.absent || 0) + '</div><div style="color:#991b1b;font-weight:600;">❌ غائب</div></div>';
+      html += '<div style="background:#fef3c7;padding:16px;border-radius:10px;text-align:center;"><div style="font-size:32px;color:#92400e;font-weight:700;">' + (ts.late || 0) + '</div><div style="color:#92400e;font-weight:600;">⏰ متأخر</div></div>';
+      html += '<div style="background:#dbeafe;padding:16px;border-radius:10px;text-align:center;"><div style="font-size:32px;color:#1e40af;font-weight:700;">' + (ts.total || 0) + '</div><div style="color:#1e40af;font-weight:600;">📋 الإجمالي</div></div>';
+      html += '</div>';
+      
+      html += '<div style="background:white;border-radius:12px;padding:20px;box-shadow:var(--shadow-sm);margin-bottom:20px;"><h3 style="margin-bottom:16px;">📋 غائبو اليوم</h3>';
+      if (abs.length === 0) {
+        html += '<div class="empty-state" style="padding:30px;"><div class="icon">🎉</div><h3>لا يوجد غائبين اليوم!</h3></div>';
+      } else {
+        var byClass = {};
+        abs.forEach(function(a){
+          var cn = (a.students && cm[a.students.class_id]) || 'غير محدد';
+          if (!byClass[cn]) byClass[cn] = [];
+          byClass[cn].push((a.students && a.students.users && a.students.users.name) || (a.students && a.students.name) || 'طالب');
+        });
+        html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;">';
+        Object.keys(byClass).forEach(function(cn){
+          html += '<div style="background:var(--bg-primary);padding:14px;border-radius:8px;"><h4 style="color:var(--primary);margin-bottom:8px;">📚 ' + window.escapeHtml(cn) + ' (' + byClass[cn].length + ')</h4><ul style="padding-right:20px;font-size:13px;color:var(--text-secondary);">';
+          byClass[cn].forEach(function(n){ html += '<li>' + window.escapeHtml(n) + '</li>'; });
+          html += '</ul></div>';
+        });
+        html += '</div>';
+      }
+      html += '</div>';
+      
+      html += '<div style="background:white;border-radius:12px;padding:20px;box-shadow:var(--shadow-sm);"><h3 style="margin-bottom:16px;">🔍 بحث تاريخي</h3>';
+      html += '<div style="display:flex;gap:12px;flex-wrap:wrap;align-items:end;margin-bottom:16px;">';
+      html += '<div style="flex:1;min-width:200px;"><label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:4px;">اسم الطالب</label><input type="text" id="attSearch" placeholder="ابحث..." style="width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;"></div>';
+      html += '<div><label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:4px;">من</label><input type="date" id="attFrom" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;"></div>';
+      html += '<div><label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:4px;">إلى</label><input type="date" id="attTo" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;"></div>';
+      html += '<button onclick="window._searchAttendance()" style="background:var(--primary);color:white;padding:10px 24px;border:none;border-radius:8px;cursor:pointer;font-family:inherit;font-weight:600;">🔍 بحث</button>';
+      html += '</div><div id="attResults"></div></div>';
+      
+      document.getElementById('main-content').innerHTML = html;
+    } catch (e) {
+      window.renderError('main-content', 'فشل تحميل الحضور: ' + e.message);
+    }
+  }
+},
+
+discipline: {
+  title: 'السلوك والإرشاد',
+  load: async function() {
+    try {
+      var results = await Promise.all([
+        window.sbClient.from('behavior_records').select('*, students(name, class_id, users(name))').order('created_at', {ascending: false}).limit(100),
+        window.sbClient.from('students').select('id, name, class_id, users(name)').limit(500),
+        window.sbClient.from('classes').select('id, name')
+      ]);
+      var records = results[0].data || [];
+      var students = results[1].data || [];
+      var classes = results[2].data || [];
+      var cm = {};
+      classes.forEach(function(c){ cm[c.id] = c.name; });
+      window._behaviorData = records;
+      window._behaviorStudents = students;
+      window._behaviorClassesMap = cm;
+      
+      var html = '<div style="background:white;padding:16px;border-radius:12px;margin-bottom:20px;box-shadow:var(--shadow-sm);display:flex;gap:12px;flex-wrap:wrap;align-items:end;">';
+      html += '<div style="min-width:160px;"><label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:4px;">📚 الصف</label><select id="bClassFilter" style="width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;" onchange="window._filterBehavior()"><option value="">كل الصفوف</option>';
+      classes.forEach(function(c){ html += '<option value="' + c.id + '">' + window.escapeHtml(c.name) + '</option>'; });
+      html += '</select></div>';
+      html += '<div style="min-width:140px;"><label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:4px;">📌 النوع</label><select id="bTypeFilter" style="width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;" onchange="window._filterBehavior()"><option value="">الكل</option><option value="positive">إيجابي</option><option value="negative">سلبي</option></select></div>';
+      html += '<div><label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:4px;">من تاريخ</label><input type="date" id="bFromDate" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;" onchange="window._filterBehavior()"></div>';
+      html += '<button onclick="window._openBehaviorModal()" style="background:#10b981;color:white;padding:10px 24px;border:none;border-radius:8px;cursor:pointer;font-family:inherit;font-weight:600;margin-right:auto;">➕ إضافة سجل</button>';
+      html += '</div><div id="bTableContainer" style="background:white;border-radius:12px;padding:20px;box-shadow:var(--shadow-sm);"></div>';
+      
+      document.getElementById('main-content').innerHTML = html;
+      window._renderBehaviorTable(records);
+    } catch (e) {
+      window.renderError('main-content', 'فشل التحميل: ' + e.message);
+    }
+  }
+},
+
+registrations: { title: 'التسجيلات', load: async function() { document.getElementById('main-content').innerHTML = '<div class="empty-state"><div class="icon">🚧</div><h3>التسجيلات</h3><p>قيد التطوير</p><div style="margin-top:20px;"><a href="registrations-admin.html" style="background:var(--primary);color:white;padding:10px 24px;border-radius:8px;text-decoration:none;font-weight:600;">📋 افتح الصفحة الكاملة</a></div></div>'; } },
+schedule: { title: 'الجدول الدراسي', load: async function() { document.getElementById('main-content').innerHTML = '<div class="empty-state"><div class="icon">🚧</div><h3>الجدول الدراسي</h3><p>قيد التطوير</p><div style="margin-top:20px;"><a href="schedule-management.html" style="background:var(--primary);color:white;padding:10px 24px;border-radius:8px;text-decoration:none;font-weight:600;">📅 افتح الجدول</a></div></div>'; } },
+payroll: { title: 'الرواتب', load: async function() { document.getElementById('main-content').innerHTML = '<div class="empty-state"><div class="icon">🚧</div><h3>الرواتب</h3><p>قيد التطوير</p></div>'; } },
+settings: { title: 'الإعدادات', load: async function() { document.getElementById('main-content').innerHTML = '<div class="empty-state"><div class="icon">🚧</div><h3>الإعدادات</h3><p>قيد التطوير</p></div>'; } },
+system: { title: 'النظام', load: async function() { document.getElementById('main-content').innerHTML = '<div class="empty-state"><div class="icon">🚧</div><h3>النظام</h3><p>قيد التطوير</p><div style="margin-top:20px;display:flex;gap:8px;justify-content:center;"><a href="system-maintenance.html" style="background:var(--primary);color:white;padding:10px 24px;border-radius:8px;text-decoration:none;font-weight:600;">⚙️ صيانة</a><a href="security-governance.html" style="background:#dc2626;color:white;padding:10px 24px;border-radius:8px;text-decoration:none;font-weight:600;">🛡️ أمن</a></div></div>'; } }
+
+};
+
+// ============ Helpers ============
+window._renderStudentsTable = function(students) {
+  var c = document.getElementById('studentsTableContainer');
+  if (!students.length) { c.innerHTML = '<div class="empty-state"><div class="icon">📭</div><h3>لا يوجد طلاب</h3></div>'; return; }
+  var html = '<div style="margin-bottom:12px;color:var(--text-secondary);font-size:13px;">إجمالي: <b>' + students.length + '</b> طالب</div>';
+  html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;"><thead><tr style="background:var(--bg-primary);"><th style="padding:12px;text-align:right;">الاسم</th><th style="padding:12px;text-align:right;">الصف</th><th style="padding:12px;text-align:right;">الحضور%</th><th style="padding:12px;text-align:right;">آخر غياب</th><th style="padding:12px;text-align:right;">إجراء</th></tr></thead><tbody>';
+  students.forEach(function(s){
+    var rate = Number(s.attendance_rate || 0);
+    var color = rate >= 90 ? '#10b981' : rate >= 75 ? '#f59e0b' : '#dc2626';
+    html += '<tr style="border-bottom:1px solid var(--border);"><td style="padding:12px;font-weight:600;">' + window.escapeHtml(s.full_name || '—') + '</td><td style="padding:12px;">' + window.escapeHtml(s.class_name || '—') + '</td><td style="padding:12px;"><span style="background:' + color + '20;color:' + color + ';padding:4px 10px;border-radius:6px;font-weight:600;">' + Math.round(rate) + '%</span></td><td style="padding:12px;font-size:13px;color:var(--text-secondary);">' + (s.last_absent_date ? String(s.last_absent_date).slice(0,10) : '—') + '</td><td style="padding:12px;"><button onclick="window._openStudentFile(\'' + s.id + '\')" style="background:var(--primary);color:white;padding:6px 14px;border:none;border-radius:6px;cursor:pointer;font-size:13px;">📋 ملف</button></td></tr>';
+  });
+  html += '</tbody></table></div>';
+  c.innerHTML = html;
+};
+
+window._filterStudents = function() {
+  var s = (document.getElementById('studentSearch').value || '').toLowerCase().trim();
+  var cf = document.getElementById('classFilter').value;
+  var sf = document.getElementById('statusFilter').value;
+  var f = (window._studentsData || []).filter(function(x){
+    if (s && !(x.full_name || '').toLowerCase().includes(s)) return false;
+    if (cf && x.class_name !== cf) return false;
+    if (sf && x.status !== sf) return false;
+    return true;
+  });
+  window._renderStudentsTable(f);
+};
+
+window._openStudentFile = async function(id) {
+  window.openModal({ title: '📋 ملف الطالب', width: 'lg', content: '<div class="skeleton skeleton-card"></div>' });
+  try {
+    var role = window.currentUserRole;
+    var ps = [
+      window.sbClient.from('students').select('*, users(name, email, phone)').eq('id', id).maybeSingle(),
+      window.sbClient.from('attendance').select('*').eq('student_id', id).order('date', {ascending: false}).limit(5),
+      window.sbClient.from('behavior_records').select('*').eq('student_id', id).order('created_at', {ascending: false}).limit(5)
+    ];
+    if (role === 'finance' || role === 'super_admin' || role === 'admin') ps.push(window.sbClient.from('student_fees').select('*').eq('student_id', id));
+    if (role === 'academic' || role === 'super_admin' || role === 'admin') ps.push(window.sbClient.from('v_academic_student_summary').select('*').eq('student_id', id).maybeSingle());
+    var rs = await Promise.all(ps);
+    var st = rs[0].data || {};
+    var att = rs[1].data || [];
+    var beh = rs[2].data || [];
+    var fees = rs[3] ? (rs[3].data || []) : [];
+    var ac = rs[4] ? (rs[4].data || {}) : {};
+    var name = (st.users && st.users.name) || st.name || 'طالب';
+    var html = '<div style="margin-bottom:20px;padding:16px;background:linear-gradient(135deg,#3b82f6,#1e40af);color:white;border-radius:10px;"><h3 style="font-size:20px;margin-bottom:8px;">🎓 ' + window.escapeHtml(name) + '</h3>';
+    if (st.users && st.users.email) html += '<div style="opacity:0.9;">📧 ' + window.escapeHtml(st.users.email) + '</div>';
+    if (st.users && st.users.phone) html += '<div style="opacity:0.9;">📞 ' + window.escapeHtml(st.users.phone) + '</div>';
+    html += '</div>';
+    html += '<h4 style="margin:16px 0 8px;color:var(--primary);">📋 آخر سجلات الحضور</h4>';
+    if (att.length === 0) html += '<div style="color:var(--text-secondary);">لا توجد سجلات</div>';
+    else {
+      html += '<table style="width:100%;border-collapse:collapse;margin-bottom:16px;">';
+      att.forEach(function(a){
+        var sc = a.status === 'present' ? '#10b981' : a.status === 'absent' ? '#dc2626' : '#f59e0b';
+        var st2 = a.status === 'present' ? 'حاضر' : a.status === 'absent' ? 'غائب' : 'متأخر';
+        html += '<tr style="border-bottom:1px solid var(--border);"><td style="padding:8px;">' + String(a.date).slice(0,10) + '</td><td style="padding:8px;color:' + sc + ';font-weight:600;">' + st2 + '</td><td style="padding:8px;color:var(--text-secondary);font-size:13px;">' + (a.note || '—') + '</td></tr>';
+      });
+      html += '</table>';
+    }
+    html += '<h4 style="margin:16px 0 8px;color:var(--primary);">🌟 آخر الملاحظات</h4>';
+    if (beh.length === 0) html += '<div style="color:var(--text-secondary);">لا توجد ملاحظات</div>';
+    else {
+      html += '<table style="width:100%;border-collapse:collapse;margin-bottom:16px;">';
+      beh.forEach(function(b){
+        var p = Number(b.points || 0);
+        var c = p >= 0 ? '#10b981' : '#dc2626';
+        html += '<tr style="border-bottom:1px solid var(--border);"><td style="padding:8px;">' + String(b.created_at || '').slice(0,10) + '</td><td style="padding:8px;">' + window.escapeHtml(b.note || b.description || '—') + '</td><td style="padding:8px;color:' + c + ';font-weight:700;">' + (p > 0 ? '+' : '') + p + '</td></tr>';
+      });
+      html += '</table>';
+    }
+    if (fees.length > 0) {
+      html += '<h4 style="margin:16px 0 8px;color:var(--primary);">💰 الرسوم</h4><table style="width:100%;border-collapse:collapse;">';
+      fees.forEach(function(f){
+        var t = Number(f.net_amount || f.base_amount || 0);
+        var p = Number(f.total_paid || 0);
+        var r = Math.max(t - p, 0);
+        html += '<tr style="border-bottom:1px solid var(--border);"><td style="padding:8px;">' + window.formatMoney(t) + '</td><td style="padding:8px;color:#10b981;">' + window.formatMoney(p) + '</td><td style="padding:8px;color:#dc2626;">' + window.formatMoney(r) + '</td></tr>';
+      });
+      html += '</table>';
+    }
+    document.getElementById('modalBody').innerHTML = html;
+  } catch (e) {
+    document.getElementById('modalBody').innerHTML = '<div class="error-state"><div class="icon">⚠️</div><p>' + window.escapeHtml(e.message) + '</p></div>';
+  }
+};
+
+window._loadFinanceOverview = async function() {
+  try {
+    var r = await window.sbClient.from('v_finance_exec_class_summary').select('*');
+    var d = r.data || [];
+    var t = d.reduce(function(a,c){ a.total_fees += Number(c.total_fees||0); a.collected += Number(c.collected||0); a.remaining += Number(c.remaining||0); a.credit += Number(c.credit_balance||0); return a; }, {total_fees:0, collected:0, remaining:0, credit:0});
+    var html = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:20px;">';
+    html += '<div style="background:#dbeafe;padding:16px;border-radius:10px;"><div style="font-size:13px;color:#1e40af;font-weight:600;">إجمالي الرسوم</div><div style="font-size:20px;color:#1e3a8a;font-weight:700;">' + window.formatMoney(t.total_fees) + '</div></div>';
+    html += '<div style="background:#d1fae5;padding:16px;border-radius:10px;"><div style="font-size:13px;color:#065f46;font-weight:600;">المحصّل</div><div style="font-size:20px;color:#064e3b;font-weight:700;">' + window.formatMoney(t.collected) + '</div></div>';
+    html += '<div style="background:#fee2e2;padding:16px;border-radius:10px;"><div style="font-size:13px;color:#991b1b;font-weight:600;">المتأخرات</div><div style="font-size:20px;color:#7f1d1d;font-weight:700;">' + window.formatMoney(t.remaining) + '</div></div>';
+    html += '<div style="background:#fef3c7;padding:16px;border-radius:10px;"><div style="font-size:13px;color:#92400e;font-weight:600;">الرصيد الدائن</div><div style="font-size:20px;color:#78350f;font-weight:700;">' + window.formatMoney(t.credit) + '</div></div>';
+    html += '</div>';
+    if (d.length > 0) {
+      html += '<h4 style="margin-bottom:12px;">📊 التحصيل حسب الصف</h4>';
+      d.forEach(function(c){
+        var rt = c.total_fees > 0 ? (c.collected / c.total_fees) * 100 : 0;
+        html += '<div style="margin-bottom:12px;"><div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:13px;"><b>' + window.escapeHtml(c.class_name) + '</b><span>' + window.formatMoney(c.collected) + ' / ' + window.formatMoney(c.total_fees) + ' (' + Math.round(rt) + '%)</span></div><div style="height:8px;background:#e5e7eb;border-radius:4px;overflow:hidden;"><div style="height:100%;background:linear-gradient(90deg,#10b981,#059669);width:' + Math.min(rt, 100) + '%;"></div></div></div>';
+      });
+    }
+    document.getElementById('finOverview').innerHTML = html;
+  } catch (e) {
+    document.getElementById('finOverview').innerHTML = '<div class="error-state"><div class="icon">⚠️</div><p>' + e.message + '</p></div>';
+  }
+};
+
+window._loadFinanceFiles = async function() {
+  try {
+    var r = await window.sbClient.from('v_finance_exec_student_balances').select('*').limit(200);
+    var d = r.data || [];
+    if (d.length === 0) { document.getElementById('finFiles').innerHTML = '<div class="empty-state"><div class="icon">📭</div><h3>لا توجد بيانات</h3></div>'; return; }
+    var html = '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;"><thead><tr style="background:var(--bg-primary);"><th style="padding:10px;text-align:right;">الطالب</th><th style="padding:10px;text-align:right;">الصف</th><th style="padding:10px;text-align:right;">الإجمالي</th><th style="padding:10px;text-align:right;">المدفوع</th><th style="padding:10px;text-align:right;">المتبقي</th><th style="padding:10px;text-align:right;">الحالة</th></tr></thead><tbody>';
+    var sc = {paid:'#10b981', partial:'#f59e0b', overdue:'#dc2626', credit:'#3b82f6'};
+    var sl = {paid:'✅ مدفوع', partial:'⏳ جزئي', overdue:'❌ متأخر', credit:'💳 دائن'};
+    d.forEach(function(s){
+      var col = sc[s.status] || '#6b7280';
+      var lab = sl[s.status] || s.status;
+      html += '<tr style="border-bottom:1px solid var(--border);"><td style="padding:10px;font-weight:600;">' + window.escapeHtml(s.full_name || '—') + '</td><td style="padding:10px;">' + window.escapeHtml(s.class_name || '—') + '</td><td style="padding:10px;">' + window.formatMoney(s.total_fees) + '</td><td style="padding:10px;color:#10b981;">' + window.formatMoney(s.paid) + '</td><td style="padding:10px;color:#dc2626;">' + window.formatMoney(s.remaining) + '</td><td style="padding:10px;"><span style="background:' + col + '20;color:' + col + ';padding:4px 10px;border-radius:6px;font-size:12px;font-weight:600;">' + lab + '</span></td></tr>';
+    });
+    html += '</tbody></table></div>';
+    document.getElementById('finFiles').innerHTML = html;
+  } catch (e) {
+    document.getElementById('finFiles').innerHTML = '<div class="error-state"><div class="icon">⚠️</div><p>' + e.message + '</p></div>';
+  }
+};
+
+window._loadFinanceCollections = async function() {
+  try {
+    var r = await window.sbClient.from('v_finance_exec_student_balances').select('*').eq('status', 'overdue').order('remaining', {ascending: false}).limit(100);
+    var d = r.data || [];
+    if (d.length === 0) { document.getElementById('finCollections').innerHTML = '<div class="empty-state"><div class="icon">🎉</div><h3>لا توجد متأخرات!</h3></div>'; return; }
+    var html = '<div style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;"><div>المتأخرون: <b>' + d.length + '</b></div><button onclick="window._sendBulkReminders()" style="background:#dc2626;color:white;padding:10px 20px;border:none;border-radius:8px;cursor:pointer;font-weight:600;">📢 تذكير جماعي</button></div>';
+    html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;"><thead><tr style="background:var(--bg-primary);"><th style="padding:10px;text-align:right;">الطالب</th><th style="padding:10px;text-align:right;">الصف</th><th style="padding:10px;text-align:right;">المتبقي</th><th style="padding:10px;text-align:right;">إجراء</th></tr></thead><tbody>';
+    d.forEach(function(s){
+      html += '<tr style="border-bottom:1px solid var(--border);"><td style="padding:10px;font-weight:600;">' + window.escapeHtml(s.full_name) + '</td><td style="padding:10px;">' + window.escapeHtml(s.class_name) + '</td><td style="padding:10px;color:#dc2626;font-weight:700;">' + window.formatMoney(s.remaining) + '</td><td style="padding:10px;"><button onclick="window._sendReminder(\'' + s.student_id + '\')" style="background:var(--primary);color:white;padding:6px 14px;border:none;border-radius:6px;cursor:pointer;font-size:13px;">📞 تذكير</button></td></tr>';
+    });
+    html += '</tbody></table></div>';
+    document.getElementById('finCollections').innerHTML = html;
+  } catch (e) {
+    document.getElementById('finCollections').innerHTML = '<div class="error-state"><div class="icon">⚠️</div><p>' + e.message + '</p></div>';
+  }
+};
+
+window._loadFinanceCredit = async function() {
+  try {
+    var r = await window.sbClient.from('v_finance_exec_student_balances').select('*').eq('status', 'credit');
+    var d = r.data || [];
+    var t = d.reduce(function(s,x){ return s + Number(x.credit_balance || 0); }, 0);
+    var html = '<div style="background:#dbeafe;padding:20px;border-radius:10px;margin-bottom:20px;text-align:center;"><div style="font-size:14px;color:#1e40af;">إجمالي الرصيد الدائن</div><div style="font-size:32px;color:#1e3a8a;font-weight:700;margin-top:8px;">' + window.formatMoney(t) + '</div></div>';
+    if (d.length === 0) html += '<div class="empty-state"><div class="icon">📭</div><h3>لا يوجد رصيد دائن</h3></div>';
+    else {
+      html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;"><thead><tr style="background:var(--bg-primary);"><th style="padding:10px;text-align:right;">الطالب</th><th style="padding:10px;text-align:right;">الصف</th><th style="padding:10px;text-align:right;">الرصيد</th></tr></thead><tbody>';
+      d.forEach(function(s){ html += '<tr style="border-bottom:1px solid var(--border);"><td style="padding:10px;font-weight:600;">' + window.escapeHtml(s.full_name) + '</td><td style="padding:10px;">' + window.escapeHtml(s.class_name) + '</td><td style="padding:10px;color:#3b82f6;font-weight:700;">' + window.formatMoney(s.credit_balance) + '</td></tr>'; });
+      html += '</tbody></table></div>';
+    }
+    document.getElementById('finCredit').innerHTML = html;
+  } catch (e) {
+    document.getElementById('finCredit').innerHTML = '<div class="error-state"><div class="icon">⚠️</div><p>' + e.message + '</p></div>';
+  }
+};
+
+window._loadFinanceReports = function() {
+  document.getElementById('finReports').innerHTML = '<div class="empty-state"><div class="icon">📈</div><h3>تقارير المالية</h3><p>اختر شهر للتقرير</p><div style="margin-top:20px;"><input type="month" id="reportMonth" style="padding:10px;border:1px solid var(--border);border-radius:8px;"></div><div style="margin-top:16px;display:flex;gap:8px;justify-content:center;"><button style="background:var(--primary);color:white;padding:10px 20px;border:none;border-radius:8px;cursor:pointer;">📊 عرض</button><button style="background:#10b981;color:white;padding:10px 20px;border:none;border-radius:8px;cursor:pointer;">📥 تصدير Excel</button></div></div>';
+};
+
+window._sendReminder = async function(id) {
+  if (!confirm('إرسال تذكير لهذا الطالب؟')) return;
+  try {
+    await window.sbClient.rpc('send_finance_overdue_reminders_detailed', {student_id: id});
+    window.showToast('✅ تم', 'تم إرسال التذكير', 'success');
+  } catch (e) { window.showToast('❌ فشل', e.message, 'error'); }
+};
+
+window._sendBulkReminders = function() {
+  if (!confirm('إرسال تذكير لكل المتأخرين؟')) return;
+  window.showToast('🚀 جاري الإرسال', 'يتم الإرسال...', 'info');
+};
+
+window._searchAttendance = async function() {
+  var q = document.getElementById('attSearch').value.trim();
+  var from = document.getElementById('attFrom').value;
+  var to = document.getElementById('attTo').value;
+  if (!q) { window.showToast('تنبيه', 'أدخل اسم الطالب', 'warning'); return; }
+  var rd = document.getElementById('attResults');
+  rd.innerHTML = '<div class="skeleton skeleton-card"></div>';
+  try {
+    var sr = await window.sbClient.from('students').select('id, name, users(name)').limit(50);
+    var sts = (sr.data || []).filter(function(s){ var n = (s.users && s.users.name) || s.name || ''; return n.toLowerCase().includes(q.toLowerCase()); });
+    if (sts.length === 0) { rd.innerHTML = '<div class="empty-state"><div class="icon">🔍</div><h3>لم يتم العثور على طلاب</h3></div>'; return; }
+    var aq = window.sbClient.from('attendance').select('*').in('student_id', sts.map(function(s){return s.id;})).order('date', {ascending: false}).limit(200);
+    if (from) aq = aq.gte('date', from);
+    if (to) aq = aq.lte('date', to);
+    var ar = await aq;
+    var att = ar.data || [];
+    var sm = {};
+    sts.forEach(function(s){ sm[s.id] = (s.users && s.users.name) || s.name; });
+    if (att.length === 0) { rd.innerHTML = '<div class="empty-state"><div class="icon">📭</div><h3>لا توجد سجلات</h3></div>'; return; }
+    var html = '<div style="margin-top:16px;overflow-x:auto;"><table style="width:100%;border-collapse:collapse;"><thead><tr style="background:var(--bg-primary);"><th style="padding:10px;text-align:right;">الطالب</th><th style="padding:10px;text-align:right;">التاريخ</th><th style="padding:10px;text-align:right;">الحالة</th><th style="padding:10px;text-align:right;">ملاحظة</th></tr></thead><tbody>';
+    att.forEach(function(a){
+      var c = a.status === 'present' ? '#10b981' : a.status === 'absent' ? '#dc2626' : '#f59e0b';
+      var t = a.status === 'present' ? 'حاضر' : a.status === 'absent' ? 'غائب' : 'متأخر';
+      html += '<tr style="border-bottom:1px solid var(--border);"><td style="padding:10px;">' + window.escapeHtml(sm[a.student_id] || '—') + '</td><td style="padding:10px;">' + String(a.date).slice(0,10) + '</td><td style="padding:10px;color:' + c + ';font-weight:600;">' + t + '</td><td style="padding:10px;font-size:13px;color:var(--text-secondary);">' + window.escapeHtml(a.note || '—') + '</td></tr>';
+    });
+    html += '</tbody></table></div>';
+    rd.innerHTML = html;
+  } catch (e) {
+    rd.innerHTML = '<div class="error-state"><div class="icon">⚠️</div><p>' + e.message + '</p></div>';
+  }
+};
+
+window._renderBehaviorTable = function(records) {
+  var c = document.getElementById('bTableContainer');
+  if (!records.length) { c.innerHTML = '<div class="empty-state"><div class="icon">📭</div><h3>لا توجد سجلات</h3></div>'; return; }
+  var html = '<div style="margin-bottom:12px;color:var(--text-secondary);font-size:13px;">إجمالي: <b>' + records.length + '</b></div>';
+  html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;"><thead><tr style="background:var(--bg-primary);"><th style="padding:10px;text-align:right;">التاريخ</th><th style="padding:10px;text-align:right;">الطالب</th><th style="padding:10px;text-align:right;">الصف</th><th style="padding:10px;text-align:right;">الوصف</th><th style="padding:10px;text-align:right;">النقاط</th></tr></thead><tbody>';
+  records.forEach(function(r){
+    var n = (r.students && r.students.users && r.students.users.name) || (r.students && r.students.name) || '—';
+    var cn = (r.students && window._behaviorClassesMap[r.students.class_id]) || '—';
+    var p = Number(r.points || 0);
+    var col = p >= 0 ? '#10b981' : '#dc2626';
+    html += '<tr style="border-bottom:1px solid var(--border);"><td style="padding:10px;font-size:13px;">' + String(r.created_at || '').slice(0,10) + '</td><td style="padding:10px;font-weight:600;">' + window.escapeHtml(n) + '</td><td style="padding:10px;font-size:13px;">' + window.escapeHtml(cn) + '</td><td style="padding:10px;color:var(--text-secondary);font-size:13px;">' + window.escapeHtml(r.note || r.description || '—') + '</td><td style="padding:10px;"><span style="background:' + col + '20;color:' + col + ';padding:4px 10px;border-radius:6px;font-weight:700;">' + (p > 0 ? '+' : '') + p + '</span></td></tr>';
+  });
+  html += '</tbody></table></div>';
+  c.innerHTML = html;
+};
+
+window._filterBehavior = function() {
+  var ci = document.getElementById('bClassFilter').value;
+  var t = document.getElementById('bTypeFilter').value;
+  var fd = document.getElementById('bFromDate').value;
+  var f = (window._behaviorData || []).filter(function(r){
+    if (ci && r.students && String(r.students.class_id) !== String(ci)) return false;
+    if (t) { var p = Number(r.points || 0); if (t === 'positive' && p <= 0) return false; if (t === 'negative' && p >= 0) return false; }
+    if (fd && r.created_at && r.created_at < fd) return false;
+    return true;
+  });
+  window._renderBehaviorTable(f);
+};
+
+window._openBehaviorModal = function() {
+  var content = '<div><div style="margin-bottom:12px;"><label style="display:block;margin-bottom:4px;font-weight:600;">الطالب *</label><select id="nbStudent" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;"><option value="">اختر...</option>';
+  (window._behaviorStudents || []).forEach(function(s){
+    var n = (s.users && s.users.name) || s.name || '—';
+    content += '<option value="' + s.id + '">' + window.escapeHtml(n) + '</option>';
+  });
+  content += '</select></div><div style="margin-bottom:12px;"><label style="display:block;margin-bottom:4px;font-weight:600;">النوع *</label><select id="nbType" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;"><option value="5">إيجابي (+5)</option><option value="10">إيجابي ممتاز (+10)</option><option value="-5">سلبي (-5)</option><option value="-10">سلبي شديد (-10)</option></select></div><div style="margin-bottom:12px;"><label style="display:block;margin-bottom:4px;font-weight:600;">الوصف *</label><textarea id="nbNote" rows="4" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;" placeholder="اكتب الوصف..."></textarea></div><div style="display:flex;gap:8px;justify-content:flex-end;"><button onclick="closeModal()" style="background:#6b7280;color:white;padding:10px 20px;border:none;border-radius:8px;cursor:pointer;">إلغاء</button><button onclick="window._saveBehavior()" style="background:#10b981;color:white;padding:10px 20px;border:none;border-radius:8px;cursor:pointer;font-weight:600;">💾 حفظ</button></div></div>';
+  window.openModal({title: '➕ إضافة سجل سلوكي', content: content, width: 'md'});
+};
+
+window._saveBehavior = async function() {
+  var sid = document.getElementById('nbStudent').value;
+  var pts = document.getElementById('nbType').value;
+  var nt = document.getElementById('nbNote').value.trim();
+  if (!sid || !nt) { window.showToast('تنبيه', 'املأ كل الحقول', 'warning'); return; }
+  try {
+    var r = await window.sbClient.from('behavior_records').insert({ student_id: sid, points: Number(pts), note: nt, description: nt, created_at: new Date().toISOString() });
+    if (r.error) throw r.error;
+    window.showToast('✅ تم', 'تم الحفظ بنجاح', 'success');
+    closeModal();
+    window.navigate('discipline');
+  } catch (e) { window.showToast('❌ فشل', e.message, 'error'); }
+};
+
+async function init() {
+  if (localStorage.getItem('darkMode') === '1') document.body.classList.add('dark');
+  var user = await checkAuth();
+  if (!user) return;
+  document.getElementById('userName').textContent = user.name || user.email || 'مستخدم';
+  var rl = { super_admin: '👑 المسؤول الأعلى', admin: '👑 مدير', finance: '💰 مالية', academic: '📚 أكاديمي', counselor: '💚 مرشد', psychologist: '🧠 أخصائي', discipline: '🛡️ انضباط', teacher: '👨‍🏫 معلم', parent: '👨‍👩‍👧 ولي أمر', student: '🎓 طالب' };
+  document.getElementById('userRole').textContent = rl[window.currentUserRole] || window.currentUserRole;
+  buildSidebar();
+  buildBottomNav();
+  var init = location.hash.replace('#','') || ROLE_SECTIONS[window.currentUserRole][0];
+  navigate(init);
+}
+
+window.addEventListener('hashchange', function() {
+  var ns = location.hash.replace('#','');
+  if (ns && ns !== window.currentSection) navigate(ns);
+});
+
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+else init();
+
+})();
+</script>
+
+<script src="assets/ux-enhancements.js"></script>
+<script src="assets/smart-alerts.js"></script>
+
+</body>
+</html>
