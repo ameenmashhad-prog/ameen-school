@@ -279,7 +279,7 @@ overview: {
       
       var er = await Promise.all([
         window.sbClient.from('attendance').select('student_id, date, status, created_at').eq('status', 'absent').order('created_at', {ascending: false}).limit(5),
-      window.sbClient.from('behavior_records').select('*').order('created_at', {ascending: false}).limit(5)
+     window.sbClient.from('behavior_records').select('student_id, note, points, created_at').order('created_at', {ascending: false}).limit(5)
       ]);
       
       var allIds = [];
@@ -292,7 +292,7 @@ overview: {
       });
       var be = (er[1].data || []).map(function(e){
         var p = Number(e.points || 0);
-        return { type: p >= 0 ? '🌟 إيجابي' : '⚠️ سلبي', tc: p >= 0 ? 'green' : 'orange', name: (studentsMap[e.student_id] && studentsMap[e.student_id].name) || 'طالب', detail: e.note || e.description || 'ملاحظة', created_at: e.created_at };
+return { type: p >= 0 ? '🌟 إيجابي' : '⚠️ سلبي', tc: p >= 0 ? 'green' : 'orange', name: (studentsMap[e.student_id] && studentsMap[e.student_id].name) || 'طالب', detail: e.note || 'ملاحظة', created_at: e.created_at };
       });
       var all = ae.concat(be).sort(function(a,b){ return new Date(b.created_at) - new Date(a.created_at); }).slice(0, 10);
       
