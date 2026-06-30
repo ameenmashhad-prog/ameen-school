@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>معاينة الهوية — مدارس أمين الرضا</title>
+<link rel="stylesheet" href="assets/design-tokens.css">
+<link rel="stylesheet" href="assets/components.css">
+<style>
+  /* للمعاينة فقط - عرض 3 حالات جنباً إلى جنب */
+  body { padding: 20px; background: #E8EAF2; }
+  .preview-row { display: flex; gap: 24px; margin-block-end: 40px; align-items: flex-start; flex-wrap: wrap; }
+  .preview-frame { background: var(--bg); border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.15); overflow: hidden; flex-shrink: 0; }
+  .preview-frame.desktop { width: 1280px; height: 720px; }
+  .preview-frame.tablet { width: 768px; height: 600px; }
+  .preview-frame.mobile { width: 375px; height: 700px; }
+  .preview-label { font-family: var(--font-arabic); font-weight: 700; padding: 12px 16px; background: var(--accent); color: white; }
+  .preview-content { padding: 24px; height: calc(100% - 48px); overflow-y: auto; }
+  
+  @media (max-width: 1400px) { .preview-frame.desktop { width: 100%; max-width: 1280px; } }
+</style>
+</head>
+<body>
+
+<h1 style="text-align:center;margin:24px 0;color:var(--accent);">معاينة الاتساق عبر الشاشات الثلاث</h1>
+
+<!-- ===== DESKTOP ===== -->
+<div class="preview-frame desktop">
+  <div class="preview-label">🖥️ Desktop (1280×720) — Sidebar كامل + جدول كامل</div>
+  <div class="preview-content" style="display:grid;grid-template-columns:260px 1fr;gap:24px;">
+    
+    <aside style="background:var(--surface);border-radius:14px;padding:20px;">
+      <div style="margin-block-end:24px;">
+        <div style="font-size:14px;color:var(--accent);font-weight:800;">مدارس أمين الرضا</div>
+        <div style="font-size:11px;color:var(--text-secondary);">البوابة الموحدة</div>
+      </div>
+      <nav>
+        <button class="sidebar-nav-item active" style="display:flex;align-items:center;gap:12px;padding:12px;width:100%;border:none;background:var(--primary);color:white;border-radius:10px;margin-block-end:4px;box-shadow:0 4px 12px var(--primary-shadow);"><span>🏠</span><span>لوحة القيادة</span></button>
+        <button style="display:flex;align-items:center;gap:12px;padding:12px;width:100%;border:none;background:transparent;color:var(--text-secondary);border-radius:10px;margin-block-end:4px;font-family:inherit;"><span>🎓</span><span>الطلاب</span></button>
+        <button style="display:flex;align-items:center;gap:12px;padding:12px;width:100%;border:none;background:transparent;color:var(--text-secondary);border-radius:10px;margin-block-end:4px;font-family:inherit;"><span>💰</span><span>المالية</span></button>
+        <button style="display:flex;align-items:center;gap:12px;padding:12px;width:100%;border:none;background:transparent;color:var(--text-secondary);border-radius:10px;font-family:inherit;"><span>📋</span><span>الحضور</span></button>
+      </nav>
+    </aside>
+    
+    <main>
+      <h1 style="font-size:32px;font-weight:800;color:var(--accent);margin-block-end:8px;">لوحة القيادة</h1>
+      <p style="color:var(--text-secondary);margin-block-end:24px;">مرحباً بك في النظام</p>
+      
+      <!-- KPI Cards -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-block-end:24px;">
+        <div class="kpi-card kpi-primary">
+          <div class="kpi-label">الطلاب</div>
+          <div class="kpi-value">٢٤٧</div>
+          <div class="kpi-icon">🎓</div>
+        </div>
+        <div class="kpi-card kpi-success">
+          <div class="kpi-label">الحضور اليوم</div>
+          <div class="kpi-value">٩٢٪</div>
+          <div class="kpi-icon">✓</div>
+        </div>
+        <div class="kpi-card kpi-secondary">
+          <div class="kpi-label">المحصّل</div>
+          <div class="kpi-value">$45,200</div>
+          <div class="kpi-icon">💰</div>
+        </div>
+        <div class="kpi-card kpi-danger">
+          <div class="kpi-label">المتأخرات</div>
+          <div class="kpi-value">$8,400</div>
+          <div class="kpi-icon">⚠</div>
+        </div>
+      </div>
+      
+      <!-- Table -->
+      <div style="background:var(--surface);border-radius:14px;border:1px solid var(--border-subtle);overflow:hidden;">
+        <div style="padding:16px;border-block-end:1px solid var(--border-subtle);font-weight:700;">آخر الأحداث</div>
+        <table class="table-flat" style="border:none;">
+          <thead><tr><th>الطالب</th><th>الصف</th><th>النوع</th><th>التاريخ</th></tr></thead>
+          <tbody>
+            <tr><td>أحمد محمد</td><td>الثاني الابتدائي</td><td><span class="badge-flat danger">غياب</span></td><td>30/6/2026</td></tr>
+            <tr><td>فاطمة علي</td><td>الأول الإعدادي</td><td><span class="badge-flat success">حضور</span></td><td>30/6/2026</td></tr>
+            <tr><td>حسن إبراهيم</td><td>الثالث المتوسط</td><td><span class="badge-flat warning">متأخر</span></td><td>30/6/2026</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ===== TABLET ===== -->
+<div class="preview-frame tablet">
+  <div class="preview-label">📱 Tablet (768×600) — Sidebar أيقونات + جدول مختصر</div>
+  <div class="preview-content" style="display:grid;grid-template-columns:72px 1fr;gap:16px;">
+    
+    <aside style="background:var(--surface);border-radius:14px;padding:12px 0;">
+      <button class="sidebar-nav-item active" style="width:56px;height:56px;margin:4px auto;display:flex;align-items:center;justify-content:center;border:none;background:var(--primary);color:white;border-radius:12px;font-size:22px;box-shadow:0 4px 12px var(--primary-shadow);">🏠</button>
+      <button style="width:56px;height:56px;margin:4px auto;display:flex;align-items:center;justify-content:center;border:none;background:transparent;color:var(--text-secondary);border-radius:12px;font-size:22px;">🎓</button>
+      <button style="width:56px;height:56px;margin:4px auto;display:flex;align-items:center;justify-content:center;border:none;background:transparent;color:var(--text-secondary);border-radius:12px;font-size:22px;">💰</button>
+      <button style="width:56px;height:56px;margin:4px auto;display:flex;align-items:center;justify-content:center;border:none;background:transparent;color:var(--text-secondary);border-radius:12px;font-size:22px;">📋</button>
+    </aside>
+    
+    <main>
+      <h1 style="font-size:28px;font-weight:800;color:var(--accent);margin-block-end:16px;">لوحة القيادة</h1>
+      
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-block-end:16px;">
+        <div class="kpi-card kpi-primary">
+          <div class="kpi-label">الطلاب</div>
+          <div class="kpi-value">٢٤٧</div>
+        </div>
+        <div class="kpi-card kpi-success">
+          <div class="kpi-label">الحضور</div>
+          <div class="kpi-value">٩٢٪</div>
+        </div>
+        <div class="kpi-card kpi-secondary">
+          <div class="kpi-label">المحصّل</div>
+          <div class="kpi-value">$45.2K</div>
+        </div>
+        <div class="kpi-card kpi-danger">
+          <div class="kpi-label">المتأخرات</div>
+          <div class="kpi-value">$8.4K</div>
+        </div>
+      </div>
+      
+      <div style="background:var(--surface);border-radius:14px;border:1px solid var(--border-subtle);overflow:hidden;">
+        <div style="padding:14px;border-block-end:1px solid var(--border-subtle);font-weight:700;font-size:14px;">آخر الأحداث</div>
+        <table class="table-flat" style="border:none;font-size:13px;">
+          <thead><tr><th>الطالب</th><th>النوع</th><th>التاريخ</th></tr></thead>
+          <tbody>
+            <tr><td>أحمد محمد</td><td><span class="badge-flat danger">غياب</span></td><td>30/6</td></tr>
+            <tr><td>فاطمة علي</td><td><span class="badge-flat success">حضور</span></td><td>30/6</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ===== MOBILE ===== -->
+<div class="preview-frame mobile">
+  <div class="preview-label">📱 Mobile (375×700) — Bottom Nav + بطاقات بدل الجدول</div>
+  <div class="preview-content" style="padding:16px;padding-block-end:80px;">
+    
+    <h1 style="font-size:22px;font-weight:800;color:var(--accent);margin-block-end:8px;">لوحة القيادة</h1>
+    <p style="color:var(--text-secondary);font-size:13px;margin-block-end:16px;">مرحباً بك</p>
+    
+    <!-- Clock Widget Mobile -->
+    <div class="clock-widget" style="margin-block-end:16px;padding:10px 14px;">
+      <div class="clock-time" style="flex-direction:row;align-items:center;gap:8px;">
+        <div class="clock-hour" style="font-size:18px;">10:24</div>
+        <div class="clock-period" style="margin-block-start:0;">صباحاً</div>
+      </div>
+      <div class="clock-date-section" style="flex-direction:row;gap:8px;">
+        <div class="clock-date">٣٠ يونيو</div>
+      </div>
+    </div>
+    
+    <!-- KPIs stacked -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-block-end:16px;">
+      <div class="kpi-card kpi-primary" style="padding:14px;">
+        <div class="kpi-label">الطلاب</div>
+        <div class="kpi-value" style="font-size:22px;">٢٤٧</div>
+      </div>
+      <div class="kpi-card kpi-success" style="padding:14px;">
+        <div class="kpi-label">الحضور</div>
+        <div class="kpi-value" style="font-size:22px;">٩٢٪</div>
+      </div>
+      <div class="kpi-card kpi-secondary" style="padding:14px;">
+        <div class="kpi-label">المحصّل</div>
+        <div class="kpi-value" style="font-size:18px;">$45K</div>
+      </div>
+      <div class="kpi-card kpi-danger" style="padding:14px;">
+        <div class="kpi-label">المتأخرات</div>
+        <div class="kpi-value" style="font-size:18px;">$8K</div>
+      </div>
+    </div>
+    
+    <!-- Cards instead of table -->
+    <div style="font-weight:700;margin-block-end:12px;">آخر الأحداث</div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div class="mobile-card">
+        <div class="mobile-card-header">
+          <div class="mobile-card-name">أحمد محمد</div>
+          <span class="badge-flat danger">غياب</span>
+        </div>
+        <div class="mobile-card-primary-info">
+          <div class="mobile-card-field">
+            <span class="mobile-card-field-label">الصف</span>
+            <span class="mobile-card-field-value">الثاني</span>
+          </div>
+          <div class="mobile-card-field">
+            <span class="mobile-card-field-label">التاريخ</span>
+            <span class="mobile-card-field-value">30/6</span>
+          </div>
+        </div>
+      </div>
+      <div class="mobile-card">
+        <div class="mobile-card-header">
+          <div class="mobile-card-name">فاطمة علي</div>
+          <span class="badge-flat success">حضور</span>
+        </div>
+        <div class="mobile-card-primary-info">
+          <div class="mobile-card-field">
+            <span class="mobile-card-field-label">الصف</span>
+            <span class="mobile-card-field-value">الإعدادي</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Bottom Nav -->
+  <nav style="position:absolute;bottom:0;left:0;right:0;background:white;border-top:1px solid var(--border-subtle);padding:8px;display:grid;grid-template-columns:repeat(5,1fr);gap:4px;">
+    <button class="bottom-nav-item active"><span class="bottom-nav-icon">🏠</span><span>الرئيسية</span></button>
+    <button class="bottom-nav-item"><span class="bottom-nav-icon">🎓</span><span>الطلاب</span></button>
+    <button class="bottom-nav-item"><span class="bottom-nav-icon">💰</span><span>المالية</span></button>
+    <button class="bottom-nav-item"><span class="bottom-nav-icon">📋</span><span>الحضور</span></button>
+    <button class="bottom-nav-item"><span class="bottom-nav-icon">⋯</span><span>المزيد</span></button>
+  </nav>
+</div>
+
+</body>
+</html>
