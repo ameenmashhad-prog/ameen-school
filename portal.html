@@ -13,1160 +13,390 @@
 <link rel="apple-touch-icon" href="assets/amin-logo-small.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-
 <style>
-:root {
-  --bg-primary: #f8fafc;
-  --bg-secondary: #ffffff;
-  --bg-sidebar: #081426;
-  --text-primary: #1f2937;
-  --text-secondary: #6b7280;
-  --text-sidebar: #cbd5e1;
-  --border: #e5e7eb;
-  --primary: #1e40af;
-  --primary-light: #3b82f6;
-  --success: #10b981;
-  --danger: #dc2626;
-  --warning: #f59e0b;
-  --info: #06b6d4;
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
-  --shadow-lg: 0 10px 30px rgba(0,0,0,0.1);
-}
-
-body.dark {
-  --bg-primary: #0f172a;
-  --bg-secondary: #1e293b;
-  --bg-sidebar: #020617;
-  --text-primary: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --border: #334155;
-}
-
-* { box-sizing: border-box; margin: 0; padding: 0; }
-
-body {
-  font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif;
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  min-height: 100vh;
-  direction: rtl;
-}
-
-.app-shell {
-  display: grid;
-  grid-template-columns: 260px 1fr;
-  min-height: 100vh;
-}
-
-.app-sidebar {
-  background: var(--bg-sidebar);
-  color: var(--text-sidebar);
-  padding: 20px 0;
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 260px;
-  height: 100vh;
-  overflow-y: auto;
-  z-index: 100;
-  transition: transform 0.3s;
-}
-
-.app-sidebar::-webkit-scrollbar { width: 6px; }
-.app-sidebar::-webkit-scrollbar-track { background: transparent; }
-.app-sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
-
-.sidebar-brand {
-  padding: 0 20px 20px;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-  margin-bottom: 16px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.sidebar-brand .logo {
-  width: 44px;
-  height: 44px;
-  background: linear-gradient(135deg, #fbbf24, #f59e0b);
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  flex-shrink: 0;
-}
-
-.sidebar-brand h1 {
-  font-size: 16px;
-  color: white;
-  font-weight: 700;
-}
-
-.sidebar-brand small {
-  font-size: 11px;
-  color: var(--text-sidebar);
-  opacity: 0.7;
-}
-
-.sidebar-user {
-  padding: 12px 20px;
-  margin: 0 12px 16px;
-  background: rgba(255,255,255,0.05);
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.sidebar-user .avatar {
-  width: 40px;
-  height: 40px;
-  background: linear-gradient(135deg, #3b82f6, #1e40af);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  flex-shrink: 0;
-}
-
-.sidebar-user .info { min-width: 0; flex: 1; }
-.sidebar-user .name { color: white; font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.sidebar-user .role { color: var(--text-sidebar); font-size: 11px; opacity: 0.8; }
-
-.sidebar-nav { padding: 0 12px; }
-
-.sidebar-nav .nav-section { margin-bottom: 16px; }
-
-.sidebar-nav .section-title {
-  font-size: 11px;
-  color: var(--text-sidebar);
-  text-transform: uppercase;
-  padding: 0 12px;
-  margin-bottom: 8px;
-  opacity: 0.6;
-  letter-spacing: 0.5px;
-}
-
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 14px;
-  margin-bottom: 2px;
-  color: var(--text-sidebar);
-  text-decoration: none;
-  border-radius: 8px;
-  font-size: 14px;
-  cursor: pointer;
-  border: none;
-  background: none;
-  width: 100%;
-  text-align: right;
-  transition: all 0.2s;
-  font-family: inherit;
-}
-
-.nav-item:hover {
-  background: rgba(255,255,255,0.05);
-  color: white;
-}
-
-.nav-item.active {
-  background: linear-gradient(135deg, #3b82f6, #1e40af);
-  color: white;
-  box-shadow: 0 4px 12px rgba(59,130,246,0.3);
-}
-
-.nav-item .icon { font-size: 18px; width: 24px; text-align: center; }
-.nav-item .text { flex: 1; }
-.nav-item .badge {
-  background: var(--danger);
-  color: white;
-  font-size: 11px;
-  padding: 2px 8px;
-  border-radius: 999px;
-  font-weight: bold;
-}
-
-.sidebar-footer {
-  padding: 16px 12px;
-  border-top: 1px solid rgba(255,255,255,0.1);
-  margin-top: 16px;
-}
-
-.logout-btn {
-  width: 100%;
-  padding: 10px;
-  background: rgba(220,38,38,0.1);
-  color: #fca5a5;
-  border: 1px solid rgba(220,38,38,0.2);
-  border-radius: 8px;
-  cursor: pointer;
-  font-family: inherit;
-  font-weight: 600;
-  transition: all 0.2s;
-}
-
-.logout-btn:hover {
-  background: #dc2626;
-  color: white;
-}
-
-.app-main {
-  margin-right: 260px;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-.app-topbar {
-  background: var(--bg-secondary);
-  padding: 14px 24px;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  box-shadow: var(--shadow-sm);
-}
-
-.app-topbar h2 {
-  font-size: 18px;
-  color: var(--text-primary);
-  font-weight: 700;
-}
-
-.topbar-actions {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-
-.btn-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--bg-primary);
-  cursor: pointer;
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-}
-
-.btn-icon:hover {
-  background: var(--primary);
-  color: white;
-  border-color: var(--primary);
-}
-
-.mobile-toggle {
-  display: none;
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  color: var(--text-primary);
-}
-
-#main-content {
-  flex: 1;
-  padding: 24px;
-  max-width: 1400px;
-  margin: 0 auto;
-  width: 100%;
-}
-
-.bottom-nav {
-  display: none;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: var(--bg-secondary);
-  border-top: 1px solid var(--border);
-  padding: 8px;
-  z-index: 99;
-  box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
-}
-
-.bottom-nav-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 4px;
-}
-
-.bottom-nav-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  padding: 8px 4px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 11px;
-  color: var(--text-secondary);
-  border-radius: 8px;
-  transition: all 0.2s;
-}
-
-.bottom-nav-item.active {
-  background: var(--primary);
-  color: white;
-}
-
-.bottom-nav-item .icon { font-size: 20px; }
-
-.skeleton {
-  background: linear-gradient(90deg, var(--border) 0%, #f3f4f6 50%, var(--border) 100%);
-  background-size: 200% 100%;
-  border-radius: 8px;
-  animation: skeleton-pulse 1.5s ease-in-out infinite;
-}
-
-@keyframes skeleton-pulse {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
-.skeleton-line { height: 16px; margin-bottom: 8px; }
-.skeleton-line.sm { height: 12px; width: 60%; }
-.skeleton-line.lg { height: 24px; width: 40%; }
-.skeleton-card { height: 120px; margin-bottom: 16px; }
-
-.error-state {
-  background: #fee2e2;
-  border: 1px solid #fca5a5;
-  color: #991b1b;
-  padding: 20px;
-  border-radius: 12px;
-  text-align: center;
-  margin: 20px 0;
-}
-
-.error-state .icon { font-size: 48px; margin-bottom: 12px; }
-.error-state h3 { margin-bottom: 8px; }
-.error-state p { margin-bottom: 16px; opacity: 0.8; }
-
-.error-state .retry-btn {
-  background: #991b1b;
-  color: white;
-  padding: 10px 24px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-family: inherit;
-  font-weight: 600;
-}
-
-.error-state .retry-btn:hover { background: #7f1d1d; }
-
-.empty-state {
-  text-align: center;
-  padding: 60px 20px;
-  color: var(--text-secondary);
-}
-
-.empty-state .icon { font-size: 64px; margin-bottom: 16px; opacity: 0.5; }
-.empty-state h3 { color: var(--text-primary); margin-bottom: 8px; }
-.empty-state p { color: var(--text-secondary); font-size: 14px; }
-
-.toast-container {
-  position: fixed;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 9999;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  pointer-events: none;
-}
-
-.toast {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  border-right: 4px solid var(--primary);
-  padding: 14px 20px;
-  border-radius: 10px;
-  box-shadow: var(--shadow-lg);
-  min-width: 280px;
-  max-width: 400px;
-  pointer-events: auto;
-  animation: toast-in 0.3s ease-out;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.toast.success { border-right-color: var(--success); }
-.toast.error { border-right-color: var(--danger); }
-.toast.warning { border-right-color: var(--warning); }
-
-.toast .toast-icon { font-size: 20px; flex-shrink: 0; }
-.toast .toast-content { flex: 1; }
-.toast .toast-title { font-weight: 700; color: var(--text-primary); }
-.toast .toast-msg { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
-
-@keyframes toast-in {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes toast-out {
-  to { opacity: 0; transform: translateY(20px); }
-}
-
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.5);
-  backdrop-filter: blur(4px);
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  animation: modal-fade-in 0.2s ease-out;
-}
-
-@keyframes modal-fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-.modal {
-  background: var(--bg-secondary);
-  border-radius: 16px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-  max-width: 100%;
-  max-height: 90vh;
-  display: flex;
-  flex-direction: column;
-  animation: modal-slide-up 0.3s ease-out;
-}
-
-.modal.sm { width: 400px; }
-.modal.md { width: 600px; }
-.modal.lg { width: 900px; }
-
-@keyframes modal-slide-up {
-  from { opacity: 0; transform: translateY(20px) scale(0.95); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-.modal-header {
-  padding: 20px 24px;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.modal-header h3 {
-  font-size: 18px;
-  color: var(--text-primary);
-  font-weight: 700;
-}
-
-.modal-close {
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  color: var(--text-secondary);
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-}
-
-.modal-close:hover {
-  background: var(--bg-primary);
-  color: var(--text-primary);
-}
-
-.modal-body {
-  padding: 24px;
-  overflow-y: auto;
-  flex: 1;
-}
-
-.tabs-container {
-  background: var(--bg-secondary);
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: var(--shadow-sm);
-  margin-bottom: 20px;
-}
-
-.tabs-nav {
-  display: flex;
-  background: var(--bg-primary);
-  border-bottom: 1px solid var(--border);
-  overflow-x: auto;
-}
-
-.tab-btn {
-  padding: 14px 24px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-secondary);
-  border-bottom: 3px solid transparent;
-  white-space: nowrap;
-  transition: all 0.2s;
-}
-
-.tab-btn:hover { color: var(--primary); }
-
-.tab-btn.active {
-  color: var(--primary);
-  border-bottom-color: var(--primary);
-  background: var(--bg-secondary);
-}
-
-.tab-content { display: none; padding: 20px; }
-.tab-content.active { display: block; }
-
-@media (max-width: 768px) {
-  .app-sidebar {
-    transform: translateX(100%);
-    box-shadow: -10px 0 30px rgba(0,0,0,0.2);
-  }
-  
-  .app-sidebar.open {
-    transform: translateX(0);
-  }
-  
-  .app-main {
-    margin-right: 0;
-    padding-bottom: 80px;
-  }
-  
-  .mobile-toggle {
-    display: flex;
-  }
-  
-  .bottom-nav {
-    display: block;
-  }
-  
-  #main-content {
-    padding: 16px;
-  }
-  
-  .sidebar-backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.5);
-    z-index: 99;
-    display: none;
-  }
-  
-  .sidebar-backdrop.active {
-    display: block;
-  }
-}
+:root{--bg-primary:#f8fafc;--bg-secondary:#fff;--bg-sidebar:#081426;--text-primary:#1f2937;--text-secondary:#6b7280;--text-sidebar:#cbd5e1;--border:#e5e7eb;--primary:#1e40af;--primary-light:#3b82f6;--success:#10b981;--danger:#dc2626;--warning:#f59e0b;--info:#06b6d4;--shadow-sm:0 1px 3px rgba(0,0,0,.1);--shadow-md:0 4px 12px rgba(0,0,0,.08);--shadow-lg:0 10px 30px rgba(0,0,0,.1)}body.dark{--bg-primary:#0f172a;--bg-secondary:#1e293b;--bg-sidebar:#020617;--text-primary:#f1f5f9;--text-secondary:#94a3b8;--border:#334155}*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Cairo','Segoe UI',Tahoma,sans-serif;background:var(--bg-primary);color:var(--text-primary);min-height:100vh;direction:rtl}.app-shell{display:grid;grid-template-columns:260px 1fr;min-height:100vh}.app-sidebar{background:var(--bg-sidebar);color:var(--text-sidebar);padding:20px 0;position:fixed;top:0;right:0;width:260px;height:100vh;overflow-y:auto;z-index:100;transition:transform .3s}.app-sidebar::-webkit-scrollbar{width:6px}.app-sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px}.sidebar-brand{padding:0 20px 20px;border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:16px;display:flex;align-items:center;gap:12px}.sidebar-brand .logo{width:44px;height:44px;background:linear-gradient(135deg,#fbbf24,#f59e0b);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}.sidebar-brand h1{font-size:16px;color:#fff;font-weight:700}.sidebar-brand small{font-size:11px;color:var(--text-sidebar);opacity:.7}.sidebar-user{padding:12px 20px;margin:0 12px 16px;background:rgba(255,255,255,.05);border-radius:10px;display:flex;align-items:center;gap:12px}.sidebar-user .avatar{width:40px;height:40px;background:linear-gradient(135deg,#3b82f6,#1e40af);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}.sidebar-user .info{min-width:0;flex:1}.sidebar-user .name{color:#fff;font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sidebar-user .role{color:var(--text-sidebar);font-size:11px;opacity:.8}.sidebar-nav{padding:0 12px}.sidebar-nav .nav-section{margin-bottom:16px}.sidebar-nav .section-title{font-size:11px;color:var(--text-sidebar);text-transform:uppercase;padding:0 12px;margin-bottom:8px;opacity:.6;letter-spacing:.5px}.nav-item{display:flex;align-items:center;gap:12px;padding:10px 14px;margin-bottom:2px;color:var(--text-sidebar);text-decoration:none;border-radius:8px;font-size:14px;cursor:pointer;border:none;background:none;width:100%;text-align:right;transition:all .2s;font-family:inherit}.nav-item:hover{background:rgba(255,255,255,.05);color:#fff}.nav-item.active{background:linear-gradient(135deg,#3b82f6,#1e40af);color:#fff;box-shadow:0 4px 12px rgba(59,130,246,.3)}.nav-item .icon{font-size:18px;width:24px;text-align:center}.nav-item .text{flex:1}.sidebar-footer{padding:16px 12px;border-top:1px solid rgba(255,255,255,.1);margin-top:16px}.logout-btn{width:100%;padding:10px;background:rgba(220,38,38,.1);color:#fca5a5;border:1px solid rgba(220,38,38,.2);border-radius:8px;cursor:pointer;font-family:inherit;font-weight:600;transition:all .2s}.logout-btn:hover{background:#dc2626;color:#fff}.app-main{margin-right:260px;min-height:100vh;display:flex;flex-direction:column}.app-topbar{background:var(--bg-secondary);padding:14px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:50;box-shadow:var(--shadow-sm)}.app-topbar h2{font-size:18px;color:var(--text-primary);font-weight:700}.topbar-actions{display:flex;gap:8px;align-items:center}.btn-icon{width:36px;height:36px;border-radius:8px;border:1px solid var(--border);background:var(--bg-primary);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .2s}.btn-icon:hover{background:var(--primary);color:#fff;border-color:var(--primary)}.mobile-toggle{display:none;background:none;border:none;font-size:24px;cursor:pointer;color:var(--text-primary)}#main-content{flex:1;padding:24px;max-width:1400px;margin:0 auto;width:100%}.bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--bg-secondary);border-top:1px solid var(--border);padding:8px;z-index:99;box-shadow:0 -4px 12px rgba(0,0,0,.1)}.bottom-nav-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}.bottom-nav-item{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px;background:none;border:none;cursor:pointer;font-family:inherit;font-size:11px;color:var(--text-secondary);border-radius:8px;transition:all .2s}.bottom-nav-item.active{background:var(--primary);color:#fff}.bottom-nav-item .icon{font-size:20px}.skeleton{background:linear-gradient(90deg,var(--border) 0%,#f3f4f6 50%,var(--border) 100%);background-size:200% 100%;border-radius:8px;animation:skeleton-pulse 1.5s ease-in-out infinite}@keyframes skeleton-pulse{0%{background-position:200% 0}100%{background-position:-200% 0}}.skeleton-line{height:16px;margin-bottom:8px}.skeleton-line.sm{height:12px;width:60%}.skeleton-line.lg{height:24px;width:40%}.skeleton-card{height:120px;margin-bottom:16px}.error-state{background:#fee2e2;border:1px solid #fca5a5;color:#991b1b;padding:20px;border-radius:12px;text-align:center;margin:20px 0}.error-state .icon{font-size:48px;margin-bottom:12px}.error-state .retry-btn{background:#991b1b;color:#fff;padding:10px 24px;border:none;border-radius:8px;cursor:pointer;font-family:inherit;font-weight:600;margin-top:12px}.empty-state{text-align:center;padding:60px 20px;color:var(--text-secondary)}.empty-state .icon{font-size:64px;margin-bottom:16px;opacity:.5}.toast-container{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none}.toast{background:var(--bg-secondary);border:1px solid var(--border);border-right:4px solid var(--primary);padding:14px 20px;border-radius:10px;box-shadow:var(--shadow-lg);min-width:280px;max-width:400px;pointer-events:auto;animation:toast-in .3s ease-out;display:flex;align-items:center;gap:12px}.toast.success{border-right-color:var(--success)}.toast.error{border-right-color:var(--danger)}.toast.warning{border-right-color:var(--warning)}.toast .toast-icon{font-size:20px;flex-shrink:0}.toast .toast-content{flex:1}.toast .toast-title{font-weight:700;color:var(--text-primary)}.toast .toast-msg{font-size:13px;color:var(--text-secondary);margin-top:2px}@keyframes toast-in{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}@keyframes toast-out{to{opacity:0;transform:translateY(20px)}}.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;animation:modal-fade-in .2s ease-out}@keyframes modal-fade-in{from{opacity:0}to{opacity:1}}.modal{background:var(--bg-secondary);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.3);max-width:100%;max-height:90vh;display:flex;flex-direction:column;animation:modal-slide-up .3s ease-out}.modal.sm{width:400px}.modal.md{width:600px}.modal.lg{width:900px}@keyframes modal-slide-up{from{opacity:0;transform:translateY(20px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}.modal-header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}.modal-header h3{font-size:18px;font-weight:700}.modal-close{background:none;border:none;font-size:24px;cursor:pointer;color:var(--text-secondary);width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center}.modal-close:hover{background:var(--bg-primary)}.modal-body{padding:24px;overflow-y:auto;flex:1}.tabs-nav{display:flex;background:var(--bg-primary);border-bottom:1px solid var(--border);overflow-x:auto}.tab-btn{padding:14px 24px;background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:var(--text-secondary);border-bottom:3px solid transparent;white-space:nowrap;transition:all .2s}.tab-btn:hover{color:var(--primary)}.tab-btn.active{color:var(--primary);border-bottom-color:var(--primary);background:var(--bg-secondary)}.tab-content{display:none;padding:20px}.tab-content.active{display:block}@media(max-width:768px){.app-sidebar{transform:translateX(100%);box-shadow:-10px 0 30px rgba(0,0,0,.2)}.app-sidebar.open{transform:translateX(0)}.app-main{margin-right:0;padding-bottom:80px}.mobile-toggle{display:flex}.bottom-nav{display:block}#main-content{padding:16px}.sidebar-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99;display:none}.sidebar-backdrop.active{display:block}}
 </style>
 </head>
 <body>
-
 <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
-
 <div class="app-shell">
-
-  <aside class="app-sidebar" id="appSidebar">
-    
-    <div class="sidebar-brand">
-      <div class="logo">🎓</div>
-      <div>
-        <h1>أمين الرضا</h1>
-        <small>البوابة الموحدة</small>
-      </div>
-    </div>
-
-    <div class="sidebar-user">
-      <div class="avatar" id="userAvatar">👤</div>
-      <div class="info">
-        <div class="name" id="userName">جاري التحميل...</div>
-        <div class="role" id="userRole">...</div>
-      </div>
-    </div>
-
-    <nav class="sidebar-nav" id="sidebarNav"></nav>
-
-    <div class="sidebar-footer">
-      <button class="logout-btn" onclick="handleLogout()">🚪 تسجيل الخروج</button>
-    </div>
-
-  </aside>
-
-  <main class="app-main">
-    
-    <header class="app-topbar">
-      <div style="display:flex;align-items:center;gap:12px;">
-        <button class="mobile-toggle" onclick="toggleSidebar()">☰</button>
-        <h2 id="pageTitle">لوحة القيادة</h2>
-      </div>
-      <div class="topbar-actions">
-        <button class="btn-icon" onclick="toggleDarkMode()" title="الوضع الليلي">🌙</button>
-        <button class="btn-icon" onclick="navigate(window.currentSection)" title="تحديث">🔄</button>
-      </div>
-    </header>
-
-    <div id="main-content"></div>
-
-  </main>
-
+<aside class="app-sidebar" id="appSidebar">
+<div class="sidebar-brand"><div class="logo">🎓</div><div><h1>أمين الرضا</h1><small>البوابة الموحدة</small></div></div>
+<div class="sidebar-user"><div class="avatar" id="userAvatar">👤</div><div class="info"><div class="name" id="userName">جاري التحميل...</div><div class="role" id="userRole">...</div></div></div>
+<nav class="sidebar-nav" id="sidebarNav"></nav>
+<div class="sidebar-footer"><button class="logout-btn" onclick="handleLogout()">🚪 تسجيل الخروج</button></div>
+</aside>
+<main class="app-main">
+<header class="app-topbar">
+<div style="display:flex;align-items:center;gap:12px;"><button class="mobile-toggle" onclick="toggleSidebar()">☰</button><h2 id="pageTitle">لوحة القيادة</h2></div>
+<div class="topbar-actions"><button class="btn-icon" onclick="toggleDarkMode()" title="الوضع الليلي">🌙</button><button class="btn-icon" onclick="navigate(window.currentSection)" title="تحديث">🔄</button></div>
+</header>
+<div id="main-content"></div>
+</main>
 </div>
-
-<nav class="bottom-nav" id="bottomNav">
-  <div class="bottom-nav-grid" id="bottomNavGrid"></div>
-</nav>
-
+<nav class="bottom-nav" id="bottomNav"><div class="bottom-nav-grid" id="bottomNavGrid"></div></nav>
 <div class="toast-container" id="toastContainer"></div>
-
 <div id="modalContainer"></div>
 
 <script src="libs/supabase.min.js"></script>
 <script src="assets/config.js"></script>
-<script src="assets/i18n.js"></script>
-
-<script>
+<script src="assets/i18n.js"></script><script>
 (function(){
-  'use strict';
+'use strict';
 
-  var ROLE_SECTIONS = {
-    super_admin: ['overview','students','academic','finance','attendance','discipline','registrations','schedule','payroll','settings','system'],
-    admin:       ['overview','students','academic','finance','attendance','discipline','registrations','schedule','payroll','settings','system'],
-    finance:     ['overview','finance'],
-    academic:    ['overview','students','academic','attendance','registrations','schedule'],
-    counselor:   ['overview','students','attendance','discipline'],
-    psychologist:['overview','students','attendance','discipline'],
-    discipline:  ['overview','students','attendance','discipline'],
-    teacher:     ['overview','students','academic','attendance','schedule'],
-    parent:      ['overview','students','academic','attendance','finance'],
-    student:     ['overview','academic','attendance','schedule']
-  };
+var ROLE_SECTIONS = {
+  super_admin: ['overview','students','academic','finance','attendance','discipline','registrations','schedule','payroll','settings','system'],
+  admin: ['overview','students','academic','finance','attendance','discipline','registrations','schedule','payroll','settings','system'],
+  finance: ['overview','finance'],
+  academic: ['overview','students','academic','attendance','registrations','schedule'],
+  counselor: ['overview','students','attendance','discipline'],
+  psychologist: ['overview','students','attendance','discipline'],
+  discipline: ['overview','students','attendance','discipline'],
+  teacher: ['overview','students','academic','attendance','schedule'],
+  parent: ['overview','students','academic','attendance','finance'],
+  student: ['overview','academic','attendance','schedule']
+};
 
-  var SECTIONS_META = {
-    overview:      { title: 'لوحة القيادة',        icon: '🏠', order: 1 },
-    students:      { title: 'الطلاب',              icon: '🎓', order: 2 },
-    academic:      { title: 'الأكاديمي',           icon: '📚', order: 3 },
-    finance:       { title: 'المالية',             icon: '💰', order: 4 },
-    attendance:    { title: 'الحضور',              icon: '📋', order: 5 },
-    discipline:    { title: 'السلوك والإرشاد',     icon: '🛡️', order: 6 },
-    registrations: { title: 'التسجيلات',           icon: '📝', order: 7 },
-    schedule:      { title: 'الجدول الدراسي',      icon: '📅', order: 8 },
-    payroll:       { title: 'الرواتب',             icon: '💵', order: 9 },
-    settings:      { title: 'الإعدادات',           icon: '⚙️', order: 10 },
-    system:        { title: 'النظام',              icon: '🔧', order: 11 }
-  };
+var SECTIONS_META = {
+  overview: { title: 'لوحة القيادة', icon: '🏠', order: 1 },
+  students: { title: 'الطلاب', icon: '🎓', order: 2 },
+  academic: { title: 'الأكاديمي', icon: '📚', order: 3 },
+  finance: { title: 'المالية', icon: '💰', order: 4 },
+  attendance: { title: 'الحضور', icon: '📋', order: 5 },
+  discipline: { title: 'السلوك والإرشاد', icon: '🛡️', order: 6 },
+  registrations: { title: 'التسجيلات', icon: '📝', order: 7 },
+  schedule: { title: 'الجدول الدراسي', icon: '📅', order: 8 },
+  payroll: { title: 'الرواتب', icon: '💵', order: 9 },
+  settings: { title: 'الإعدادات', icon: '⚙️', order: 10 },
+  system: { title: 'النظام', icon: '🔧', order: 11 }
+};
 
-  window.SECTIONS = {
-    overview:      { title: SECTIONS_META.overview.title,      load: null },
-    students:      { title: SECTIONS_META.students.title,      load: null },
-    academic:      { title: SECTIONS_META.academic.title,      load: null },
-    finance:       { title: SECTIONS_META.finance.title,       load: null },
-    attendance:    { title: SECTIONS_META.attendance.title,    load: null },
-    discipline:    { title: SECTIONS_META.discipline.title,    load: null },
-    registrations: { title: SECTIONS_META.registrations.title, load: null },
-    schedule:      { title: SECTIONS_META.schedule.title,      load: null },
-    payroll:       { title: SECTIONS_META.payroll.title,       load: null },
-    settings:      { title: SECTIONS_META.settings.title,      load: null },
-    system:        { title: SECTIONS_META.system.title,        load: null }
-  };
+window.currentSection = null;
+window.currentUser = null;
+window.currentUserRole = null;
+window.sbClient = null;
 
-  window.currentSection = null;
-  window.currentUser = null;
-  window.currentUserRole = null;
-  window.sbClient = null;
+window.showToast = function(title, msg, type) {
+  type = type || 'info';
+  var container = document.getElementById('toastContainer');
+  if (!container) return;
+  var toast = document.createElement('div');
+  toast.className = 'toast ' + type;
+  var icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+  toast.innerHTML = '<div class="toast-icon">' + (icons[type] || icons.info) + '</div><div class="toast-content"><div class="toast-title">' + escapeHtml(title) + '</div>' + (msg ? '<div class="toast-msg">' + escapeHtml(msg) + '</div>' : '') + '</div>';
+  container.appendChild(toast);
+  setTimeout(function() {
+    toast.style.animation = 'toast-out 0.3s ease-out forwards';
+    setTimeout(function() { toast.remove(); }, 300);
+  }, 3000);
+};
 
-  // ========== دالة API الموحدة ==========
-  window.apiCall = async function(opts) {
-    opts = opts || {};
-    var method = opts.method || 'GET';
-    var url;
-    
-    if (opts.rpc) {
-      url = '/api/rpc?fn=' + opts.rpc;
-      if (opts.body) {
-        var res = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(opts.body)
-        });
-        if (!res.ok) throw new Error(await res.text());
-        return res.json();
-      }
-    } else {
-      var params = new URLSearchParams();
-      params.set('table', opts.table);
-      if (opts.select) params.set('select', opts.select);
-      if (opts.order) params.set('order', opts.order);
-      if (opts.limit) params.set('limit', opts.limit);
-      if (opts.filters) Object.keys(opts.filters).forEach(function(k) {
-        params.append('filter', k + '=' + opts.filters[k]);
-      });
-      url = '/api/query?' + params;
-    }
-    
-    if (method === 'GET') {
-      var res2 = await fetch(url);
-      if (!res2.ok) throw new Error(await res2.text());
-      return res2.json();
-    }
-    
-    var res3 = await fetch(url, {
-      method: method,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(opts.body)
-    });
-    if (!res3.ok) throw new Error(await res3.text());
-    return res3.json();
-  };
+window.openModal = function(config) {
+  var title = config.title;
+  var content = config.content;
+  var width = config.width || 'md';
+  var onClose = config.onClose;
+  var container = document.getElementById('modalContainer');
+  closeModal();
+  var backdrop = document.createElement('div');
+  backdrop.className = 'modal-backdrop';
+  backdrop.id = 'activeModalBackdrop';
+  var modal = document.createElement('div');
+  modal.className = 'modal ' + width;
+  modal.innerHTML = '<div class="modal-header"><h3>' + escapeHtml(title) + '</h3><button class="modal-close" onclick="closeModal()">×</button></div><div class="modal-body" id="modalBody"></div>';
+  backdrop.appendChild(modal);
+  container.appendChild(backdrop);
+  var body = modal.querySelector('#modalBody');
+  if (typeof content === 'string') body.innerHTML = content;
+  else if (content instanceof HTMLElement) body.appendChild(content);
+  backdrop.addEventListener('click', function(e) { if (e.target === backdrop) closeModal(); });
+  backdrop._onClose = onClose;
+};
 
-  // ========== Toast ==========
-  window.showToast = function(title, msg, type) {
-    type = type || 'info';
-    var container = document.getElementById('toastContainer');
-    if (!container) return;
-    
-    var toast = document.createElement('div');
-    toast.className = 'toast ' + type;
-    
-    var icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
-    
-    toast.innerHTML = 
-      '<div class="toast-icon">' + (icons[type] || icons.info) + '</div>' +
-      '<div class="toast-content">' +
-        '<div class="toast-title">' + escapeHtml(title) + '</div>' +
-        (msg ? '<div class="toast-msg">' + escapeHtml(msg) + '</div>' : '') +
-      '</div>';
-    
-    container.appendChild(toast);
-    
-    setTimeout(function() {
-      toast.style.animation = 'toast-out 0.3s ease-out forwards';
-      setTimeout(function() { toast.remove(); }, 300);
-    }, 3000);
-  };
+window.closeModal = function() {
+  var backdrop = document.getElementById('activeModalBackdrop');
+  if (!backdrop) return;
+  if (typeof backdrop._onClose === 'function') backdrop._onClose();
+  backdrop.remove();
+};
 
-  // ========== Modal ==========
-  window.openModal = function(config) {
-    var title = config.title;
-    var content = config.content;
-    var width = config.width || 'md';
-    var onClose = config.onClose;
-    var container = document.getElementById('modalContainer');
-    
-    closeModal();
-    
-    var backdrop = document.createElement('div');
-    backdrop.className = 'modal-backdrop';
-    backdrop.id = 'activeModalBackdrop';
-    
-    var modal = document.createElement('div');
-    modal.className = 'modal ' + width;
-    
-    modal.innerHTML = 
-      '<div class="modal-header">' +
-        '<h3>' + escapeHtml(title) + '</h3>' +
-        '<button class="modal-close" onclick="closeModal()" aria-label="إغلاق">×</button>' +
-      '</div>' +
-      '<div class="modal-body" id="modalBody"></div>';
-    
-    backdrop.appendChild(modal);
-    container.appendChild(backdrop);
-    
-    var body = modal.querySelector('#modalBody');
-    if (typeof content === 'string') {
-      body.innerHTML = content;
-    } else if (content instanceof HTMLElement) {
-      body.appendChild(content);
-    }
-    
-    backdrop.addEventListener('click', function(e) {
-      if (e.target === backdrop) closeModal();
-    });
-    
-    var escHandler = function(e) {
-      if (e.key === 'Escape') {
-        closeModal();
-        document.removeEventListener('keydown', escHandler);
-      }
-    };
-    document.addEventListener('keydown', escHandler);
-    
-    backdrop._onClose = onClose;
-  };
-
-  window.closeModal = function() {
-    var backdrop = document.getElementById('activeModalBackdrop');
-    if (!backdrop) return;
-    
-    if (typeof backdrop._onClose === 'function') {
-      backdrop._onClose();
-    }
-    
-    backdrop.style.animation = 'modal-fade-in 0.2s ease-out reverse';
-    setTimeout(function() { backdrop.remove(); }, 200);
-  };
-
-  // ========== Tabs ==========
-  window.initTabs = function(containerId) {
-    var container = document.getElementById(containerId);
-    if (!container) return;
-    
-    var tabBtns = container.querySelectorAll('.tab-btn[data-tab]');
-    var tabContents = container.querySelectorAll('.tab-content[data-tab-content]');
-    
-    var activeTab = container.dataset.activeTab || (tabBtns[0] && tabBtns[0].dataset.tab);
-    
-    function activateTab(tabName) {
-      tabBtns.forEach(function(btn) {
-        btn.classList.toggle('active', btn.dataset.tab === tabName);
-      });
-      
-      tabContents.forEach(function(content) {
-        content.classList.toggle('active', content.dataset.tabContent === tabName);
-      });
-      
-      container.dataset.activeTab = tabName;
-    }
-    
-    tabBtns.forEach(function(btn) {
-      btn.addEventListener('click', function() { activateTab(btn.dataset.tab); });
-    });
-    
-    if (activeTab) activateTab(activeTab);
-  };
-
-  // ========== Helpers ==========
-  function escapeHtml(v) {
-    return String(v == null ? '' : v)
-      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-      .replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+window.initTabs = function(containerId) {
+  var container = document.getElementById(containerId);
+  if (!container) return;
+  var tabBtns = container.querySelectorAll('.tab-btn[data-tab]');
+  var tabContents = container.querySelectorAll('.tab-content[data-tab-content]');
+  var activeTab = container.dataset.activeTab || (tabBtns[0] && tabBtns[0].dataset.tab);
+  function activateTab(name) {
+    tabBtns.forEach(function(b){ b.classList.toggle('active', b.dataset.tab === name); });
+    tabContents.forEach(function(c){ c.classList.toggle('active', c.dataset.tabContent === name); });
+    container.dataset.activeTab = name;
   }
-  
-  window.escapeHtml = escapeHtml;
-  
-  window.formatNumber = function(num) {
-    return Number(num || 0).toLocaleString('ar-IQ');
-  };
-  
-  window.formatMoney = function(num) {
-    return '$' + Number(num || 0).toLocaleString('ar-IQ', {maximumFractionDigits: 0});
-  };
+  tabBtns.forEach(function(b){ b.addEventListener('click', function(){ activateTab(b.dataset.tab); }); });
+  if (activeTab) activateTab(activeTab);
+};
 
-  window.renderSkeleton = function(containerId, count) {
-    count = count || 3;
-    var container = document.getElementById(containerId) || document.getElementById('main-content');
-    if (!container) return;
-    
-    var html = '<div class="skeleton-line lg"></div>';
-    html += '<div class="skeleton-line sm"></div>';
-    html += '<div style="margin-top:24px;">';
-    for (var i = 0; i < count; i++) {
-      html += '<div class="skeleton skeleton-card"></div>';
-    }
-    html += '</div>';
-    
-    container.innerHTML = html;
-  };
-  
-  window.renderError = function(containerId, message, retryFn) {
-    var container = document.getElementById(containerId) || document.getElementById('main-content');
-    if (!container) return;
-    
-    var retryName = retryFn || 'navigate(window.currentSection)';
-    
-    container.innerHTML = 
-      '<div class="error-state">' +
-        '<div class="icon">⚠️</div>' +
-        '<h3>حدث خطأ</h3>' +
-        '<p>' + escapeHtml(message) + '</p>' +
-        '<button class="retry-btn" onclick="' + retryName + '">🔄 إعادة المحاولة</button>' +
-      '</div>';
-  };
-  
-  window.renderEmpty = function(containerId, message) {
-    message = message || 'لا توجد بيانات';
-    var container = document.getElementById(containerId) || document.getElementById('main-content');
-    if (!container) return;
-    
-    container.innerHTML = 
-      '<div class="empty-state">' +
-        '<div class="icon">📭</div>' +
-        '<h3>' + escapeHtml(message) + '</h3>' +
-        '<p>سيتم عرض البيانات هنا عند توفرها</p>' +
-      '</div>';
-  };
+function escapeHtml(v) {
+  return String(v == null ? '' : v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+}
+window.escapeHtml = escapeHtml;
+window.formatNumber = function(n){ return Number(n||0).toLocaleString('ar-IQ'); };
+window.formatMoney = function(n){ return '$' + Number(n||0).toLocaleString('ar-IQ',{maximumFractionDigits:0}); };
 
-  // ========== التحقق من المستخدم ==========
-  async function checkAuth() {
-    try {
-      if (!window.supabase || !window.AMIN_CONFIG) {
-        throw new Error('Supabase not loaded');
-      }
-      
-      var sb = window.supabase.createClient(
-        window.AMIN_CONFIG.supabaseUrl,
-        window.AMIN_CONFIG.supabaseAnonKey,
-        {auth:{persistSession:true, autoRefreshToken:true, detectSessionInUrl:true, storageKey:(window.AMIN_CONFIG.authStorageKey||'amin-ovcjzsrqqgjsbqswtkro-auth-v2')}}
-      );
-      
-      window.sbClient = sb;
-      
-      var sessionRes = await sb.auth.getSession();
-      var session = sessionRes.data.session;
-      
-      if (!session) {
-        console.log('No session - redirecting to login');
-        setTimeout(function(){ location.href = 'index.html'; }, 500);
-        return null;
-      }
-      
-      var userRes = await sb.from('users').select('*').eq('id', session.user.id).maybeSingle();
-      
-      if (!userRes.data) {
-        console.error('User not found in database');
-        setTimeout(function(){ location.href = 'index.html'; }, 500);
-        return null;
-      }
-      
-      var user = userRes.data;
-      var role = user.is_super_admin ? 'super_admin' : (user.role || 'guest');
-      
-      if (!ROLE_SECTIONS[role]) {
-        showToast('غير مصرّح', 'ليس لديك صلاحية الوصول لهذه البوابة', 'error');
-        setTimeout(function(){ location.href = 'index.html'; }, 2000);
-        return null;
-      }
-      
-      window.currentUser = user;
-      window.currentUserRole = role;
-      window.ME = user;
-      
-      console.log('✅ User authenticated:', user.name, '| Role:', role);
-      
-      return user;
-    } catch (e) {
-      console.error('Auth check failed:', e);
-      setTimeout(function(){ location.href = 'index.html'; }, 1000);
+window.renderSkeleton = function(id, count) {
+  count = count || 3;
+  var c = document.getElementById(id) || document.getElementById('main-content');
+  if (!c) return;
+  var h = '<div class="skeleton-line lg"></div><div class="skeleton-line sm"></div><div style="margin-top:24px;">';
+  for (var i=0; i<count; i++) h += '<div class="skeleton skeleton-card"></div>';
+  c.innerHTML = h + '</div>';
+};
+
+window.renderError = function(id, msg, retry) {
+  var c = document.getElementById(id) || document.getElementById('main-content');
+  if (!c) return;
+  c.innerHTML = '<div class="error-state"><div class="icon">⚠️</div><h3>حدث خطأ</h3><p>' + escapeHtml(msg) + '</p><button class="retry-btn" onclick="' + (retry || 'navigate(window.currentSection)') + '">🔄 إعادة المحاولة</button></div>';
+};
+
+window.renderEmpty = function(id, msg) {
+  var c = document.getElementById(id) || document.getElementById('main-content');
+  if (!c) return;
+  c.innerHTML = '<div class="empty-state"><div class="icon">📭</div><h3>' + escapeHtml(msg || 'لا توجد بيانات') + '</h3></div>';
+};
+
+async function checkAuth() {
+  try {
+    if (!window.supabase || !window.AMIN_CONFIG) throw new Error('Supabase not loaded');
+    var sb = window.supabase.createClient(window.AMIN_CONFIG.supabaseUrl, window.AMIN_CONFIG.supabaseAnonKey, {auth:{persistSession:true, autoRefreshToken:true, detectSessionInUrl:true, storageKey:(window.AMIN_CONFIG.authStorageKey||'amin-ovcjzsrqqgjsbqswtkro-auth-v2')}});
+    window.sbClient = sb;
+    var sessionRes = await sb.auth.getSession();
+    if (!sessionRes.data.session) { setTimeout(function(){ location.href = 'index.html'; }, 500); return null; }
+    var userRes = await sb.from('users').select('*').eq('id', sessionRes.data.session.user.id).maybeSingle();
+    if (!userRes.data) { setTimeout(function(){ location.href = 'index.html'; }, 500); return null; }
+    var user = userRes.data;
+    var role = user.is_super_admin ? 'super_admin' : (user.role || 'guest');
+    if (!ROLE_SECTIONS[role]) {
+      showToast('غير مصرّح', 'ليس لديك صلاحية', 'error');
+      setTimeout(function(){ location.href = 'index.html'; }, 2000);
       return null;
     }
+    window.currentUser = user;
+    window.currentUserRole = role;
+    window.ME = user;
+    console.log('✅ User:', user.name, '| Role:', role);
+    return user;
+  } catch (e) {
+    console.error('Auth error:', e);
+    setTimeout(function(){ location.href = 'index.html'; }, 1000);
+    return null;
   }
+}
 
-  // ========== بناء Sidebar ==========
-  function buildSidebar() {
-    var role = window.currentUserRole;
-    var allowedSections = ROLE_SECTIONS[role] || [];
-    var nav = document.getElementById('sidebarNav');
-    
-    if (!allowedSections.length) {
-      nav.innerHTML = '<div style="padding:20px;color:#94a3b8;text-align:center;">لا توجد أقسام متاحة</div>';
-      return;
-    }
-    
-    var sortedSections = allowedSections
-      .filter(function(s){ return SECTIONS_META[s]; })
-      .sort(function(a, b){ return SECTIONS_META[a].order - SECTIONS_META[b].order; });
-    
-    var html = '<div class="nav-section">';
-    html += '<div class="section-title">الأقسام</div>';
-    
-    sortedSections.forEach(function(sectionId) {
-      var meta = SECTIONS_META[sectionId];
-      html += 
-        '<button class="nav-item" data-section="' + sectionId + '" onclick="navigate(\'' + sectionId + '\')">' +
-          '<span class="icon">' + meta.icon + '</span>' +
-          '<span class="text">' + meta.title + '</span>' +
-        '</button>';
-    });
-    
-    html += '</div>';
-    nav.innerHTML = html;
-  }
-
-  // ========== بناء Bottom Nav ==========
-  function buildBottomNav() {
-    var role = window.currentUserRole;
-    var allowedSections = ROLE_SECTIONS[role] || [];
-    var grid = document.getElementById('bottomNavGrid');
-    
-    var top5 = allowedSections
-      .filter(function(s){ return SECTIONS_META[s]; })
-      .sort(function(a, b){ return SECTIONS_META[a].order - SECTIONS_META[b].order; })
-      .slice(0, 5);
-    
-    var html = '';
-    top5.forEach(function(sectionId) {
-      var meta = SECTIONS_META[sectionId];
-      html += 
-        '<button class="bottom-nav-item" data-section="' + sectionId + '" onclick="navigate(\'' + sectionId + '\')">' +
-          '<span class="icon">' + meta.icon + '</span>' +
-          '<span>' + meta.title + '</span>' +
-        '</button>';
-    });
-    
-    grid.innerHTML = html;
-  }
-
-  // ========== التنقل ==========
-  window.navigate = function(sectionId) {
-    var role = window.currentUserRole;
-    var allowedSections = ROLE_SECTIONS[role] || [];
-    
-    if (!sectionId || allowedSections.indexOf(sectionId) === -1) {
-      sectionId = allowedSections[0] || 'overview';
-    }
-    
-    if (location.hash !== '#' + sectionId) {
-      location.hash = sectionId;
-    }
-    
-    window.currentSection = sectionId;
-    
-    var navItems = document.querySelectorAll('.nav-item[data-section]');
-    navItems.forEach(function(item) {
-      item.classList.toggle('active', item.dataset.section === sectionId);
-    });
-    
-    var bottomItems = document.querySelectorAll('.bottom-nav-item[data-section]');
-    bottomItems.forEach(function(item) {
-      item.classList.toggle('active', item.dataset.section === sectionId);
-    });
-    
-    var meta = SECTIONS_META[sectionId];
-    if (meta) {
-      document.getElementById('pageTitle').textContent = meta.icon + ' ' + meta.title;
-      document.title = meta.title + ' — البوابة الموحدة | أمين الرضا';
-    }
-    
-    if (window.innerWidth <= 768) {
-      document.getElementById('appSidebar').classList.remove('open');
-      document.getElementById('sidebarBackdrop').classList.remove('active');
-    }
-    
-    renderSkeleton('main-content', 4);
-    
-    var section = window.SECTIONS[sectionId];
-    if (section && typeof section.load === 'function') {
-      Promise.resolve(section.load()).catch(function(err) {
-        console.error('Section load error:', err);
-        renderError('main-content', err.message || 'فشل تحميل القسم');
-      });
-    } else {
-      document.getElementById('main-content').innerHTML = 
-        '<div class="empty-state">' +
-          '<div class="icon">🚧</div>' +
-          '<h3>' + escapeHtml(meta.title) + '</h3>' +
-          '<p>هذا القسم قيد التطوير - سيتم إضافته قريباً</p>' +
-        '</div>';
-    }
-  };
-
-  // ========== Mobile Toggle ==========
-  window.toggleSidebar = function() {
-    var sidebar = document.getElementById('appSidebar');
-    var backdrop = document.getElementById('sidebarBackdrop');
-    
-    sidebar.classList.toggle('open');
-    backdrop.classList.toggle('active');
-  };
-
-  // ========== Dark Mode ==========
-  window.toggleDarkMode = function() {
-    document.body.classList.toggle('dark');
-    var isDark = document.body.classList.contains('dark');
-    localStorage.setItem('darkMode', isDark ? '1' : '0');
-    showToast(isDark ? '🌙 الوضع الليلي' : '☀️ الوضع النهاري', null, 'success');
-  };
-
-  // ========== Logout ==========
-  window.handleLogout = async function() {
-    if (!confirm('هل تريد تسجيل الخروج؟')) return;
-    
-    try {
-      if (window.sbClient) {
-        await window.sbClient.auth.signOut({scope:'local'});
-      }
-      location.href = 'index.html';
-    } catch (e) {
-      console.error('Logout error:', e);
-      location.href = 'index.html';
-    }
-  };
-
-  // ========== التهيئة ==========
-  async function init() {
-    if (localStorage.getItem('darkMode') === '1') {
-      document.body.classList.add('dark');
-    }
-    
-    var user = await checkAuth();
-    if (!user) return;
-    
-    document.getElementById('userName').textContent = user.name || user.email || 'مستخدم';
-    
-    var roleLabels = {
-      super_admin: '👑 المسؤول الأعلى',
-      admin: '👑 مدير النظام',
-      finance: '💰 المسؤول المالي',
-      academic: '📚 المسؤول العلمي',
-      counselor: '💚 المرشد النفسي',
-      psychologist: '🧠 أخصائي نفسي',
-      discipline: '🛡️ مسؤول الانضباط',
-      teacher: '👨‍🏫 معلم',
-      parent: '👨‍👩‍👧 ولي أمر',
-      student: '🎓 طالب'
-    };
-    document.getElementById('userRole').textContent = roleLabels[window.currentUserRole] || window.currentUserRole;
-    
-    buildSidebar();
-    buildBottomNav();
-    
-    var initialSection = location.hash.replace('#','') || ROLE_SECTIONS[window.currentUserRole][0];
-    navigate(initialSection);
-  }
-
-  // ========== Hash Change ==========
-  window.addEventListener('hashchange', function() {
-    var newSection = location.hash.replace('#','');
-    if (newSection && newSection !== window.currentSection) {
-      navigate(newSection);
-    }
+function buildSidebar() {
+  var role = window.currentUserRole;
+  var allowed = ROLE_SECTIONS[role] || [];
+  var nav = document.getElementById('sidebarNav');
+  if (!allowed.length) { nav.innerHTML = '<div style="padding:20px;text-align:center;color:#94a3b8;">لا توجد أقسام</div>'; return; }
+  var sorted = allowed.filter(function(s){ return SECTIONS_META[s]; }).sort(function(a,b){ return SECTIONS_META[a].order - SECTIONS_META[b].order; });
+  var html = '<div class="nav-section"><div class="section-title">الأقسام</div>';
+  sorted.forEach(function(id){
+    var m = SECTIONS_META[id];
+    html += '<button class="nav-item" data-section="' + id + '" onclick="navigate(\'' + id + '\')"><span class="icon">' + m.icon + '</span><span class="text">' + m.title + '</span></button>';
   });
+  nav.innerHTML = html + '</div>';
+}
 
-  // ========== Start ==========
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
+function buildBottomNav() {
+  var role = window.currentUserRole;
+  var allowed = ROLE_SECTIONS[role] || [];
+  var grid = document.getElementById('bottomNavGrid');
+  var top5 = allowed.filter(function(s){ return SECTIONS_META[s]; }).sort(function(a,b){ return SECTIONS_META[a].order - SECTIONS_META[b].order; }).slice(0,5);
+  var html = '';
+  top5.forEach(function(id){
+    var m = SECTIONS_META[id];
+    html += '<button class="bottom-nav-item" data-section="' + id + '" onclick="navigate(\'' + id + '\')"><span class="icon">' + m.icon + '</span><span>' + m.title + '</span></button>';
+  });
+  grid.innerHTML = html;
+}
+
+window.navigate = function(sectionId) {
+  var role = window.currentUserRole;
+  var allowed = ROLE_SECTIONS[role] || [];
+  if (!sectionId || allowed.indexOf(sectionId) === -1) sectionId = allowed[0] || 'overview';
+  if (location.hash !== '#' + sectionId) location.hash = sectionId;
+  window.currentSection = sectionId;
+  document.querySelectorAll('.nav-item[data-section]').forEach(function(i){ i.classList.toggle('active', i.dataset.section === sectionId); });
+  document.querySelectorAll('.bottom-nav-item[data-section]').forEach(function(i){ i.classList.toggle('active', i.dataset.section === sectionId); });
+  var meta = SECTIONS_META[sectionId];
+  if (meta) {
+    document.getElementById('pageTitle').textContent = meta.icon + ' ' + meta.title;
+    document.title = meta.title + ' — البوابة الموحدة';
   }
+  if (window.innerWidth <= 768) {
+    document.getElementById('appSidebar').classList.remove('open');
+    document.getElementById('sidebarBackdrop').classList.remove('active');
+  }
+  renderSkeleton('main-content', 4);
+  var section = window.SECTIONS[sectionId];
+  if (section && typeof section.load === 'function') {
+    Promise.resolve(section.load()).catch(function(err){
+      console.error('Section error:', err);
+      renderError('main-content', err.message || 'فشل التحميل');
+    });
+  } else {
+    document.getElementById('main-content').innerHTML = '<div class="empty-state"><div class="icon">🚧</div><h3>' + escapeHtml(meta.title) + '</h3><p>قيد التطوير</p></div>';
+  }
+};
 
-})();
-</script>
+window.toggleSidebar = function() {
+  document.getElementById('appSidebar').classList.toggle('open');
+  document.getElementById('sidebarBackdrop').classList.toggle('active');
+};
 
-<script src="assets/ux-enhancements.js"></script>
-<script src="assets/smart-alerts.js"></script>
+window.toggleDarkMode = function() {
+  document.body.classList.toggle('dark');
+  var dark = document.body.classList.contains('dark');
+  localStorage.setItem('darkMode', dark ? '1' : '0');
+  showToast(dark ? '🌙 الوضع الليلي' : '☀️ الوضع النهاري', null, 'success');
+};
 
-</body>
-</html>
+window.handleLogout = async function() {
+  if (!confirm('هل تريد تسجيل الخروج؟')) return;
+  try {
+    if (window.sbClient) await window.sbClient.auth.signOut({scope:'local'});
+    location.href = 'index.html';
+  } catch (e) { location.href = 'index.html'; }
+};
+
+// ============================================
+// SECTIONS - الأقسام
+// ============================================
+window.SECTIONS = {
+
+overview: {
+  title: 'لوحة القيادة',
+  load: async function() {
+    try {
+      var role = window.currentUserRole;
+      var results = await Promise.all([
+        window.sbClient.from('v_clean_student_overview').select('*').limit(1).maybeSingle(),
+        window.sbClient.from('v_clean_finance_summary').select('*').limit(1).maybeSingle(),
+        window.sbClient.from('v_clean_attendance_today').select('*').limit(1).maybeSingle()
+      ]);
+      var so = results[0].data || {};
+      var fs = results[1].data || {};
+      var at = results[2].data || {};
+      
+      var eventsRes = await Promise.all([
+        window.sbClient.from('attendance').select('student_id, date, status, created_at, students(name, users(name))').eq('status', 'absent').order('created_at', {ascending: false}).limit(5),
+        window.sbClient.from('behavior_records').select('student_id, note, description, points, created_at, students(name, users(name))').order('created_at', {ascending: false}).limit(5)
+      ]);
+      
+      var absentEvents = (eventsRes[0].data || []).map(function(e){
+        return {
+          type: '❌ غياب', type_class: 'red',
+          name: (e.students && e.students.users && e.students.users.name) || (e.students && e.students.name) || 'طالب',
+          detail: 'تاريخ: ' + String(e.date || '').slice(0,10),
+          created_at: e.created_at
+        };
+      });
+      var behaviorEvents = (eventsRes[1].data || []).map(function(e){
+        var p = Number(e.points || 0);
+        return {
+          type: p >= 0 ? '🌟 إيجابي' : '⚠️ سلبي',
+          type_class: p >= 0 ? 'green' : 'orange',
+          name: (e.students && e.students.users && e.students.users.name) || (e.students && e.students.name) || 'طالب',
+          detail: e.note || e.description || 'ملاحظة',
+          created_at: e.created_at
+        };
+      });
+      var allEvents = absentEvents.concat(behaviorEvents).sort(function(a,b){ return new Date(b.created_at) - new Date(a.created_at); }).slice(0, 10);
+      
+      var cards = [];
+      if (role === 'super_admin' || role === 'admin') {
+        cards = [
+          { label: 'إجمالي الطلاب', value: window.formatNumber(so.total || 0), icon: '🎓', color: '#3b82f6' },
+          { label: 'حضور اليوم', value: window.formatNumber(at.present || 0) + ' / ' + window.formatNumber(at.total || 0), icon: '✅', color: '#10b981' },
+          { label: 'المحصّل', value: window.formatMoney(fs.collected || 0), icon: '💰', color: '#10b981' },
+          { label: 'المتأخرات', value: window.formatMoney(fs.overdue || 0), icon: '⚠️', color: '#dc2626' }
+        ];
+      } else if (role === 'finance') {
+        var total = (fs.collected || 0) + (fs.overdue || 0);
+        var rate = total > 0 ? Math.round(((fs.collected || 0) / total) * 100) : 0;
+        cards = [
+          { label: 'المحصّل', value: window.formatMoney(fs.collected || 0), icon: '💰', color: '#10b981' },
+          { label: 'المتأخرات', value: window.formatMoney(fs.overdue || 0), icon: '⚠️', color: '#dc2626' },
+          { label: 'الرصيد الدائن', value: window.formatMoney(fs.credit || 0), icon: '💳', color: '#3b82f6' },
+          { label: 'نسبة التحصيل', value: rate + '%', icon: '📊', color: '#f59e0b' }
+        ];
+      } else if (role === 'academic') {
+        cards = [
+          { label: 'الطلاب', value: window.formatNumber(so.total || 0), icon: '🎓', color: '#3b82f6' },
+          { label: 'المتغيبون اليوم', value: window.formatNumber(at.absent || 0), icon: '❌', color: '#dc2626' },
+          { label: 'حضور اليوم', value: window.formatNumber(at.present || 0), icon: '✅', color: '#10b981' },
+          { label: 'متأخرون اليوم', value: window.formatNumber(at.late || 0), icon: '⏰', color: '#f59e0b' }
+        ];
+      } else if (role === 'counselor' || role === 'psychologist' || role === 'discipline') {
+        var todayRes = await window.sbClient.from('behavior_records').select('id').gte('created_at', new Date().toISOString().slice(0,10)).limit(100);
+        var today = (todayRes.data || []).length;
+        cards = [
+          { label: 'غياب اليوم', value: window.formatNumber(at.absent || 0), icon: '❌', color: '#dc2626' },
+          { label: 'متأخرون اليوم', value: window.formatNumber(at.late || 0), icon: '⏰', color: '#f59e0b' },
+          { label: 'سجلات سلوك اليوم', value: window.formatNumber(today), icon: '🌟', color: '#3b82f6' },
+          { label: 'إجمالي الطلاب', value: window.formatNumber(so.total || 0), icon: '🎓', color: '#10b981' }
+        ];
+      } else {
+        cards = [
+          { label: 'الطلاب', value: window.formatNumber(so.total || 0), icon: '🎓', color: '#3b82f6' },
+          { label: 'حضور اليوم', value: window.formatNumber(at.present || 0), icon: '✅', color: '#10b981' },
+          { label: 'الغياب', value: window.formatNumber(at.absent || 0), icon: '❌', color: '#dc2626' },
+          { label: 'المتأخرون', value: window.formatNumber(at.late || 0), icon: '⏰', color: '#f59e0b' }
+        ];
+      }
+      
+      var html = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:24px;">';
+      cards.forEach(function(c){
+        html += '<div style="background:white;border-radius:12px;padding:20px;box-shadow:var(--shadow-sm);border-right:4px solid ' + c.color + ';">';
+        html += '<div style="display:flex;justify-content:space-between;margin-bottom:12px;"><div style="font-size:13px;color:var(--text-secondary);font-weight:600;">' + window.escapeHtml(c.label) + '</div><div style="font-size:32px;">' + c.icon + '</div></div>';
+        html += '<div style="font-size:24px;font-weight:700;">' + c.value + '</div></div>';
+      });
+      html += '</div>';
+      
+      html += '<div style="background:white;border-radius:12px;padding:20px;box-shadow:var(--shadow-sm);"><h3 style="margin-bottom:16px;">📋 آخر الأحداث</h3>';
+      if (allEvents.length === 0) {
+        html += '<div class="empty-state" style="padding:30px;"><div class="icon">📭</div><h3>لا توجد أحداث</h3></div>';
+      } else {
+        html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;"><thead><tr style="background:var(--bg-primary);"><th style="padding:10px;text-align:right;">النوع</th><th style="padding:10px;text-align:right;">الطالب</th><th style="padding:10px;text-align:right;">التفاصيل</th><th style="padding:10px;text-align:right;">التاريخ</th></tr></thead><tbody>';
+        allEvents.forEach(function(e){
+          var bg = e.type_class === 'red' ? '#fee2e2' : e.type_class === 'green' ? '#d1fae5' : '#fef3c7';
+          var tc = e.type_class === 'red' ? '#991b1b' : e.type_class === 'green' ? '#065f46' : '#92400e';
+          html += '<tr style="border-bottom:1px solid var(--border);"><td style="padding:10px;"><span style="background:' + bg + ';color:' + tc + ';padding:4px 10px;border-radius:6px;font-size:12px;font-weight:600;">' + e.type + '</span></td><td style="padding:10px;font-weight:600;">' + window.escapeHtml(e.name) + '</td><td style="padding:10px;font-size:13px;color:var(--text-secondary);">' + window.escapeHtml(e.detail) + '</td><td style="padding:10px;font-size:13px;color:var(--text-secondary);">' + String(e.created_at || '').slice(0,10) + '</td></tr>';
+        });
+        html += '</tbody></table></div>';
+      }
+      html += '</div>';
+      
+      document.getElementById('main-content').innerHTML = html;
+    } catch (e) {
+      window.renderError('main-content', 'فشل تحميل لوحة القيادة: ' + e.message);
+    }
+  }
+},
+
+students: {
+  title: 'الطلاب',
+  load: async function() {
+    try {
+      var results = await Promise.all([
+        window.sbClient.from('v_clean_student_overview').select('*').limit(50),
+        window.sbClient.from('classes').select('id, name').order('name')
+      ]);
+      var students = results[0].data || [];
+      var classes = results[1].data || [];
+      window._studentsData = students;
+      
+      var html = '<div style="background:white;padding:16px;border-radius:12px;margin-bottom:20px;box-shadow:var(--shadow-sm);display:flex;gap:12px;flex-wrap:wrap;align-items:end;">';
+      html += '<div style="flex:1;min-width:200px;"><label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:4px;">🔍 بحث</label><input type="text" id="studentSearch" placeholder="اسم الطالب..." style="width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;"></div>';
+      html += '<div style="min-width:180px;"><label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:4px;">📚 الصف</label><select id="classFilter" style="width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;" onchange="window._filterStudents()"><option value="">كل الصفوف</option>';
+      classes.forEach(function(c){ html += '<option value="' + window.escapeHtml(c.name) + '">' + window.escapeHtml(c.name) + '</option>'; });
+      html += '</select></div>';
+      html += '<
