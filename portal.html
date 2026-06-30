@@ -598,7 +598,7 @@ window._openSF = async function(id) {
       beh.forEach(function(b){
         var p = Number(b.points || 0);
         var col = p >= 0 ? '#10b981' : '#dc2626';
-        h += '<tr style="border-bottom:1px solid var(--border);"><td style="padding:8px;">' + String(b.created_at || '').slice(0,10) + '</td><td style="padding:8px;">' + escapeHtml(b.note || b.description || '—') + '</td><td style="padding:8px;color:' + col + ';font-weight:700;">' + (p > 0 ? '+' : '') + p + '</td></tr>';
+        h += '<tr style="border-bottom:1px solid var(--border);"><td style="padding:8px;">' + String(b.created_at || '').slice(0,10) + '</td><td style="padding:8px;">' + escapeHtml(b.note || '—') + '</td><td style="padding:8px;color:' + col + ';font-weight:700;">' + (p > 0 ? '+' : '') + p + '</td></tr>';
       });
       h += '</table>';
     }
