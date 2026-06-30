@@ -263,7 +263,7 @@ overview: {
         window.sbClient.from('v_clean_attendance_today').select('*').limit(1).maybeSingle()
       ]);
       var so = r[0].data || {}, fs = r[1].data || {}, at = r[2].data || {};
-     var er = await Promise.all([
+ var er = await Promise.all([
         window.sbClient.from('attendance').select('student_id, date, status, created_at').eq('status', 'absent').order('created_at', {ascending: false}).limit(5),
         window.sbClient.from('behavior_records').select('student_id, note, description, points, created_at').order('created_at', {ascending: false}).limit(5)
       ]);
@@ -280,12 +280,35 @@ overview: {
           studentsMap[s.id] = (s.users && s.users.name) || s.name || 'طالب';
         });
       }
-     var ae = (er[0].data || []).map(function(e){ 
+      
+      // جلب أسماء الطلاب بشكل منفصل
+      var allStudentIds = [];
+      (er[0].data || []).forEach(function(e){ if(e.student_id) allStudentIds.push(e.student_id); });
+      (er[1].data || []).forEach(function(e){ if(e.student_id) allStudentIds.push(e.student_id); });
+      
+      var studentsMap = {};
+      if (allStudentIds.length > 0) {
+        var stRes = await window.sbClient.from('students').select('id, name, users(name)').in('id', allStudentIds);
+        (stRes.data || []).forEach(function(s){
+          studentsMap[s.id] = (s.users && s.users.name) || s.name || 'طالب';
+        });
+      }
+ var ae = (er[0].data || []).map(function(e){ 
         return { 
           type: '❌ غياب', 
           tc: 'red', 
           name: studentsMap[e.student_id] || 'طالب', 
           detail: 'تاريخ: ' + String(e.date || '').slice(0,10), 
+          created_at: e.created_at 
+        }; 
+      });
+      var be = (er[1].data || []).map(function(e){ 
+        var p = Number(e.points || 0); 
+        return { 
+          type: p >= 0 ? '🌟 إيجابي' : '⚠️ سلبي', 
+          tc: p >= 0 ? 'green' : 'orange', 
+          name: studentsMap[e.student_id] || 'طالب', 
+          detail: e.note || e.description || 'ملاحظة', 
           created_at: e.created_at 
         }; 
       });
