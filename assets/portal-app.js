@@ -18,17 +18,17 @@ var ROLE_SECTIONS = {
 };
 
 var SECTIONS_META = {
-  overview: { title: 'لوحة القيادة', icon: '🏠', order: 1 },
-  students: { title: 'الطلاب', icon: '🎓', order: 2 },
-  academic: { title: 'الأكاديمي', icon: '📚', order: 3 },
-  finance: { title: 'المالية', icon: '💰', order: 4 },
-  attendance: { title: 'الحضور', icon: '📋', order: 5 },
-  discipline: { title: 'السلوك', icon: '🛡️', order: 6 },
-  registrations: { title: 'التسجيلات', icon: '📝', order: 7 },
-  schedule: { title: 'الجدول', icon: '📅', order: 8 },
-  payroll: { title: 'الرواتب', icon: '💵', order: 9 },
-  settings: { title: 'الإعدادات', icon: '⚙️', order: 10 },
-  system: { title: 'النظام', icon: '🔧', order: 11 }
+  overview: { title: 'لوحة القيادة', icon: 'overview', order: 1 },
+  students: { title: 'الطلاب', icon: 'students', order: 2 },
+  academic: { title: 'الأكاديمي', icon: 'academic', order: 3 },
+  finance: { title: 'المالية', icon: 'finance', order: 4 },
+  attendance: { title: 'الحضور', icon: 'attendance', order: 5 },
+  discipline: { title: 'السلوك', icon: 'discipline', order: 6 },
+  registrations: { title: 'التسجيلات', icon: 'registrations', order: 7 },
+  schedule: { title: 'الجدول', icon: 'schedule', order: 8 },
+  payroll: { title: 'الرواتب', icon: 'payroll', order: 9 },
+  settings: { title: 'الإعدادات', icon: 'settings', order: 10 },
+  system: { title: 'النظام', icon: 'system', order: 11 }
 };
 
 var ROLE_LABELS = {
