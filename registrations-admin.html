@@ -33,4 +33,5 @@ async function loadTeachers(){const {data,error}=await sb.from('registration_tea
 async function loadAll(){if(!await ensure())return;await Promise.all([loadFamilies(),loadTeachers()])}
 window.addEventListener('load',loadAll);
 </script><script src="assets/ux-enhancements.js"></script>
+<script src="assets/amin-theme-injector.js"></script>
 </body></html>

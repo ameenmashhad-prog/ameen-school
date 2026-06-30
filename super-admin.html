@@ -776,7 +776,8 @@
       '</style></head><body>'+
       '<button class="print-btn no-print" onclick="window.print()">🖨️ طباعة</button>'+
       '<div class="print-header"><h1>'+SCHOOL_LOGO+' '+SCHOOL_NAME+'</h1><h2>'+title+'</h2><div>📅 '+today+'</div></div>'+
-      content+'</body></html>';
+      content+'<script src="assets/amin-theme-injector.js"></script>
+</body></html>';
     
     const w = window.open('', '_blank', 'width=900,height=700');
     w.document.write(html);
@@ -845,5 +846,6 @@
 
 <script src="assets/ux-enhancements.js"></script>
 <script src="assets/smart-alerts.js"></script>
+<script src="assets/amin-theme-injector.js"></script>
 </body>
 </html>
