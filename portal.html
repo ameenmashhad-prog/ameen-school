@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <style>
-:root{--bg-primary:#f8fafc;--bg-secondary:#fff;--bg-sidebar:#081426;--text-primary:#1f2937;--text-secondary:#6b7280;--text-sidebar:#cbd5e1;--border:#e5e7eb;--primary:#1e40af;--primary-light:#3b82f6;--success:#10b981;--danger:#dc2626;--warning:#f59e0b;--info:#06b6d4;--shadow-sm:0 1px 3px rgba(0,0,0,.1);--shadow-md:0 4px 12px rgba(0,0,0,.08);--shadow-lg:0 10px 30px rgba(0,0,0,.1)}body.dark{--bg-primary:#0f172a;--bg-secondary:#1e293b;--bg-sidebar:#020617;--text-primary:#f1f5f9;--text-secondary:#94a3b8;--border:#334155}*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Cairo','Segoe UI',Tahoma,sans-serif;background:var(--bg-primary);color:var(--text-primary);min-height:100vh;direction:rtl}.app-shell{display:grid;grid-template-columns:260px 1fr;min-height:100vh}.app-sidebar{background:var(--bg-sidebar);color:var(--text-sidebar);padding:20px 0;position:fixed;top:0;right:0;width:260px;height:100vh;overflow-y:auto;z-index:100;transition:transform .3s}.app-sidebar::-webkit-scrollbar{width:6px}.app-sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px}.sidebar-brand{padding:0 20px 20px;border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:16px;display:flex;align-items:center;gap:12px}.sidebar-brand .logo{width:44px;height:44px;background:linear-gradient(135deg,#fbbf24,#f59e0b);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}.sidebar-brand h1{font-size:16px;color:#fff;font-weight:700}.sidebar-brand small{font-size:11px;color:var(--text-sidebar);opacity:.7}.sidebar-user{padding:12px 20px;margin:0 12px 16px;background:rgba(255,255,255,.05);border-radius:10px;display:flex;align-items:center;gap:12px}.sidebar-user .avatar{width:40px;height:40px;background:linear-gradient(135deg,#3b82f6,#1e40af);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}.sidebar-user .info{min-width:0;flex:1}.sidebar-user .name{color:#fff;font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sidebar-user .role{color:var(--text-sidebar);font-size:11px;opacity:.8}.sidebar-nav{padding:0 12px}.sidebar-nav .nav-section{margin-bottom:16px}.sidebar-nav .section-title{font-size:11px;color:var(--text-sidebar);text-transform:uppercase;padding:0 12px;margin-bottom:8px;opacity:.6;letter-spacing:.5px}.nav-item{display:flex;align-items:center;gap:12px;padding:10px 14px;margin-bottom:2px;color:var(--text-sidebar);text-decoration:none;border-radius:8px;font-size:14px;cursor:pointer;border:none;background:none;width:100%;text-align:right;transition:all .2s;font-family:inherit}.nav-item:hover{background:rgba(255,255,255,.05);color:#fff}.nav-item.active{background:linear-gradient(135deg,#3b82f6,#1e40af);color:#fff;box-shadow:0 4px 12px rgba(59,130,246,.3)}.nav-item .icon{font-size:18px;width:24px;text-align:center}.nav-item .text{flex:1}.sidebar-footer{padding:16px 12px;border-top:1px solid rgba(255,255,255,.1);margin-top:16px}.logout-btn{width:100%;padding:10px;background:rgba(220,38,38,.1);color:#fca5a5;border:1px solid rgba(220,38,38,.2);border-radius:8px;cursor:pointer;font-family:inherit;font-weight:600;transition:all .2s}.logout-btn:hover{background:#dc2626;color:#fff}.app-main{margin-right:260px;min-height:100vh;display:flex;flex-direction:column}.app-topbar{background:var(--bg-secondary);padding:14px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:50;box-shadow:var(--shadow-sm)}.app-topbar h2{font-size:18px;color:var(--text-primary);font-weight:700}.topbar-actions{display:flex;gap:8px;align-items:center}.btn-icon{width:36px;height:36px;border-radius:8px;border:1px solid var(--border);background:var(--bg-primary);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .2s}.btn-icon:hover{background:var(--primary);color:#fff;border-color:var(--primary)}.mobile-toggle{display:none;background:none;border:none;font-size:24px;cursor:pointer;color:var(--text-primary)}#main-content{flex:1;padding:24px;max-width:1400px;margin:0 auto;width:100%}.bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--bg-secondary);border-top:1px solid var(--border);padding:8px;z-index:99;box-shadow:0 -4px 12px rgba(0,0,0,.1)}.bottom-nav-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}.bottom-nav-item{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px;background:none;border:none;cursor:pointer;font-family:inherit;font-size:11px;color:var(--text-secondary);border-radius:8px;transition:all .2s}.bottom-nav-item.active{background:var(--primary);color:#fff}.bottom-nav-item .icon{font-size:20px}.skeleton{background:linear-gradient(90deg,var(--border) 0%,#f3f4f6 50%,var(--border) 100%);background-size:200% 100%;border-radius:8px;animation:skeleton-pulse 1.5s ease-in-out infinite}@keyframes skeleton-pulse{0%{background-position:200% 0}100%{background-position:-200% 0}}.skeleton-line{height:16px;margin-bottom:8px}.skeleton-line.sm{height:12px;width:60%}.skeleton-line.lg{height:24px;width:40%}.skeleton-card{height:120px;margin-bottom:16px}.error-state{background:#fee2e2;border:1px solid #fca5a5;color:#991b1b;padding:20px;border-radius:12px;text-align:center;margin:20px 0}.error-state .icon{font-size:48px;margin-bottom:12px}.error-state .retry-btn{background:#991b1b;color:#fff;padding:10px 24px;border:none;border-radius:8px;cursor:pointer;font-family:inherit;font-weight:600;margin-top:12px}.empty-state{text-align:center;padding:60px 20px;color:var(--text-secondary)}.empty-state .icon{font-size:64px;margin-bottom:16px;opacity:.5}.toast-container{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none}.toast{background:var(--bg-secondary);border:1px solid var(--border);border-right:4px solid var(--primary);padding:14px 20px;border-radius:10px;box-shadow:var(--shadow-lg);min-width:280px;max-width:400px;pointer-events:auto;animation:toast-in .3s ease-out;display:flex;align-items:center;gap:12px}.toast.success{border-right-color:var(--success)}.toast.error{border-right-color:var(--danger)}.toast.warning{border-right-color:var(--warning)}.toast .toast-icon{font-size:20px;flex-shrink:0}.toast .toast-content{flex:1}.toast .toast-title{font-weight:700;color:var(--text-primary)}.toast .toast-msg{font-size:13px;color:var(--text-secondary);margin-top:2px}@keyframes toast-in{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px}.modal{background:var(--bg-secondary);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.3);max-width:100%;max-height:90vh;display:flex;flex-direction:column}.modal.sm{width:400px}.modal.md{width:600px}.modal.lg{width:900px}.modal-header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}.modal-header h3{font-size:18px;font-weight:700}.modal-close{background:none;border:none;font-size:24px;cursor:pointer;color:var(--text-secondary);width:32px;height:32px;border-radius:8px}.modal-body{padding:24px;overflow-y:auto;flex:1}.tabs-nav{display:flex;background:var(--bg-primary);border-bottom:1px solid var(--border);overflow-x:auto}.tab-btn{padding:14px 24px;background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:var(--text-secondary);border-bottom:3px solid transparent;white-space:nowrap;transition:all .2s}.tab-btn:hover{color:var(--primary)}.tab-btn.active{color:var(--primary);border-bottom-color:var(--primary);background:var(--bg-secondary)}.tab-content{display:none;padding:20px}.tab-content.active{display:block}@media(max-width:768px){.app-sidebar{transform:translateX(100%);box-shadow:-10px 0 30px rgba(0,0,0,.2)}.app-sidebar.open{transform:translateX(0)}.app-main{margin-right:0;padding-bottom:80px}.mobile-toggle{display:flex}.bottom-nav{display:block}#main-content{padding:16px}.sidebar-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99;display:none}.sidebar-backdrop.active{display:block}}
+:root{--bg-primary:#f8fafc;--bg-secondary:#fff;--bg-sidebar:#081426;--text-primary:#1f2937;--text-secondary:#6b7280;--text-sidebar:#cbd5e1;--border:#e5e7eb;--primary:#1e40af;--primary-light:#3b82f6;--success:#10b981;--danger:#dc2626;--warning:#f59e0b;--info:#06b6d4;--shadow-sm:0 1px 3px rgba(0,0,0,.1);--shadow-md:0 4px 12px rgba(0,0,0,.08);--shadow-lg:0 10px 30px rgba(0,0,0,.1)}body.dark{--bg-primary:#0f172a;--bg-secondary:#1e293b;--bg-sidebar:#020617;--text-primary:#f1f5f9;--text-secondary:#94a3b8;--border:#334155}*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Cairo','Segoe UI',Tahoma,sans-serif;background:var(--bg-primary);color:var(--text-primary);min-height:100vh;direction:rtl}.app-shell{display:grid;grid-template-columns:260px 1fr;min-height:100vh}.app-sidebar{background:var(--bg-sidebar);color:var(--text-sidebar);padding:20px 0;position:fixed;top:0;right:0;width:260px;height:100vh;overflow-y:auto;z-index:100;transition:transform .3s}.sidebar-brand{padding:0 20px 20px;border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:16px;display:flex;align-items:center;gap:12px}.sidebar-brand .logo{width:44px;height:44px;background:linear-gradient(135deg,#fbbf24,#f59e0b);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}.sidebar-brand h1{font-size:16px;color:#fff;font-weight:700}.sidebar-brand small{font-size:11px;color:var(--text-sidebar);opacity:.7}.sidebar-user{padding:12px 20px;margin:0 12px 16px;background:rgba(255,255,255,.05);border-radius:10px;display:flex;align-items:center;gap:12px}.sidebar-user .avatar{width:40px;height:40px;background:linear-gradient(135deg,#3b82f6,#1e40af);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px}.sidebar-user .info{min-width:0;flex:1}.sidebar-user .name{color:#fff;font-weight:600;font-size:14px}.sidebar-user .role{color:var(--text-sidebar);font-size:11px;opacity:.8}.sidebar-nav{padding:0 12px}.section-title{font-size:11px;color:var(--text-sidebar);text-transform:uppercase;padding:0 12px;margin-bottom:8px;opacity:.6}.nav-item{display:flex;align-items:center;gap:12px;padding:10px 14px;margin-bottom:2px;color:var(--text-sidebar);border-radius:8px;font-size:14px;cursor:pointer;border:none;background:none;width:100%;text-align:right;transition:all .2s;font-family:inherit}.nav-item:hover{background:rgba(255,255,255,.05);color:#fff}.nav-item.active{background:linear-gradient(135deg,#3b82f6,#1e40af);color:#fff}.nav-item .icon{font-size:18px;width:24px;text-align:center}.nav-item .text{flex:1}.sidebar-footer{padding:16px 12px;border-top:1px solid rgba(255,255,255,.1);margin-top:16px}.logout-btn{width:100%;padding:10px;background:rgba(220,38,38,.1);color:#fca5a5;border:1px solid rgba(220,38,38,.2);border-radius:8px;cursor:pointer;font-family:inherit;font-weight:600}.logout-btn:hover{background:#dc2626;color:#fff}.app-main{margin-right:260px;min-height:100vh;display:flex;flex-direction:column}.app-topbar{background:var(--bg-secondary);padding:14px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:50;box-shadow:var(--shadow-sm)}.app-topbar h2{font-size:18px;font-weight:700}.topbar-actions{display:flex;gap:8px}.btn-icon{width:36px;height:36px;border-radius:8px;border:1px solid var(--border);background:var(--bg-primary);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}.btn-icon:hover{background:var(--primary);color:#fff}.mobile-toggle{display:none;background:none;border:none;font-size:24px;cursor:pointer;color:var(--text-primary)}#main-content{flex:1;padding:24px;max-width:1400px;margin:0 auto;width:100%}.bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--bg-secondary);border-top:1px solid var(--border);padding:8px;z-index:99}.bottom-nav-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}.bottom-nav-item{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px;background:none;border:none;cursor:pointer;font-family:inherit;font-size:11px;color:var(--text-secondary);border-radius:8px}.bottom-nav-item.active{background:var(--primary);color:#fff}.bottom-nav-item .icon{font-size:20px}.skeleton{background:linear-gradient(90deg,var(--border) 0%,#f3f4f6 50%,var(--border) 100%);background-size:200% 100%;border-radius:8px;animation:sp 1.5s ease-in-out infinite}@keyframes sp{0%{background-position:200% 0}100%{background-position:-200% 0}}.skeleton-line{height:16px;margin-bottom:8px}.skeleton-line.lg{height:24px;width:40%}.skeleton-line.sm{height:12px;width:60%}.skeleton-card{height:120px;margin-bottom:16px}.error-state{background:#fee2e2;border:1px solid #fca5a5;color:#991b1b;padding:20px;border-radius:12px;text-align:center;margin:20px 0}.error-state .icon{font-size:48px;margin-bottom:12px}.error-state .retry-btn{background:#991b1b;color:#fff;padding:10px 24px;border:none;border-radius:8px;cursor:pointer;font-family:inherit;font-weight:600;margin-top:12px}.empty-state{text-align:center;padding:60px 20px;color:var(--text-secondary)}.empty-state .icon{font-size:64px;margin-bottom:16px;opacity:.5}.toast-container{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none}.toast{background:var(--bg-secondary);border:1px solid var(--border);border-right:4px solid var(--primary);padding:14px 20px;border-radius:10px;box-shadow:var(--shadow-lg);min-width:280px;max-width:400px;pointer-events:auto;display:flex;align-items:center;gap:12px}.toast.success{border-right-color:var(--success)}.toast.error{border-right-color:var(--danger)}.toast.warning{border-right-color:var(--warning)}.toast .toast-icon{font-size:20px}.toast .toast-content{flex:1}.toast .toast-title{font-weight:700}.toast .toast-msg{font-size:13px;color:var(--text-secondary);margin-top:2px}.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px}.modal{background:var(--bg-secondary);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.3);max-width:100%;max-height:90vh;display:flex;flex-direction:column}.modal.sm{width:400px}.modal.md{width:600px}.modal.lg{width:900px}.modal-header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}.modal-header h3{font-size:18px;font-weight:700}.modal-close{background:none;border:none;font-size:24px;cursor:pointer;color:var(--text-secondary);width:32px;height:32px;border-radius:8px}.modal-body{padding:24px;overflow-y:auto;flex:1}.tabs-nav{display:flex;background:var(--bg-primary);border-bottom:1px solid var(--border);overflow-x:auto}.tab-btn{padding:14px 24px;background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:var(--text-secondary);border-bottom:3px solid transparent;white-space:nowrap}.tab-btn:hover{color:var(--primary)}.tab-btn.active{color:var(--primary);border-bottom-color:var(--primary);background:var(--bg-secondary)}.tab-content{display:none;padding:20px}.tab-content.active{display:block}@media(max-width:768px){.app-sidebar{transform:translateX(100%)}.app-sidebar.open{transform:translateX(0)}.app-main{margin-right:0;padding-bottom:80px}.mobile-toggle{display:flex}.bottom-nav{display:block}#main-content{padding:16px}.sidebar-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99;display:none}.sidebar-backdrop.active{display:block}}
 </style>
 </head>
 <body>
@@ -107,7 +107,6 @@ window.openModal = function(config) {
   c.appendChild(bd);
   var b = m.querySelector('#modalBody');
   if (typeof config.content === 'string') b.innerHTML = config.content;
-  else if (config.content instanceof HTMLElement) b.appendChild(config.content);
   bd.addEventListener('click', function(e){ if (e.target === bd) closeModal(); });
 };
 
@@ -146,11 +145,25 @@ window.renderError = function(id, msg, retry) {
   c.innerHTML = '<div class="error-state"><div class="icon">⚠️</div><h3>حدث خطأ</h3><p>' + escapeHtml(msg) + '</p><button class="retry-btn" onclick="' + (retry || 'navigate(window.currentSection)') + '">🔄 إعادة المحاولة</button></div>';
 };
 
-window.renderEmpty = function(id, msg) {
-  var c = document.getElementById(id) || document.getElementById('main-content');
-  if (!c) return;
-  c.innerHTML = '<div class="empty-state"><div class="icon">📭</div><h3>' + escapeHtml(msg || 'لا توجد بيانات') + '</h3></div>';
-};
+async function fetchStudentsByIds(ids) {
+  if (!ids || !ids.length) return {};
+  try {
+    var unique = Array.from(new Set(ids.filter(Boolean)));
+    if (!unique.length) return {};
+    var r = await window.sbClient.from('students').select('id, name, class_id, users(name)').in('id', unique);
+    var map = {};
+    (r.data || []).forEach(function(s){
+      map[s.id] = {
+        name: (s.users && s.users.name) || s.name || 'طالب',
+        class_id: s.class_id
+      };
+    });
+    return map;
+  } catch (e) {
+    console.warn('Students fetch error:', e);
+    return {};
+  }
+}
 
 async function checkAuth() {
   try {
@@ -184,7 +197,7 @@ function buildSidebar() {
   var nav = document.getElementById('sidebarNav');
   if (!allowed.length) { nav.innerHTML = '<div style="padding:20px;text-align:center;color:#94a3b8;">لا توجد أقسام</div>'; return; }
   var sorted = allowed.filter(function(s){ return SECTIONS_META[s]; }).sort(function(a,b){ return SECTIONS_META[a].order - SECTIONS_META[b].order; });
-  var html = '<div class="nav-section"><div class="section-title">الأقسام</div>';
+  var html = '<div style="margin-bottom:16px;"><div class="section-title">الأقسام</div>';
   sorted.forEach(function(id){
     var m = SECTIONS_META[id];
     html += '<button class="nav-item" data-section="' + id + '" onclick="navigate(\'' + id + '\')"><span class="icon">' + m.icon + '</span><span class="text">' + m.title + '</span></button>';
@@ -263,64 +276,23 @@ overview: {
         window.sbClient.from('v_clean_attendance_today').select('*').limit(1).maybeSingle()
       ]);
       var so = r[0].data || {}, fs = r[1].data || {}, at = r[2].data || {};
- var er = await Promise.all([
+      
+      var er = await Promise.all([
         window.sbClient.from('attendance').select('student_id, date, status, created_at').eq('status', 'absent').order('created_at', {ascending: false}).limit(5),
         window.sbClient.from('behavior_records').select('student_id, note, description, points, created_at').order('created_at', {ascending: false}).limit(5)
       ]);
       
-      // جلب أسماء الطلاب بشكل منفصل
-      var allStudentIds = [];
-      (er[0].data || []).forEach(function(e){ if(e.student_id) allStudentIds.push(e.student_id); });
-      (er[1].data || []).forEach(function(e){ if(e.student_id) allStudentIds.push(e.student_id); });
+      var allIds = [];
+      (er[0].data || []).forEach(function(e){ if (e.student_id) allIds.push(e.student_id); });
+      (er[1].data || []).forEach(function(e){ if (e.student_id) allIds.push(e.student_id); });
+      var studentsMap = await fetchStudentsByIds(allIds);
       
-      var studentsMap = {};
-      if (allStudentIds.length > 0) {
-        var stRes = await window.sbClient.from('students').select('id, name, users(name)').in('id', allStudentIds);
-        (stRes.data || []).forEach(function(s){
-          studentsMap[s.id] = (s.users && s.users.name) || s.name || 'طالب';
-        });
-      }
-      
-      // جلب أسماء الطلاب بشكل منفصل
-      var allStudentIds = [];
-      (er[0].data || []).forEach(function(e){ if(e.student_id) allStudentIds.push(e.student_id); });
-      (er[1].data || []).forEach(function(e){ if(e.student_id) allStudentIds.push(e.student_id); });
-      
-      var studentsMap = {};
-      if (allStudentIds.length > 0) {
-        var stRes = await window.sbClient.from('students').select('id, name, users(name)').in('id', allStudentIds);
-        (stRes.data || []).forEach(function(s){
-          studentsMap[s.id] = (s.users && s.users.name) || s.name || 'طالب';
-        });
-      }
- var ae = (er[0].data || []).map(function(e){ 
-        return { 
-          type: '❌ غياب', 
-          tc: 'red', 
-          name: studentsMap[e.student_id] || 'طالب', 
-          detail: 'تاريخ: ' + String(e.date || '').slice(0,10), 
-          created_at: e.created_at 
-        }; 
+      var ae = (er[0].data || []).map(function(e){
+        return { type: '❌ غياب', tc: 'red', name: (studentsMap[e.student_id] && studentsMap[e.student_id].name) || 'طالب', detail: 'تاريخ: ' + String(e.date || '').slice(0,10), created_at: e.created_at };
       });
-      var be = (er[1].data || []).map(function(e){ 
-        var p = Number(e.points || 0); 
-        return { 
-          type: p >= 0 ? '🌟 إيجابي' : '⚠️ سلبي', 
-          tc: p >= 0 ? 'green' : 'orange', 
-          name: studentsMap[e.student_id] || 'طالب', 
-          detail: e.note || e.description || 'ملاحظة', 
-          created_at: e.created_at 
-        }; 
-      });
-      var be = (er[1].data || []).map(function(e){ 
-        var p = Number(e.points || 0); 
-        return { 
-          type: p >= 0 ? '🌟 إيجابي' : '⚠️ سلبي', 
-          tc: p >= 0 ? 'green' : 'orange', 
-          name: studentsMap[e.student_id] || 'طالب', 
-          detail: e.note || e.description || 'ملاحظة', 
-          created_at: e.created_at 
-        }; 
+      var be = (er[1].data || []).map(function(e){
+        var p = Number(e.points || 0);
+        return { type: p >= 0 ? '🌟 إيجابي' : '⚠️ سلبي', tc: p >= 0 ? 'green' : 'orange', name: (studentsMap[e.student_id] && studentsMap[e.student_id].name) || 'طالب', detail: e.note || e.description || 'ملاحظة', created_at: e.created_at };
       });
       var all = ae.concat(be).sort(function(a,b){ return new Date(b.created_at) - new Date(a.created_at); }).slice(0, 10);
       
@@ -344,8 +316,8 @@ overview: {
       } else if (role === 'academic') {
         cards = [
           { label: 'الطلاب', value: window.formatNumber(so.total || 0), icon: '🎓', color: '#3b82f6' },
-          { label: 'المتغيبون اليوم', value: window.formatNumber(at.absent || 0), icon: '❌', color: '#dc2626' },
-          { label: 'حضور اليوم', value: window.formatNumber(at.present || 0), icon: '✅', color: '#10b981' },
+          { label: 'المتغيبون', value: window.formatNumber(at.absent || 0), icon: '❌', color: '#dc2626' },
+          { label: 'الحضور', value: window.formatNumber(at.present || 0), icon: '✅', color: '#10b981' },
           { label: 'متأخرون', value: window.formatNumber(at.late || 0), icon: '⏰', color: '#f59e0b' }
         ];
       } else if (role === 'counselor' || role === 'psychologist' || role === 'discipline') {
@@ -354,7 +326,7 @@ overview: {
           { label: 'غياب اليوم', value: window.formatNumber(at.absent || 0), icon: '❌', color: '#dc2626' },
           { label: 'متأخرون', value: window.formatNumber(at.late || 0), icon: '⏰', color: '#f59e0b' },
           { label: 'سلوك اليوم', value: window.formatNumber((tr.data || []).length), icon: '🌟', color: '#3b82f6' },
-          { label: 'إجمالي الطلاب', value: window.formatNumber(so.total || 0), icon: '🎓', color: '#10b981' }
+          { label: 'الطلاب', value: window.formatNumber(so.total || 0), icon: '🎓', color: '#10b981' }
         ];
       } else {
         cards = [
@@ -424,30 +396,18 @@ finance: { title: 'المالية', load: async function() {
   window._loadFinCr();
 }},
 
-discipline: { title: 'السلوك', load: async function() {
+attendance: { title: 'الحضور', load: async function() {
   try {
     var r = await Promise.all([
-      window.sbClient.from('behavior_records').select('*').order('created_at', {ascending: false}).limit(100),
+      window.sbClient.from('v_clean_attendance_today').select('*').limit(1).maybeSingle(),
+      window.sbClient.from('attendance').select('student_id, date, status').eq('status', 'absent').gte('date', new Date().toISOString().slice(0,10)).limit(100),
       window.sbClient.from('classes').select('id, name')
     ]);
-    
-    // جلب بيانات الطلاب بشكل منفصل
-    var bIds = (r[0].data || []).map(function(x){ return x.student_id; }).filter(Boolean);
-    var bStudents = {};
-    if (bIds.length > 0) {
-      var bsR = await window.sbClient.from('students').select('id, name, class_id, users(name)').in('id', bIds);
-      (bsR.data || []).forEach(function(s){
-        bStudents[s.id] = {
-          name: (s.users && s.users.name) || s.name || 'طالب',
-          class_id: s.class_id
-        };
-      });
-    }
-    // إضافة البيانات للسجلات
-    r[0].data = (r[0].data || []).map(function(x){
-      return Object.assign({}, x, { students: bStudents[x.student_id] || {} });
-    });
+    var ts = r[0].data || {}, abs = r[1].data || [], classes = r[2].data || [];
     var cm = {}; classes.forEach(function(c){ cm[c.id] = c.name; });
+    
+    var absIds = abs.map(function(a){ return a.student_id; }).filter(Boolean);
+    var studentsMap = await fetchStudentsByIds(absIds);
     
     var html = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:20px;">';
     html += '<div style="background:#d1fae5;padding:16px;border-radius:10px;text-align:center;"><div style="font-size:32px;color:#065f46;font-weight:700;">' + (ts.present || 0) + '</div><div style="color:#065f46;font-weight:600;">✅ حاضر</div></div>';
@@ -462,9 +422,10 @@ discipline: { title: 'السلوك', load: async function() {
     } else {
       var bc = {};
       abs.forEach(function(a){
-        var cn = (a.students && cm[a.students.class_id]) || 'غير محدد';
+        var sd = studentsMap[a.student_id] || {};
+        var cn = cm[sd.class_id] || 'غير محدد';
         if (!bc[cn]) bc[cn] = [];
-        bc[cn].push((a.students && a.students.users && a.students.users.name) || (a.students && a.students.name) || 'طالب');
+        bc[cn].push(sd.name || 'طالب');
       });
       html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;">';
       Object.keys(bc).forEach(function(cn){
@@ -482,13 +443,22 @@ discipline: { title: 'السلوك', load: async function() {
 discipline: { title: 'السلوك', load: async function() {
   try {
     var r = await Promise.all([
-      window.sbClient.from('behavior_records').select('*, students(name, class_id, users(name))').order('created_at', {ascending: false}).limit(100),
+      window.sbClient.from('behavior_records').select('*').order('created_at', {ascending: false}).limit(100),
       window.sbClient.from('classes').select('id, name')
     ]);
     var records = r[0].data || [], classes = r[1].data || [];
     var cm = {}; classes.forEach(function(c){ cm[c.id] = c.name; });
+    
+    var bIds = records.map(function(x){ return x.student_id; }).filter(Boolean);
+    var bStudents = await fetchStudentsByIds(bIds);
+    
+    records = records.map(function(x){
+      return Object.assign({}, x, { _studentInfo: bStudents[x.student_id] || {} });
+    });
+    
     window._behaviorData = records;
     window._behaviorCM = cm;
+    
     var html = '<div style="background:white;padding:16px;border-radius:12px;margin-bottom:20px;box-shadow:var(--shadow-sm);"><div style="display:flex;gap:12px;flex-wrap:wrap;align-items:end;">';
     html += '<div style="min-width:160px;"><label style="font-size:13px;display:block;margin-bottom:4px;">📚 الصف</label><select id="bcFilter" style="width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:8px;" onchange="window._filterB()"><option value="">كل الصفوف</option>';
     classes.forEach(function(c){ html += '<option value="' + c.id + '">' + escapeHtml(c.name) + '</option>'; });
@@ -681,8 +651,7 @@ window._loadFinCo = async function() {
     var r = await window.sbClient.from('v_finance_exec_student_balances').select('*').eq('status', 'overdue').order('remaining', {ascending: false}).limit(100);
     var d = r.data || [];
     if (!d.length) { document.getElementById('finCo').innerHTML = '<div class="empty-state"><div class="icon">🎉</div><h3>لا توجد متأخرات!</h3></div>'; return; }
-    var h = '<div style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;"><div>المتأخرون: <b>' + d.length + '</b></div></div>';
-    h += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;"><thead><tr style="background:var(--bg-primary);"><th style="padding:10px;text-align:right;">الطالب</th><th style="padding:10px;text-align:right;">الصف</th><th style="padding:10px;text-align:right;">المتبقي</th></tr></thead><tbody>';
+    var h = '<div style="margin-bottom:16px;">المتأخرون: <b>' + d.length + '</b></div><div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;"><thead><tr style="background:var(--bg-primary);"><th style="padding:10px;text-align:right;">الطالب</th><th style="padding:10px;text-align:right;">الصف</th><th style="padding:10px;text-align:right;">المتبقي</th></tr></thead><tbody>';
     d.forEach(function(s){
       h += '<tr style="border-bottom:1px solid var(--border);"><td style="padding:10px;font-weight:600;">' + escapeHtml(s.full_name) + '</td><td style="padding:10px;">' + escapeHtml(s.class_name) + '</td><td style="padding:10px;color:#dc2626;font-weight:700;">' + window.formatMoney(s.remaining) + '</td></tr>';
     });
@@ -711,7 +680,7 @@ window._renderB = function(rec) {
   if (!rec.length) { c.innerHTML = '<div class="empty-state"><div class="icon">📭</div><h3>لا توجد سجلات</h3></div>'; return; }
   var h = '<div style="margin-bottom:12px;color:var(--text-secondary);font-size:13px;">إجمالي: <b>' + rec.length + '</b></div><div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;"><thead><tr style="background:var(--bg-primary);"><th style="padding:10px;text-align:right;">التاريخ</th><th style="padding:10px;text-align:right;">الطالب</th><th style="padding:10px;text-align:right;">الوصف</th><th style="padding:10px;text-align:right;">النقاط</th></tr></thead><tbody>';
   rec.forEach(function(r){
-    var n = (r.students && r.students.users && r.students.users.name) || (r.students && r.students.name) || '—';
+    var n = (r._studentInfo && r._studentInfo.name) || '—';
     var p = Number(r.points || 0);
     var col = p >= 0 ? '#10b981' : '#dc2626';
     h += '<tr style="border-bottom:1px solid var(--border);"><td style="padding:10px;font-size:13px;">' + String(r.created_at || '').slice(0,10) + '</td><td style="padding:10px;font-weight:600;">' + escapeHtml(n) + '</td><td style="padding:10px;font-size:13px;">' + escapeHtml(r.note || r.description || '—') + '</td><td style="padding:10px;"><span style="background:' + col + '20;color:' + col + ';padding:4px 10px;border-radius:6px;font-weight:700;">' + (p > 0 ? '+' : '') + p + '</span></td></tr>';
@@ -723,7 +692,7 @@ window._filterB = function() {
   var ci = document.getElementById('bcFilter').value;
   var t = document.getElementById('btFilter').value;
   var f = (window._behaviorData || []).filter(function(r){
-    if (ci && r.students && String(r.students.class_id) !== String(ci)) return false;
+    if (ci && r._studentInfo && String(r._studentInfo.class_id) !== String(ci)) return false;
     if (t) { var p = Number(r.points || 0); if (t === 'positive' && p <= 0) return false; if (t === 'negative' && p >= 0) return false; }
     return true;
   });
@@ -893,8 +862,8 @@ window._loadPay = async function() {
     var tsn = d.reduce(function(s,r){ return s + Number(r.verified_sessions || 0); }, 0);
     var h = '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;">';
     h += '<div style="background:#dbeafe;padding:16px;border-radius:10px;text-align:center;"><div style="font-size:13px;color:#1e40af;">المعلمون</div><div style="font-size:24px;color:#1e3a8a;font-weight:700;">' + d.length + '</div></div>';
-    h += '<div style="background:#d1fae5;padding:16px;border-radius:10px;text-align:center;"><div style="font-size:13px;color:#065f46;">إجمالي الحصص</div><div style="font-size:24px;color:#064e3b;font-weight:700;">' + tsn + '</div></div>';
-    h += '<div style="background:#fef3c7;padding:16px;border-radius:10px;text-align:center;"><div style="font-size:13px;color:#92400e;">إجمالي الرواتب</div><div style="font-size:24px;color:#78350f;font-weight:700;">' + window.formatMoney(ts) + '</div></div>';
+    h += '<div style="background:#d1fae5;padding:16px;border-radius:10px;text-align:center;"><div style="font-size:13px;color:#065f46;">الحصص</div><div style="font-size:24px;color:#064e3b;font-weight:700;">' + tsn + '</div></div>';
+    h += '<div style="background:#fef3c7;padding:16px;border-radius:10px;text-align:center;"><div style="font-size:13px;color:#92400e;">الرواتب</div><div style="font-size:24px;color:#78350f;font-weight:700;">' + window.formatMoney(ts) + '</div></div>';
     h += '</div><div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;"><thead><tr style="background:var(--bg-primary);"><th style="padding:10px;text-align:right;">المعلم</th><th style="padding:10px;text-align:right;">الحصص</th><th style="padding:10px;text-align:right;">السعر</th><th style="padding:10px;text-align:right;">الراتب</th></tr></thead><tbody>';
     d.forEach(function(r){
       h += '<tr style="border-bottom:1px solid var(--border);"><td style="padding:10px;font-weight:600;">' + escapeHtml(r.teacher_name || '—') + '</td><td style="padding:10px;">' + (r.verified_sessions || 0) + '</td><td style="padding:10px;">' + window.formatMoney(r.hourly_rate) + '</td><td style="padding:10px;color:#10b981;font-weight:700;">' + window.formatMoney(r.total_salary) + '</td></tr>';
@@ -1097,7 +1066,7 @@ window._rejEx = async function(id) {
   } catch (e) { window.showToast('❌ فشل', e.message, 'error'); }
 };
 
-async function init() {
+async function initPage() {
   if (localStorage.getItem('darkMode') === '1') document.body.classList.add('dark');
   var user = await checkAuth();
   if (!user) return;
@@ -1106,8 +1075,8 @@ async function init() {
   document.getElementById('userRole').textContent = rl[window.currentUserRole] || window.currentUserRole;
   buildSidebar();
   buildBottomNav();
-  var init = location.hash.replace('#','') || ROLE_SECTIONS[window.currentUserRole][0];
-  navigate(init);
+  var initial = location.hash.replace('#','') || ROLE_SECTIONS[window.currentUserRole][0];
+  navigate(initial);
 }
 
 window.addEventListener('hashchange', function() {
@@ -1115,8 +1084,8 @@ window.addEventListener('hashchange', function() {
   if (ns && ns !== window.currentSection) navigate(ns);
 });
 
-if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
-else init();
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initPage);
+else initPage();
 
 })();
 </script>
