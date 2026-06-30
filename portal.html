@@ -94,19 +94,19 @@
   <nav class="sidebar-nav" id="sidebarNav"></nav>
 
   <div class="sidebar-footer">
-    <button class="logout-btn" onclick="handleLogout()">🚪 تسجيل الخروج</button>
+    <button class="logout-btn" onclick="handleLogout()"><span id="logoutIcon"></span> تسجيل الخروج</button>
   </div>
 </aside>
 
 <main class="app-main">
   <header class="app-topbar">
     <div style="display:flex;align-items:center;gap:12px;">
-      <button class="mobile-toggle" onclick="toggleSidebar()">☰</button>
+      <button class="mobile-toggle" onclick="toggleSidebar()" id="menuIcon">☰</button>
       <h2 id="pageTitle" style="font-size:var(--text-h3);margin:0;">لوحة القيادة</h2>
     </div>
     <div style="display:flex;gap:8px;">
-      <button class="mobile-toggle" onclick="toggleDarkMode()" id="darkModeBtn">🌙</button>
-      <button class="mobile-toggle" onclick="navigate(window.currentSection)">🔄</button>
+     <button class="mobile-toggle" onclick="toggleDarkMode()" id="darkModeBtn"></button>
+<button class="mobile-toggle" onclick="navigate(window.currentSection)" id="refreshBtn"></button>
     </div>
   </header>
 
@@ -122,6 +122,7 @@
 <script src="libs/supabase.min.js"></script>
 <script src="assets/config.js"></script>
 <script src="libs/xlsx.full.min.js"></script>
+  <script src="assets/amin-icons.js"></script>
 <script src="assets/signature-star.js"></script>
 <script src="assets/renderHelpers.js"></script>
 <script src="assets/portal-app.js"></script>
