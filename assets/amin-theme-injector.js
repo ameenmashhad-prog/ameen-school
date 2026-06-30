@@ -9,13 +9,14 @@ window._aminThemeInjected = true;
 
 // ===== 1. حذف ملفات CSS القديمة =====
 function disableOldCSS() {
-  var oldCSSFiles = [
+var oldCSSFiles = [
     'amin-identity.css',
     'brand-redesign.css',
     'amin-v3.css',
-    'i18n.css'
+    'i18n.css',
+    'portal.css',
+    'teacher-dashboard.css'
   ];
-  
   document.querySelectorAll('link[rel="stylesheet"]').forEach(function(link){
     var href = link.getAttribute('href') || '';
     oldCSSFiles.forEach(function(oldFile){
