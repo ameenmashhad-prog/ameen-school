@@ -221,16 +221,15 @@ window.toggleSidebar = function() {
   document.getElementById('appSidebar').classList.toggle('open');
   document.getElementById('sidebarBackdrop').classList.toggle('active');
 };
-
+   
 window.toggleDarkMode = function() {
   document.body.classList.toggle('dark');
   var dark = document.body.classList.contains('dark');
   localStorage.setItem('darkMode', dark ? '1' : '0');
   var btn = document.getElementById('darkModeBtn');
-  if (btn) btn.textContent = dark ? '☀️' : '🌙';
+  if (btn && window.AminIcons) btn.innerHTML = window.AminIcons.create(dark ? 'lightmode' : 'darkmode', 24);
   window.showToast(dark ? 'الوضع الليلي' : 'الوضع النهاري', null, 'success');
 };
-
 window.handleLogout = async function() {
   if (!confirm('هل تريد تسجيل الخروج؟')) return;
   try { if (window.sbClient) await window.sbClient.auth.signOut({scope:'local'}); location.href = 'index.html'; }
@@ -407,10 +406,25 @@ window._filterStudents = function() {
 // INIT
 // ====================================
 async function initPage() {
+  // تطبيق الأيقونات على الـ topbar
+  if (window.AminIcons) {
+    var menuBtn = document.getElementById('menuIcon');
+    if (menuBtn) menuBtn.innerHTML = window.AminIcons.create('menu', 24);
+    
+    var refreshBtn = document.getElementById('refreshBtn');
+    if (refreshBtn) refreshBtn.innerHTML = window.AminIcons.create('refresh', 24);
+    
+    var logoutIcon = document.getElementById('logoutIcon');
+    if (logoutIcon) logoutIcon.innerHTML = window.AminIcons.create('logout', 20);
+  }
+  
   if (localStorage.getItem('darkMode') === '1') {
     document.body.classList.add('dark');
     var btn = document.getElementById('darkModeBtn');
-    if (btn) btn.textContent = '☀️';
+    if (btn && window.AminIcons) btn.innerHTML = window.AminIcons.create('lightmode', 24);
+  } else {
+    var btn2 = document.getElementById('darkModeBtn');
+    if (btn2 && window.AminIcons) btn2.innerHTML = window.AminIcons.create('darkmode', 24);
   }
   
   var user = await checkAuth();
