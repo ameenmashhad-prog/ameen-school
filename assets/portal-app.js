@@ -169,8 +169,8 @@ function buildSidebar() {
   var html = '';
   sorted.forEach(function(id){
     var m = SECTIONS_META[id];
-    html += '<button class="sidebar-nav-item" data-section="' + id + '" onclick="navigate(\'' + id + '\')"><span class="nav-icon-wrap">' + m.icon + '</span><span class="sidebar-nav-label">' + m.title + '</span></button>';
-  });
+    var iconHTML = window.AminIcons ? window.AminIcons.create(m.icon, 28) : m.icon;
+    html += '<button class="sidebar-nav-item" data-section="' + id + '" onclick="navigate(\'' + id + '\')"><span class="nav-icon-wrap">' + iconHTML + '</span><span class="sidebar-nav-label">' + m.title + '</span></button>';
   nav.innerHTML = html;
   var logoEl = document.getElementById('sidebarLogo');
   if (logoEl && window.AminStar) logoEl.innerHTML = window.AminStar.createStar({variant:'filled', size:28, color:'white'});
@@ -185,7 +185,8 @@ function buildBottomNav() {
   var html = '';
   top5.forEach(function(id){
     var m = SECTIONS_META[id];
-    html += '<button class="bottom-nav-item" data-section="' + id + '" onclick="navigate(\'' + id + '\')"><span class="bottom-nav-icon">' + m.icon + '</span><span>' + m.title + '</span></button>';
+      var iconHTML = window.AminIcons ? window.AminIcons.create(m.icon, 24) : m.icon;
+    html += '<button class="bottom-nav-item" data-section="' + id + '" onclick="navigate(\'' + id + '\')"><span class="bottom-nav-icon">' + iconHTML + '</span><span>' + m.title + '</span></button>';
   });
   nav.innerHTML = html;
 }
@@ -199,7 +200,7 @@ window.navigate = function(sectionId) {
   document.querySelectorAll('.sidebar-nav-item[data-section]').forEach(function(i){ i.classList.toggle('active', i.dataset.section === sectionId); });
   document.querySelectorAll('.bottom-nav-item[data-section]').forEach(function(i){ i.classList.toggle('active', i.dataset.section === sectionId); });
   var meta = SECTIONS_META[sectionId];
-  if (meta) { document.getElementById('pageTitle').textContent = meta.icon + ' ' + meta.title; document.title = meta.title + ' — البوابة الموحدة'; }
+   if (meta) {     var titleEl = document.getElementById('pageTitle');     var iconHTML = window.AminIcons ? window.AminIcons.create(meta.icon, 28) : '';     titleEl.innerHTML = iconHTML + ' <span style="vertical-align:middle;">' + meta.title + '</span>'; document.title = meta.title + ' — البوابة الموحدة'; }
   if (window.innerWidth <= 639) {
     document.getElementById('appSidebar').classList.remove('open');
     document.getElementById('sidebarBackdrop').classList.remove('active');
