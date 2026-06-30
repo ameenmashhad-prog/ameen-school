@@ -401,14 +401,29 @@ finance: { title: 'المالية', load: async function() {
   window._loadFinCr();
 }},
 
-attendance: { title: 'الحضور', load: async function() {
+discipline: { title: 'السلوك', load: async function() {
   try {
     var r = await Promise.all([
-      window.sbClient.from('v_clean_attendance_today').select('*').limit(1).maybeSingle(),
-      window.sbClient.from('attendance').select('student_id, date, status, students(name, class_id, users(name))').eq('status', 'absent').gte('date', new Date().toISOString().slice(0,10)).limit(100),
+      window.sbClient.from('behavior_records').select('*').order('created_at', {ascending: false}).limit(100),
       window.sbClient.from('classes').select('id, name')
     ]);
-    var ts = r[0].data || {}, abs = r[1].data || [], classes = r[2].data || [];
+    
+    // جلب بيانات الطلاب بشكل منفصل
+    var bIds = (r[0].data || []).map(function(x){ return x.student_id; }).filter(Boolean);
+    var bStudents = {};
+    if (bIds.length > 0) {
+      var bsR = await window.sbClient.from('students').select('id, name, class_id, users(name)').in('id', bIds);
+      (bsR.data || []).forEach(function(s){
+        bStudents[s.id] = {
+          name: (s.users && s.users.name) || s.name || 'طالب',
+          class_id: s.class_id
+        };
+      });
+    }
+    // إضافة البيانات للسجلات
+    r[0].data = (r[0].data || []).map(function(x){
+      return Object.assign({}, x, { students: bStudents[x.student_id] || {} });
+    });
     var cm = {}; classes.forEach(function(c){ cm[c.id] = c.name; });
     
     var html = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:20px;">';
