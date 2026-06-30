@@ -1,0 +1,211 @@
+/* ================================================================
+   AMIN TACTILE IDENTITY SYSTEM — Design Tokens
+   مدارس أمين الرضا (ع) — الهوية اللونية الكاملة
+   ================================================================ */
+
+/* ===== Light Mode (افتراضي) ===== */
+:root {
+  /* Primary — أخضر زمردي عميق (هوية إسلامية، ليس SaaS أزرق) */
+  --primary: #0B6E4F;
+  --primary-tint: #E6F4EF;
+  --primary-shadow: rgba(11, 110, 79, 0.25);
+  --primary-shadow-strong: rgba(11, 110, 79, 0.35);
+  
+  /* Secondary — ذهبي/نحاسي دافئ (استخدام محدود: badges، نجوم، مميزات) */
+  --secondary: #B8860B;
+  --secondary-tint: #FBF1DC;
+  --secondary-shadow: rgba(184, 134, 11, 0.25);
+  
+  /* Accent — كحلي نيلي عميق (للتباين والطاقة) */
+  --accent: #3A3565;
+  --accent-tint: #E8E6F0;
+  --accent-shadow: rgba(58, 53, 101, 0.25);
+  
+  /* Surfaces — خلفية دافئة شبه مسطحة */
+  --bg: #F7F5F0;           /* الخلفية الرئيسية - دافئة، ليست بيضاء نقية */
+  --surface: #FFFFFF;       /* البطاقات والمحتوى الأساسي */
+  --surface-2: #F4F6FB;     /* Tier 2 backgrounds */
+  --surface-3: #EEF1F7;     /* محايد للجداول */
+  --border-subtle: #E5E8F0;
+  --border-medium: #D1D5DB;
+  
+  /* Text */
+  --text-primary: #1E2433;
+  --text-secondary: #6B7280;
+  --text-tertiary: #9CA3AF;
+  --text-on-primary: #FFFFFF;
+  --text-on-dark: #FFFFFF;
+  
+  /* Semantic Colors */
+  --success: #16A34A;
+  --success-tint: #DCFCE7;
+  --success-shadow: rgba(22, 163, 74, 0.25);
+  
+  --warning: #D97706;
+  --warning-tint: #FEF3C7;
+  --warning-shadow: rgba(217, 119, 6, 0.25);
+  
+  --danger: #DC2626;
+  --danger-tint: #FEE2E2;
+  --danger-shadow: rgba(220, 38, 38, 0.25);
+  
+  --info: #0EA5E9;
+  --info-tint: #E0F2FE;
+  --info-shadow: rgba(14, 165, 233, 0.25);
+  
+  /* ===== Shadows (اتجاه ثابت بصرف النظر عن RTL/LTR) ===== */
+  --shadow-highlight: rgba(255, 255, 255, 0.9);
+  --shadow-depth: rgba(0, 0, 0, 0.08);
+  
+  /* Tier 1 — Tactile (للأزرار الرئيسية والـ KPI cards) */
+  --shadow-tactile-light: -6px -6px 14px var(--shadow-highlight);
+  --shadow-tactile-dark: 6px 6px 14px var(--shadow-depth);
+  --shadow-tactile-inset: inset 3px 3px 8px rgba(0, 0, 0, 0.15);
+  
+  /* Tier 2 — Soft (للبطاقات الثانوية والـ modals) */
+  --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.06);
+  --shadow-soft-hover: 0 6px 16px rgba(0, 0, 0, 0.08);
+  
+  /* Tier 3 — Flat (للجداول والـ badges - بدون ظل) */
+  --shadow-flat: none;
+  
+  /* ===== Motion (سرعة الرضا - بطيئة هادئة) ===== */
+  --transition-fast: 200ms cubic-bezier(0.22, 1, 0.36, 1);
+  --transition-standard: 350ms cubic-bezier(0.22, 1, 0.36, 1);
+  --transition-slow: 500ms cubic-bezier(0.22, 1, 0.36, 1);
+  --transition-mode: 450ms cubic-bezier(0.22, 1, 0.36, 1); /* لتبديل dark/light */
+  
+  /* ===== Spacing Scale (متناسق مع المساحة البيضاء السخية) ===== */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  
+  /* ===== Border Radius (هندسة ناعمة، ليست حادة) ===== */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+  --radius-2xl: 24px;
+  --radius-full: 9999px;
+  
+  /* ===== Typography ===== */
+  --font-arabic: 'IBM Plex Sans Arabic', 'Cairo', 'Segoe UI', Tahoma, sans-serif;
+  --font-display: 'IBM Plex Sans Arabic', 'Cairo', sans-serif; /* للعناوين الجريئة */
+  --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
+  
+  /* Type Scale Responsive (clamp بدل breakpoints منفصلة) */
+  --text-display: clamp(28px, 5vw, 48px);    /* h1 hero */
+  --text-h1: clamp(22px, 4vw, 40px);          /* عناوين رئيسية */
+  --text-h2: clamp(20px, 3vw, 32px);          /* عناوين ثانوية */
+  --text-h3: clamp(18px, 2.5vw, 24px);        /* عناوين فرعية */
+  --text-body-lg: clamp(15px, 1.8vw, 18px);   /* نص رئيسي */
+  --text-body: clamp(14px, 1.6vw, 16px);      /* نص عادي */
+  --text-sm: clamp(12px, 1.4vw, 14px);        /* نص ثانوي */
+  --text-xs: clamp(11px, 1.2vw, 12px);        /* labels صغيرة */
+  
+  /* Font Weights */
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --weight-extrabold: 800;
+  
+  /* ===== Touch Targets (Capacitor APK) ===== */
+  --touch-min: 44px;
+  
+  /* ===== Z-index Scale ===== */
+  --z-base: 0;
+  --z-sticky: 50;
+  --z-dropdown: 100;
+  --z-sidebar: 200;
+  --z-modal-backdrop: 900;
+  --z-modal: 1000;
+  --z-toast: 9999;
+  --z-tooltip: 10000;
+}
+
+/* ===== Dark Mode (أسود مائل للأخضر، ليس Slate أزرق قياسي) ===== */
+body.dark,
+:root.dark {
+  --primary: #1FAE7C;
+  --primary-tint: #0D2A20;
+  --primary-shadow: rgba(31, 174, 124, 0.3);
+  --primary-shadow-strong: rgba(31, 174, 124, 0.4);
+  
+  --secondary: #DAA520;
+  --secondary-tint: #2A2010;
+  --secondary-shadow: rgba(218, 165, 32, 0.3);
+  
+  --accent: #6B5DD3;
+  --accent-tint: #1A1530;
+  --accent-shadow: rgba(107, 93, 211, 0.3);
+  
+  --bg: #14181A;           /* أسود مائل للأخضر الداكن */
+  --surface: #1C2236;
+  --surface-2: #242B42;
+  --surface-3: #2D344B;
+  --border-subtle: #2E3450;
+  --border-medium: #3D4564;
+  
+  --text-primary: #E8EAF2;
+  --text-secondary: #9CA3AF;
+  --text-tertiary: #6B7280;
+  --text-on-primary: #FFFFFF;
+  --text-on-dark: #FFFFFF;
+  
+  --success: #4ADE80;
+  --success-tint: #0F2818;
+  --success-shadow: rgba(74, 222, 128, 0.3);
+  
+  --warning: #FBBF24;
+  --warning-tint: #2A1F08;
+  --warning-shadow: rgba(251, 191, 36, 0.3);
+  
+  --danger: #F87171;
+  --danger-tint: #2A1010;
+  --danger-shadow: rgba(248, 113, 113, 0.3);
+  
+  --info: #38BDF8;
+  --info-tint: #0A1E2A;
+  --info-shadow: rgba(56, 189, 248, 0.3);
+  
+  /* Shadows adjusted for dark mode */
+  --shadow-highlight: rgba(255, 255, 255, 0.04);
+  --shadow-depth: rgba(0, 0, 0, 0.45);
+  
+  --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.3);
+  --shadow-soft-hover: 0 6px 16px rgba(0, 0, 0, 0.4);
+  --shadow-tactile-inset: inset 3px 3px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* ===== Breakpoints (للتوثيق - تُستخدم في media queries) ===== */
+/*
+  --bp-mobile:  0–639px;       عمود واحد، Bottom Nav
+  --bp-tablet:  640–1023px;    نظام هجين، Sidebar أيقونات
+  --bp-desktop: 1024–1439px;   Sidebar كامل
+  --bp-wide:    1440px+;       معلومات إضافية، لا تمديد
+*/
+
+/* ===== Respect User Motion Preferences ===== */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --transition-fast: 0ms;
+    --transition-standard: 0ms;
+    --transition-slow: 0ms;
+    --transition-mode: 0ms;
+  }
+}
+
+/* ===== System Dark Mode Preference (أول زيارة فقط) ===== */
+@media (prefers-color-scheme: dark) {
+  :root:not(.light-mode-forced) {
+    /* يُطبَّق فقط إن لم يكن المستخدم اختار يدوياً */
+  }
+}
