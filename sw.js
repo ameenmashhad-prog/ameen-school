@@ -1,5 +1,6 @@
 /* Amin Al-Ridha PWA Service Worker — local/offline shell, no external APIs */
-const CACHE_NAME = 'amin-pwa-v2026-06-26-24-homework-plan-link';
+// Bump cache name on V3 redesign to force clients to fetch new design assets
+const CACHE_NAME = 'amin-pwa-v2026-07-01-v2';
 const CORE_ASSETS = [
   '/',
   '/index.html',
