@@ -1,604 +1,147 @@
 /* ================================================================
-   AMIN THEME INJECTOR v4 - يطغى على inline styles أيضاً
+   AMIN THEME INJECTOR v5 - يحترم portal.css ويضيف تحسينات فقط
    ================================================================ */
 (function(){
-'use strict';
-
-if (window._aminThemeInjected) return;
-window._aminThemeInjected = true;
-
-// ===== 1. حذف ملفات CSS القديمة =====
-function disableOldCSS() {
-var oldCSSFiles = [
-    'amin-identity.css',
-    'brand-redesign.css',
-    'amin-v3.css',
-    'i18n.css',
-    'portal.css',
-    'teacher-dashboard.css'
-  ];
-  document.querySelectorAll('link[rel="stylesheet"]').forEach(function(link){
-    var href = link.getAttribute('href') || '';
-    oldCSSFiles.forEach(function(oldFile){
-      if (href.indexOf(oldFile) !== -1) {
-        link.disabled = true;
-        link.remove();
-      }
-    });
-  });
-}
-
-// ===== 2. حقن CSS الجديد =====
-function injectNewCSS() {
-  if (!document.getElementById('amin-design-tokens')) {
-    var link1 = document.createElement('link');
-    link1.id = 'amin-design-tokens';
-    link1.rel = 'stylesheet';
-    link1.href = 'assets/design-tokens.css';
-    document.head.appendChild(link1);
-  }
-}
-
-// ===== 3. حقن السكريبتات =====
-function injectScripts(callback) {
-  var scripts = [
-    'assets/signature-star.js',
-    'assets/amin-icons.js'
-  ];
-  var loaded = 0;
-  scripts.forEach(function(src){
-    if (document.querySelector('script[src="' + src + '"]')) {
-      loaded++;
-      if (loaded === scripts.length && callback) callback();
-      return;
-    }
-    var s = document.createElement('script');
-    s.src = src;
-    s.onload = function(){
-      loaded++;
-      if (loaded === scripts.length && callback) callback();
-    };
-    s.onerror = function(){
-      loaded++;
-      if (loaded === scripts.length && callback) callback();
-    };
-    document.body.appendChild(s);
-  });
-}
-
-// ===== 4. Dark Mode =====
-function applyDarkMode() {
-  if (localStorage.getItem('darkMode') === '1') {
-    document.body.classList.add('dark');
-  }
-}
-
-// ===== 5. حقن CSS قوي جداً يطغى على inline styles =====
-function forceIdentity() {
-  // إزالة أي نسخة قديمة
-  var oldStyle = document.getElementById('amin-force-v4');
-  if (oldStyle) oldStyle.remove();
+  'use strict';
   
-  var style = document.createElement('style');
-  style.id = 'amin-force-v4';
-  style.textContent = [
-    '/* ===== AMIN IDENTITY OVERRIDE v4 ===== */',
-    '',
-    '/* Force font on everything */',
-    'html, body, *, *::before, *::after {',
-    '  font-family: "Cairo", "Segoe UI", Tahoma, sans-serif !important;',
-    '}',
-    '',
-    '/* Body backgrounds */',
-    'body, html {',
-    '  background: #F7F5F0 !important;',
-    '  background-image: none !important;',
-    '  color: #1E2433 !important;',
-    '}',
-    '',
-    'body.dark, body.dark html {',
-    '  background: #14181A !important;',
-    '  color: #E8EAF2 !important;',
-    '}',
-    '',
-    '/* Remove all decorative gradient overlays */',
-    'body::before, body::after,',
-    '.shell::before, .shell::after,',
-    '.unified-shell::before, .unified-shell::after,',
-    '.unified-hero::before, .unified-hero::after,',
-    '.unified-main::before, .unified-main::after,',
-    '.main::before, .main::after,',
-    '.hero::before, .hero::after,',
-    '.brand::before, .brand::after,',
-    '.kpi::before, .kpi::after,',
-    '.card::before, .card::after {',
-    '  display: none !important;',
-    '  content: none !important;',
-    '  background: none !important;',
-    '  background-image: none !important;',
-    '}',
-    '',
-    '/* Shell containers */',
-    '.shell, .unified-shell, .app-shell {',
-    '  background: transparent !important;',
-    '  background-image: none !important;',
-    '}',
-    '',
-    '/* ===== SIDEBAR ===== */',
-    '.sidebar, .unified-side, aside.sidebar {',
-    '  background: #081426 !important;',
-    '  background-image: none !important;',
-    '  color: #cbd5e1 !important;',
-    '  border: none !important;',
-    '}',
-    '',
-    'body.dark .sidebar, body.dark .unified-side {',
-    '  background: #020617 !important;',
-    '}',
-    '',
-    '.brand {',
-    '  background: transparent !important;',
-    '  background-image: none !important;',
-    '  border-bottom: 1px solid rgba(255,255,255,0.1) !important;',
-    '  padding: 20px !important;',
-    '}',
-    '',
-    '.brand-mark {',
-    '  background: linear-gradient(135deg, #0B6E4F, #1FAE7C) !important;',
-    '  background-image: linear-gradient(135deg, #0B6E4F, #1FAE7C) !important;',
-    '  color: white !important;',
-    '  width: 44px !important;',
-    '  height: 44px !important;',
-    '  border-radius: 12px !important;',
-    '  display: flex !important;',
-    '  align-items: center !important;',
-    '  justify-content: center !important;',
-    '  font-weight: 700 !important;',
-    '  border: none !important;',
-    '}',
-    '',
-    '.brand h1, .brand > div > h1 {',
-    '  color: white !important;',
-    '  font-size: 16px !important;',
-    '  font-weight: 700 !important;',
-    '}',
-    '',
-    '.brand small, .brand > div > small {',
-    '  color: #cbd5e1 !important;',
-    '  opacity: 0.7 !important;',
-    '}',
-    '',
-    '/* Profile mini */',
-    '.profile-mini {',
-    '  background: rgba(255,255,255,0.05) !important;',
-    '  background-image: none !important;',
-    '  border-radius: 10px !important;',
-    '  margin: 12px !important;',
-    '  border: none !important;',
-    '}',
-    '',
-    '.profile-mini b { color: white !important; }',
-    '.profile-mini small { color: #cbd5e1 !important; }',
-    '.profile-mini .avatar {',
-    '  background: linear-gradient(135deg, #3b82f6, #1e40af) !important;',
-    '  background-image: linear-gradient(135deg, #3b82f6, #1e40af) !important;',
-    '  color: white !important;',
-    '}',
-    '',
-    '/* Sidebar nav buttons */',
-    '.sidebar .nav button, .sidebar-nav button, .nav button {',
-    '  background: transparent !important;',
-    '  background-image: none !important;',
-    '  color: #cbd5e1 !important;',
-    '  border: none !important;',
-    '  padding: 10px 14px !important;',
-    '  margin-bottom: 4px !important;',
-    '  border-radius: 8px !important;',
-    '  font-family: "Cairo", sans-serif !important;',
-    '  font-size: 14px !important;',
-    '  text-align: start !important;',
-    '  cursor: pointer !important;',
-    '  display: flex !important;',
-    '  align-items: center !important;',
-    '  gap: 12px !important;',
-    '  transition: all 0.2s !important;',
-    '  box-shadow: none !important;',
-    '  width: 100% !important;',
-    '  text-shadow: none !important;',
-    '}',
-    '',
-    '.sidebar .nav button:hover, .sidebar-nav button:hover, .nav button:hover {',
-    '  background: rgba(255,255,255,0.05) !important;',
-    '  background-image: none !important;',
-    '  color: white !important;',
-    '  transform: none !important;',
-    '}',
-    '',
-    '.sidebar .nav button.active, .sidebar-nav button.active, .nav button.active {',
-    '  background: linear-gradient(135deg, #0B6E4F, #1FAE7C) !important;',
-    '  background-image: linear-gradient(135deg, #0B6E4F, #1FAE7C) !important;',
-    '  color: white !important;',
-    '  box-shadow: 0 4px 12px rgba(11,110,79,0.3) !important;',
-    '}',
-    '',
-    '.nav-section {',
-    '  color: #cbd5e1 !important;',
-    '  opacity: 0.6 !important;',
-    '  font-size: 11px !important;',
-    '  text-transform: uppercase !important;',
-    '  padding: 12px 14px 6px !important;',
-    '  letter-spacing: 0.5px !important;',
-    '}',
-    '',
-    '/* ===== TOPBAR ===== */',
-    '.topbar, .unified-hero, header.topbar {',
-    '  background: white !important;',
-    '  background-image: none !important;',
-    '  border-bottom: 1px solid #E5E8F0 !important;',
-    '  color: #1E2433 !important;',
-    '  box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;',
-    '}',
-    '',
-    'body.dark .topbar, body.dark .unified-hero {',
-    '  background: #1C2236 !important;',
-    '  border-bottom-color: #2E3450 !important;',
-    '  color: #E8EAF2 !important;',
-    '}',
-    '',
-    '.topbar h2, .unified-hero h1, .unified-hero h2 {',
-    '  color: #1E2433 !important;',
-    '  font-weight: 700 !important;',
-    '  background: none !important;',
-    '  background-image: none !important;',
-    '  -webkit-background-clip: unset !important;',
-    '  -webkit-text-fill-color: #1E2433 !important;',
-    '}',
-    '',
-    'body.dark .topbar h2 {',
-    '  color: #E8EAF2 !important;',
-    '  -webkit-text-fill-color: #E8EAF2 !important;',
-    '}',
-    '',
-    '.unified-hero p { color: #6B7280 !important; }',
-    '',
-    '/* ===== MAIN ===== */',
-    '.main, .unified-main, main.main, main {',
-    '  background: #F7F5F0 !important;',
-    '  background-image: none !important;',
-    '  color: #1E2433 !important;',
-    '}',
-    '',
-    'body.dark .main, body.dark .unified-main, body.dark main {',
-    '  background: #14181A !important;',
-    '  color: #E8EAF2 !important;',
-    '}',
-    '',
-    '/* All h1 in main - force green */',
-    '.main h1, .unified-main h1, main h1,',
-    '.page-head h1, .section-page-head h1 {',
-    '  color: #0B6E4F !important;',
-    '  background: none !important;',
-    '  background-image: none !important;',
-    '  -webkit-background-clip: unset !important;',
-    '  -webkit-text-fill-color: #0B6E4F !important;',
-    '  font-weight: 800 !important;',
-    '  text-shadow: none !important;',
-    '}',
-    '',
-    'body.dark .main h1, body.dark .unified-main h1, body.dark main h1 {',
-    '  color: #1FAE7C !important;',
-    '  -webkit-text-fill-color: #1FAE7C !important;',
-    '}',
-    '',
-    '/* Remove golden lines under headings */',
-    '.page-head::after, .page-head::before,',
-    '.page-head h1::after, .page-head h1::before,',
-    '.section-page-head::after, .section-page-head::before {',
-    '  display: none !important;',
-    '  background: none !important;',
-    '  background-image: none !important;',
-    '  border: none !important;',
-    '  content: none !important;',
-    '}',
-    '',
-    '/* ===== BUTTONS ===== */',
-    'button.btn, .btn {',
-    '  font-family: "Cairo", sans-serif !important;',
-    '  border-radius: 14px !important;',
-    '  padding: 10px 22px !important;',
-    '  min-height: 44px !important;',
-    '  font-weight: 600 !important;',
-    '  font-size: 14px !important;',
-    '  cursor: pointer !important;',
-    '  transition: all 0.2s !important;',
-    '  border: none !important;',
-    '  display: inline-flex !important;',
-    '  align-items: center !important;',
-    '  justify-content: center !important;',
-    '  gap: 8px !important;',
-    '  text-shadow: none !important;',
-    '}',
-    '',
-    'button.btn:hover, .btn:hover { transform: translateY(-2px) !important; }',
-    'button.btn:active, .btn:active { transform: translateY(1px) !important; }',
-    '',
-    '.btn.gold, button.btn.gold {',
-    '  background: #0B6E4F !important;',
-    '  background-image: linear-gradient(135deg, #0B6E4F, #1FAE7C) !important;',
-    '  color: white !important;',
-    '  box-shadow: 0 6px 16px rgba(11,110,79,0.25) !important;',
-    '  border: none !important;',
-    '}',
-    '',
-    '.btn.blue, button.btn.blue {',
-    '  background: #3A3565 !important;',
-    '  background-image: linear-gradient(135deg, #3A3565, #4d4485) !important;',
-    '  color: white !important;',
-    '  box-shadow: 0 6px 16px rgba(58,53,101,0.25) !important;',
-    '  border: none !important;',
-    '}',
-    '',
-    '.btn.red, button.btn.red {',
-    '  background: #DC2626 !important;',
-    '  background-image: linear-gradient(135deg, #DC2626, #F87171) !important;',
-    '  color: white !important;',
-    '  box-shadow: 0 6px 16px rgba(220,38,38,0.25) !important;',
-    '  border: none !important;',
-    '}',
-    '',
-    '.btn.green, button.btn.green {',
-    '  background: #16A34A !important;',
-    '  background-image: linear-gradient(135deg, #16A34A, #4ADE80) !important;',
-    '  color: white !important;',
-    '  box-shadow: 0 6px 16px rgba(22,163,74,0.25) !important;',
-    '  border: none !important;',
-    '}',
-    '',
-    '/* Default buttons (no color class) */',
-    'button.btn:not(.gold):not(.blue):not(.red):not(.green):not(.mobile-menu):not(.tab) {',
-    '  background: white !important;',
-    '  background-image: none !important;',
-    '  color: #1E2433 !important;',
-    '  border: 1px solid #E5E8F0 !important;',
-    '  box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;',
-    '}',
-    '',
-    'body.dark button.btn:not(.gold):not(.blue):not(.red):not(.green):not(.mobile-menu):not(.tab) {',
-    '  background: #1C2236 !important;',
-    '  color: #E8EAF2 !important;',
-    '  border-color: #2E3450 !important;',
-    '}',
-    '',
-    '#logoutBtn {',
-    '  background: rgba(220,38,38,0.1) !important;',
-    '  background-image: none !important;',
-    '  color: #fca5a5 !important;',
-    '  border: 1px solid rgba(220,38,38,0.2) !important;',
-    '  width: 100% !important;',
-    '  box-shadow: none !important;',
-    '}',
-    '',
-    '#logoutBtn:hover {',
-    '  background: #DC2626 !important;',
-    '  background-image: none !important;',
-    '  color: white !important;',
-    '}',
-    '',
-    '/* ===== KPI ===== */',
-    '.kpi {',
-    '  background: white !important;',
-    '  background-image: none !important;',
-    '  padding: 20px !important;',
-    '  border-radius: 14px !important;',
-    '  box-shadow: 0 1px 3px rgba(0,0,0,0.08) !important;',
-    '  border: 1px solid #E5E8F0 !important;',
-    '  border-right: 4px solid #0B6E4F !important;',
-    '  position: relative !important;',
-    '  overflow: hidden !important;',
-    '}',
-    '',
-    'body.dark .kpi {',
-    '  background: #1C2236 !important;',
-    '  border-color: #2E3450 !important;',
-    '  border-right-color: #0B6E4F !important;',
-    '}',
-    '',
-    '.kpi small, .kpi > small {',
-    '  color: #6B7280 !important;',
-    '  font-size: 13px !important;',
-    '  font-weight: 600 !important;',
-    '  display: block !important;',
-    '  margin-bottom: 8px !important;',
-    '}',
-    '',
-    '.kpi b, .kpi > b {',
-    '  font-size: 28px !important;',
-    '  color: #1E2433 !important;',
-    '  font-weight: 800 !important;',
-    '  display: block !important;',
-    '}',
-    '',
-    'body.dark .kpi b { color: #E8EAF2 !important; }',
-    '',
-    '.kpi.gold { border-right-color: #B8860B !important; }',
-    '.kpi.green { border-right-color: #16A34A !important; }',
-    '.kpi.red { border-right-color: #DC2626 !important; }',
-    '.kpi.blue { border-right-color: #0EA5E9 !important; }',
-    '',
-    '/* ===== CARDS ===== */',
-    '.card, .panel {',
-    '  background: white !important;',
-    '  background-image: none !important;',
-    '  border-radius: 14px !important;',
-    '  box-shadow: 0 1px 3px rgba(0,0,0,0.08) !important;',
-    '  border: 1px solid #E5E8F0 !important;',
-    '  color: #1E2433 !important;',
-    '}',
-    '',
-    'body.dark .card, body.dark .panel {',
-    '  background: #1C2236 !important;',
-    '  border-color: #2E3450 !important;',
-    '  color: #E8EAF2 !important;',
-    '}',
-    '',
-    '.card-head h3, .card-head h2 {',
-    '  color: #1E2433 !important;',
-    '  background: none !important;',
-    '  -webkit-text-fill-color: #1E2433 !important;',
-    '}',
-    '',
-    'body.dark .card-head h3 {',
-    '  color: #E8EAF2 !important;',
-    '  -webkit-text-fill-color: #E8EAF2 !important;',
-    '}',
-    '',
-    '/* ===== TABLES ===== */',
-    'table {',
-    '  width: 100% !important;',
-    '  border-collapse: collapse !important;',
-    '  background: white !important;',
-    '  background-image: none !important;',
-    '  border-radius: 14px !important;',
-    '  overflow: hidden !important;',
-    '}',
-    '',
-    'body.dark table { background: #1C2236 !important; }',
-    '',
-    'table th {',
-    '  background: #F4F6FB !important;',
-    '  background-image: none !important;',
-    '  color: #6B7280 !important;',
-    '  padding: 12px !important;',
-    '  font-weight: 600 !important;',
-    '  border-bottom: 1px solid #E5E8F0 !important;',
-    '  text-align: start !important;',
-    '  font-size: 13px !important;',
-    '}',
-    '',
-    'body.dark table th {',
-    '  background: #242B42 !important;',
-    '  color: #9CA3AF !important;',
-    '  border-bottom-color: #2E3450 !important;',
-    '}',
-    '',
-    'table td {',
-    '  padding: 10px 12px !important;',
-    '  border-bottom: 1px solid #E5E8F0 !important;',
-    '  color: #1E2433 !important;',
-    '}',
-    '',
-    'body.dark table td {',
-    '  color: #E8EAF2 !important;',
-    '  border-bottom-color: #2E3450 !important;',
-    '}',
-    '',
-    'table tbody tr:hover { background: #F4F6FB !important; }',
-    'body.dark table tbody tr:hover { background: #242B42 !important; }',
-    '',
-    '/* ===== INPUTS ===== */',
-    'input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),',
-    'select, textarea {',
-    '  background: white !important;',
-    '  background-image: none !important;',
-    '  color: #1E2433 !important;',
-    '  border: 1px solid #E5E8F0 !important;',
-    '  border-radius: 12px !important;',
-    '  padding: 10px 14px !important;',
-    '  font-family: "Cairo", sans-serif !important;',
-    '  font-size: 14px !important;',
-    '  min-height: 44px !important;',
-    '  transition: border-color 0.2s !important;',
-    '  box-shadow: none !important;',
-    '}',
-    '',
-    'body.dark input, body.dark select, body.dark textarea {',
-    '  background: #1C2236 !important;',
-    '  color: #E8EAF2 !important;',
-    '  border-color: #2E3450 !important;',
-    '}',
-    '',
-    'input:focus, select:focus, textarea:focus {',
-    '  outline: none !important;',
-    '  border-color: #0B6E4F !important;',
-    '  box-shadow: 0 0 0 3px rgba(11,110,79,0.2) !important;',
-    '}',
-    '',
-    '/* ===== BADGES ===== */',
-    '.badge {',
-    '  display: inline-flex !important;',
-    '  align-items: center !important;',
-    '  padding: 4px 10px !important;',
-    '  border-radius: 8px !important;',
-    '  font-size: 12px !important;',
-    '  font-weight: 600 !important;',
-    '  border: 1px solid !important;',
-    '  background-image: none !important;',
-    '}',
-    '',
-    '.badge.green {',
-    '  background: #DCFCE7 !important;',
-    '  color: #16A34A !important;',
-    '  border-color: #16A34A !important;',
-    '}',
-    '',
-    '.badge.red {',
-    '  background: #FEE2E2 !important;',
-    '  color: #DC2626 !important;',
-    '  border-color: #DC2626 !important;',
-    '}',
-    '',
-    '.badge.gold, .badge.yellow {',
-    '  background: #FEF3C7 !important;',
-    '  color: #D97706 !important;',
-    '  border-color: #D97706 !important;',
-    '}',
-    '',
-    '.badge.blue {',
-    '  background: #E0F2FE !important;',
-    '  color: #0EA5E9 !important;',
-    '  border-color: #0EA5E9 !important;',
-    '}',
-    '',
-    '/* ===== LINKS ===== */',
-    'a {',
-    '  color: #0B6E4F !important;',
-    '  transition: color 0.2s !important;',
-    '  text-decoration: none !important;',
-    '  background: none !important;',
-    '  -webkit-text-fill-color: #0B6E4F !important;',
-    '}',
-    '',
-    'a:hover {',
-    '  color: #1FAE7C !important;',
-    '  -webkit-text-fill-color: #1FAE7C !important;',
-    '}',
-    '',
-    '/* ===== TABS ===== */',
-    '.tab, .tabs button, .tabs-nav button {',
-    '  background: transparent !important;',
-    '  background-image: none !important;',
-    '  color: #6B7280 !important;',
-    '  border: none !important;',
-    '  border-bottom: 3px solid transparent !important;',
-    '  padding: 12px 20px !important;',
-    '  font-family: "Cairo", sans-serif !important;',
-    '  font-weight: 600 !important;',
-    '  cursor: pointer !important;',
-    '  border-radius: 0 !important;',
-    '  box-shadow: none !important;',
-    '  transition: all 0.2s !important;',
-    '}',
-    '',
-    '.tab:hover, .tabs button:hover {',
-    '  color: #0B6E4F !important;',
-    '  background: transparent !important;',
-    '}',
-    '',
-    '.tab.active, .tabs button.active, .tabs-nav button.active {',
-    '  color: #0B6E4F !important;',
-    '  border-bottom-color: #0B6E4F !important;',
-    '  background: transparent !important;',
-    '  background-image: none !important;',
-    '}',
-    '',
-    '/* ===== HEADINGS GLOBAL ==
+  if (window._aminThemeInjected) return;
+  window._aminThemeInjected = true;
+  
+  // ===== Dark Mode Support =====
+  function applyDarkMode() {
+    if (localStorage.getItem('darkMode') === '1') {
+      document.body.classList.add('dark');
+    }
+  }
+  
+  // ===== حقن CSS لدعم Dark Mode =====
+  function injectDarkModeCSS() {
+    if (document.getElementById('amin-dark-mode-support')) return;
+    
+    var style = document.createElement('style');
+    style.id = 'amin-dark-mode-support';
+    style.textContent = 
+      'body.dark {' +
+        'background: linear-gradient(135deg, #14181A, #1C2236) !important;' +
+        'color: #E8EAF2 !important;' +
+      '}' +
+      'body.dark .sidebar {' +
+        'background: rgba(28, 34, 54, 0.85) !important;' +
+        'border-color: #2E3450 !important;' +
+      '}' +
+      'body.dark .topbar {' +
+        'background: rgba(28, 34, 54, 0.85) !important;' +
+        'color: #E8EAF2 !important;' +
+      '}' +
+      'body.dark .card, body.dark .kpi, body.dark .panel {' +
+        'background: linear-gradient(145deg, #1C2236, #242B42) !important;' +
+        'border-color: #2E3450 !important;' +
+        'color: #E8EAF2 !important;' +
+      '}' +
+      'body.dark .brand, body.dark .profile-mini {' +
+        'background: linear-gradient(145deg, #1C2236, #242B42) !important;' +
+        'border-color: #2E3450 !important;' +
+        'color: #E8EAF2 !important;' +
+      '}' +
+      'body.dark .nav button {' +
+        'color: #9CA3AF !important;' +
+      '}' +
+      'body.dark .nav button:hover {' +
+        'background: #242B42 !important;' +
+        'color: #E8EAF2 !important;' +
+      '}' +
+      'body.dark .nav button.active {' +
+        'background: linear-gradient(145deg, #242B42, #2E3450) !important;' +
+        'color: #9EBCEC !important;' +
+        'border-color: #3D4564 !important;' +
+      '}' +
+      'body.dark table {' +
+        'background: #1C2236 !important;' +
+        'color: #E8EAF2 !important;' +
+      '}' +
+      'body.dark th {' +
+        'background: linear-gradient(145deg, #1C2236, #242B42) !important;' +
+        'color: #9CA3AF !important;' +
+      '}' +
+      'body.dark td {' +
+        'color: #E8EAF2 !important;' +
+        'border-bottom-color: #2E3450 !important;' +
+      '}' +
+      'body.dark tbody tr:hover {' +
+        'background: rgba(158, 188, 236, 0.05) !important;' +
+      '}' +
+      'body.dark .input, body.dark .select, body.dark textarea {' +
+        'background: linear-gradient(145deg, #1C2236, #242B42) !important;' +
+        'color: #E8EAF2 !important;' +
+        'border-color: #2E3450 !important;' +
+      '}' +
+      'body.dark .btn {' +
+        'background: linear-gradient(145deg, #242B42, #2E3450) !important;' +
+        'color: #E8EAF2 !important;' +
+        'border-color: #3D4564 !important;' +
+      '}' +
+      'body.dark .toast {' +
+        'background: #1C2236 !important;' +
+        'color: #E8EAF2 !important;' +
+      '}' +
+      'body.dark .modal {' +
+        'background: #1C2236 !important;' +
+        'color: #E8EAF2 !important;' +
+      '}' +
+      'body.dark .item {' +
+        'background: rgba(28, 34, 54, 0.7) !important;' +
+        'border-color: #2E3450 !important;' +
+      '}' +
+      'body.dark body::before { opacity: 0.15 !important; }';
+    document.head.appendChild(style);
+  }
+  
+  // ===== Floating Buttons =====
+  function addFloatingButtons() {
+    if (document.getElementById('amin-floating-controls')) return;
+    
+    var container = document.createElement('div');
+    container.id = 'amin-floating-controls';
+    container.style.cssText = 'position:fixed;bottom:24px;left:24px;z-index:9998;display:flex;flex-direction:column;gap:12px;';
+    
+    var homeBtn = document.createElement('button');
+    homeBtn.title = 'البوابة الموحدة';
+    homeBtn.style.cssText = 'width:52px;height:52px;border-radius:50%;background:linear-gradient(145deg,#9EBCEC,#7FA1DD);color:white;border:1px solid rgba(255,255,255,0.9);cursor:pointer;box-shadow:0 8px 24px rgba(158,188,236,0.4);display:flex;align-items:center;justify-content:center;padding:0;font-size:22px;transition:transform 0.2s;';
+    homeBtn.onmouseover = function(){ this.style.transform = 'scale(1.08)'; };
+    homeBtn.onmouseout = function(){ this.style.transform = 'scale(1)'; };
+    homeBtn.onclick = function(){ location.href = 'portal.html'; };
+    homeBtn.innerHTML = '🏛️';
+    
+    var darkBtn = document.createElement('button');
+    darkBtn.title = 'تبديل الوضع الليلي';
+    darkBtn.style.cssText = 'width:52px;height:52px;border-radius:50%;background:linear-gradient(145deg,#fff,#F8FFFF);color:#294B83;border:1px solid rgba(158,188,236,0.4);cursor:pointer;box-shadow:0 8px 24px rgba(31,41,55,0.15);display:flex;align-items:center;justify-content:center;padding:0;font-size:22px;transition:transform 0.2s;';
+    darkBtn.onmouseover = function(){ this.style.transform = 'scale(1.08)'; };
+    darkBtn.onmouseout = function(){ this.style.transform = 'scale(1)'; };
+    darkBtn.onclick = function(){
+      document.body.classList.toggle('dark');
+      var dark = document.body.classList.contains('dark');
+      localStorage.setItem('darkMode', dark ? '1' : '0');
+      darkBtn.innerHTML = dark ? '☀️' : '🌙';
+    };
+    var isDark = document.body.classList.contains('dark');
+    darkBtn.innerHTML = isDark ? '☀️' : '🌙';
+    
+    container.appendChild(darkBtn);
+    container.appendChild(homeBtn);
+    document.body.appendChild(container);
+  }
+  
+  // ===== التشغيل =====
+  function init() {
+    applyDarkMode();
+    injectDarkModeCSS();
+    addFloatingButtons();
+    console.log('✨ Amin Theme v5 Applied');
+  }
+  
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
