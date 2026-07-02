@@ -3,8 +3,17 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>فحص النسخة المنشورة — أمين الرضا</title>
-<link rel="stylesheet" href="assets/brand-redesign.css"><link rel="stylesheet" href="assets/amin-v3.css"><link rel="stylesheet" href="assets/i18n.css">
-<style>.check-wrap{max-width:980px;margin:40px auto;padding:20px}.check-card{padding:18px;border-radius:24px;background:var(--c-surface,#fff);border:1px solid var(--c-border,#ddd);box-shadow:var(--sh-out,0 8px 24px #ddd);margin-bottom:14px}.ok{color:#2D9D6B;font-weight:900}.bad{color:#C0392B;font-weight:900}.code{direction:ltr;display:block;background:rgba(0,0,0,.06);padding:10px;border-radius:12px;white-space:pre-wrap}</style>
+  <link rel="stylesheet" href="assets/amin.css">
+<link rel="stylesheet" href="assets/i18n.css">
+<style id="amin-page">
+*{box-sizing:border-box;}
+body{margin:0;font-family:var(--font-arabic);background:var(--bg);color:var(--text-primary);min-height:100vh;padding:24px;}
+.check-wrap{max-width:760px;margin:0 auto;}
+.check-card{background:var(--surface);border:1px solid var(--border-subtle);border-radius:18px;box-shadow:var(--shadow-soft);padding:24px;margin-bottom:16px;}
+.check-card h3{margin:0 0 12px;color:var(--primary);font-size:18px;}
+.code{background:var(--surface-2);border:1px solid var(--border-subtle);border-radius:10px;padding:12px;font-family:monospace;font-size:12px;direction:ltr;text-align:start;white-space:pre-wrap;color:var(--text-secondary);overflow:auto;}
+.bad{color:var(--danger);font-weight:700;} .ok{color:var(--success);font-weight:700;}
+</style>
 </head>
   <script src="assets/amin-theme-injector.js"></script>
 <body>
@@ -21,7 +30,7 @@
     ['assets/achievements.js?v=20260626-runtime3', txt => !txt.includes('.rpc(\'get_my_badge_progress\').catch') && txt.includes('try{const prog=await client().rpc')],
     ['assets/curriculum-planner.js?v=20260626-runtime3', txt => !txt.includes('get_curriculum_holiday_context',{p_plan_id:CURRENT_PLAN}).catch') && txt.includes('let ctx={data:null}')],
     ['sql/113_runtime_fix_achievements_curriculum.sql', txt => txt.includes('runtime_fix_achievements_curriculum_health_check')],
-    ['assets/amin-v3.css?v=20260626-runtime3', txt => txt.includes('--c-primary:#6B2D6B')]
+    ['assets/amin.css', txt => txt.includes('--primary:#0B6E4F')]
   ];
   const out=[];
   for(const [url,test] of checks){
