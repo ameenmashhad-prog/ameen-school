@@ -28,7 +28,7 @@ body{margin:0;font-family:var(--font-arabic);background:var(--bg);color:var(--te
 (async function(){
   const checks = [
     ['assets/achievements.js?v=20260626-runtime3', txt => !txt.includes('.rpc(\'get_my_badge_progress\').catch') && txt.includes('try{const prog=await client().rpc')],
-    ['assets/curriculum-planner.js?v=20260626-runtime3', txt => !txt.includes('get_curriculum_holiday_context',{p_plan_id:CURRENT_PLAN}).catch') && txt.includes('let ctx={data:null}')],
+    ['assets/curriculum-planner.js?v=20260626-runtime3', txt => !txt.includes('get_curriculum_holiday_context') && txt.includes('let ctx={data:null}')],
     ['sql/113_runtime_fix_achievements_curriculum.sql', txt => txt.includes('runtime_fix_achievements_curriculum_health_check')],
     ['assets/amin.css', txt => txt.includes('--primary:#0B6E4F')]
   ];
