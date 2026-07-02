@@ -209,15 +209,15 @@ img,svg{max-width:100%;}
 /* ============================ 5) البطاقات (Tier 2/3) ============================ */
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:var(--space-4);}
 .card,.report-card,.teacher-panel,.result-box,.settings-card{
-  position:relative;overflow:hidden;background:var(--surface);border:1px solid var(--border-subtle);
-  border-radius:var(--radius-xl);box-shadow:var(--shadow-soft);transition:transform var(--transition-standard),box-shadow var(--transition-standard);
+  position:relative;overflow:hidden;background:var(--surface);border:1px solid var(--border-subtle)!important;
+  border-radius:var(--radius-xl);box-shadow:var(--shadow-tactile)!important;transition:transform var(--transition-standard),box-shadow var(--transition-standard);
 }
 .card::before,.report-card::before{content:"";position:absolute;inset-block-start:0;inset-inline:0;height:4px;background:linear-gradient(90deg,var(--primary),var(--accent-teal),var(--secondary));opacity:.9;}
-.card:hover,.report-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-soft-lg);}
+.card:hover,.report-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-tactile),var(--shadow-soft-lg)!important;}
 .card-head{display:flex;align-items:center;justify-content:space-between;gap:var(--space-3);padding:var(--space-4) var(--space-5) 0;}
 .card-head h3{margin:0;font-size:var(--text-h3);color:var(--text-primary);}
 .card-body{padding:var(--space-4) var(--space-5) var(--space-5);}
-.card-soft{background:var(--surface);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);box-shadow:var(--shadow-soft);padding:var(--space-5);}
+.card-soft{background:var(--surface);border:1px solid var(--border-subtle)!important;border-radius:var(--radius-lg);box-shadow:var(--shadow-tactile)!important;padding:var(--space-5);}
 .card-soft-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-3);}
 .card-soft-title{font-weight:700;color:var(--text-primary);}
 
