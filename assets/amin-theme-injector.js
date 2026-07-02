@@ -51,8 +51,8 @@
         'color: #E8EAF2 !important;' +
       '}' +
       'body.dark .nav button.active {' +
-        'background: linear-gradient(145deg, #242B42, #2E3450) !important;' +
-        'color: #9EBCEC !important;' +
+        'background: linear-gradient(135deg, var(--primary), var(--accent)) !important;' +
+        'color: #fff !important;' +
         'border-color: #3D4564 !important;' +
       '}' +
       'body.dark table {' +
@@ -76,7 +76,7 @@
         'border-color: #2E3450 !important;' +
       '}' +
       'body.dark .btn {' +
-        'background: linear-gradient(145deg, #242B42, #2E3450) !important;' +
+        'background: linear-gradient(135deg, var(--primary), var(--accent)) !important;' +
         'color: #E8EAF2 !important;' +
         'border-color: #3D4564 !important;' +
       '}' +
@@ -106,7 +106,7 @@
     
     var homeBtn = document.createElement('button');
     homeBtn.title = 'البوابة الموحدة';
-    homeBtn.style.cssText = 'width:52px;height:52px;border-radius:50%;background:linear-gradient(145deg,#9EBCEC,#7FA1DD);color:white;border:1px solid rgba(255,255,255,0.9);cursor:pointer;box-shadow:0 8px 24px rgba(158,188,236,0.4);display:flex;align-items:center;justify-content:center;padding:0;font-size:22px;transition:transform 0.2s;';
+    homeBtn.style.cssText = 'width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));color:white;border:1px solid rgba(255,255,255,0.9);cursor:pointer;box-shadow:0 8px 24px rgba(158,188,236,0.4);display:flex;align-items:center;justify-content:center;padding:0;font-size:22px;transition:transform 0.2s;';
     homeBtn.onmouseover = function(){ this.style.transform = 'scale(1.08)'; };
     homeBtn.onmouseout = function(){ this.style.transform = 'scale(1)'; };
     homeBtn.onclick = function(){ location.href = 'portal.html'; };
