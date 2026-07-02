@@ -1,5 +1,6 @@
 /* ================================================================
-   AMIN THEME INJECTOR v5 - يحترم portal.css ويضيف تحسينات فقط
+   AMIN THEME INJECTOR v6 - يحترم portal.css ويضيف تحسينات فقط
+   الآن يقوم أيضاً باستبدال روابط CSS القديمة بروابط النظام التصميمي V3
    ================================================================ */
 (function(){
   'use strict';
@@ -7,6 +8,18 @@
   if (window._aminThemeInjected) return;
   window._aminThemeInjected = true;
   
+  // ===== CONFIG: ملفات CSS القديمة التي نريد استبدالها =====
+  const OLD_CSS = [
+    'assets/portal.css',
+    'assets/amin-identity.css',
+    'assets/brand-redesign.css',
+    'assets/amin-v3.css'
+  ];
+  const NEW_CSS = [
+    'assets/design-tokens.css',
+    'assets/components.css'
+  ];
+
   // ===== Dark Mode Support =====
   function applyDarkMode() {
     if (localStorage.getItem('darkMode') === '1') {
@@ -17,7 +30,6 @@
   // ===== حقن CSS لدعم Dark Mode =====
   function injectDarkModeCSS() {
     if (document.getElementById('amin-dark-mode-support')) return;
-    
     var style = document.createElement('style');
     style.id = 'amin-dark-mode-support';
     style.textContent = 
@@ -99,22 +111,19 @@
   // ===== Floating Buttons =====
   function addFloatingButtons() {
     if (document.getElementById('amin-floating-controls')) return;
-    
     var container = document.createElement('div');
     container.id = 'amin-floating-controls';
     container.style.cssText = 'position:fixed;bottom:24px;left:24px;z-index:9998;display:flex;flex-direction:column;gap:12px;';
-    
     var homeBtn = document.createElement('button');
     homeBtn.title = 'البوابة الموحدة';
-    homeBtn.style.cssText = 'width:52px;height:52px;border-radius:50%;background:linear-gradient(145deg,#9EBCEC,#7FA1DD);color:white;border:1px solid rgba(255,255,255,0.9);cursor:pointer;box-shadow:0 8px 24px rgba(158,188,236,0.4);display:flex;align-items:center;justify-content:center;padding:0;font-size:22px;transition:transform 0.2s;';
+    homeBtn.style.cssText = 'width:52px;height:52px;border-radius:50%;background:linear-gradient(145deg,#9EBCEC,#7FA1DD);color:white;border:1px solid rgba(255,255,255,0.9);cursor:pointer;box-shadow:0 8px 30px rgba(62,100,170,0.12);';
     homeBtn.onmouseover = function(){ this.style.transform = 'scale(1.08)'; };
     homeBtn.onmouseout = function(){ this.style.transform = 'scale(1)'; };
     homeBtn.onclick = function(){ location.href = 'portal.html'; };
     homeBtn.innerHTML = '🏛️';
-    
     var darkBtn = document.createElement('button');
     darkBtn.title = 'تبديل الوضع الليلي';
-    darkBtn.style.cssText = 'width:52px;height:52px;border-radius:50%;background:linear-gradient(145deg,#fff,#F8FFFF);color:#294B83;border:1px solid rgba(158,188,236,0.4);cursor:pointer;box-shadow:0 8px 24px rgba(31,41,55,0.15);display:flex;align-items:center;justify-content:center;padding:0;font-size:22px;transition:transform 0.2s;';
+    darkBtn.style.cssText = 'width:52px;height:52px;border-radius:50%;background:linear-gradient(145deg,#fff,#F8FFFF);color:#294B83;border:1px solid rgba(158,188,236,0.4);cursor:pointer;box-shadow:0 8px 30px rgba(62,100,170,0.06);';
     darkBtn.onmouseover = function(){ this.style.transform = 'scale(1.08)'; };
     darkBtn.onmouseout = function(){ this.style.transform = 'scale(1)'; };
     darkBtn.onclick = function(){
@@ -125,18 +134,57 @@
     };
     var isDark = document.body.classList.contains('dark');
     darkBtn.innerHTML = isDark ? '☀️' : '🌙';
-    
     container.appendChild(darkBtn);
     container.appendChild(homeBtn);
     document.body.appendChild(container);
   }
-  
+
+  // ===== New: Replace old stylesheet links with unified design tokens/components =====
+  function unifyStylesheets() {
+    try {
+      var head = document.head || document.getElementsByTagName('head')[0];
+      if(!head) return;
+
+      // If new CSS already present, skip
+      var already = NEW_CSS.some(function(h){ return !!document.querySelector('link[rel="stylesheet"][href="'+h+'"]'); });
+      if(already) return;
+
+      // Remove old CSS links if present
+      var links = Array.from(document.querySelectorAll('link[rel="stylesheet"]'));
+      var removedAny = false;
+      links.forEach(function(l){
+        var href = l.getAttribute('href') || '';
+        if(OLD_CSS.some(function(o){ return href.indexOf(o) !== -1; })){
+          l.parentNode && l.parentNode.removeChild(l);
+          removedAny = true;
+        }
+      });
+
+      // Insert new CSS links at the start of head
+      for(var i=0;i<NEW_CSS.length;i++){
+        var href = NEW_CSS[i];
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = href;
+        head.insertBefore(link, head.firstChild);
+      }
+
+      // Re-run theme injector pieces that depend on variables
+      injectDarkModeCSS();
+
+      // If we removed anything, log for diagnostics
+      if(removedAny) console.log('Amin Theme: Replaced legacy CSS with unified design tokens/components');
+    } catch(e) { console.warn('Amin Theme: unifyStylesheets failed', e); }
+  }
+
   // ===== التشغيل =====
   function init() {
     applyDarkMode();
     injectDarkModeCSS();
     addFloatingButtons();
-    console.log('✨ Amin Theme v5 Applied');
+    // Try to unify early (in head-run pages this will still work when script is at end)
+    unifyStylesheets();
+    console.log('✨ Amin Theme v6 Applied');
   }
   
   if (document.readyState === 'loading') {
