@@ -1,111 +1,38 @@
 #!/usr/bin/env node
-
-/**
- * سكريبت تحويل جميع الصفحات للتنسيق الجديد من portal.html
- * يحول من التنسيق القديم (portal.css + amin-identity.css) للتنسيق الحديث
+/*
+ * Amin Tactile Identity — unified design migration (idempotent & safe)
+ * -----------------------------------------------------------------
+ * يوحّد كل صفحات HTML على نظام هوية واحد: assets/amin.css
+ * (أخضر زمردي #0B6E4F + ذهبي #B8860B + كحلي #3A3565، نجمة ثمانية،
+ *  عمق لمسي ثلاثي، RTL، وضع ليلي، responsive).
+ *
+ * ما يفعله بأمان (قابل لإعادة التشغيل):
+ *   1) يزيل طبقات الثيم القديمة من <head> (portal/amin-identity/brand-redesign/amin-v3/design-tokens/components).
+ *   2) يضيف رابطاً واحداً: assets/amin.css (مرة واحدة فقط).
+ *
+ * يُبقي: ملفات CSS الخاصة بكل صفحة (مثل achievements.css) وروابط JS كما هي.
+ * ملاحظة: الصفحات الأربع ذات التنسيق الداكن المضمّن عولجت يدوياً بتحويل
+ *       تنسيقها المضمّن إلى الهوية الفاتحة أثناء التهجير الأول.
+ *
+ * التشغيل: node convert-to-new-design.js
  */
-
 const fs = require('fs');
 const path = require('path');
 
-const NEW_DESIGN_HEAD = `<link rel="stylesheet" href="assets/design-tokens.css">
-<link rel="stylesheet" href="assets/components.css">`;
+const ROOT = __dirname;
+const AMIN_LINK = '  <link rel="stylesheet" href="assets/amin.css">\n';
+const THEME_RE = /<link[^>]*assets\/(portal|amin-identity|brand-redesign|amin-v3|design-tokens|components)\.css[^>]*>\s*\n?/g;
+const AMIN_RE  = /<link[^>]*assets\/amin\.css[^>]*>\s*\n?/g;
 
-const OLD_DESIGN_HEAD = `<link rel="stylesheet" href="assets/portal.css">
-<link rel="stylesheet" href="assets/amin-identity.css">`;
-
-const REQUIRED_SCRIPTS = [
-  '<script src="assets/amin-theme-injector.js"></script>'
-];
-
-const UX_ENHANCEMENTS = '<script src="assets/ux-enhancements.js"></script>';
-
-// الصفحات التي تحتاج تحديث
-const PAGES_TO_UPDATE = [
-  'teacher.html',
-  'student.html',
-  'parent.html',
-  'admin.html',
-  'hr.html',
-  'finance-pro.html',
-  'finance-cashbox.html',
-  'finance-collections.html',
-  'finance-credit-report.html',
-  'finance-executive.html',
-  'finance-receiver-reports.html',
-  'counselor.html',
-  'announcements.html',
-  'analytics-center.html',
-  'smart-calendar.html',
-  'notifications.html',
-  'curriculum-planner.html',
-  'teacher-exams.html',
-  'homework-reports.html',
-  'online-exams.html',
-  'student-homeworks.html',
-  'homework-audit.html'
-];
-
-function convertPage(filePath) {
-  try {
-    let content = fs.readFileSync(filePath, 'utf8');
-    
-    // 1. استبدال CSS القديم بالجديد
-    content = content.replace(OLD_DESIGN_HEAD, NEW_DESIGN_HEAD);
-    
-    // 2. إزالة CSS القديمة الإضافية
-    content = content.replace(
-      /<link rel="stylesheet" href="assets\/(brand-redesign|amin-v3)\.css">\s*/g,
-      ''
-    );
-    
-    // 3. إضافة amin-theme-injector في النهاية قبل </body>
-    if (!content.includes('amin-theme-injector.js')) {
-      content = content.replace(
-        '</body>',
-        `  ${REQUIRED_SCRIPTS[0]}\n</body>`
-      );
-    }
-    
-    // 4. التأكد من أن ux-enhancements.js موجود
-    if (!content.includes('ux-enhancements.js')) {
-      content = content.replace(
-        '</body>',
-        `  ${UX_ENHANCEMENTS}\n</body>`
-      );
-    }
-    
-    // 5. تحديث <meta name="theme-color">
-    content = content.replace(
-      /<meta name="theme-color" content="#[0-9A-Fa-f]{6}">/,
-      '<meta name="theme-color" content="#0B6E4F">'
-    );
-    
-    fs.writeFileSync(filePath, content, 'utf8');
-    console.log(`✅ ${filePath}`);
-    return true;
-  } catch (error) {
-    console.error(`❌ ${filePath}: ${error.message}`);
-    return false;
+function migratePage(file){
+  let html = fs.readFileSync(file, 'utf8');
+  html = html.replace(THEME_RE, '').replace(AMIN_RE, '');
+  if (!html.includes('assets/amin.css"')) {
+    html = html.replace(/(<\/title>\s*)/, `$1${AMIN_LINK}`);
   }
+  fs.writeFileSync(file, html, 'utf8');
 }
 
-// التنفيذ
-console.log('🔄 جاري تحويل الصفحات للتنسيق الجديد...\n');
-
-let converted = 0;
-let failed = 0;
-
-PAGES_TO_UPDATE.forEach(page => {
-  if (fs.existsSync(page)) {
-    if (convertPage(page)) {
-      converted++;
-    } else {
-      failed++;
-    }
-  }
-});
-
-console.log(`\n✨ اكتمل التحويل!`);
-console.log(`✅ تم تحويل: ${converted} صفحة`);
-console.log(`❌ فشل: ${failed} صفحة`);
+const pages = fs.readdirSync(ROOT).filter(f => f.endsWith('.html'));
+pages.forEach(f => migratePage(path.join(ROOT, f)));
+console.log(`✅ وُحّدت ${pages.length} صفحة على assets/amin.css (idempotent)`);

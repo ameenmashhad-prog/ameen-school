@@ -4,12 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>بوابة الطالب — مدارس أمين الرضا</title>
+  <link rel="stylesheet" href="assets/amin.css">
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<link rel="stylesheet" href="assets/portal.css">
-<link rel="stylesheet" href="assets/amin-identity.css">
-<link rel="stylesheet" href="assets/brand-redesign.css">
-<link rel="stylesheet" href="assets/amin-v3.css">
 <link rel="stylesheet" href="assets/i18n.css">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="assets/amin-logo-small.png">
@@ -355,7 +352,7 @@
       html += '<div style="margin-bottom:24px;"><h3 style="margin-bottom:12px;">⚠️ تنبيهات مهمة ('+alerts.length+')</h3><div class="cards">';
       alerts.slice(0, 4).forEach(function(a) {
         const bgColor = a.type === 'danger' ? '#fee2e2' : a.type === 'warning' ? '#fef3c7' : '#dbeafe';
-        const borderColor = a.type === 'danger' ? '#dc2626' : a.type === 'warning' ? '#d97706' : '#2563eb';
+        const borderColor = a.type === 'danger' ? '#dc2626' : a.type === 'warning' ? '#d97706' : '#0B6E4F';
         html += '<div style="background:'+bgColor+';border-right:4px solid '+borderColor+';padding:14px;border-radius:10px;color:#333;"><div style="font-size:16px;font-weight:bold;margin-bottom:4px;">'+a.icon+' '+esc(a.title)+'</div><div style="font-size:13px;opacity:0.85;">'+esc(a.message)+'</div></div>';
       });
       html += '</div></div>';
@@ -364,10 +361,10 @@
     // أزرار الإجراءات السريعة
     html += '<h3 style="margin-bottom:12px;">⚡ إجراءات سريعة</h3>';
     html += '<div class="cards" style="margin-bottom:24px;">';
-    html += '<div onclick="StudentPortal.showView(\'homeworks\')" class="card" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📚</div><div style="font-weight:bold;margin-top:8px;">واجباتي</div></div>';
-    html += '<div onclick="StudentPortal.showView(\'exams\')" class="card" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📝</div><div style="font-weight:bold;margin-top:8px;">اختباراتي</div></div>';
-    html += '<div onclick="StudentPortal.showView(\'grades\')" class="card" style="background:linear-gradient(135deg,#10b981,#059669);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📊</div><div style="font-weight:bold;margin-top:8px;">درجاتي</div></div>';
-    html += '<div onclick="StudentPortal.showView(\'achievements\')" class="card" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">🏆</div><div style="font-weight:bold;margin-top:8px;">شاراتي</div></div>';
+    html += '<div onclick="StudentPortal.showView(\'homeworks\')" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">📚</div><div style="font-weight:bold;margin-top:8px;">واجباتي</div></div>';
+    html += '<div onclick="StudentPortal.showView(\'exams\')" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">📝</div><div style="font-weight:bold;margin-top:8px;">اختباراتي</div></div>';
+    html += '<div onclick="StudentPortal.showView(\'grades\')" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">📊</div><div style="font-weight:bold;margin-top:8px;">درجاتي</div></div>';
+    html += '<div onclick="StudentPortal.showView(\'achievements\')" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">🏆</div><div style="font-weight:bold;margin-top:8px;">شاراتي</div></div>';
     html += '</div>';
     
     // الواجبات القريبة
@@ -386,7 +383,7 @@
     if(DATA.achievements.length > 0) {
       html += '<h3 style="margin:24px 0 12px;">🏆 آخر إنجازاتك</h3><div class="cards">';
       DATA.achievements.slice(0, 3).forEach(function(a) {
-        html += '<div class="card" style="background:linear-gradient(135deg,#fef3c7,#fde68a);border:2px solid #f59e0b;"><div class="card-body" style="text-align:center;"><div style="font-size:48px;">🏆</div><b style="color:#92400e;">'+esc(a.badge_title_ar || a.badge_code || 'شارة')+'</b><div style="color:#78350f;font-size:13px;margin-top:4px;">'+esc(a.awarded_at ? String(a.awarded_at).slice(0,10) : '')+'</div><div style="color:#92400e;font-weight:bold;margin-top:8px;">+'+num(a.points_awarded || 0)+' نقطة</div></div></div>';
+        html += '<div class="card" style="border:2px solid #f59e0b"><div class="card-body" style="text-align:center;"><div style="font-size:48px;">🏆</div><b style="color:#92400e;">'+esc(a.badge_title_ar || a.badge_code || 'شارة')+'</b><div style="color:#78350f;font-size:13px;margin-top:4px;">'+esc(a.awarded_at ? String(a.awarded_at).slice(0,10) : '')+'</div><div style="color:#92400e;font-weight:bold;margin-top:8px;">+'+num(a.points_awarded || 0)+' نقطة</div></div></div>';
       });
       html += '</div>';
     }
@@ -398,7 +395,7 @@
     const container = $('#view-grades');
     
     let html = '<div class="page-head" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;"><div><h1>📊 درجاتي</h1></div>';
-    html += '<button class="btn" style="background:#1e40af;color:white;padding:10px 18px;" onclick="StudentPortal.printReport(\'grades\')">🖨️ طباعة الكشف</button>';
+    html += '<button class="btn" style="background:#0B6E4F;color:white;padding:10px 18px;" onclick="StudentPortal.printReport(\'grades\')">🖨️ طباعة الكشف</button>';
     html += '</div>';
     
     if(!DATA.grades.length) {
@@ -436,7 +433,7 @@
     const late = DATA.attendance.filter(function(a){ return a.status === 'late'; }).length;
     
     let html = '<div class="page-head" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;"><div><h1>📋 حضوري</h1></div>';
-    html += '<button class="btn" style="background:#1e40af;color:white;padding:10px 18px;" onclick="StudentPortal.printReport(\'attendance\')">🖨️ طباعة الكشف</button>';
+    html += '<button class="btn" style="background:#0B6E4F;color:white;padding:10px 18px;" onclick="StudentPortal.printReport(\'attendance\')">🖨️ طباعة الكشف</button>';
     html += '</div>';
     html += '<div class="kpis" style="margin-bottom:20px;"><div class="kpi green"><small>أيام الحضور</small><b>'+present+'</b></div><div class="kpi red"><small>أيام الغياب</small><b>'+absent+'</b></div><div class="kpi gold"><small>أيام التأخير</small><b>'+late+'</b></div><div class="kpi blue"><small>الإجمالي</small><b>'+DATA.attendance.length+'</b></div></div>';
     
@@ -480,7 +477,7 @@
         const isUrgent = !isSubmitted && (due.includes('متأخر') || due === 'اليوم');
         const badge = isSubmitted ? 'green' : isUrgent ? 'red' : 'blue';
         const statusLabel = isSubmitted ? '✅ مسلّم' : '⏳ ' + due;
-        html += '<div class="item"><div><b>'+esc(h.title || h.homework_title || 'واجب')+'</b><small>'+esc(getSubjectName(h.subject_id))+(h.description ? ' · ' + esc(h.description) : '')+'</small></div><div style="display:flex;gap:8px;align-items:center;"><span class="badge '+badge+'">'+statusLabel+'</span>'+(!isSubmitted ? '<button class="btn small" style="background:#3b82f6;color:white;" onclick="location.href=\'student-homeworks.html\'">تسليم</button>' : '')+'</div></div>';
+        html += '<div class="item"><div><b>'+esc(h.title || h.homework_title || 'واجب')+'</b><small>'+esc(getSubjectName(h.subject_id))+(h.description ? ' · ' + esc(h.description) : '')+'</small></div><div style="display:flex;gap:8px;align-items:center;"><span class="badge '+badge+'">'+statusLabel+'</span>'+(!isSubmitted ? '<button class="btn small" style="background:#3A3565;color:white;" onclick="location.href=\'student-homeworks.html\'">تسليم</button>' : '')+'</div></div>';
       });
       html += '</div>';
     }
@@ -502,7 +499,7 @@
         const due = start ? dueText(start) : 'بدون موعد';
         const isUpcoming = !due.includes('متأخر') && due !== 'انتهى';
         const badge = isUpcoming ? 'blue' : 'gold';
-        html += '<div class="item"><div><b>'+esc(e.title || e.exam_title || 'اختبار')+'</b><small>'+esc(getSubjectName(e.subject_id))+(e.duration_minutes ? ' · ' + e.duration_minutes + ' دقيقة' : '')+'</small></div><div style="display:flex;gap:8px;align-items:center;"><span class="badge '+badge+'">'+esc(due)+'</span><button class="btn small" style="background:#8b5cf6;color:white;" onclick="location.href=\'online-exams.html\'">دخول</button></div></div>';
+        html += '<div class="item"><div><b>'+esc(e.title || e.exam_title || 'اختبار')+'</b><small>'+esc(getSubjectName(e.subject_id))+(e.duration_minutes ? ' · ' + e.duration_minutes + ' دقيقة' : '')+'</small></div><div style="display:flex;gap:8px;align-items:center;"><span class="badge '+badge+'">'+esc(due)+'</span><button class="btn small" style="background:#3A3565;color:white;" onclick="location.href=\'online-exams.html\'">دخول</button></div></div>';
       });
       html += '</div>';
     }
@@ -558,7 +555,7 @@
       
       html += '<div class="cards">';
       DATA.achievements.forEach(function(a) {
-        html += '<div class="card" style="background:linear-gradient(135deg,#fef3c7,#fde68a);border:2px solid #f59e0b;text-align:center;"><div class="card-body"><div style="font-size:64px;">🏆</div><b style="color:#92400e;font-size:16px;display:block;margin:8px 0;">'+esc(a.badge_title_ar || a.badge_code || 'شارة')+'</b><div style="color:#78350f;font-size:12px;">'+esc(a.awarded_at ? String(a.awarded_at).slice(0,10) : '')+'</div><div style="color:#92400e;font-weight:bold;margin-top:8px;font-size:14px;">+'+num(a.points_awarded || 0)+' نقطة</div></div></div>';
+        html += '<div class="card" style="border:2px solid #f59e0b;text-align:center"><div class="card-body"><div style="font-size:64px;">🏆</div><b style="color:#92400e;font-size:16px;display:block;margin:8px 0;">'+esc(a.badge_title_ar || a.badge_code || 'شارة')+'</b><div style="color:#78350f;font-size:12px;">'+esc(a.awarded_at ? String(a.awarded_at).slice(0,10) : '')+'</div><div style="color:#92400e;font-weight:bold;margin-top:8px;font-size:14px;">+'+num(a.points_awarded || 0)+' نقطة</div></div></div>';
       });
       html += '</div>';
     }
@@ -591,33 +588,32 @@
       '<style>'+
       '* { margin: 0; padding: 0; box-sizing: border-box; }'+
       'body { font-family: "Cairo", "Segoe UI", Tahoma, sans-serif; padding: 30px; color: #333; line-height: 1.6; }'+
-      '.print-header { text-align: center; padding-bottom: 20px; border-bottom: 3px double #1e40af; margin-bottom: 30px; }'+
-      '.print-header h1 { color: #1e40af; font-size: 28px; margin-bottom: 8px; }'+
+      '.print-header { text-align: center; padding-bottom: 20px; border-bottom: 3px double #0B6E4F; margin-bottom: 30px; }'+
+      '.print-header h1 { color: #0B6E4F; font-size: 28px; margin-bottom: 8px; }'+
       '.print-header h2 { color: #555; font-size: 18px; font-weight: normal; }'+
-      '.info-box { background: #f3f4f6; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-right: 4px solid #3b82f6; }'+
+      '.info-box { background: #f3f4f6; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-right: 4px solid #3A3565; }'+
       'table { width: 100%; border-collapse: collapse; margin: 20px 0; }'+
-      'table th { background: #1e40af; color: white; padding: 12px; text-align: right; }'+
+      'table th { background: #0B6E4F; color: white; padding: 12px; text-align: right; }'+
       'table td { padding: 10px 12px; border-bottom: 1px solid #e5e7eb; }'+
       'table tr:nth-child(even) td { background: #f9fafb; }'+
       '.stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin: 20px 0; }'+
       '.stat-card { background: #f3f4f6; padding: 15px; border-radius: 8px; text-align: center; border: 1px solid #d1d5db; }'+
       '.stat-card .label { color: #6b7280; font-size: 13px; margin-bottom: 5px; }'+
-      '.stat-card .value { color: #1e40af; font-size: 24px; font-weight: bold; }'+
-      '.section-title { color: #1e40af; font-size: 18px; margin: 25px 0 12px; padding-bottom: 8px; border-bottom: 2px solid #1e40af; }'+
+      '.stat-card .value { color: #0B6E4F; font-size: 24px; font-weight: bold; }'+
+      '.section-title { color: #0B6E4F; font-size: 18px; margin: 25px 0 12px; padding-bottom: 8px; border-bottom: 2px solid #0B6E4F; }'+
       '.badge-green { background: #d1fae5; color: #065f46; padding: 3px 10px; border-radius: 4px; }'+
       '.badge-red { background: #fee2e2; color: #991b1b; padding: 3px 10px; border-radius: 4px; }'+
       '.badge-gold { background: #fef3c7; color: #92400e; padding: 3px 10px; border-radius: 4px; }'+
       '.print-footer { margin-top: 50px; padding-top: 20px; border-top: 2px dashed #ccc; text-align: center; color: #666; font-size: 13px; }'+
       '@media print { body { padding: 15px; } .no-print { display: none !important; } @page { size: A4; margin: 1cm; } }'+
-      '.print-btn { position: fixed; top: 20px; left: 20px; background: #1e40af; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; }'+
+      '.print-btn { position: fixed; top: 20px; left: 20px; background: #0B6E4F; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; }'+
       '</style></head><body>'+
       '<button class="print-btn no-print" onclick="window.print()">🖨️ طباعة</button>'+
       '<div class="print-header"><h1>'+SCHOOL_LOGO+' '+SCHOOL_NAME+'</h1><h2>'+title+'</h2><div>📅 '+today+'</div></div>'+
       '<div class="info-box"><div><b>الطالب:</b> '+esc(ME.name)+'</div></div>'+
       content+
       '<div class="print-footer"><div>📞 '+SCHOOL_PHONE+' | '+SCHOOL_NAME+'</div></div>'+
-      '<script src="assets/amin-theme-injector.js"></script>
-</body></html>';
+      '<script src="assets/amin-theme-injector.js"><\/script></body></html>';
   }
   
   function buildGradesReport() {

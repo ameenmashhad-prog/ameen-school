@@ -4,12 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>الإرشاد النفسي — مدارس أمين الرضا</title>
+  <link rel="stylesheet" href="assets/amin.css">
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<link rel="stylesheet" href="assets/portal.css">
-<link rel="stylesheet" href="assets/amin-identity.css">
-<link rel="stylesheet" href="assets/brand-redesign.css">
-<link rel="stylesheet" href="assets/amin-v3.css">
 <link rel="stylesheet" href="assets/i18n.css">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="assets/amin-logo-small.png">
@@ -64,7 +61,7 @@
       <button class="btn mobile-menu" id="mobileMenuBtn">☰</button>
       <h2>💚 الإرشاد النفسي والمتابعة</h2>
       <div class="top-actions">
-        <button class="btn" style="background:#3b82f6;color:white;" onclick="CounselorPortal.refresh()">🔄 تحديث</button>
+        <button class="btn" style="background:#3A3565;color:white;" onclick="CounselorPortal.refresh()">🔄 تحديث</button>
       </div>
     </header>
 
@@ -316,7 +313,7 @@
     let html = '<div class="page-head"><div><h1>أهلاً بك، ' + esc(ME.name) + ' 💚</h1><p>لوحة معلومات الإرشاد النفسي والمتابعة' + (unreadNotifs > 0 ? ' · <span class="badge red">' + unreadNotifs + ' إشعار</span>' : '') + '</p></div></div>';
 
     // تنبيه خصوصية
-    html += '<div style="background:linear-gradient(135deg,#fef3c7,#fde68a);border-right:4px solid #f59e0b;padding:16px;border-radius:10px;margin-bottom:24px;color:#78350f;"><b>🔒 تنبيه خصوصية:</b> جميع البيانات هنا محمية ومخصصة للمرشد فقط. لا يمكن مشاركتها بدون إذن.</div>';
+    html += '<div style="border-right:4px solid #B8860B;padding:16px;border-radius:10px;margin-bottom:24px;color:#78350f"><b>🔒 تنبيه خصوصية:</b> جميع البيانات هنا محمية ومخصصة للمرشد فقط. لا يمكن مشاركتها بدون إذن.</div>';
 
     // الإحصائيات
     html += '<h3 style="margin-bottom:12px;">📊 الإحصائيات</h3>';
@@ -332,8 +329,8 @@
       html += '<h3 style="margin-bottom:12px;">⚠️ تنبيهات تحتاج اهتمامك (' + alerts.length + ')</h3>';
       html += '<div class="cards" style="margin-bottom:24px;">';
       alerts.forEach(function(a) {
-        const bgColor = a.type === 'danger' ? '#fee2e2' : a.type === 'warning' ? '#fef3c7' : '#dbeafe';
-        const borderColor = a.type === 'danger' ? '#dc2626' : a.type === 'warning' ? '#d97706' : '#2563eb';
+        const bgColor = a.type === 'danger' ? '#fee2e2' : a.type === 'warning' ? '#FBF1DC' : '#E6F4EF';
+        const borderColor = a.type === 'danger' ? '#dc2626' : a.type === 'warning' ? '#B8860B' : '#0B6E4F';
         html += '<div style="background:' + bgColor + ';border-right:4px solid ' + borderColor + ';padding:14px;border-radius:10px;color:#333;"><div style="font-size:16px;font-weight:bold;margin-bottom:4px;">' + a.icon + ' ' + esc(a.title) + '</div><div style="font-size:13px;opacity:0.85;">' + esc(a.message) + '</div></div>';
       });
       html += '</div>';
@@ -342,10 +339,10 @@
     // إجراءات سريعة
     html += '<h3 style="margin-bottom:12px;">⚡ إجراءات سريعة</h3>';
     html += '<div class="cards" style="margin-bottom:24px;">';
-    html += '<div onclick="CounselorPortal.showView(\'students\')" class="card" style="background:linear-gradient(135deg,#ec4899,#be185d);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">👥</div><div style="font-weight:bold;margin-top:8px;">الطلاب المتابعون</div></div>';
-    html += '<div onclick="CounselorPortal.showView(\'behavior\')" class="card" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">🌟</div><div style="font-weight:bold;margin-top:8px;">سجل السلوك</div></div>';
-    html += '<div onclick="CounselorPortal.showView(\'attendance\')" class="card" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📋</div><div style="font-weight:bold;margin-top:8px;">متابعة الغياب</div></div>';
-    html += '<div onclick="CounselorPortal.showView(\'reports\')" class="card" style="background:linear-gradient(135deg,#10b981,#059669);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📈</div><div style="font-weight:bold;margin-top:8px;">التقارير</div></div>';
+    html += '<div onclick="CounselorPortal.showView(\'students\')" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">👥</div><div style="font-weight:bold;margin-top:8px;">الطلاب المتابعون</div></div>';
+    html += '<div onclick="CounselorPortal.showView(\'behavior\')" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">🌟</div><div style="font-weight:bold;margin-top:8px;">سجل السلوك</div></div>';
+    html += '<div onclick="CounselorPortal.showView(\'attendance\')" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">📋</div><div style="font-weight:bold;margin-top:8px;">متابعة الغياب</div></div>';
+    html += '<div onclick="CounselorPortal.showView(\'reports\')" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">📈</div><div style="font-weight:bold;margin-top:8px;">التقارير</div></div>';
     html += '</div>';
 
     // الطلاب الذين يحتاجون متابعة عاجلة
@@ -372,7 +369,7 @@
         html += '<td><span class="badge ' + (absRate > 20 ? 'red' : 'gold') + '">' + absRate + '%</span></td>';
         html += '<td><span class="badge ' + (negBehavior > 0 ? 'red' : 'green') + '">' + negBehavior + '</span></td>';
         html += '<td>' + (grades.length ? '<span class="badge ' + (avg < 60 ? 'red' : avg < 85 ? 'gold' : 'green') + '">' + avg + '%</span>' : '—') + '</td>';
-        html += '<td><button class="btn small" style="background:#8b5cf6;color:white;" onclick="CounselorPortal.showStudentCase(\'' + s.id + '\')">👁️ متابعة</button></td>';
+        html += '<td><button class="btn small" style="background:#3A3565;color:white;" onclick="CounselorPortal.showStudentCase(\'' + s.id + '\')">👁️ متابعة</button></td>';
         html += '</tr>';
       });
       
@@ -411,7 +408,7 @@
         const behaviorColor = totalPoints >= 0 ? 'green' : 'red';
         const gradeColor = avg >= 85 ? 'green' : avg >= 60 ? 'gold' : 'red';
         
-        html += '<tr ' + (needsAttention ? 'style="background:#fef3c7;"' : '') + '>';
+        html += '<tr ' + (needsAttention ? 'style="background:#FBF1DC;"' : '') + '>';
         html += '<td>' + (i+1) + '</td>';
         html += '<td><b>' + esc(studentName) + '</b></td>';
         html += '<td>' + esc(getClassName(s.class_id)) + '</td>';
@@ -419,7 +416,7 @@
         html += '<td><span class="badge ' + behaviorColor + '">' + (totalPoints > 0 ? '+' : '') + totalPoints + '</span></td>';
         html += '<td>' + (grades.length ? '<span class="badge ' + gradeColor + '">' + avg + '%</span>' : '—') + '</td>';
         html += '<td>' + (needsAttention ? '<span class="badge red">⚠️ متابعة</span>' : '<span class="badge green">✅ طبيعي</span>') + '</td>';
-        html += '<td><button class="btn small" style="background:#8b5cf6;color:white;" onclick="CounselorPortal.showStudentCase(\'' + s.id + '\')">👁️ تفاصيل</button></td>';
+        html += '<td><button class="btn small" style="background:#3A3565;color:white;" onclick="CounselorPortal.showStudentCase(\'' + s.id + '\')">👁️ تفاصيل</button></td>';
         html += '</tr>';
       });
       
@@ -435,7 +432,7 @@
     
     let html = '<div class="page-head" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">';
     html += '<div><h1>🌟 سجل السلوك والملاحظات</h1></div>';
-    html += '<button class="btn" style="background:#1e40af;color:white;" onclick="CounselorPortal.printBehaviorReport()">🖨️ طباعة التقرير</button>';
+    html += '<button class="btn" style="background:#0B6E4F;color:white;" onclick="CounselorPortal.printBehaviorReport()">🖨️ طباعة التقرير</button>';
     html += '</div>';
     
     const positive = DATA.behavior.filter(function(b){ return num(b.points) > 0; }).length;
@@ -553,7 +550,7 @@
         if(negBehavior > 0) issues.push(negBehavior + ' ملاحظة سلبية');
         if(avg && avg < 60) issues.push('درجات منخفضة (' + avg + '%)');
         
-        html += '<div class="card" style="border:2px solid #fbbf24;">';
+        html += '<div class="card" style="border:2px solid #B8860B;">';
         html += '<div class="card-head"><h3>🎓 ' + esc(studentName) + '</h3><span class="badge red">⚠️ حالة</span></div>';
         html += '<div class="card-body">';
         html += '<p><b>الصف:</b> ' + esc(getClassName(s.class_id)) + '</p>';
@@ -561,7 +558,7 @@
         html += '<ul style="padding-right:20px;margin:8px 0;color:#dc2626;">';
         issues.forEach(function(iss){ html += '<li>' + esc(iss) + '</li>'; });
         html += '</ul>';
-        html += '<button class="btn small" style="background:#8b5cf6;color:white;margin-top:8px;" onclick="CounselorPortal.showStudentCase(\'' + s.id + '\')">📋 فتح الملف</button>';
+        html += '<button class="btn small" style="background:#3A3565;color:white;margin-top:8px;" onclick="CounselorPortal.showStudentCase(\'' + s.id + '\')">📋 فتح الملف</button>';
         html += '</div></div>';
       });
       html += '</div>';
@@ -576,7 +573,7 @@
     
     let html = '<div class="page-head"><div><h1>📅 الجلسات الإرشادية</h1><p>إدارة المواعيد والجلسات</p></div></div>';
     
-    html += '<div class="empty" style="text-align:center;padding:60px;background:#f0fdf4;border-radius:12px;">';
+    html += '<div class="empty" style="text-align:center;padding:60px;background:#E6F4EF;border-radius:12px;">';
     html += '<div style="font-size:64px;">📅</div>';
     html += '<h3 style="margin-top:16px;">نظام الجلسات قيد التطوير</h3>';
     html += '<p style="color:#666;margin-top:8px;">سيتم إضافة:</p>';
@@ -621,7 +618,7 @@
     html += '<button class="btn gold" style="margin-top:12px;" onclick="CounselorPortal.printAttendanceReport()">🖨️ طباعة</button>';
     html += '</div></div>';
     
-    html += '<div class="card" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:white;cursor:pointer;" onclick="location.href=\'counseling-report.html\'"><div class="card-body" style="text-align:center;">';
+    html += '<div class="card" style="cursor:pointer" onclick="location.href=\'counseling-report.html\'"><div class="card-body" style="text-align:center;">';
     html += '<div style="font-size:48px;">📊</div>';
     html += '<h3 style="margin-top:12px;">تقارير الإرشاد المتقدمة</h3>';
     html += '<p style="opacity:0.95;">فتح صفحة التقارير الكاملة</p>';
@@ -673,27 +670,26 @@
     const html = '<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>'+title+'</title>'+
       '<style>* { margin: 0; padding: 0; box-sizing: border-box; }'+
       'body { font-family: "Cairo", "Segoe UI", Tahoma, sans-serif; padding: 30px; color: #333; line-height: 1.6; }'+
-      '.print-header { text-align: center; padding-bottom: 20px; border-bottom: 3px double #8b5cf6; margin-bottom: 30px; }'+
-      '.print-header h1 { color: #6d28d9; font-size: 28px; margin-bottom: 8px; }'+
+      '.print-header { text-align: center; padding-bottom: 20px; border-bottom: 3px double #3A3565; margin-bottom: 30px; }'+
+      '.print-header h1 { color: #3A3565; font-size: 28px; margin-bottom: 8px; }'+
       '.confidential { background: #fee2e2; color: #991b1b; padding: 10px; border-radius: 8px; text-align: center; margin-bottom: 20px; font-weight: bold; }'+
       'table { width: 100%; border-collapse: collapse; margin: 20px 0; }'+
-      'table th { background: #6d28d9; color: white; padding: 12px; text-align: right; }'+
+      'table th { background: #3A3565; color: white; padding: 12px; text-align: right; }'+
       'table td { padding: 10px 12px; border-bottom: 1px solid #e5e7eb; }'+
       'table tr:nth-child(even) td { background: #f9fafb; }'+
       '.stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin: 20px 0; }'+
       '.stat-card { background: #f3f4f6; padding: 15px; border-radius: 8px; text-align: center; }'+
       '.stat-card .label { color: #6b7280; font-size: 13px; }'+
-      '.stat-card .value { color: #6d28d9; font-size: 24px; font-weight: bold; }'+
-      '.section-title { color: #6d28d9; font-size: 18px; margin: 25px 0 12px; padding-bottom: 8px; border-bottom: 2px solid #6d28d9; }'+
+      '.stat-card .value { color: #3A3565; font-size: 24px; font-weight: bold; }'+
+      '.section-title { color: #3A3565; font-size: 18px; margin: 25px 0 12px; padding-bottom: 8px; border-bottom: 2px solid #3A3565; }'+
       '@media print { @page { size: A4; margin: 1cm; } .no-print { display: none !important; } }'+
-      '.print-btn { position: fixed; top: 20px; left: 20px; background: #6d28d9; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; }'+
+      '.print-btn { position: fixed; top: 20px; left: 20px; background: #3A3565; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; }'+
       '</style></head><body>'+
       '<button class="print-btn no-print" onclick="window.print()">🖨️ طباعة</button>'+
       '<div class="confidential">🔒 سري - مخصص للإرشاد النفسي فقط</div>'+
       '<div class="print-header"><h1>'+SCHOOL_LOGO+' '+SCHOOL_NAME+'</h1><h2>'+title+'</h2><div>📅 '+today+'</div></div>'+
       content+
-      '<script src="assets/amin-theme-injector.js"></script>
-</body></html>';
+      '<script src="assets/amin-theme-injector.js"><\/script></body></html>';
     
     const w = window.open('', '_blank', 'width=900,height=700');
     w.document.write(html);

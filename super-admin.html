@@ -4,12 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>المسؤول الأعلى — مدارس أمين الرضا</title>
+  <link rel="stylesheet" href="assets/amin.css">
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<link rel="stylesheet" href="assets/portal.css">
-<link rel="stylesheet" href="assets/amin-identity.css">
-<link rel="stylesheet" href="assets/brand-redesign.css">
-<link rel="stylesheet" href="assets/amin-v3.css">
 <link rel="stylesheet" href="assets/i18n.css">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="assets/amin-logo-small.png">
@@ -62,7 +59,7 @@
       <button class="btn mobile-menu" id="mobileMenuBtn">☰</button>
       <h2>👑 لوحة المسؤول الأعلى</h2>
       <div class="top-actions">
-        <button class="btn" style="background:#3b82f6;color:white;" onclick="SuperAdmin.refresh()">🔄 تحديث</button>
+        <button class="btn" style="background:#3A3565;color:white;" onclick="SuperAdmin.refresh()">🔄 تحديث</button>
       </div>
     </header>
 
@@ -339,7 +336,7 @@
       html += '<div class="cards" style="margin-bottom:24px;">';
       alerts.forEach(function(a) {
         const bgColor = a.type === 'danger' ? '#fee2e2' : a.type === 'warning' ? '#fef3c7' : '#dbeafe';
-        const borderColor = a.type === 'danger' ? '#dc2626' : a.type === 'warning' ? '#d97706' : '#2563eb';
+        const borderColor = a.type === 'danger' ? '#dc2626' : a.type === 'warning' ? '#d97706' : '#0B6E4F';
         html += '<div style="background:'+bgColor+';border-right:4px solid '+borderColor+';padding:14px;border-radius:10px;color:#333;"><div style="font-size:16px;font-weight:bold;margin-bottom:4px;">'+a.icon+' '+esc(a.title)+'</div><div style="font-size:13px;opacity:0.85;">'+esc(a.message)+'</div></div>';
       });
       html += '</div>';
@@ -348,71 +345,71 @@
     // التسجيلات الجديدة - مع زر استيراد Excel
     html += '<h3 style="margin-bottom:12px;">📝 التسجيلات وإضافة المستخدمين</h3>';
     html += '<div class="cards" style="margin-bottom:24px;">';
-    html += '<div onclick="location.href=\'family-registration.html\'" class="card" style="background:linear-gradient(135deg,#10b981,#059669);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">👨‍👩‍👧</div><div style="font-weight:bold;margin-top:8px;">تسجيل ولي أمر/طالب</div></div>';
-    html += '<div onclick="location.href=\'teacher-registration.html\'" class="card" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">👨‍🏫</div><div style="font-weight:bold;margin-top:8px;">تسجيل معلم</div></div>';
-    html += '<div onclick="location.href=\'import-students.html\'" class="card" style="background:linear-gradient(135deg,#06b6d4,#0e7490);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📥</div><div style="font-weight:bold;margin-top:8px;">استيراد من Excel</div><small style="opacity:0.9;display:block;margin-top:4px;">Google Forms</small></div>';
-    html += '<div onclick="location.href=\'registrations-admin.html\'" class="card" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📋</div><div style="font-weight:bold;margin-top:8px;">مراجعة التسجيلات</div></div>';
-    html += '<div onclick="location.href=\'permissions-management.html\'" class="card" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">🔑</div><div style="font-weight:bold;margin-top:8px;">إدارة الصلاحيات</div></div>';
+    html += '<div onclick="location.href=\'family-registration.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">👨‍👩‍👧</div><div style="font-weight:bold;margin-top:8px;">تسجيل ولي أمر/طالب</div></div>';
+    html += '<div onclick="location.href=\'teacher-registration.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">👨‍🏫</div><div style="font-weight:bold;margin-top:8px;">تسجيل معلم</div></div>';
+    html += '<div onclick="location.href=\'import-students.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">📥</div><div style="font-weight:bold;margin-top:8px;">استيراد من Excel</div><small style="opacity:0.9;display:block;margin-top:4px;">Google Forms</small></div>';
+    html += '<div onclick="location.href=\'registrations-admin.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">📋</div><div style="font-weight:bold;margin-top:8px;">مراجعة التسجيلات</div></div>';
+    html += '<div onclick="location.href=\'permissions-management.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">🔑</div><div style="font-weight:bold;margin-top:8px;">إدارة الصلاحيات</div></div>';
     html += '</div>';
     
     // المالية
     html += '<h3 style="margin-bottom:12px;">💰 الأنظمة المالية</h3>';
     html += '<div class="cards" style="margin-bottom:24px;">';
-    html += '<div onclick="location.href=\'finance-pro.html\'" class="card" style="background:linear-gradient(135deg,#10b981,#059669);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">💰</div><div style="font-weight:bold;margin-top:8px;">النظام المالي</div></div>';
-    html += '<div onclick="location.href=\'finance-cashbox.html\'" class="card" style="background:linear-gradient(135deg,#06b6d4,#0891b2);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">💵</div><div style="font-weight:bold;margin-top:8px;">صندوق اليومية</div></div>';
-    html += '<div onclick="location.href=\'finance-collections.html\'" class="card" style="background:linear-gradient(135deg,#dc2626,#991b1b);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📞</div><div style="font-weight:bold;margin-top:8px;">التحصيل والمتابعة</div></div>';
-    html += '<div onclick="location.href=\'finance-executive.html\'" class="card" style="background:linear-gradient(135deg,#7c3aed,#5b21b6);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📊</div><div style="font-weight:bold;margin-top:8px;">المركز المالي التنفيذي</div></div>';
-    html += '<div onclick="location.href=\'finance-credit-report.html\'" class="card" style="background:linear-gradient(135deg,#0891b2,#0e7490);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">💳</div><div style="font-weight:bold;margin-top:8px;">الرصيد الدائن</div></div>';
-    html += '<div onclick="location.href=\'finance-receiver-reports.html\'" class="card" style="background:linear-gradient(135deg,#be185d,#9f1239);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📈</div><div style="font-weight:bold;margin-top:8px;">تقارير المستلمين</div></div>';
-    html += '<div onclick="location.href=\'admin-finance-rules.html\'" class="card" style="background:linear-gradient(135deg,#6b7280,#4b5563);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">⚙️</div><div style="font-weight:bold;margin-top:8px;">قواعد المالية</div></div>';
+    html += '<div onclick="location.href=\'finance-pro.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">💰</div><div style="font-weight:bold;margin-top:8px;">النظام المالي</div></div>';
+    html += '<div onclick="location.href=\'finance-cashbox.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">💵</div><div style="font-weight:bold;margin-top:8px;">صندوق اليومية</div></div>';
+    html += '<div onclick="location.href=\'finance-collections.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">📞</div><div style="font-weight:bold;margin-top:8px;">التحصيل والمتابعة</div></div>';
+    html += '<div onclick="location.href=\'finance-executive.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">📊</div><div style="font-weight:bold;margin-top:8px;">المركز المالي التنفيذي</div></div>';
+    html += '<div onclick="location.href=\'finance-credit-report.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">💳</div><div style="font-weight:bold;margin-top:8px;">الرصيد الدائن</div></div>';
+    html += '<div onclick="location.href=\'finance-receiver-reports.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">📈</div><div style="font-weight:bold;margin-top:8px;">تقارير المستلمين</div></div>';
+    html += '<div onclick="location.href=\'admin-finance-rules.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">⚙️</div><div style="font-weight:bold;margin-top:8px;">قواعد المالية</div></div>';
     html += '</div>';
     
     // الأكاديمي
     html += '<h3 style="margin-bottom:12px;">📚 الأنظمة الأكاديمية</h3>';
     html += '<div class="cards" style="margin-bottom:24px;">';
-    html += '<div onclick="location.href=\'academic-pro.html\'" class="card" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📚</div><div style="font-weight:bold;margin-top:8px;">النظام الأكاديمي</div></div>';
-    html += '<div onclick="location.href=\'schedule-management.html\'" class="card" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📅</div><div style="font-weight:bold;margin-top:8px;">إدارة الجداول</div></div>';
-    html += '<div onclick="location.href=\'section-assignment-management.html\'" class="card" style="background:linear-gradient(135deg,#06b6d4,#0891b2);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">🎯</div><div style="font-weight:bold;margin-top:8px;">الشعب والإسنادات</div></div>';
-    html += '<div onclick="location.href=\'curriculum-planner.html\'" class="card" style="background:linear-gradient(135deg,#10b981,#059669);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📖</div><div style="font-weight:bold;margin-top:8px;">مخطط المنهج</div></div>';
-    html += '<div onclick="location.href=\'teacher-exams.html\'" class="card" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📝</div><div style="font-weight:bold;margin-top:8px;">بنك الأسئلة</div></div>';
-    html += '<div onclick="location.href=\'online-exams.html\'" class="card" style="background:linear-gradient(135deg,#ec4899,#be185d);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">💻</div><div style="font-weight:bold;margin-top:8px;">الاختبارات الإلكترونية</div></div>';
-    html += '<div onclick="location.href=\'exam-integrity.html\'" class="card" style="background:linear-gradient(135deg,#dc2626,#991b1b);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">🛡️</div><div style="font-weight:bold;margin-top:8px;">نزاهة الاختبارات</div></div>';
-    html += '<div onclick="location.href=\'homework-reports.html\'" class="card" style="background:linear-gradient(135deg,#0891b2,#0e7490);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📊</div><div style="font-weight:bold;margin-top:8px;">تقارير الواجبات</div></div>';
-    html += '<div onclick="location.href=\'homework-audit.html\'" class="card" style="background:linear-gradient(135deg,#7c3aed,#5b21b6);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📋</div><div style="font-weight:bold;margin-top:8px;">سجل الواجبات</div></div>';
+    html += '<div onclick="location.href=\'academic-pro.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">📚</div><div style="font-weight:bold;margin-top:8px;">النظام الأكاديمي</div></div>';
+    html += '<div onclick="location.href=\'schedule-management.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">📅</div><div style="font-weight:bold;margin-top:8px;">إدارة الجداول</div></div>';
+    html += '<div onclick="location.href=\'section-assignment-management.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">🎯</div><div style="font-weight:bold;margin-top:8px;">الشعب والإسنادات</div></div>';
+    html += '<div onclick="location.href=\'curriculum-planner.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">📖</div><div style="font-weight:bold;margin-top:8px;">مخطط المنهج</div></div>';
+    html += '<div onclick="location.href=\'teacher-exams.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">📝</div><div style="font-weight:bold;margin-top:8px;">بنك الأسئلة</div></div>';
+    html += '<div onclick="location.href=\'online-exams.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">💻</div><div style="font-weight:bold;margin-top:8px;">الاختبارات الإلكترونية</div></div>';
+    html += '<div onclick="location.href=\'exam-integrity.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">🛡️</div><div style="font-weight:bold;margin-top:8px;">نزاهة الاختبارات</div></div>';
+    html += '<div onclick="location.href=\'homework-reports.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">📊</div><div style="font-weight:bold;margin-top:8px;">تقارير الواجبات</div></div>';
+    html += '<div onclick="location.href=\'homework-audit.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">📋</div><div style="font-weight:bold;margin-top:8px;">سجل الواجبات</div></div>';
     html += '</div>';
     
     // الموارد والمرافق
     html += '<h3 style="margin-bottom:12px;">📦 الموارد والمرافق</h3>';
     html += '<div class="cards" style="margin-bottom:24px;">';
-    html += '<div onclick="location.href=\'library.html\'" class="card" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📚</div><div style="font-weight:bold;margin-top:8px;">المكتبة</div></div>';
-    html += '<div onclick="location.href=\'inventory.html\'" class="card" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📦</div><div style="font-weight:bold;margin-top:8px;">المخزون</div></div>';
-    html += '<div onclick="location.href=\'fixed-assets.html\'" class="card" style="background:linear-gradient(135deg,#06b6d4,#0891b2);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">🏢</div><div style="font-weight:bold;margin-top:8px;">الأصول والعهد</div></div>';
-    html += '<div onclick="location.href=\'labs-activities.html\'" class="card" style="background:linear-gradient(135deg,#10b981,#059669);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">🔬</div><div style="font-weight:bold;margin-top:8px;">المختبرات والأنشطة</div></div>';
-    html += '<div onclick="location.href=\'transportation.html\'" class="card" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">🚌</div><div style="font-weight:bold;margin-top:8px;">النقل المدرسي</div></div>';
-    html += '<div onclick="location.href=\'documents.html\'" class="card" style="background:linear-gradient(135deg,#6b7280,#4b5563);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📄</div><div style="font-weight:bold;margin-top:8px;">الوثائق والأرشيف</div></div>';
+    html += '<div onclick="location.href=\'library.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">📚</div><div style="font-weight:bold;margin-top:8px;">المكتبة</div></div>';
+    html += '<div onclick="location.href=\'inventory.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">📦</div><div style="font-weight:bold;margin-top:8px;">المخزون</div></div>';
+    html += '<div onclick="location.href=\'fixed-assets.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">🏢</div><div style="font-weight:bold;margin-top:8px;">الأصول والعهد</div></div>';
+    html += '<div onclick="location.href=\'labs-activities.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">🔬</div><div style="font-weight:bold;margin-top:8px;">المختبرات والأنشطة</div></div>';
+    html += '<div onclick="location.href=\'transportation.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">🚌</div><div style="font-weight:bold;margin-top:8px;">النقل المدرسي</div></div>';
+    html += '<div onclick="location.href=\'documents.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">📄</div><div style="font-weight:bold;margin-top:8px;">الوثائق والأرشيف</div></div>';
     html += '</div>';
     
     // الإرشاد والموارد البشرية
     html += '<h3 style="margin-bottom:12px;">👥 الإرشاد والموارد البشرية</h3>';
     html += '<div class="cards" style="margin-bottom:24px;">';
-    html += '<div onclick="location.href=\'counselor.html\'" class="card" style="background:linear-gradient(135deg,#ec4899,#be185d);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">💚</div><div style="font-weight:bold;margin-top:8px;">الإرشاد النفسي</div></div>';
-    html += '<div onclick="location.href=\'counseling-report.html\'" class="card" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📊</div><div style="font-weight:bold;margin-top:8px;">تقارير الإرشاد</div></div>';
-    html += '<div onclick="location.href=\'hr.html\'" class="card" style="background:linear-gradient(135deg,#0891b2,#0e7490);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">👔</div><div style="font-weight:bold;margin-top:8px;">الموارد البشرية</div></div>';
-    html += '<div onclick="location.href=\'staff.html\'" class="card" style="background:linear-gradient(135deg,#10b981,#059669);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">👥</div><div style="font-weight:bold;margin-top:8px;">الموظفون</div></div>';
+    html += '<div onclick="location.href=\'counselor.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">💚</div><div style="font-weight:bold;margin-top:8px;">الإرشاد النفسي</div></div>';
+    html += '<div onclick="location.href=\'counseling-report.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">📊</div><div style="font-weight:bold;margin-top:8px;">تقارير الإرشاد</div></div>';
+    html += '<div onclick="location.href=\'hr.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">👔</div><div style="font-weight:bold;margin-top:8px;">الموارد البشرية</div></div>';
+    html += '<div onclick="location.href=\'staff.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">👥</div><div style="font-weight:bold;margin-top:8px;">الموظفون</div></div>';
     html += '</div>';
     
     // الأنظمة والإدارة
     html += '<h3 style="margin-bottom:12px;">⚙️ الأنظمة والإدارة</h3>';
     html += '<div class="cards" style="margin-bottom:24px;">';
-    html += '<div onclick="location.href=\'analytics-center.html\'" class="card" style="background:linear-gradient(135deg,#ec4899,#be185d);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📊</div><div style="font-weight:bold;margin-top:8px;">مركز التحليلات</div></div>';
-    html += '<div onclick="location.href=\'announcements.html\'" class="card" style="background:linear-gradient(135deg,#06b6d4,#0891b2);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📢</div><div style="font-weight:bold;margin-top:8px;">الإعلانات الجماعية</div></div>';
-    html += '<div onclick="location.href=\'notifications.html\'" class="card" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">🔔</div><div style="font-weight:bold;margin-top:8px;">الإشعارات</div></div>';
-    html += '<div onclick="location.href=\'smart-calendar.html\'" class="card" style="background:linear-gradient(135deg,#10b981,#059669);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📅</div><div style="font-weight:bold;margin-top:8px;">التقويم الذكي</div></div>';
-    html += '<div onclick="location.href=\'achievements.html\'" class="card" style="background:linear-gradient(135deg,#fbbf24,#f59e0b);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">🏆</div><div style="font-weight:bold;margin-top:8px;">الإنجازات والشارات</div></div>';
-    html += '<div onclick="location.href=\'system-maintenance.html\'" class="card" style="background:linear-gradient(135deg,#6b7280,#4b5563);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">⚙️</div><div style="font-weight:bold;margin-top:8px;">صيانة النظام</div></div>';
-    html += '<div onclick="location.href=\'security-governance.html\'" class="card" style="background:linear-gradient(135deg,#dc2626,#991b1b);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">🛡️</div><div style="font-weight:bold;margin-top:8px;">حوكمة الأمن</div></div>';
-    html += '<div onclick="location.href=\'final-readiness.html\'" class="card" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">✅</div><div style="font-weight:bold;margin-top:8px;">الجاهزية النهائية</div></div>';
-    html += '<div onclick="location.href=\'deployment-check.html\'" class="card" style="background:linear-gradient(135deg,#7c3aed,#5b21b6);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">🚀</div><div style="font-weight:bold;margin-top:8px;">فحص النشر</div></div>';
+    html += '<div onclick="location.href=\'analytics-center.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">📊</div><div style="font-weight:bold;margin-top:8px;">مركز التحليلات</div></div>';
+    html += '<div onclick="location.href=\'announcements.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">📢</div><div style="font-weight:bold;margin-top:8px;">الإعلانات الجماعية</div></div>';
+    html += '<div onclick="location.href=\'notifications.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">🔔</div><div style="font-weight:bold;margin-top:8px;">الإشعارات</div></div>';
+    html += '<div onclick="location.href=\'smart-calendar.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">📅</div><div style="font-weight:bold;margin-top:8px;">التقويم الذكي</div></div>';
+    html += '<div onclick="location.href=\'achievements.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">🏆</div><div style="font-weight:bold;margin-top:8px;">الإنجازات والشارات</div></div>';
+    html += '<div onclick="location.href=\'system-maintenance.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">⚙️</div><div style="font-weight:bold;margin-top:8px;">صيانة النظام</div></div>';
+    html += '<div onclick="location.href=\'security-governance.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">🛡️</div><div style="font-weight:bold;margin-top:8px;">حوكمة الأمن</div></div>';
+    html += '<div onclick="location.href=\'final-readiness.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">✅</div><div style="font-weight:bold;margin-top:8px;">الجاهزية النهائية</div></div>';
+    html += '<div onclick="location.href=\'deployment-check.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">🚀</div><div style="font-weight:bold;margin-top:8px;">فحص النشر</div></div>';
     html += '</div>';
     
     container.innerHTML = html;
@@ -426,35 +423,35 @@
     
     html += '<div class="cards" style="margin-bottom:24px;">';
     
-    html += '<div onclick="location.href=\'family-registration.html\'" class="card" style="background:linear-gradient(135deg,#10b981,#059669);color:white;cursor:pointer;padding:30px;border:none;">';
+    html += '<div onclick="location.href=\'family-registration.html\'" class="card" style="cursor:pointer;padding:30px">';
     html += '<div style="text-align:center;"><div style="font-size:64px;">👨‍👩‍👧</div>';
     html += '<h2 style="margin:12px 0;">تسجيل ولي أمر/طالب</h2>';
     html += '<p style="opacity:0.95;">سجّل عائلة جديدة (ولي أمر + أبناءه)</p>';
     html += '<div style="margin-top:16px;padding:8px 16px;background:rgba(255,255,255,0.2);border-radius:8px;display:inline-block;">📝 ابدأ التسجيل</div>';
     html += '</div></div>';
     
-    html += '<div onclick="location.href=\'teacher-registration.html\'" class="card" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:white;cursor:pointer;padding:30px;border:none;">';
+    html += '<div onclick="location.href=\'teacher-registration.html\'" class="card" style="cursor:pointer;padding:30px">';
     html += '<div style="text-align:center;"><div style="font-size:64px;">👨‍🏫</div>';
     html += '<h2 style="margin:12px 0;">تسجيل معلم جديد</h2>';
     html += '<p style="opacity:0.95;">أضف معلم/معلمة جديد للنظام</p>';
     html += '<div style="margin-top:16px;padding:8px 16px;background:rgba(255,255,255,0.2);border-radius:8px;display:inline-block;">📝 ابدأ التسجيل</div>';
     html += '</div></div>';
     
-    html += '<div onclick="location.href=\'import-students.html\'" class="card" style="background:linear-gradient(135deg,#06b6d4,#0e7490);color:white;cursor:pointer;padding:30px;border:none;">';
+    html += '<div onclick="location.href=\'import-students.html\'" class="card" style="cursor:pointer;padding:30px">';
     html += '<div style="text-align:center;"><div style="font-size:64px;">📥</div>';
     html += '<h2 style="margin:12px 0;">استيراد من Excel</h2>';
     html += '<p style="opacity:0.95;">رفع نتائج Google Forms جماعياً</p>';
     html += '<div style="margin-top:16px;padding:8px 16px;background:rgba(255,255,255,0.2);border-radius:8px;display:inline-block;">📊 ارفع الملف</div>';
     html += '</div></div>';
     
-    html += '<div onclick="location.href=\'registrations-admin.html\'" class="card" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:white;cursor:pointer;padding:30px;border:none;">';
+    html += '<div onclick="location.href=\'registrations-admin.html\'" class="card" style="cursor:pointer;padding:30px">';
     html += '<div style="text-align:center;"><div style="font-size:64px;">📋</div>';
     html += '<h2 style="margin:12px 0;">مراجعة التسجيلات</h2>';
     html += '<p style="opacity:0.95;">راجع طلبات التسجيل الجديدة</p>';
     html += '<div style="margin-top:16px;padding:8px 16px;background:rgba(255,255,255,0.2);border-radius:8px;display:inline-block;">📋 المراجعة</div>';
     html += '</div></div>';
     
-    html += '<div onclick="location.href=\'permissions-management.html\'" class="card" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:white;cursor:pointer;padding:30px;border:none;">';
+    html += '<div onclick="location.href=\'permissions-management.html\'" class="card" style="cursor:pointer;padding:30px">';
     html += '<div style="text-align:center;"><div style="font-size:64px;">🔑</div>';
     html += '<h2 style="margin:12px 0;">إدارة الصلاحيات</h2>';
     html += '<p style="opacity:0.95;">امنح أو الغ صلاحيات المستخدمين</p>';
@@ -483,7 +480,7 @@
     html += '<div><h1>🎓 إدارة الطلاب</h1><p>إجمالي: <b>'+DATA.students.length+'</b> طالب</p></div>';
     html += '<div style="display:flex;gap:8px;flex-wrap:wrap;">';
     html += '<button class="btn" style="background:#10b981;color:white;padding:12px 24px;" onclick="location.href=\'family-registration.html\'">➕ إضافة طالب جديد</button>';
-    html += '<button class="btn" style="background:#06b6d4;color:white;padding:12px 24px;" onclick="location.href=\'import-students.html\'">📥 استيراد جماعي</button>';
+    html += '<button class="btn" style="background:#0E9C92;color:white;padding:12px 24px;" onclick="location.href=\'import-students.html\'">📥 استيراد جماعي</button>';
     html += '</div></div>';
     
     if(!DATA.students.length) {
@@ -497,7 +494,7 @@
       
       html += '<div class="cards" style="margin-bottom:20px;">';
       Object.keys(classCounts).slice(0, 6).forEach(function(cn) {
-        html += '<div class="card" style="text-align:center;padding:16px;"><b style="font-size:24px;color:#3b82f6;">'+classCounts[cn]+'</b><div style="color:#666;font-size:13px;">'+esc(cn)+'</div></div>';
+        html += '<div class="card" style="text-align:center;padding:16px;"><b style="font-size:24px;color:#3A3565;">'+classCounts[cn]+'</b><div style="color:#666;font-size:13px;">'+esc(cn)+'</div></div>';
       });
       html += '</div>';
       
@@ -547,7 +544,7 @@
     
     let html = '<div class="page-head" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">';
     html += '<div><h1>👨‍🏫 المعلمون</h1><p>إجمالي: <b>'+DATA.teachers.length+'</b> معلم</p></div>';
-    html += '<button class="btn" style="background:#3b82f6;color:white;padding:12px 24px;" onclick="location.href=\'teacher-registration.html\'">➕ إضافة معلم جديد</button>';
+    html += '<button class="btn" style="background:#3A3565;color:white;padding:12px 24px;" onclick="location.href=\'teacher-registration.html\'">➕ إضافة معلم جديد</button>';
     html += '</div>';
     
     if(!DATA.teachers.length) {
@@ -577,7 +574,7 @@
     html += '<div><h1>👨‍👩‍👧 أولياء الأمور</h1><p>إجمالي: <b>'+DATA.parents.length+'</b> ولي أمر</p></div>';
     html += '<div style="display:flex;gap:8px;flex-wrap:wrap;">';
     html += '<button class="btn" style="background:#10b981;color:white;padding:12px 24px;" onclick="location.href=\'family-registration.html\'">➕ إضافة ولي أمر</button>';
-    html += '<button class="btn" style="background:#06b6d4;color:white;padding:12px 24px;" onclick="location.href=\'import-students.html\'">📥 استيراد جماعي</button>';
+    html += '<button class="btn" style="background:#0E9C92;color:white;padding:12px 24px;" onclick="location.href=\'import-students.html\'">📥 استيراد جماعي</button>';
     html += '</div></div>';
     
     if(!DATA.parents.length) {
@@ -616,10 +613,10 @@
     
     html += '<h3 style="margin-bottom:12px;">🔗 الوصول للأنظمة المالية</h3>';
     html += '<div class="cards" style="margin-bottom:24px;">';
-    html += '<div onclick="location.href=\'finance-pro.html\'" class="card" style="background:linear-gradient(135deg,#10b981,#059669);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">💰</div><div style="font-weight:bold;margin-top:8px;">النظام المالي</div></div>';
-    html += '<div onclick="location.href=\'finance-cashbox.html\'" class="card" style="background:linear-gradient(135deg,#06b6d4,#0891b2);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">💵</div><div style="font-weight:bold;margin-top:8px;">صندوق اليومية</div></div>';
-    html += '<div onclick="location.href=\'finance-collections.html\'" class="card" style="background:linear-gradient(135deg,#dc2626,#991b1b);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📞</div><div style="font-weight:bold;margin-top:8px;">التحصيل</div></div>';
-    html += '<div onclick="location.href=\'finance-executive.html\'" class="card" style="background:linear-gradient(135deg,#7c3aed,#5b21b6);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📊</div><div style="font-weight:bold;margin-top:8px;">التنفيذي</div></div>';
+    html += '<div onclick="location.href=\'finance-pro.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">💰</div><div style="font-weight:bold;margin-top:8px;">النظام المالي</div></div>';
+    html += '<div onclick="location.href=\'finance-cashbox.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">💵</div><div style="font-weight:bold;margin-top:8px;">صندوق اليومية</div></div>';
+    html += '<div onclick="location.href=\'finance-collections.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">📞</div><div style="font-weight:bold;margin-top:8px;">التحصيل</div></div>';
+    html += '<div onclick="location.href=\'finance-executive.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">📊</div><div style="font-weight:bold;margin-top:8px;">التنفيذي</div></div>';
     html += '</div>';
     
     const overdueFees = DATA.fees.filter(function(f){
@@ -663,10 +660,10 @@
     
     html += '<h3 style="margin-bottom:12px;">🔗 الأنظمة الأكاديمية</h3>';
     html += '<div class="cards" style="margin-bottom:24px;">';
-    html += '<div onclick="location.href=\'academic-pro.html\'" class="card" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📚</div><div style="font-weight:bold;margin-top:8px;">النظام الأكاديمي</div></div>';
-    html += '<div onclick="location.href=\'schedule-management.html\'" class="card" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📅</div><div style="font-weight:bold;margin-top:8px;">إدارة الجداول</div></div>';
-    html += '<div onclick="location.href=\'curriculum-planner.html\'" class="card" style="background:linear-gradient(135deg,#10b981,#059669);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📖</div><div style="font-weight:bold;margin-top:8px;">مخطط المنهج</div></div>';
-    html += '<div onclick="location.href=\'teacher-exams.html\'" class="card" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📝</div><div style="font-weight:bold;margin-top:8px;">بنك الأسئلة</div></div>';
+    html += '<div onclick="location.href=\'academic-pro.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">📚</div><div style="font-weight:bold;margin-top:8px;">النظام الأكاديمي</div></div>';
+    html += '<div onclick="location.href=\'schedule-management.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">📅</div><div style="font-weight:bold;margin-top:8px;">إدارة الجداول</div></div>';
+    html += '<div onclick="location.href=\'curriculum-planner.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">📖</div><div style="font-weight:bold;margin-top:8px;">مخطط المنهج</div></div>';
+    html += '<div onclick="location.href=\'teacher-exams.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">📝</div><div style="font-weight:bold;margin-top:8px;">بنك الأسئلة</div></div>';
     html += '</div>';
     
     const studentAverages = DATA.students.map(function(s) {
@@ -700,12 +697,12 @@
     let html = '<div class="page-head"><div><h1>📦 الموارد والمرافق</h1></div></div>';
     
     html += '<div class="cards">';
-    html += '<div onclick="location.href=\'library.html\'" class="card" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:white;cursor:pointer;padding:30px;border:none;text-align:center;"><div style="font-size:64px;">📚</div><h2 style="margin-top:12px;">المكتبة</h2><p style="opacity:0.95;">فهرس الكتب والإعارة</p></div>';
-    html += '<div onclick="location.href=\'inventory.html\'" class="card" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:white;cursor:pointer;padding:30px;border:none;text-align:center;"><div style="font-size:64px;">📦</div><h2 style="margin-top:12px;">المخزون والمشتريات</h2><p style="opacity:0.95;">إدارة الأصناف والموردين</p></div>';
-    html += '<div onclick="location.href=\'fixed-assets.html\'" class="card" style="background:linear-gradient(135deg,#06b6d4,#0891b2);color:white;cursor:pointer;padding:30px;border:none;text-align:center;"><div style="font-size:64px;">🏢</div><h2 style="margin-top:12px;">الأصول والعهد</h2><p style="opacity:0.95;">إدارة الأصول الثابتة</p></div>';
-    html += '<div onclick="location.href=\'labs-activities.html\'" class="card" style="background:linear-gradient(135deg,#10b981,#059669);color:white;cursor:pointer;padding:30px;border:none;text-align:center;"><div style="font-size:64px;">🔬</div><h2 style="margin-top:12px;">المختبرات والأنشطة</h2><p style="opacity:0.95;">إدارة المختبرات والأنشطة</p></div>';
-    html += '<div onclick="location.href=\'transportation.html\'" class="card" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:white;cursor:pointer;padding:30px;border:none;text-align:center;"><div style="font-size:64px;">🚌</div><h2 style="margin-top:12px;">النقل المدرسي</h2><p style="opacity:0.95;">الحافلات والمسارات</p></div>';
-    html += '<div onclick="location.href=\'documents.html\'" class="card" style="background:linear-gradient(135deg,#6b7280,#4b5563);color:white;cursor:pointer;padding:30px;border:none;text-align:center;"><div style="font-size:64px;">📄</div><h2 style="margin-top:12px;">الوثائق والأرشيف</h2><p style="opacity:0.95;">ملفات الطلاب والموظفين</p></div>';
+    html += '<div onclick="location.href=\'library.html\'" class="card" style="cursor:pointer;padding:30px;text-align:center"><div style="font-size:64px;">📚</div><h2 style="margin-top:12px;">المكتبة</h2><p style="opacity:0.95;">فهرس الكتب والإعارة</p></div>';
+    html += '<div onclick="location.href=\'inventory.html\'" class="card" style="cursor:pointer;padding:30px;text-align:center"><div style="font-size:64px;">📦</div><h2 style="margin-top:12px;">المخزون والمشتريات</h2><p style="opacity:0.95;">إدارة الأصناف والموردين</p></div>';
+    html += '<div onclick="location.href=\'fixed-assets.html\'" class="card" style="cursor:pointer;padding:30px;text-align:center"><div style="font-size:64px;">🏢</div><h2 style="margin-top:12px;">الأصول والعهد</h2><p style="opacity:0.95;">إدارة الأصول الثابتة</p></div>';
+    html += '<div onclick="location.href=\'labs-activities.html\'" class="card" style="cursor:pointer;padding:30px;text-align:center"><div style="font-size:64px;">🔬</div><h2 style="margin-top:12px;">المختبرات والأنشطة</h2><p style="opacity:0.95;">إدارة المختبرات والأنشطة</p></div>';
+    html += '<div onclick="location.href=\'transportation.html\'" class="card" style="cursor:pointer;padding:30px;text-align:center"><div style="font-size:64px;">🚌</div><h2 style="margin-top:12px;">النقل المدرسي</h2><p style="opacity:0.95;">الحافلات والمسارات</p></div>';
+    html += '<div onclick="location.href=\'documents.html\'" class="card" style="cursor:pointer;padding:30px;text-align:center"><div style="font-size:64px;">📄</div><h2 style="margin-top:12px;">الوثائق والأرشيف</h2><p style="opacity:0.95;">ملفات الطلاب والموظفين</p></div>';
     html += '</div>';
     
     container.innerHTML = html;
@@ -722,15 +719,15 @@
     html += '<div class="card"><div class="card-head"><h3>📊 التقرير العام</h3></div><div class="card-body"><p>الطلاب: <b>'+stats.totalStudents+'</b></p><p>المعلمون: <b>'+stats.totalTeachers+'</b></p><p>أولياء الأمور: <b>'+stats.totalParents+'</b></p><button class="btn blue" style="margin-top:12px;" onclick="SuperAdmin.printGeneralReport()">🖨️ طباعة</button></div></div>';
     html += '<div class="card"><div class="card-head"><h3>💰 التقرير المالي</h3></div><div class="card-body"><p>الرسوم: <b>'+money(stats.totalFees)+'</b></p><p>المحصّل: <b style="color:#10b981;">'+money(stats.totalPaid)+'</b></p><p>المتأخرات: <b style="color:#dc2626;">'+money(stats.totalRemaining)+'</b></p><button class="btn gold" style="margin-top:12px;" onclick="SuperAdmin.printFinanceReport()">🖨️ طباعة</button></div></div>';
     html += '<div class="card"><div class="card-head"><h3>📚 التقرير الأكاديمي</h3></div><div class="card-body"><p>الدرجات: <b>'+stats.totalGrades+'</b></p><p>المعدل: <b>'+stats.gradesAvg+'%</b></p><button class="btn green" style="margin-top:12px;" onclick="SuperAdmin.printAcademicReport()">🖨️ طباعة</button></div></div>';
-    html += '<div class="card"><div class="card-head"><h3>📋 تقرير الحضور</h3></div><div class="card-body"><p>السجلات: <b>'+DATA.attendance.length+'</b></p><p>حضور اليوم: <b>'+stats.attRate+'%</b></p><button class="btn" style="background:#8b5cf6;color:white;margin-top:12px;" onclick="SuperAdmin.printAttendanceReport()">🖨️ طباعة</button></div></div>';
+    html += '<div class="card"><div class="card-head"><h3>📋 تقرير الحضور</h3></div><div class="card-body"><p>السجلات: <b>'+DATA.attendance.length+'</b></p><p>حضور اليوم: <b>'+stats.attRate+'%</b></p><button class="btn" style="background:#3A3565;color:white;margin-top:12px;" onclick="SuperAdmin.printAttendanceReport()">🖨️ طباعة</button></div></div>';
     html += '</div>';
     
     html += '<h3 style="margin:24px 0 12px;">🔗 صفحات التقارير المتقدمة</h3>';
     html += '<div class="cards">';
-    html += '<div onclick="location.href=\'analytics-center.html\'" class="card" style="background:linear-gradient(135deg,#ec4899,#be185d);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📊</div><div style="font-weight:bold;margin-top:8px;">مركز التحليلات</div></div>';
-    html += '<div onclick="location.href=\'finance-receiver-reports.html\'" class="card" style="background:linear-gradient(135deg,#10b981,#059669);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">💰</div><div style="font-weight:bold;margin-top:8px;">تقارير المالية</div></div>';
-    html += '<div onclick="location.href=\'homework-reports.html\'" class="card" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📚</div><div style="font-weight:bold;margin-top:8px;">تقارير الواجبات</div></div>';
-    html += '<div onclick="location.href=\'counseling-report.html\'" class="card" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">💚</div><div style="font-weight:bold;margin-top:8px;">تقارير الإرشاد</div></div>';
+    html += '<div onclick="location.href=\'analytics-center.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">📊</div><div style="font-weight:bold;margin-top:8px;">مركز التحليلات</div></div>';
+    html += '<div onclick="location.href=\'finance-receiver-reports.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">💰</div><div style="font-weight:bold;margin-top:8px;">تقارير المالية</div></div>';
+    html += '<div onclick="location.href=\'homework-reports.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">📚</div><div style="font-weight:bold;margin-top:8px;">تقارير الواجبات</div></div>';
+    html += '<div onclick="location.href=\'counseling-report.html\'" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">💚</div><div style="font-weight:bold;margin-top:8px;">تقارير الإرشاد</div></div>';
     html += '</div>';
     
     container.innerHTML = html;
@@ -743,12 +740,12 @@
     let html = '<div class="page-head"><div><h1>⚙️ إدارة النظام</h1><p>صيانة وفحص النظام والأمن</p></div></div>';
     
     html += '<div class="cards">';
-    html += '<div onclick="location.href=\'system-maintenance.html\'" class="card" style="background:linear-gradient(135deg,#6b7280,#4b5563);color:white;cursor:pointer;padding:30px;border:none;text-align:center;"><div style="font-size:64px;">⚙️</div><h2 style="margin-top:12px;">صيانة النظام</h2><p style="opacity:0.95;">فحص صحة النظام والتنظيف</p></div>';
-    html += '<div onclick="location.href=\'security-governance.html\'" class="card" style="background:linear-gradient(135deg,#dc2626,#991b1b);color:white;cursor:pointer;padding:30px;border:none;text-align:center;"><div style="font-size:64px;">🛡️</div><h2 style="margin-top:12px;">حوكمة الأمن</h2><p style="opacity:0.95;">فحص الصلاحيات وRLS</p></div>';
-    html += '<div onclick="location.href=\'final-readiness.html\'" class="card" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:white;cursor:pointer;padding:30px;border:none;text-align:center;"><div style="font-size:64px;">✅</div><h2 style="margin-top:12px;">الجاهزية النهائية</h2><p style="opacity:0.95;">فحص نهائي للوحدات</p></div>';
-    html += '<div onclick="location.href=\'deployment-check.html\'" class="card" style="background:linear-gradient(135deg,#7c3aed,#5b21b6);color:white;cursor:pointer;padding:30px;border:none;text-align:center;"><div style="font-size:64px;">🚀</div><h2 style="margin-top:12px;">فحص النشر</h2><p style="opacity:0.95;">تحقق من حالة النشر</p></div>';
-    html += '<div onclick="location.href=\'permissions-management.html\'" class="card" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:white;cursor:pointer;padding:30px;border:none;text-align:center;"><div style="font-size:64px;">🔑</div><h2 style="margin-top:12px;">إدارة الصلاحيات</h2><p style="opacity:0.95;">منح وإلغاء الصلاحيات</p></div>';
-    html += '<div onclick="location.href=\'clear-session.html\'" class="card" style="background:linear-gradient(135deg,#0891b2,#0e7490);color:white;cursor:pointer;padding:30px;border:none;text-align:center;"><div style="font-size:64px;">🔄</div><h2 style="margin-top:12px;">مسح الجلسات</h2><p style="opacity:0.95;">إعادة تعيين الجلسات</p></div>';
+    html += '<div onclick="location.href=\'system-maintenance.html\'" class="card" style="cursor:pointer;padding:30px;text-align:center"><div style="font-size:64px;">⚙️</div><h2 style="margin-top:12px;">صيانة النظام</h2><p style="opacity:0.95;">فحص صحة النظام والتنظيف</p></div>';
+    html += '<div onclick="location.href=\'security-governance.html\'" class="card" style="cursor:pointer;padding:30px;text-align:center"><div style="font-size:64px;">🛡️</div><h2 style="margin-top:12px;">حوكمة الأمن</h2><p style="opacity:0.95;">فحص الصلاحيات وRLS</p></div>';
+    html += '<div onclick="location.href=\'final-readiness.html\'" class="card" style="cursor:pointer;padding:30px;text-align:center"><div style="font-size:64px;">✅</div><h2 style="margin-top:12px;">الجاهزية النهائية</h2><p style="opacity:0.95;">فحص نهائي للوحدات</p></div>';
+    html += '<div onclick="location.href=\'deployment-check.html\'" class="card" style="cursor:pointer;padding:30px;text-align:center"><div style="font-size:64px;">🚀</div><h2 style="margin-top:12px;">فحص النشر</h2><p style="opacity:0.95;">تحقق من حالة النشر</p></div>';
+    html += '<div onclick="location.href=\'permissions-management.html\'" class="card" style="cursor:pointer;padding:30px;text-align:center"><div style="font-size:64px;">🔑</div><h2 style="margin-top:12px;">إدارة الصلاحيات</h2><p style="opacity:0.95;">منح وإلغاء الصلاحيات</p></div>';
+    html += '<div onclick="location.href=\'clear-session.html\'" class="card" style="cursor:pointer;padding:30px;text-align:center"><div style="font-size:64px;">🔄</div><h2 style="margin-top:12px;">مسح الجلسات</h2><p style="opacity:0.95;">إعادة تعيين الجلسات</p></div>';
     html += '</div>';
     
     container.innerHTML = html;
@@ -760,24 +757,23 @@
     const html = '<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>'+title+'</title>'+
       '<style>* { margin: 0; padding: 0; box-sizing: border-box; }'+
       'body { font-family: "Cairo", "Segoe UI", Tahoma, sans-serif; padding: 30px; color: #333; line-height: 1.6; }'+
-      '.print-header { text-align: center; padding-bottom: 20px; border-bottom: 3px double #1e40af; margin-bottom: 30px; }'+
-      '.print-header h1 { color: #1e40af; font-size: 28px; margin-bottom: 8px; }'+
+      '.print-header { text-align: center; padding-bottom: 20px; border-bottom: 3px double #0B6E4F; margin-bottom: 30px; }'+
+      '.print-header h1 { color: #0B6E4F; font-size: 28px; margin-bottom: 8px; }'+
       'table { width: 100%; border-collapse: collapse; margin: 20px 0; }'+
-      'table th { background: #1e40af; color: white; padding: 12px; text-align: right; }'+
+      'table th { background: #0B6E4F; color: white; padding: 12px; text-align: right; }'+
       'table td { padding: 10px 12px; border-bottom: 1px solid #e5e7eb; }'+
       'table tr:nth-child(even) td { background: #f9fafb; }'+
       '.stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin: 20px 0; }'+
       '.stat-card { background: #f3f4f6; padding: 15px; border-radius: 8px; text-align: center; }'+
       '.stat-card .label { color: #6b7280; font-size: 13px; }'+
-      '.stat-card .value { color: #1e40af; font-size: 24px; font-weight: bold; }'+
-      '.section-title { color: #1e40af; font-size: 18px; margin: 25px 0 12px; padding-bottom: 8px; border-bottom: 2px solid #1e40af; }'+
+      '.stat-card .value { color: #0B6E4F; font-size: 24px; font-weight: bold; }'+
+      '.section-title { color: #0B6E4F; font-size: 18px; margin: 25px 0 12px; padding-bottom: 8px; border-bottom: 2px solid #0B6E4F; }'+
       '@media print { @page { size: A4; margin: 1cm; } .no-print { display: none !important; } }'+
-      '.print-btn { position: fixed; top: 20px; left: 20px; background: #1e40af; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; }'+
+      '.print-btn { position: fixed; top: 20px; left: 20px; background: #0B6E4F; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; }'+
       '</style></head><body>'+
       '<button class="print-btn no-print" onclick="window.print()">🖨️ طباعة</button>'+
       '<div class="print-header"><h1>'+SCHOOL_LOGO+' '+SCHOOL_NAME+'</h1><h2>'+title+'</h2><div>📅 '+today+'</div></div>'+
-      content+'<script src="assets/amin-theme-injector.js"></script>
-</body></html>';
+      content+'<script src="assets/amin-theme-injector.js"><\/script></body></html>';
     
     const w = window.open('', '_blank', 'width=900,height=700');
     w.document.write(html);
