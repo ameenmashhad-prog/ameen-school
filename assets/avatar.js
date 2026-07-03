@@ -96,9 +96,22 @@
   function init() {
     injectStyle();
     mount(document);
-    // re-mount shortly after data load (profiles fill in asynchronously)
-    setTimeout(function () { mount(document); }, 600);
-    setTimeout(function () { mount(document); }, 1800);
+    // Profiles load asynchronously; poll briefly until window.ME carries a
+    // photo, then stop (no busy loop).
+    var tries = 0, maxTries = 16; // ~8s at 500ms
+    var knownPhoto = '';
+    var iv = setInterval(function () {
+      tries++;
+      var me = window.ME || (window.AminAuth && window.AminAuth.me && window.AminAuth.me()) || null;
+      var photo = photoOf(me);
+      mount(document);
+      if ((photo && photo !== knownPhoto) || tries >= maxTries) {
+        clearInterval(iv);
+        knownPhoto = photo;
+        return;
+      }
+      knownPhoto = photo;
+    }, 500);
     window.addEventListener('amin:language-change', function () {});
   }
 
