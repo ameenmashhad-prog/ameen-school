@@ -49,10 +49,10 @@
     <div style="padding:24px;">
       
       <!-- شرح -->
-      <div class="card" style="border-right:4px solid #2563eb;margin-bottom:24px">
+      <div class="card" style="border-right:4px solid #0B6E4F;margin-bottom:24px">
         <div class="card-body">
-          <h2 style="color:#1e40af;margin-bottom:12px;">📋 كيف يعمل النظام؟</h2>
-          <ol style="color:#1e3a8a;line-height:2;padding-right:20px;">
+          <h2 style="color:#0B6E4F;margin-bottom:12px;">📋 كيف يعمل النظام؟</h2>
+          <ol style="color:#2E2A52;line-height:2;padding-right:20px;">
             <li>📝 أرسل رابط Google Form لأولياء الأمور لتعبئة بياناتهم</li>
             <li>📊 افتح Google Sheet المرتبط بالفورم</li>
             <li>💾 نزّل الردود كملف Excel (.xlsx)</li>
@@ -73,7 +73,7 @@
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
             <input type="text" id="formLink" class="input" placeholder="https://forms.gle/..." style="flex:1;min-width:300px;padding:10px;" value="">
             <button class="btn" style="background:#10b981;color:white;padding:10px 20px;" onclick="ImportStudents.saveLink()">💾 حفظ</button>
-            <button class="btn" style="background:#3b82f6;color:white;padding:10px 20px;" onclick="ImportStudents.copyLink()">📋 نسخ</button>
+            <button class="btn" style="background:#3A3565;color:white;padding:10px 20px;" onclick="ImportStudents.copyLink()">📋 نسخ</button>
             <button class="btn" style="background:#25d366;color:white;padding:10px 20px;" onclick="ImportStudents.shareWhatsApp()">💬 مشاركة واتساب</button>
           </div>
         </div>
@@ -210,7 +210,7 @@
     const file = event.target.files[0];
     if(!file) return;
     
-    $('#fileInfo').innerHTML = '<div style="padding:12px;background:#dbeafe;border-radius:8px;color:#1e40af;">📄 الملف: <b>'+esc(file.name)+'</b> ('+Math.round(file.size/1024)+' KB)<br>⏳ جاري قراءة الملف...</div>';
+    $('#fileInfo').innerHTML = '<div style="padding:12px;background:#dbeafe;border-radius:8px;color:#0B6E4F;">📄 الملف: <b>'+esc(file.name)+'</b> ('+Math.round(file.size/1024)+' KB)<br>⏳ جاري قراءة الملف...</div>';
     
     const reader = new FileReader();
     reader.onload = function(e) {
@@ -255,11 +255,11 @@
     // عرض جدول
     html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;">';
     html += '<thead><tr>';
-    html += '<th style="background:#1e40af;color:white;padding:10px;">#</th>';
+    html += '<th style="background:#0B6E4F;color:white;padding:10px;">#</th>';
     headers.slice(0, 6).forEach(function(h) {
-      html += '<th style="background:#1e40af;color:white;padding:10px;">'+esc(h)+'</th>';
+      html += '<th style="background:#0B6E4F;color:white;padding:10px;">'+esc(h)+'</th>';
     });
-    html += '<th style="background:#1e40af;color:white;padding:10px;">الحالة</th>';
+    html += '<th style="background:#0B6E4F;color:white;padding:10px;">الحالة</th>';
     html += '</tr></thead><tbody>';
     
     PARSED_DATA.slice(0, 10).forEach(function(row, i) {
@@ -268,7 +268,7 @@
       headers.slice(0, 6).forEach(function(h) {
         html += '<td style="padding:8px;border-bottom:1px solid #e5e7eb;">'+esc(row[h] || '—')+'</td>';
       });
-      html += '<td style="padding:8px;border-bottom:1px solid #e5e7eb;"><span style="background:#dbeafe;color:#1e40af;padding:2px 8px;border-radius:4px;font-size:12px;">⏳ جاهز</span></td>';
+      html += '<td style="padding:8px;border-bottom:1px solid #e5e7eb;"><span style="background:#dbeafe;color:#0B6E4F;padding:2px 8px;border-radius:4px;font-size:12px;">⏳ جاهز</span></td>';
       html += '</tr>';
     });
     
@@ -386,7 +386,7 @@
     }
     
     resultHtml += '<div style="margin-top:20px;display:flex;gap:8px;flex-wrap:wrap;">';
-    resultHtml += '<button class="btn" style="background:#3b82f6;color:white;padding:10px 20px;" onclick="location.href=\'registrations-admin.html\'">📋 مراجعة التسجيلات</button>';
+    resultHtml += '<button class="btn" style="background:#3A3565;color:white;padding:10px 20px;" onclick="location.href=\'registrations-admin.html\'">📋 مراجعة التسجيلات</button>';
     resultHtml += '<button class="btn" style="background:#10b981;color:white;padding:10px 20px;" onclick="location.href=\'super-admin.html\'">🏠 لوحة المدير</button>';
     resultHtml += '<button class="btn" style="background:#6b7280;color:white;padding:10px 20px;" onclick="location.reload()">🔄 استيراد ملف آخر</button>';
     resultHtml += '</div>';

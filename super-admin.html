@@ -59,7 +59,7 @@
       <button class="btn mobile-menu" id="mobileMenuBtn">☰</button>
       <h2>👑 لوحة المسؤول الأعلى</h2>
       <div class="top-actions">
-        <button class="btn" style="background:#3b82f6;color:white;" onclick="SuperAdmin.refresh()">🔄 تحديث</button>
+        <button class="btn" style="background:#3A3565;color:white;" onclick="SuperAdmin.refresh()">🔄 تحديث</button>
       </div>
     </header>
 
@@ -336,7 +336,7 @@
       html += '<div class="cards" style="margin-bottom:24px;">';
       alerts.forEach(function(a) {
         const bgColor = a.type === 'danger' ? '#fee2e2' : a.type === 'warning' ? '#fef3c7' : '#dbeafe';
-        const borderColor = a.type === 'danger' ? '#dc2626' : a.type === 'warning' ? '#d97706' : '#2563eb';
+        const borderColor = a.type === 'danger' ? '#dc2626' : a.type === 'warning' ? '#d97706' : '#0B6E4F';
         html += '<div style="background:'+bgColor+';border-right:4px solid '+borderColor+';padding:14px;border-radius:10px;color:#333;"><div style="font-size:16px;font-weight:bold;margin-bottom:4px;">'+a.icon+' '+esc(a.title)+'</div><div style="font-size:13px;opacity:0.85;">'+esc(a.message)+'</div></div>';
       });
       html += '</div>';
@@ -480,7 +480,7 @@
     html += '<div><h1>🎓 إدارة الطلاب</h1><p>إجمالي: <b>'+DATA.students.length+'</b> طالب</p></div>';
     html += '<div style="display:flex;gap:8px;flex-wrap:wrap;">';
     html += '<button class="btn" style="background:#10b981;color:white;padding:12px 24px;" onclick="location.href=\'family-registration.html\'">➕ إضافة طالب جديد</button>';
-    html += '<button class="btn" style="background:#06b6d4;color:white;padding:12px 24px;" onclick="location.href=\'import-students.html\'">📥 استيراد جماعي</button>';
+    html += '<button class="btn" style="background:#0E9C92;color:white;padding:12px 24px;" onclick="location.href=\'import-students.html\'">📥 استيراد جماعي</button>';
     html += '</div></div>';
     
     if(!DATA.students.length) {
@@ -494,7 +494,7 @@
       
       html += '<div class="cards" style="margin-bottom:20px;">';
       Object.keys(classCounts).slice(0, 6).forEach(function(cn) {
-        html += '<div class="card" style="text-align:center;padding:16px;"><b style="font-size:24px;color:#3b82f6;">'+classCounts[cn]+'</b><div style="color:#666;font-size:13px;">'+esc(cn)+'</div></div>';
+        html += '<div class="card" style="text-align:center;padding:16px;"><b style="font-size:24px;color:#3A3565;">'+classCounts[cn]+'</b><div style="color:#666;font-size:13px;">'+esc(cn)+'</div></div>';
       });
       html += '</div>';
       
@@ -544,7 +544,7 @@
     
     let html = '<div class="page-head" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">';
     html += '<div><h1>👨‍🏫 المعلمون</h1><p>إجمالي: <b>'+DATA.teachers.length+'</b> معلم</p></div>';
-    html += '<button class="btn" style="background:#3b82f6;color:white;padding:12px 24px;" onclick="location.href=\'teacher-registration.html\'">➕ إضافة معلم جديد</button>';
+    html += '<button class="btn" style="background:#3A3565;color:white;padding:12px 24px;" onclick="location.href=\'teacher-registration.html\'">➕ إضافة معلم جديد</button>';
     html += '</div>';
     
     if(!DATA.teachers.length) {
@@ -574,7 +574,7 @@
     html += '<div><h1>👨‍👩‍👧 أولياء الأمور</h1><p>إجمالي: <b>'+DATA.parents.length+'</b> ولي أمر</p></div>';
     html += '<div style="display:flex;gap:8px;flex-wrap:wrap;">';
     html += '<button class="btn" style="background:#10b981;color:white;padding:12px 24px;" onclick="location.href=\'family-registration.html\'">➕ إضافة ولي أمر</button>';
-    html += '<button class="btn" style="background:#06b6d4;color:white;padding:12px 24px;" onclick="location.href=\'import-students.html\'">📥 استيراد جماعي</button>';
+    html += '<button class="btn" style="background:#0E9C92;color:white;padding:12px 24px;" onclick="location.href=\'import-students.html\'">📥 استيراد جماعي</button>';
     html += '</div></div>';
     
     if(!DATA.parents.length) {
@@ -719,7 +719,7 @@
     html += '<div class="card"><div class="card-head"><h3>📊 التقرير العام</h3></div><div class="card-body"><p>الطلاب: <b>'+stats.totalStudents+'</b></p><p>المعلمون: <b>'+stats.totalTeachers+'</b></p><p>أولياء الأمور: <b>'+stats.totalParents+'</b></p><button class="btn blue" style="margin-top:12px;" onclick="SuperAdmin.printGeneralReport()">🖨️ طباعة</button></div></div>';
     html += '<div class="card"><div class="card-head"><h3>💰 التقرير المالي</h3></div><div class="card-body"><p>الرسوم: <b>'+money(stats.totalFees)+'</b></p><p>المحصّل: <b style="color:#10b981;">'+money(stats.totalPaid)+'</b></p><p>المتأخرات: <b style="color:#dc2626;">'+money(stats.totalRemaining)+'</b></p><button class="btn gold" style="margin-top:12px;" onclick="SuperAdmin.printFinanceReport()">🖨️ طباعة</button></div></div>';
     html += '<div class="card"><div class="card-head"><h3>📚 التقرير الأكاديمي</h3></div><div class="card-body"><p>الدرجات: <b>'+stats.totalGrades+'</b></p><p>المعدل: <b>'+stats.gradesAvg+'%</b></p><button class="btn green" style="margin-top:12px;" onclick="SuperAdmin.printAcademicReport()">🖨️ طباعة</button></div></div>';
-    html += '<div class="card"><div class="card-head"><h3>📋 تقرير الحضور</h3></div><div class="card-body"><p>السجلات: <b>'+DATA.attendance.length+'</b></p><p>حضور اليوم: <b>'+stats.attRate+'%</b></p><button class="btn" style="background:#8b5cf6;color:white;margin-top:12px;" onclick="SuperAdmin.printAttendanceReport()">🖨️ طباعة</button></div></div>';
+    html += '<div class="card"><div class="card-head"><h3>📋 تقرير الحضور</h3></div><div class="card-body"><p>السجلات: <b>'+DATA.attendance.length+'</b></p><p>حضور اليوم: <b>'+stats.attRate+'%</b></p><button class="btn" style="background:#3A3565;color:white;margin-top:12px;" onclick="SuperAdmin.printAttendanceReport()">🖨️ طباعة</button></div></div>';
     html += '</div>';
     
     html += '<h3 style="margin:24px 0 12px;">🔗 صفحات التقارير المتقدمة</h3>';
@@ -757,19 +757,19 @@
     const html = '<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>'+title+'</title>'+
       '<style>* { margin: 0; padding: 0; box-sizing: border-box; }'+
       'body { font-family: "Cairo", "Segoe UI", Tahoma, sans-serif; padding: 30px; color: #333; line-height: 1.6; }'+
-      '.print-header { text-align: center; padding-bottom: 20px; border-bottom: 3px double #1e40af; margin-bottom: 30px; }'+
-      '.print-header h1 { color: #1e40af; font-size: 28px; margin-bottom: 8px; }'+
+      '.print-header { text-align: center; padding-bottom: 20px; border-bottom: 3px double #0B6E4F; margin-bottom: 30px; }'+
+      '.print-header h1 { color: #0B6E4F; font-size: 28px; margin-bottom: 8px; }'+
       'table { width: 100%; border-collapse: collapse; margin: 20px 0; }'+
-      'table th { background: #1e40af; color: white; padding: 12px; text-align: right; }'+
+      'table th { background: #0B6E4F; color: white; padding: 12px; text-align: right; }'+
       'table td { padding: 10px 12px; border-bottom: 1px solid #e5e7eb; }'+
       'table tr:nth-child(even) td { background: #f9fafb; }'+
       '.stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin: 20px 0; }'+
       '.stat-card { background: #f3f4f6; padding: 15px; border-radius: 8px; text-align: center; }'+
       '.stat-card .label { color: #6b7280; font-size: 13px; }'+
-      '.stat-card .value { color: #1e40af; font-size: 24px; font-weight: bold; }'+
-      '.section-title { color: #1e40af; font-size: 18px; margin: 25px 0 12px; padding-bottom: 8px; border-bottom: 2px solid #1e40af; }'+
+      '.stat-card .value { color: #0B6E4F; font-size: 24px; font-weight: bold; }'+
+      '.section-title { color: #0B6E4F; font-size: 18px; margin: 25px 0 12px; padding-bottom: 8px; border-bottom: 2px solid #0B6E4F; }'+
       '@media print { @page { size: A4; margin: 1cm; } .no-print { display: none !important; } }'+
-      '.print-btn { position: fixed; top: 20px; left: 20px; background: #1e40af; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; }'+
+      '.print-btn { position: fixed; top: 20px; left: 20px; background: #0B6E4F; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; }'+
       '</style></head><body>'+
       '<button class="print-btn no-print" onclick="window.print()">🖨️ طباعة</button>'+
       '<div class="print-header"><h1>'+SCHOOL_LOGO+' '+SCHOOL_NAME+'</h1><h2>'+title+'</h2><div>📅 '+today+'</div></div>'+

@@ -333,8 +333,8 @@
     if(alerts.length > 0) {
       html += '<div style="margin-bottom:20px;"><h3 style="margin-bottom:12px;">⚠️ تنبيهات تحتاج اهتمامك ('+alerts.length+')</h3><div class="cards">';
       alerts.slice(0, 4).forEach(function(a) {
-        const bgColor = a.type === 'danger' ? '#fee2e2' : a.type === 'warning' ? '#fef3c7' : '#dbeafe';
-        const borderColor = a.type === 'danger' ? '#dc2626' : a.type === 'warning' ? '#d97706' : '#2563eb';
+        const bgColor = a.type === 'danger' ? '#fee2e2' : a.type === 'warning' ? '#FBF1DC' : '#E6F4EF';
+        const borderColor = a.type === 'danger' ? '#dc2626' : a.type === 'warning' ? '#B8860B' : '#0B6E4F';
         html += '<div style="background:'+bgColor+';border-right:4px solid '+borderColor+';padding:14px;border-radius:10px;color:#333;"><div style="font-size:16px;font-weight:bold;margin-bottom:4px;">'+a.icon+' '+esc(a.title)+'</div><div style="font-size:13px;opacity:0.85;">'+esc(a.message)+'</div></div>';
       });
       html += '</div></div>';
@@ -358,7 +358,7 @@
       const gradesAvg = data.grades.length ? Math.round(data.grades.reduce(function(s,g){ return s + num(g.score || g.grade || g.mark); }, 0) / data.grades.length) : 0;
       const isActive = String(child.id) === String(currentChildId);
       
-      html += '<div class="card" style="'+(isActive ? 'border:2px solid #fbbf24;box-shadow:0 4px 20px rgba(251,191,36,0.2);' : '')+'cursor:pointer;" onclick="ParentPortal.selectChild(\''+child.id+'\')">';
+      html += '<div class="card" style="'+(isActive ? 'border:2px solid #B8860B;box-shadow:0 4px 20px rgba(251,191,36,0.2);' : '')+'cursor:pointer;" onclick="ParentPortal.selectChild(\''+child.id+'\')">';
       html += '<div class="card-head"><h3>🎓 '+esc(childName)+'</h3>'+(isActive ? '<span class="badge gold">👁️ المحدد</span>' : '')+'</div>';
       html += '<div class="card-body"><div class="kpis">';
       html += '<div class="kpi green"><small>الحضور</small><b>'+attRate+'%</b></div>';
@@ -369,7 +369,7 @@
       html += '<button class="btn small blue" onclick="event.stopPropagation();ParentPortal.viewChild(\''+child.id+'\',\'grades\')">📊 الدرجات</button>';
       html += '<button class="btn small green" onclick="event.stopPropagation();ParentPortal.viewChild(\''+child.id+'\',\'attendance\')">📋 الحضور</button>';
       html += '<button class="btn small gold" onclick="event.stopPropagation();ParentPortal.viewChild(\''+child.id+'\',\'finance\')">💰 الأقساط</button>';
-      html += '<button class="btn small" style="background:#1e40af;color:white;" onclick="event.stopPropagation();ParentPortal.selectChild(\''+child.id+'\');setTimeout(function(){ParentPortal.printChildReport(\'full\');},200);">🖨️ تقرير كامل</button>';
+      html += '<button class="btn small" style="background:#0B6E4F;color:white;" onclick="event.stopPropagation();ParentPortal.selectChild(\''+child.id+'\');setTimeout(function(){ParentPortal.printChildReport(\'full\');},200);">🖨️ تقرير كامل</button>';
       html += '</div></div></div>';
     });
     html += '</div>';
@@ -378,7 +378,7 @@
       html += '<h3 style="margin:24px 0 12px;">🔔 آخر الإشعارات</h3><div class="list">';
       NOTIFICATIONS.slice(0, 5).forEach(function(n) {
         const isUnread = !n.read_at;
-        html += '<div class="item" style="'+(isUnread ? 'background:#fef3c7;border-right:3px solid #f59e0b;' : '')+'"><div><b>'+esc(n.title || 'إشعار')+'</b><small>'+esc(n.body || n.message || '')+' · '+esc(String(n.created_at || '').slice(0,10))+'</small></div><span class="badge '+(isUnread ? 'gold' : 'blue')+'">'+(isUnread ? 'جديد' : 'مقروء')+'</span></div>';
+        html += '<div class="item" style="'+(isUnread ? 'background:#FBF1DC;border-right:3px solid #B8860B;' : '')+'"><div><b>'+esc(n.title || 'إشعار')+'</b><small>'+esc(n.body || n.message || '')+' · '+esc(String(n.created_at || '').slice(0,10))+'</small></div><span class="badge '+(isUnread ? 'gold' : 'blue')+'">'+(isUnread ? 'جديد' : 'مقروء')+'</span></div>';
       });
       html += '</div>';
     }
@@ -393,7 +393,7 @@
     const childName = (child && child.users && child.users.name) || (child && child.name) || 'الطالب';
     
     let html = '<div class="page-head" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;"><div><h1>📊 درجات '+esc(childName)+'</h1></div>';
-    html += '<button class="btn" style="background:#1e40af;color:white;padding:10px 18px;" onclick="ParentPortal.printChildReport(\'grades\')">🖨️ طباعة الكشف</button>';
+    html += '<button class="btn" style="background:#0B6E4F;color:white;padding:10px 18px;" onclick="ParentPortal.printChildReport(\'grades\')">🖨️ طباعة الكشف</button>';
     html += '</div>';
     
     if(!data.grades.length) {
@@ -422,7 +422,7 @@
     const late = data.attendance.filter(function(a){ return a.status === 'late'; }).length;
     
     let html = '<div class="page-head" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;"><div><h1>📋 حضور '+esc(childName)+'</h1></div>';
-    html += '<button class="btn" style="background:#1e40af;color:white;padding:10px 18px;" onclick="ParentPortal.printChildReport(\'attendance\')">🖨️ طباعة الكشف</button>';
+    html += '<button class="btn" style="background:#0B6E4F;color:white;padding:10px 18px;" onclick="ParentPortal.printChildReport(\'attendance\')">🖨️ طباعة الكشف</button>';
     html += '</div>';
     html += '<div class="kpis" style="margin-bottom:20px;"><div class="kpi green"><small>أيام الحضور</small><b>'+present+'</b></div><div class="kpi red"><small>أيام الغياب</small><b>'+absent+'</b></div><div class="kpi gold"><small>أيام التأخير</small><b>'+late+'</b></div><div class="kpi blue"><small>الإجمالي</small><b>'+data.attendance.length+'</b></div></div>';
     
@@ -449,7 +449,7 @@
     const childName = (child && child.users && child.users.name) || (child && child.name) || 'الطالب';
     
     let html = '<div class="page-head" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;"><div><h1>💰 أقساط '+esc(childName)+'</h1></div>';
-    html += '<button class="btn" style="background:#1e40af;color:white;padding:10px 18px;" onclick="ParentPortal.printChildReport(\'finance\')">🖨️ طباعة الكشف</button>';
+    html += '<button class="btn" style="background:#0B6E4F;color:white;padding:10px 18px;" onclick="ParentPortal.printChildReport(\'finance\')">🖨️ طباعة الكشف</button>';
     html += '</div>';
     
     if(!data.fees.length) {
@@ -574,30 +574,30 @@
       '<style>'+
       '* { margin: 0; padding: 0; box-sizing: border-box; }'+
       'body { font-family: "Cairo", "Segoe UI", Tahoma, sans-serif; padding: 30px; color: #333; line-height: 1.6; }'+
-      '.print-header { text-align: center; padding-bottom: 20px; border-bottom: 3px double #1e40af; margin-bottom: 30px; }'+
-      '.print-header h1 { color: #1e40af; font-size: 28px; margin-bottom: 8px; }'+
+      '.print-header { text-align: center; padding-bottom: 20px; border-bottom: 3px double #0B6E4F; margin-bottom: 30px; }'+
+      '.print-header h1 { color: #0B6E4F; font-size: 28px; margin-bottom: 8px; }'+
       '.print-header h2 { color: #555; font-size: 18px; font-weight: normal; }'+
       '.print-header .date { color: #888; font-size: 14px; margin-top: 8px; }'+
-      '.info-box { background: #f3f4f6; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-right: 4px solid #3b82f6; }'+
-      '.info-box h3 { color: #1e40af; margin-bottom: 8px; }'+
+      '.info-box { background: #f3f4f6; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-right: 4px solid #3A3565; }'+
+      '.info-box h3 { color: #0B6E4F; margin-bottom: 8px; }'+
       'table { width: 100%; border-collapse: collapse; margin: 20px 0; }'+
-      'table th { background: #1e40af; color: white; padding: 12px; text-align: right; }'+
+      'table th { background: #0B6E4F; color: white; padding: 12px; text-align: right; }'+
       'table td { padding: 10px 12px; border-bottom: 1px solid #e5e7eb; }'+
       'table tr:nth-child(even) td { background: #f9fafb; }'+
       '.stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin: 20px 0; }'+
       '.stat-card { background: #f3f4f6; padding: 15px; border-radius: 8px; text-align: center; border: 1px solid #d1d5db; }'+
       '.stat-card .label { color: #6b7280; font-size: 13px; margin-bottom: 5px; }'+
-      '.stat-card .value { color: #1e40af; font-size: 24px; font-weight: bold; }'+
-      '.section-title { color: #1e40af; font-size: 18px; margin: 25px 0 12px; padding-bottom: 8px; border-bottom: 2px solid #1e40af; }'+
-      '.badge-green { background: #d1fae5; color: #065f46; padding: 3px 10px; border-radius: 4px; font-size: 12px; }'+
+      '.stat-card .value { color: #0B6E4F; font-size: 24px; font-weight: bold; }'+
+      '.section-title { color: #0B6E4F; font-size: 18px; margin: 25px 0 12px; padding-bottom: 8px; border-bottom: 2px solid #0B6E4F; }'+
+      '.badge-green { background: #E6F4EF; color: #065f46; padding: 3px 10px; border-radius: 4px; font-size: 12px; }'+
       '.badge-red { background: #fee2e2; color: #991b1b; padding: 3px 10px; border-radius: 4px; font-size: 12px; }'+
-      '.badge-gold { background: #fef3c7; color: #92400e; padding: 3px 10px; border-radius: 4px; font-size: 12px; }'+
+      '.badge-gold { background: #FBF1DC; color: #92400e; padding: 3px 10px; border-radius: 4px; font-size: 12px; }'+
       '.print-footer { margin-top: 50px; padding-top: 20px; border-top: 2px dashed #ccc; text-align: center; color: #666; font-size: 13px; }'+
       '.signature { display: flex; justify-content: space-around; margin-top: 60px; }'+
       '.signature div { text-align: center; }'+
       '.signature .line { width: 200px; border-top: 1px solid #333; padding-top: 5px; }'+
       '@media print { body { padding: 15px; } .no-print { display: none !important; } @page { size: A4; margin: 1cm; } }'+
-      '.print-btn { position: fixed; top: 20px; left: 20px; background: #1e40af; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; box-shadow: 0 4px 12px rgba(30,64,175,0.3); }'+
+      '.print-btn { position: fixed; top: 20px; left: 20px; background: #0B6E4F; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; box-shadow: 0 4px 12px rgba(30,64,175,0.3); }'+
       '</style></head><body>'+
       '<button class="print-btn no-print" onclick="window.print()">🖨️ طباعة الآن</button>'+
       '<div class="print-header">'+
