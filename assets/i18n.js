@@ -158,7 +158,7 @@ const dict={
     'سعر الصرف USD/IRR':'Exchange Rate USD/IRR',
     'جلب TGJU':'Fetch TGJU',
     'نقداً':'Cash',
-    'بطاقة مصرفية':'Card',
+    'بطاقة مصرفية':'Bank Card',
     'حوالة مصرفية':'Bank Transfer',
     'أخرى':'Other',
     'اسم الدافع':'Payer Name',
@@ -1172,7 +1172,7 @@ const dict={
     'المهمة':'وظیفه',
     'الموعد':'قرار ملاقات',
     'الوقت':'زمان',
-    'الرصيد':'ترازو',
+    'الرصيد':'موجودی',
     'الإجمالي':'جمع کل',
     'التفاصيل':'جزئیات',
     'الملاحظات':'یادداشت‌ها',
@@ -1717,7 +1717,7 @@ const dict={
     'مرحباً بك':'خوش آمدید',
     'الأصول':'دارایی‌ها',
   }
-};;;;;;
+};;;;;;;
 
 const attrNames=['placeholder','title','aria-label','value'];
 function normalize(s){return String(s||'').replace(/[\u200B-\u200D\uFE00-\uFE0F\u061C\u200E\u200F]/g,'').replace(/\s+/g,' ').trim();}

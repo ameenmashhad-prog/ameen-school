@@ -308,4 +308,83 @@
     
     // التنبيهات
     if(alerts.length > 0) {
-      html += '<div style="margin-bottom:24px;'><
+      html += '<div class="card"><div class="card-head"><h3>التنبيهات الذكية</h3></div><div class="card-body"><div class="stack">' + alerts.map(function(a){
+        return '<div class="alert alert-'+a.type+'"><span class="alert-ic">'+a.icon+'</span><div><b>'+esc(a.title)+'</b><p class="muted">'+esc(a.message)+'</p></div></div>';
+      }).join('') + '</div></div></div>';
+    } else {
+      html += '<div class="amin-empty"><div class="amin-empty-mark"></div><div class="amin-empty-title">لا توجد تنبيهات حالياً</div></div>';
+    }
+
+    container.innerHTML = html;
+  }
+
+  function wrapCard(title, body){
+    return '<div class="card"><div class="card-head"><h3>'+esc(title)+'</h3></div><div class="card-body">'+body+'</div></div>';
+  }
+  function buildTable(headers, rows){
+    var thead = '<tr>'+headers.map(function(h){return '<th>'+esc(h)+'</th>';}).join('')+'</tr>';
+    var tbody = rows.length ? rows.map(function(r){return '<tr>'+r.map(function(c){return '<td>'+esc(c==null?'—':c)+'</td>';}).join('')+'</tr>';}).join('') : '<tr><td class="muted" colspan="'+headers.length+'">لا توجد بيانات</td></tr>';
+    return '<div class="table-wrap"><table class="table"><thead>'+thead+'</thead><tbody>'+tbody+'</tbody></table></div>';
+  }
+
+  function renderAttendance(){
+    var c=document.getElementById('view-attendance'); if(!c) return;
+    var today=iso();
+    var rows = DATA.students.map(function(s){
+      var a = DATA.attendance.filter(function(x){return x.student_id===s.id && String(x.date).slice(0,10)===today;})[0];
+      var st = a ? (a.status==='present'?'حاضر':(a.status==='absent'?'غائب':'متأخر')) : 'غير مسجّل';
+      return [s.name||'—', getClassName(s.class_id), st];
+    });
+    c.innerHTML = wrapCard('تحضير الحضور · '+today, buildTable(['الطالب','الصف','الحالة'], rows));
+  }
+
+  function renderStudents(){
+    var c=document.getElementById('view-students'); if(!c) return;
+    var rows = DATA.students.map(function(s){ return [s.name||'—', getClassName(s.class_id), s.phone||'—']; });
+    c.innerHTML = wrapCard('طلابي', buildTable(['الاسم','الصف','الهاتف'], rows));
+  }
+
+  function renderGrades(){
+    var c=document.getElementById('view-grades'); if(!c) return;
+    var rows = DATA.grades.map(function(g){ return [g.student_name||'—', getSubjectName(g.subject_id), (g.value!=null?g.value:'—')]; });
+    c.innerHTML = wrapCard('الدرجات', buildTable(['الطالب','المادة','الدرجة'], rows));
+  }
+
+  function renderSchedule(){
+    var c=document.getElementById('view-schedule'); if(!c) return;
+    var todayDay = (new Date().getDay()===5)?6:((new Date().getDay()+1)%7);
+    var rows = DATA.schedule.filter(function(s){return num(s.day)===todayDay;}).map(function(s){
+      return [getSubjectName(s.subject_id), (s.start||'')+' - '+(s.end||''), getClassName(s.class_id)];
+    });
+    c.innerHTML = wrapCard('جدولي', buildTable(['المادة','الوقت','الصف'], rows));
+  }
+
+  function renderHomeworks(){
+    var c=document.getElementById('view-homeworks'); if(!c) return;
+    var rows = DATA.homeworks.map(function(h){ return [h.title||'—', getSubjectName(h.subject_id), h.due_date||'—', h.status||'—']; });
+    c.innerHTML = wrapCard('الواجبات', buildTable(['العنوان','المادة','التسليم','الحالة'], rows));
+  }
+
+  function wireNav(){
+    Array.prototype.forEach.call(document.querySelectorAll('.nav button[data-view]'), function(b){
+      b.addEventListener('click', function(){
+        Array.prototype.forEach.call(document.querySelectorAll('.nav button[data-view]'), function(x){ x.classList.toggle('active', x===b); });
+        showView(b.getAttribute('data-view'));
+      });
+    });
+    var mm=document.getElementById('mobileMenuBtn');
+    if(mm){ mm.addEventListener('click', function(){ var sb=document.getElementById('sidebar'); if(sb){ sb.classList.toggle('open'); } }); }
+  }
+
+  window.TeacherPortal = { showView: showView };
+
+  init().catch(function(e){ console.error('Teacher init error:', e); }).finally(function(){
+    try{ wireNav(); showView('overview'); }catch(e){ console.error(e); }
+  });
+
+})();
+</script>
+<script src="assets/amin-theme-injector.js"></script>
+<script src="assets/amin-icons.js" defer></script>
+</body>
+</html>
