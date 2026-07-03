@@ -80,6 +80,7 @@
 <script src="assets/platform-modules.js"></script>
 <script src="assets/i18n.js"></script>
 
+<script src="assets/report-export.js"></script>
 <script>
 (function(){
   'use strict';
@@ -335,7 +336,7 @@
       var st = a ? (a.status==='present'?'حاضر':(a.status==='absent'?'غائب':'متأخر')) : 'غير مسجّل';
       return [s.name||'—', getClassName(s.class_id), st];
     });
-    c.innerHTML = wrapCard('تحضير الحضور · '+today, buildTable(['الطالب','الصف','الحالة'], rows));
+    c.innerHTML = wrapCard('تحضير الحضور · '+today, '<div style="margin-bottom:10px"><button class="btn gold" onclick="exportAttendanceReport()">تصدير/طباعة الكشف · Export / Print report</button></div>' + buildTable(['الطالب','الصف','الحالة'], rows));
   }
 
   function renderStudents(){
@@ -347,9 +348,22 @@
   function renderGrades(){
     var c=document.getElementById('view-grades'); if(!c) return;
     var rows = DATA.grades.map(function(g){ return [g.student_name||'—', getSubjectName(g.subject_id), (g.value!=null?g.value:'—')]; });
-    c.innerHTML = wrapCard('الدرجات', buildTable(['الطالب','المادة','الدرجة'], rows));
+    c.innerHTML = wrapCard('الدرجات', '<div style="margin-bottom:10px"><button class="btn gold" onclick="exportGradesReport(true)">تصدير (مع درجات) · With grades</button> <button class="btn gold" onclick="exportGradesReport(false)">تصدير (بدون درجات) · Without grades</button></div>' + buildTable(['الطالب','المادة','الدرجة'], rows));
   }
 
+  function exportAttendanceReport(){
+    if(!window.AminExport) return;
+    var today=iso().slice(0,10);
+    var statusLabel={present:['حاضر','Present','حاضر'],absent:['غائب','Absent','غایب'],late:['متأخر','Late','دیرآمده'],permission:['مستأذن','Permitted','با اجازه'],medical_excuse:['عذر طبي','Medical excuse','عذر پزشکی'],external_activity:['نشاط خارجي','External activity','فعالیت خارجی']};
+    var rows=DATA.students.map(function(s,i){var a=DATA.attendance.filter(function(x){return x.student_id===s.id && String(x.date).slice(0,10)===today;})[0];var st=a?a.status:null;var L=st?(statusLabel[st]||[st,st,st]):['غير مسجّل','Not recorded','ثبت نشده'];var at=(a&&a.absence_type)?a.absence_type:'';var nt=(a&&a.note)?a.note:'';return [(i+1),esc(s.name||'—'),esc(getClassName(s.class_id)||'—'),L[0]+' · '+L[1]+' · '+L[2],esc(at),esc(nt)];});
+    AminExport.report({title:'كشف الحضور والغياب · Attendance Report · گزارش حضور و غیاب — '+today,headers:['# · No · شماره','الطالب · Student · دانش‌آموز','الصف · Class · کلاس','الحالة · Status · وضعیت','نوع الغياب · Absence type · نوع غیاب','ملاحظة · Note · یادداشت'],rows:rows,filename:'attendance_report'});
+  }
+  function exportGradesReport(withGrades){
+    if(!window.AminExport) return;
+    var rows=DATA.grades.map(function(g,i){var base=[(i+1),esc(g.student_name||'—'),esc(getSubjectName(g.subject_id)||'—')];if(withGrades)base.push(esc(g.value!=null?g.value:'—'));return base;});
+    var headers=withGrades?['# · No · شماره','الطالب · Student · دانش‌آموز','المادة · Subject · ماده','الدرجة · Grade · نمره']:['# · No · شماره','الطالب · Student · دانش‌آموز','المادة · Subject · ماده'];
+    AminExport.report({title:'كشف الدرجات · Grades Report · کارنامه'+(withGrades?' (مع الدرجات · with grades)':' (بدون درجات · without grades)'),headers:headers,rows:rows,filename:withGrades?'grades_with':'grades_without'});
+  }
   function renderSchedule(){
     var c=document.getElementById('view-schedule'); if(!c) return;
     var todayDay = (new Date().getDay()===5)?6:((new Date().getDay()+1)%7);
