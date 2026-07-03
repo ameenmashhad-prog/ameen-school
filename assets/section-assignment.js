@@ -35,5 +35,17 @@ async function saveAssignment(){const id=$('#editingAssignmentId').value,teacher
 async function toggleAssignment(id,active){const updateLinked=confirm('هل تريدين تحديث الحصص والجلسات المرتبطة بهذا الإسناد أيضاً؟');try{const {data,error}=await client().rpc('set_teacher_assignment_active',{p_assignment_id:id,p_active:active,p_update_linked_schedule:updateLinked});if(error)throw error;if(data&&data.ok===false){toast('تعذر التنفيذ',data.message||'خطأ','red');return}toast('تم التحديث',active?'تم تفعيل الإسناد':'تم إيقاف الإسناد','green');reload()}catch(e){toast('تعذر التحديث',e.message,'red')}}
 function applyQueryPrefill(){const params=new URLSearchParams(location.search);const section=params.get('section');const subject=params.get('subject');if(section){$('#assignSection').value=section;$('#rosterSection').value=section;renderRoster();document.getElementById('assignCard')?.scrollIntoView({behavior:'smooth'});}if(subject)$('#assignSubject').value=subject}
 async function reload(){await load()}async function init(){client();if(!await ensure())return;$('#logoutBtn').onclick=async()=>{await client().auth.signOut({scope:'local'});location.href='index.html'};$('#mobileMenuBtn')?.addEventListener('click',()=>$('#sidebar').classList.toggle('open'));await load();applyQueryPrefill()}
-window.SectionAssignment={init,reload,renderSections,renderRoster,createSection,openCreateSection:createSection,editSection,focusRoster,selectAllRoster,bulkMoveSelected,moveStudent,editAssignment,cancelAssignmentEdit,saveAssignment,toggleAssignment};
+function exportRoster(){
+  const sid=$('#rosterSection').value||DATA.sections[0]&&DATA.sections[0].section_id;
+  if(!sid){toast('تنبيه','اختاري شعبة أولاً','red');return;}
+  const sec=DATA.sections.find(s=>String(s.section_id)===String(sid));
+  const enrs=DATA.enrollments.filter(e=>String(e.section_id)===String(sid));
+  const headers=['# · No · شماره','الاسم · Name · نام','الجنس · Gender · جنسیت','الحالة · Status · وضعیت'];
+  const rows=enrs.map((e,i)=>{const st=DATA.students.find(s=>String(s.id)===String(e.student_id));return[(i+1),st?esc(fullName(st)):'—',st?esc(st.gender||'—'):'—',esc(e.enrollment_status||'—')];});
+  if(!rows.length){toast('تنبيه','لا يوجد طلاب في هذه الشعبة','red');return;}
+  const title='قائمة الفصل · Class Roster · لیست کلاس — '+(sec?esc(sec.class_name||sec.section_code||''):'');
+  if(window.AminExport){AminExport.report({title:title,headers:headers,rows:rows,filename:'class_roster'});}
+  else{toast('تعذر','أداة التصدير غير متاحة','red');}
+}
+window.SectionAssignment={init,reload,renderSections,renderRoster,createSection,openCreateSection:createSection,editSection,focusRoster,selectAllRoster,bulkMoveSelected,moveStudent,editAssignment,cancelAssignmentEdit,saveAssignment,toggleAssignment,exportRoster};
 }());

@@ -54,6 +54,7 @@
           <button class="btn" onclick="SectionAssignment.selectAllRoster(true)">تحديد الكل</button>
           <button class="btn" onclick="SectionAssignment.selectAllRoster(false)">إلغاء التحديد</button>
           <button class="btn gold" onclick="SectionAssignment.bulkMoveSelected()">نقل المحددين</button>
+          <button class="btn gold" onclick="SectionAssignment.exportRoster()">تصدير/طباعة القائمة</button>
         </div>
         <div class="notice">حددي الطلاب من القائمة ثم اختاري الشعبة الهدف. النقل يحدّث جدول الطلاب وجدول الالتحاق معاً.</div>
         <div id="rosterBox"></div>
@@ -79,7 +80,8 @@
   </main>
 </div>
 <div id="toast" class="toast"></div>
-<script src="libs/supabase.min.js"></script><script src="assets/config.js"></script><script src="assets/platform-modules.js"></script><script src="assets/i18n.js"></script><script src="assets/section-assignment.js"></script>
+<script src="libs/supabase.min.js"></script><script src="assets/config.js"></script><script src="assets/platform-modules.js"></script><script src="assets/i18n.js"></script><script src="assets/report-export.js"></script>
+<script src="assets/section-assignment.js"></script>
 <script>window.addEventListener('load',()=>SectionAssignment.init());</script>
 <script src="assets/ux-enhancements.js"></script>
 <script src="assets/amin-theme-injector.js"></script>
