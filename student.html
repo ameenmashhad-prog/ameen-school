@@ -361,10 +361,10 @@
     // أزرار الإجراءات السريعة
     html += '<h3 style="margin-bottom:12px;">⚡ إجراءات سريعة</h3>';
     html += '<div class="cards" style="margin-bottom:24px;">';
-    html += '<div onclick="StudentPortal.showView(\'homeworks\')" class="card" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📚</div><div style="font-weight:bold;margin-top:8px;">واجباتي</div></div>';
-    html += '<div onclick="StudentPortal.showView(\'exams\')" class="card" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📝</div><div style="font-weight:bold;margin-top:8px;">اختباراتي</div></div>';
-    html += '<div onclick="StudentPortal.showView(\'grades\')" class="card" style="background:linear-gradient(135deg,#10b981,#059669);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📊</div><div style="font-weight:bold;margin-top:8px;">درجاتي</div></div>';
-    html += '<div onclick="StudentPortal.showView(\'achievements\')" class="card" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">🏆</div><div style="font-weight:bold;margin-top:8px;">شاراتي</div></div>';
+    html += '<div onclick="StudentPortal.showView(\'homeworks\')" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">📚</div><div style="font-weight:bold;margin-top:8px;">واجباتي</div></div>';
+    html += '<div onclick="StudentPortal.showView(\'exams\')" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">📝</div><div style="font-weight:bold;margin-top:8px;">اختباراتي</div></div>';
+    html += '<div onclick="StudentPortal.showView(\'grades\')" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">📊</div><div style="font-weight:bold;margin-top:8px;">درجاتي</div></div>';
+    html += '<div onclick="StudentPortal.showView(\'achievements\')" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">🏆</div><div style="font-weight:bold;margin-top:8px;">شاراتي</div></div>';
     html += '</div>';
     
     // الواجبات القريبة
@@ -383,7 +383,7 @@
     if(DATA.achievements.length > 0) {
       html += '<h3 style="margin:24px 0 12px;">🏆 آخر إنجازاتك</h3><div class="cards">';
       DATA.achievements.slice(0, 3).forEach(function(a) {
-        html += '<div class="card" style="background:linear-gradient(135deg,#fef3c7,#fde68a);border:2px solid #f59e0b;"><div class="card-body" style="text-align:center;"><div style="font-size:48px;">🏆</div><b style="color:#92400e;">'+esc(a.badge_title_ar || a.badge_code || 'شارة')+'</b><div style="color:#78350f;font-size:13px;margin-top:4px;">'+esc(a.awarded_at ? String(a.awarded_at).slice(0,10) : '')+'</div><div style="color:#92400e;font-weight:bold;margin-top:8px;">+'+num(a.points_awarded || 0)+' نقطة</div></div></div>';
+        html += '<div class="card" style="border:2px solid #f59e0b"><div class="card-body" style="text-align:center;"><div style="font-size:48px;">🏆</div><b style="color:#92400e;">'+esc(a.badge_title_ar || a.badge_code || 'شارة')+'</b><div style="color:#78350f;font-size:13px;margin-top:4px;">'+esc(a.awarded_at ? String(a.awarded_at).slice(0,10) : '')+'</div><div style="color:#92400e;font-weight:bold;margin-top:8px;">+'+num(a.points_awarded || 0)+' نقطة</div></div></div>';
       });
       html += '</div>';
     }
@@ -555,7 +555,7 @@
       
       html += '<div class="cards">';
       DATA.achievements.forEach(function(a) {
-        html += '<div class="card" style="background:linear-gradient(135deg,#fef3c7,#fde68a);border:2px solid #f59e0b;text-align:center;"><div class="card-body"><div style="font-size:64px;">🏆</div><b style="color:#92400e;font-size:16px;display:block;margin:8px 0;">'+esc(a.badge_title_ar || a.badge_code || 'شارة')+'</b><div style="color:#78350f;font-size:12px;">'+esc(a.awarded_at ? String(a.awarded_at).slice(0,10) : '')+'</div><div style="color:#92400e;font-weight:bold;margin-top:8px;font-size:14px;">+'+num(a.points_awarded || 0)+' نقطة</div></div></div>';
+        html += '<div class="card" style="border:2px solid #f59e0b;text-align:center"><div class="card-body"><div style="font-size:64px;">🏆</div><b style="color:#92400e;font-size:16px;display:block;margin:8px 0;">'+esc(a.badge_title_ar || a.badge_code || 'شارة')+'</b><div style="color:#78350f;font-size:12px;">'+esc(a.awarded_at ? String(a.awarded_at).slice(0,10) : '')+'</div><div style="color:#92400e;font-weight:bold;margin-top:8px;font-size:14px;">+'+num(a.points_awarded || 0)+' نقطة</div></div></div>';
       });
       html += '</div>';
     }

@@ -313,7 +313,7 @@
     let html = '<div class="page-head"><div><h1>أهلاً بك، ' + esc(ME.name) + ' 💚</h1><p>لوحة معلومات الإرشاد النفسي والمتابعة' + (unreadNotifs > 0 ? ' · <span class="badge red">' + unreadNotifs + ' إشعار</span>' : '') + '</p></div></div>';
 
     // تنبيه خصوصية
-    html += '<div style="background:linear-gradient(135deg,#fef3c7,#fde68a);border-right:4px solid #f59e0b;padding:16px;border-radius:10px;margin-bottom:24px;color:#78350f;"><b>🔒 تنبيه خصوصية:</b> جميع البيانات هنا محمية ومخصصة للمرشد فقط. لا يمكن مشاركتها بدون إذن.</div>';
+    html += '<div style="border-right:4px solid #f59e0b;padding:16px;border-radius:10px;margin-bottom:24px;color:#78350f"><b>🔒 تنبيه خصوصية:</b> جميع البيانات هنا محمية ومخصصة للمرشد فقط. لا يمكن مشاركتها بدون إذن.</div>';
 
     // الإحصائيات
     html += '<h3 style="margin-bottom:12px;">📊 الإحصائيات</h3>';
@@ -339,10 +339,10 @@
     // إجراءات سريعة
     html += '<h3 style="margin-bottom:12px;">⚡ إجراءات سريعة</h3>';
     html += '<div class="cards" style="margin-bottom:24px;">';
-    html += '<div onclick="CounselorPortal.showView(\'students\')" class="card" style="background:linear-gradient(135deg,#ec4899,#be185d);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">👥</div><div style="font-weight:bold;margin-top:8px;">الطلاب المتابعون</div></div>';
-    html += '<div onclick="CounselorPortal.showView(\'behavior\')" class="card" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">🌟</div><div style="font-weight:bold;margin-top:8px;">سجل السلوك</div></div>';
-    html += '<div onclick="CounselorPortal.showView(\'attendance\')" class="card" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📋</div><div style="font-weight:bold;margin-top:8px;">متابعة الغياب</div></div>';
-    html += '<div onclick="CounselorPortal.showView(\'reports\')" class="card" style="background:linear-gradient(135deg,#10b981,#059669);color:white;cursor:pointer;text-align:center;padding:20px;border:none;"><div style="font-size:36px;">📈</div><div style="font-weight:bold;margin-top:8px;">التقارير</div></div>';
+    html += '<div onclick="CounselorPortal.showView(\'students\')" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">👥</div><div style="font-weight:bold;margin-top:8px;">الطلاب المتابعون</div></div>';
+    html += '<div onclick="CounselorPortal.showView(\'behavior\')" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">🌟</div><div style="font-weight:bold;margin-top:8px;">سجل السلوك</div></div>';
+    html += '<div onclick="CounselorPortal.showView(\'attendance\')" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">📋</div><div style="font-weight:bold;margin-top:8px;">متابعة الغياب</div></div>';
+    html += '<div onclick="CounselorPortal.showView(\'reports\')" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">📈</div><div style="font-weight:bold;margin-top:8px;">التقارير</div></div>';
     html += '</div>';
 
     // الطلاب الذين يحتاجون متابعة عاجلة
@@ -618,7 +618,7 @@
     html += '<button class="btn gold" style="margin-top:12px;" onclick="CounselorPortal.printAttendanceReport()">🖨️ طباعة</button>';
     html += '</div></div>';
     
-    html += '<div class="card" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:white;cursor:pointer;" onclick="location.href=\'counseling-report.html\'"><div class="card-body" style="text-align:center;">';
+    html += '<div class="card" style="cursor:pointer" onclick="location.href=\'counseling-report.html\'"><div class="card-body" style="text-align:center;">';
     html += '<div style="font-size:48px;">📊</div>';
     html += '<h3 style="margin-top:12px;">تقارير الإرشاد المتقدمة</h3>';
     html += '<p style="opacity:0.95;">فتح صفحة التقارير الكاملة</p>';
