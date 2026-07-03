@@ -410,20 +410,6 @@ body.dark .nav button:hover,.nav-child-btn:hover,.sidebar-nav-item:hover{color:#
    AMIN ENHANCEMENTS (additive) - signature loader, empty state,
    motion cohesion, reduced-motion. Safe to remove as a block.
    ============================================================ */
-.amin-spinner{display:inline-block;background:center/100% 100% no-repeat url("data:image/svg+xml,%3C%3Fxml%20version%3D%271.0%27%20encoding%3D%27UTF-8%27%3F%3E%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%20100%20100%27%3E%3Cpath%20d%3D%27M%2050%205%20L%2056.5%2028.5%20L%2080%2022%20L%2071.5%2045%20L%2095%2050%20L%2071.5%2055%20L%2080%2078%20L%2056.5%2071.5%20L%2050%2095%20L%2043.5%2071.5%20L%2020%2078%20L%2028.5%2055%20L%205%2050%20L%2028.5%2045%20L%2020%2022%20L%2043.5%2028.5%20Z%27%20fill%3D%27none%27%20stroke%3D%27%25230B6E4F%27%20stroke-width%3D%275%27%20stroke-linejoin%3D%27round%27%2F%3E%3C%2Fsvg%3E");animation:amin-spin 1.4s linear infinite}
-.amin-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:48px 20px;color:var(--text-secondary)}
-.amin-empty .amin-empty-mark{width:88px;height:88px;opacity:.10;background:center/contain no-repeat url("data:image/svg+xml,%3C%3Fxml%20version%3D%271.0%27%20encoding%3D%27UTF-8%27%3F%3E%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%20100%20100%27%3E%3Cpath%20d%3D%27M%2050%205%20L%2056.5%2028.5%20L%2080%2022%20L%2071.5%2045%20L%2095%2050%20L%2071.5%2055%20L%2080%2078%20L%2056.5%2071.5%20L%2050%2095%20L%2043.5%2071.5%20L%2020%2078%20L%2028.5%2055%20L%205%2050%20L%2028.5%2045%20L%2020%2022%20L%2043.5%2028.5%20Z%27%20fill%3D%27%25230B6E4F%27%20stroke%3D%27none%27%20stroke-width%3D%270%27%20stroke-linejoin%3D%27round%27%2F%3E%3C%2Fsvg%3E")}
-.amin-empty .amin-empty-title{font-size:1.05rem;font-weight:700;color:var(--text-primary)}
-.amin-empty .amin-empty-hint{font-size:.9rem;max-width:330px;line-height:1.65}
-.nav button,.nav-child-btn,.nav-group-card,.app-nav a{transition:background var(--transition-standard),color var(--transition-standard),transform var(--transition-standard)}
-tbody tr{transition:background var(--transition-standard)}
-tbody tr:hover{background:var(--primary-tint)}
-@media (prefers-reduced-motion: reduce){*{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}}
-
-/* ============================================================
-   AMIN ENHANCEMENTS (additive) - signature loader, empty state,
-   motion cohesion, reduced-motion. Safe to remove as a block.
-   ============================================================ */
 .amin-spinner{display:inline-block;background:center/100% 100% no-repeat url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%20100%20100%27%3E%3Cpath%20d%3D%27M%2050%205%20L%2056.5%2028.5%20L%2080%2022%20L%2071.5%2045%20L%2095%2050%20L%2071.5%2055%20L%2080%2078%20L%2056.5%2071.5%20L%2050%2095%20L%2043.5%2071.5%20L%2020%2078%20L%2028.5%2055%20L%205%2050%20L%2028.5%2045%20L%2020%2022%20L%2043.5%2028.5%20Z%27%20fill%3D%27none%27%20stroke%3D%27%25230B6E4F%27%20stroke-width%3D%275%27%20stroke-linejoin%3D%27round%27%2F%3E%3C%2Fsvg%3E");animation:amin-spin 1.4s linear infinite}
 .amin-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:48px 20px;color:var(--text-secondary)}
 .amin-empty .amin-empty-mark{width:88px;height:88px;opacity:.10;background:center/contain no-repeat url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%20100%20100%27%3E%3Cpath%20d%3D%27M%2050%205%20L%2056.5%2028.5%20L%2080%2022%20L%2071.5%2045%20L%2095%2050%20L%2071.5%2055%20L%2080%2078%20L%2056.5%2071.5%20L%2050%2095%20L%2043.5%2071.5%20L%2020%2078%20L%2028.5%2055%20L%205%2050%20L%2028.5%2045%20L%2020%2022%20L%2043.5%2028.5%20Z%27%20fill%3D%27%25230B6E4F%27%20stroke%3D%27none%27%20stroke-width%3D%270%27%20stroke-linejoin%3D%27round%27%2F%3E%3C%2Fsvg%3E")}
