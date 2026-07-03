@@ -419,3 +419,63 @@ body.dark .nav button:hover,.nav-child-btn:hover,.sidebar-nav-item:hover{color:#
 tbody tr{transition:background var(--transition-standard)}
 tbody tr:hover{background:var(--primary-tint)}
 @media (prefers-reduced-motion: reduce){*{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}}
+
+/* ============================================================
+   Amin Tactile — Appearance polish (additive, spec-compliant)
+   Only transform/opacity animated; reduced-motion handled globally.
+   ============================================================ */
+
+/* Tier-1 tactile entrance for key widgets (calm, staggered) */
+.card,.kpi,.panel{
+  animation:amin-fade-up var(--transition-standard) both;
+}
+.card:nth-child(1),.kpi:nth-child(1){animation-delay:.02s}
+.card:nth-child(2),.kpi:nth-child(2){animation-delay:.06s}
+.card:nth-child(3),.kpi:nth-child(3){animation-delay:.10s}
+.card:nth-child(4),.kpi:nth-child(4){animation-delay:.14s}
+.card:nth-child(5),.kpi:nth-child(5){animation-delay:.18s}
+.card:nth-child(n+6),.kpi:nth-child(n+6){animation-delay:.22s}
+
+/* Tier-1 buttons: soft press depth (transform only) */
+.btn{
+  transition:transform var(--transition-standard), background-color var(--transition-standard), color var(--transition-standard);
+  will-change:transform;
+}
+.btn:hover{transform:translateY(-2px);}
+.btn:active{transform:translateY(0) scale(.985);}
+
+/* KPI cards lift gently on hover (Tier-1 critical info) */
+.kpi{
+  transition:transform var(--transition-standard), box-shadow var(--transition-standard);
+}
+.kpi:hover{transform:translateY(-3px);}
+
+/* Refined toast entrance (pop) if used */
+.toast{animation:amin-pop var(--transition-standard) both;}
+
+/* Mobile bottom navigation — safe-area + signature active accent */
+.bottom-nav{padding-bottom:calc(var(--space-2) + env(safe-area-inset-bottom,0px));}
+.bottom-nav-item{
+  position:relative;
+  transition:color var(--transition-standard), background-color var(--transition-standard), transform var(--transition-standard);
+  border-radius:var(--radius-md,12px);
+}
+.bottom-nav-item:active{transform:scale(.94);}
+.bottom-nav-item.active::before{
+  content:"";
+  position:absolute;
+  inset-block-start:-2px;
+  inset-inline:35%;
+  block-size:3px;
+  border-radius:3px;
+  background:linear-gradient(90deg,var(--primary),var(--primary-dark-mode,var(--accent)));
+}
+
+/* Dark-mode definition: subtle 1px separation so surfaces don't blend */
+body.dark .card,body.dark .kpi,body.dark .panel{
+  border:1px solid var(--border-subtle);
+  box-shadow:none;
+}
+body.dark .btn-primary,body.dark .btn[class*="primary"]{
+  border-color:transparent;
+}
