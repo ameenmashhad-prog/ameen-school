@@ -12,7 +12,7 @@ create or replace function public.activate_registered_user(p_reg_type text, p_re
 returns jsonb
 language plpgsql
 security definer
-set search_path = public, auth
+set search_path = public, auth, extensions
 as $$
 declare
   v_reg_type text := lower(trim(coalesce(p_reg_type, '')));
