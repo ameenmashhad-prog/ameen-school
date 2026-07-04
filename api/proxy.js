@@ -2,6 +2,13 @@ const SUPABASE_URL = 'https://ovcjzsrqqgjsbqswtkro.supabase.co';
 const MAX_BODY_BYTES = 6 * 1024 * 1024;
 const ALLOWED_PREFIXES = ['/rest/v1/', '/auth/v1/', '/storage/v1/'];
 
+export const config = {
+  api: {
+    bodyParser: false,
+    responseLimit: false,
+  },
+};
+
 function originAllowed(req) {
   const origin = req.headers.origin;
   if (!origin) return null;
@@ -14,7 +21,6 @@ function originAllowed(req) {
   try {
     const u = new URL(origin);
     if (allowed.has(origin)) return origin;
-    // Allow same Vercel preview host only when the request is served from the same host.
     if (String(host || '').endsWith('.vercel.app') && u.host === host) return origin;
   } catch {}
   return false;
@@ -26,6 +32,15 @@ function normalizeTargetPath(req) {
   path = path.replace(/^\/api(?=\/|\?|$)/, '');
   if (!path.startsWith('/')) path = '/' + path;
   return path;
+}
+
+async function getRawBody(req) {
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    req.on('data', chunk => chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk));
+    req.on('end', () => resolve(Buffer.concat(chunks)));
+    req.on('error', err => reject(err));
+  });
 }
 
 export default async function handler(req, res) {
@@ -61,11 +76,19 @@ export default async function handler(req, res) {
   try {
     let body;
     if (!['GET', 'HEAD'].includes(req.method)) {
-      body = typeof req.body === 'string' ? req.body : (req.body ? JSON.stringify(req.body) : undefined);
+      if (req.body !== undefined && req.body !== null && req.body !== '') {
+        if (Buffer.isBuffer(req.body) || typeof req.body === 'string') {
+          body = req.body;
+        } else {
+          body = JSON.stringify(req.body);
+        }
+      } else {
+        body = await getRawBody(req);
+      }
     }
 
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 15000);
+    const timer = setTimeout(() => controller.abort(), 28000);
     const response = await fetch(targetUrl, { method: req.method, headers, body, signal: controller.signal });
     clearTimeout(timer);
 
