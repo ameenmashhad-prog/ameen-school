@@ -5,14 +5,16 @@
 'use strict';
 
 var ROLE_SECTIONS = {
-  super_admin: ['overview','students','academic','finance','attendance','discipline','registrations','schedule','payroll','settings','system'],
+  super_admin: ['overview','tasks','tasks','students','academic','finance','attendance','discipline','registrations','schedule','payroll','settings','system'],
   admin: ['overview','students','academic','finance','attendance','discipline','registrations','schedule','payroll','settings','system'],
   finance: ['overview','finance'],
-  academic: ['overview','students','academic','attendance','registrations','schedule'],
+  academic: ['overview','tasks','students','academic','attendance','registrations','schedule'],
   counselor: ['overview','students','attendance','discipline'],
   psychologist: ['overview','students','attendance','discipline'],
   discipline: ['overview','students','attendance','discipline'],
-  teacher: ['overview','students','academic','attendance','schedule'],
+  teacher: ['overview','students','academic','attendance','schedule','tasks'],
+  staff: ['overview','attendance','tasks'],
+  hr: ['overview','attendance','tasks'],
   parent: ['overview','students','academic','attendance','finance'],
   student: ['overview','academic','attendance','schedule']
 };
@@ -23,6 +25,7 @@ var SECTIONS_META = {
   academic: { title: 'الأكاديمي', icon: 'academic', order: 3 },
   finance: { title: 'المالية', icon: 'finance', order: 4 },
   attendance: { title: 'الحضور', icon: 'attendance', order: 5 },
+  tasks: { title: 'المهام والتكليفات 📋', icon: 'tasks', order: 12, external: 'tasks-management.html' },
   discipline: { title: 'السلوك', icon: 'discipline', order: 6 },
   registrations: { title: 'التسجيلات', icon: 'registrations', order: 7 },
   schedule: { title: 'الجدول', icon: 'schedule', order: 8 },

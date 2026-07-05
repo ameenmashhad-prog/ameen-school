@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>المهام والتكليفات الرسمية — مدارس أمين الرضا</title>
+<link rel="stylesheet" href="assets/amin.css">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="stylesheet" href="assets/i18n.css">
+<style>
+.tasks-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; margin-top: 16px; }
+.task-card { background: #fff; border: 1px solid #ddd; border-radius: 10px; padding: 14px; display: flex; flex-direction: column; justify-content: space-between; gap: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.04); transition: transform 0.2s, box-shadow 0.2s; }
+.task-card:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
+.task-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; border-bottom: 1px solid #eee; padding-bottom: 8px; }
+.task-title { font-size: 16px; font-weight: bold; color: var(--primary, #0B6E4F); margin: 0; }
+.task-meta { font-size: 12px; color: #666; display: flex; flex-direction: column; gap: 4px; }
+.task-desc { font-size: 13px; color: #333; background: #f9f9f9; padding: 8px; border-radius: 6px; margin: 6px 0; max-height: 80px; overflow-y: auto; }
+.task-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; border-top: 1px solid #eee; padding-top: 8px; }
+.priority-urgent { border-left: 4px solid #b71c1c !important; }
+.priority-high { border-left: 4px solid #d32f2f !important; }
+.priority-normal { border-left: 4px solid #1976d2 !important; }
+.priority-low { border-left: 4px solid #388e3c !important; }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#mainContent">تخطي إلى المحتوى</a>
+<div class="shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-mark">إ</div>
+      <div><h1>المهام والتكليفات</h1><small>متابعة التشغيل والأداء</small></div>
+    </div>
+    <div class="profile-mini">
+      <div class="avatar">📋</div>
+      <div><b id="profileName">...</b><small id="profileRole">...</small></div>
+    </div>
+    <nav class="nav">
+      <button data-view="overview" class="active">🏠 الرئيسية</button>
+      <button data-view="my_tasks">📋 مهامي الخاصة</button>
+      <button data-view="assign" class="admin-only" style="display:none">👑 تكليف وإدارة المهام</button>
+      <div class="nav-section">روابط سريعة</div>
+      <button onclick="location.href='portal.html'">🏛️ البوابة الموحدة</button>
+      <button onclick="location.href='teacher.html'">👨‍🏫 لوحة المعلم</button>
+      <button onclick="location.href='hr.html'">👥 الموارد البشرية</button>
+      <button onclick="location.href='academic-pro.html'">🎓 النظام الأكاديمي</button>
+      <button onclick="history.back()">↩️ رجوع</button>
+    </nav>
+    <div class="side-footer"><button id="logoutBtn" class="btn red block">تسجيل الخروج</button></div>
+  </aside>
+  <main class="main" id="mainContent" tabindex="-1">
+    <header class="topbar">
+      <button class="btn mobile-menu" id="mobileMenuBtn">☰</button>
+      <h2>نظام المهام والتكليفات الرسمية 📋</h2>
+      <div class="top-actions">
+        <button id="refreshBtn" class="btn blue">تحديث</button>
+      </div>
+    </header>
+    <section id="view-overview" class="view active"></section>
+    <section id="view-my_tasks" class="view"></section>
+    <section id="view-assign" class="view"></section>
+  </main>
+</div>
+<div id="toast" class="toast"></div>
+<script src="libs/supabase.min.js"></script>
+<script src="assets/config.js"></script>
+<script src="assets/platform-modules.js"></script>
+<script src="assets/i18n.js"></script>
+<script src="assets/tasks-management.js"></script>
+<script>window.addEventListener('load',()=>TasksApp.init());</script>
+<script src="assets/ux-enhancements.js"></script>
+<script src="assets/amin-theme-injector.js"></script>
+<script src="assets/amin-icons.js" defer></script>
+</body>
+</html>
