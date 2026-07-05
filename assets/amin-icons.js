@@ -145,6 +145,64 @@ function create(name, size, state) {
   return `<span class="amin-3d-ico-wrap" style="display:inline-flex;align-items:center;justify-content:center;width:${size}px;height:${size}px;">${ico}</span>`;
 }
 
-window.AminIcons = { create, CLAY_ICONS, inject3DStyles };
+
+// 4. Automatic Emoji-to-3D-Icon Scanner
+const EMOJI_MAP = {
+  '📚':'books', '📖':'book', '📄':'doc', '📝':'note', '🧾':'doc', '📋':'clipboard',
+  '💰':'finance', '💵':'money', '💳':'card',
+  '👥':'users', '👨‍👩‍👧':'users', '👨‍🏫':'person', '👨‍🎓':'students', '👨':'person', '👩':'person', '👧':'person', '👦':'person',
+  '📅':'calendar', '🗓️':'calendar', '🗓':'calendar', '⏱️':'calendar', '⏱':'calendar',
+  '📊':'chart', '📈':'trendUp',
+  '🏆':'trophy', '👑':'crown', '🏅':'award', '🌟':'star', '⭐':'star',
+  '📦':'box',
+  '🏢':'home', '🏫':'home', '🏠':'home',
+  '🔬':'sparkle', '🧪':'sparkle', '✨':'sparkle', '🤖':'ai',
+  '🚌':'bus',
+  '⚙️':'settings', '⚙':'settings', '🔧':'settings',
+  '🛡️':'shield', '🛡':'shield', '⚠️':'warning', '⚠':'warning', '🚨':'warning',
+  '✅':'check', '✔':'check', '🟢':'check', '🎯':'target', '😊':'check', '💚':'heart',
+  '🔑':'key', '🔐':'lock',
+  '🔄':'refresh',
+  '📥':'download', '📤':'upload',
+  '📞':'phone', '💬':'chat', '✉️':'mail', '✉':'mail', '🔔':'bell', '📣':'bell',
+  '🖨️':'print', '🖨':'print', '🌴':'sun'
+};
+
+function autoReplaceEmojis(root) {
+  root = root || document.body;
+  if (!root) return;
+  
+  root.querySelectorAll('.amin-3d-ico-auto').forEach(el => {
+    const size = Number(el.getAttribute('data-size') || 36);
+    const emoji = (el.getAttribute('data-emoji') || '').trim();
+    let icoName = 'star';
+    for (const k in EMOJI_MAP) {
+      if (emoji.includes(k)) { icoName = EMOJI_MAP[k]; break; }
+    }
+    el.outerHTML = create(icoName, size);
+  });
+}
+
+function initAutoReplacer() {
+  autoReplaceEmojis();
+  const obs = new MutationObserver((muts) => {
+    let needs = false;
+    for (const m of muts) {
+      if (m.addedNodes.length) { needs = true; break; }
+    }
+    if (needs) autoReplaceEmojis();
+  });
+  if (document.body) {
+    obs.observe(document.body, { childList: true, subtree: true });
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initAutoReplacer);
+} else {
+  initAutoReplacer();
+}
+
+window.AminIcons = { create, CLAY_ICONS, inject3DStyles, autoReplaceEmojis };
 window.Icon3D = { create };
 })();
