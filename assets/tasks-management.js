@@ -197,16 +197,21 @@
       return;
     }
 
-    const staffList = DATA.users.filter(u => u.role !== 'student' && u.role !== 'parent');
-    const staffOptions = staffList.map(u => `<option value="${u.id}">${esc(u.name || u.email)} — (${esc(roleLabel(u.role))})</option>`).join('');
-
-    const formHtml = `<div class="card" style="margin-bottom:20px"><div class="card-head"><h3>👑 تكليف موظف أو معلم بمهمة رسمية جديدة</h3></div><div class="card-body"><div class="hr-form" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;align-items:end">` +
-      `<div><label>عنوان المهمة / التكليف *</label><input id="tskTitle" class="input" placeholder="مثال: إعداد تحضير الأسبوع القادم / تنظيم نشاط اليوم"></div>` +
-      `<div><label>الموظف أو المعلم المكلف *</label><select id="tskAssignee" class="select"><option value="">اختاري المكلف...</option>${staffOptions}</select></div>` +
+    const formHtml = `<div class="card" style="margin-bottom:20px"><div class="card-head"><h3>👑 تكليف عدة معلمين وموظفين بمهمة رسمية (اختيار متعدد بالـ Checkbox)</h3></div><div class="card-body"><div class="hr-form" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;align-items:end">` +
+      `<div style="grid-column:1/-1"><label>عنوان المهمة / التكليف *</label><input id="tskTitle" class="input" placeholder="مثال: إعداد تحضير الأسبوع القادم / تنظيم نشاط اليوم الرياضي"></div>` +
       `<div><label>الأولوية *</label><select id="tskPriority" class="select"><option value="normal">عادية</option><option value="high">هامة ⭐</option><option value="urgent">عاجلة جداً 🔥</option><option value="low">منخفضة</option></select></div>` +
       `<div><label>الموعد النهائي (Deadline) *</label><input id="tskDue" type="datetime-local" class="input" value="${new Date(Date.now() + 86400000 * 3).toISOString().slice(0, 16)}"></div>` +
       `<div style="grid-column:1/-1"><label>تفاصيل ومطلوب التكليف (اختياري)</label><input id="tskDesc" class="input" placeholder="اكتبي تفاصيل أو إرشادات تنفيذ المهمة..."></div>` +
-      `<div style="grid-column:1/-1"><button class="btn gold block" onclick="TasksApp.createAssignment()">🚀 تكليف الموظف بالمهمة وإرسال إشعار فوري</button></div>` +
+      `<div style="grid-column:1/-1"><label>تصفية واختيار المكلفين بالمهام (معلمين، مرشدين، موظفين...) *</label>` +
+      `<div style="display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap">` +
+      `<button type="button" class="btn small blue" onclick="TasksApp.filterAssignees('all')">الكل</button>` +
+      `<button type="button" class="btn small gold" onclick="TasksApp.filterAssignees('teacher')">المعلمون</button>` +
+      `<button type="button" class="btn small green" onclick="TasksApp.filterAssignees('counselor')">المرشدون والإرشاد</button>` +
+      `<button type="button" class="btn small blue" onclick="TasksApp.filterAssignees('staff')">الموظفون والإدارة</button>` +
+      `</div>` +
+      `<div id="assigneesBox" style="max-height:160px;overflow-y:auto;border:1px solid #ccc;padding:8px;border-radius:6px;background:#f9f9f9;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px"></div>` +
+      `</div>` +
+      `<div style="grid-column:1/-1"><button class="btn gold block" onclick="TasksApp.createAssignment()">🚀 تكليف جميع المحدد ين بالصح ☑ وإرسال الإشعارات لهم فوراً</button></div>` +
       `</div></div></div>`;
 
     const rows = DATA.tasks.map(t => {
@@ -231,28 +236,49 @@
       return `<tr><td><b>${esc(t.title)}</b><br><small class="muted">${esc(t.description || '')}</small></td><td><b>${esc(t.assigned_to_name)}</b><br><small class="muted">${esc(roleLabel(t.assigned_to_role))}</small></td><td>${esc(priText)}</td><td>${esc(String(t.due_date||'').slice(0,16).replace('T',' '))}</td><td>${stBadge}</td><td>${esc(t.completion_note || '—')}</td><td>${fileLink}</td><td>${actionBtn}</td></tr>`;
     });
 
-    $('#view-assign').innerHTML = `<div class="page-head"><div><h1>👑 تكليف وإدارة مهام المدرسة</h1><p>توجيه مهام وتكليفات رسمية للمعلمين والموظفين، ومتابعة نسبة الإنجاز والاعتماد.</p></div></div>` +
+    $('#view-assign').innerHTML = `<div class="page-head"><div><h1>👑 تكليف وإدارة مهام المدرسة</h1><p>توجيه مهام وتكليفات رسمية لمعلمين ومرشدين وموظفين متعددين في نفس الوقت، ومتابعة نسبة الإنجاز والاعتماد.</p></div></div>` +
       formHtml + table(['المهمة', 'المكلف', 'الأولوية', 'الموعد النهائي', 'الحالة', 'ملاحظة الإنجاز', 'المرفق', 'إجراء التحقق'], rows, 'لا توجد تكليفات مسجلة');
+  
+    setTimeout(() => filterAssignees('all'), 10);
+  }
+
+  function filterAssignees(roleFilter) {
+    const box = $('#assigneesBox');
+    if (!box) return;
+    const staffList = DATA.users.filter(u => u.role !== 'student' && u.role !== 'parent');
+    const filtered = staffList.filter(u => {
+      if (roleFilter === 'all') return true;
+      if (roleFilter === 'teacher') return u.role === 'teacher';
+      if (roleFilter === 'counselor') return ['counselor','psychologist','discipline'].includes(u.role);
+      return ['admin','academic_admin','super_admin','principal','scientific','hr','supervisor','staff','finance'].includes(u.role);
+    });
+
+    box.innerHTML = `<div style="grid-column:1/-1;border-bottom:1px solid #ddd;padding-bottom:4px;margin-bottom:4px"><label style="font-weight:bold;cursor:pointer;display:flex;align-items:center;gap:6px;color:#0B6E4F"><input type="checkbox" id="selectAllAssignees" onchange="TasksApp.toggleAllAssignees(this.checked)"> تحديد جميع المعروضين بالصح ☑ (${filtered.length})</label></div>` +
+      filtered.map(u => `<label style="display:flex;align-items:center;gap:6px;cursor:pointer;background:#fff;padding:4px 8px;border:1px solid #eee;border-radius:4px"><input type="checkbox" class="tsk-assign-chk" value="${u.id}"> <b>${esc(u.name || u.email)}</b> <small class="muted">(${esc(roleLabel(u.role))})</small></label>`).join('');
+  }
+
+  function toggleAllAssignees(checked) {
+    document.querySelectorAll('.tsk-assign-chk').forEach(el => el.checked = checked);
   }
 
   async function createAssignment() {
     const title = $('#tskTitle')?.value?.trim();
-    const to = $('#tskAssignee')?.value;
+    const checked = Array.from(document.querySelectorAll('.tsk-assign-chk:checked')).map(el => el.value);
     const pri = $('#tskPriority')?.value || 'normal';
     const due = $('#tskDue')?.value;
     const desc = $('#tskDesc')?.value?.trim() || null;
 
-    if (!title || !to || !due) {
-      toast('تنبيه', 'أكملي عنوان المهمة والموظف المكلف والموعد النهائي', 'red');
+    if (!title || checked.length === 0 || !due) {
+      toast('تنبيه', 'أكملي عنوان المهمة واختاري شخصاً واحداً على الأقل من القائمة وحددي الموعد النهائي', 'red');
       return;
     }
 
     try {
-      toast('جاري التكليف...', 'يرجى الانتظار');
-      const res = await client().rpc('task_create_assignment', {
+      toast('جاري التكليف المتعدد...', 'تم إرسال ' + checked.length + ' موظف للتكليف');
+      const res = await client().rpc('task_create_multi_assignment', {
         p_title: title,
         p_description: desc,
-        p_assigned_to: to,
+        p_assigned_to_list: checked,
         p_priority: pri,
         p_due_date: new Date(due).toISOString()
       });
@@ -296,5 +322,5 @@
     await load();
   }
 
-  window.TasksApp = { init, render, updateProgress, createAssignment, verifyTask };
+  window.TasksApp = { init, render, updateProgress, createAssignment, verifyTask, filterAssignees, toggleAllAssignees };
 })();
