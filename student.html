@@ -391,8 +391,28 @@
     container.innerHTML = html;
   }
 
-  function renderGrades() {
+  async function renderGrades() {
     const container = $('#view-grades');
+    if (!container) return;
+
+    try {
+      const blockRes = await client().rpc('check_student_tuition_blocked', { p_student_id: ME.student_id || null });
+      if (blockRes && blockRes.data && blockRes.data.blocked === true) {
+        container.innerHTML = '<div class="page-head"><div><h1>📊 درجاتي</h1></div></div>' +
+          '<div class="card" style="border:2px solid #B8860B;background:#fffaf0;padding:24px;text-align:center;border-radius:12px;margin:20px 0">' +
+          '<div style="font-size:48px;margin-bottom:12px">🔒💵</div>' +
+          '<h2 style="color:#8b0000;margin-bottom:8px">الدرجات والشهادات محجوبة مؤقتاً بسبب الأقساط المدرسية</h2>' +
+          '<p style="font-size:16px;color:#333;max-width:600px;margin:0 auto 16px">' + esc(blockRes.data.message) + '</p>' +
+          '<div style="background:#fff;border:1px solid #ddd;padding:12px 20px;border-radius:8px;display:inline-block;margin-bottom:16px">' +
+          '<b>الأقساط المستحقة المتأخرة: </b><span class="badge red" style="font-size:14px">' + esc(blockRes.data.overdue_installments) + ' قسط</span>' +
+          '</div>' +
+          '<p class="muted" style="font-size:13px">يرجى مراجعة إدارة المدرسة أو القسم المالي لتسوية القسط وتفعيل ظهور كشف الدرجات فوراً.</p>' +
+          '</div>';
+        return;
+      }
+    } catch(e) {
+      console.warn('Tuition check error:', e);
+    }
     
     let html = '<div class="page-head" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;"><div><h1>📊 درجاتي</h1></div>';
     html += '<button class="btn" style="background:#0B6E4F;color:white;padding:10px 18px;" onclick="StudentPortal.printReport(\'grades\')">🖨️ طباعة الكشف</button>';
