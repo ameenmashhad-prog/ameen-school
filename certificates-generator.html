@@ -60,6 +60,39 @@
   .cert-preview-wrap { gap: 0 !important; margin: 0 !important; }
   .cert-card { width: 100% !important; max-width: 100% !important; border: 8px double #B8860B !important; border-radius: 0 !important; box-shadow: none !important; page-break-after: always !important; break-after: page !important; min-height: 95vh !important; display: flex !important; flex-direction: column !important; justify-content: space-between !important; padding: 30px !important; margin: 0 !important; }
 }
+/* Illustrated Cards Print & Display Setup */
+* {
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+  color-adjust: exact !important;
+}
+.cert-card.illustrated-card {
+  width: 100%;
+  max-width: 950px;
+  background-size: cover !important;
+  background-position: center !important;
+  border-radius: 18px;
+  overflow: hidden;
+}
+@media print {
+  .cert-card.illustrated-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 95vh !important;
+    background-size: contain !important;
+    background-position: center !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    padding: 20px !important;
+  }
+  .illustrated-overlay {
+    background: rgba(255, 255, 255, 0.95) !important;
+    box-shadow: none !important;
+    border: 2px solid #0B6E4F !important;
+  }
+}
 </style>
 </head>
 <body>
