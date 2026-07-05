@@ -37,12 +37,22 @@ function renderSchedules() {
     let stBadge = '<span class="badge gold">بانتظار الرفع</span>';
     if (t.status === 'submitted') stBadge = '<span class="badge green">تم الرفع 📤</span>';
     else if (t.status === 'late') stBadge = '<span class="badge red">متأخر! تجاوز المهلة ⚠️</span>';
+    else if (t.status === 'approved') stBadge = '<span class="badge green" style="background:#0B6E4F;color:#fff">معتمد رسمياً 🟢</span>';
+    else if (t.status === 'rejected') stBadge = '<span class="badge red">مرفوض/طلب تعديل 🔄</span>';
     else if (t.status === 'offline_verified') stBadge = `<span class="badge blue">إثبات: ${esc(t.delivery_method)} 📲</span>`;
+
+    let actions = `<button class="btn small gold" onclick="AcademicPro.verifyOfflinePrompt('${t.id}')">إثبات تسليم 📲</button>`;
+    if (t.status === 'submitted' || t.status === 'offline_verified' || t.status === 'late') {
+      actions += ` <button class="btn small green" onclick="AcademicPro.reviewTask('${t.id}', 'approved')" title="اعتماد وقفل على المعلم">✅ اعتماد</button>`;
+      actions += ` <button class="btn small red" onclick="AcademicPro.reviewTask('${t.id}', 'rejected')" title="طلب إعادة رفع من المعلم">🔄 تعديل</button>`;
+    } else if (t.status === 'approved') {
+      actions += ` <button class="btn small red" onclick="AcademicPro.reviewTask('${t.id}', 'rejected')" title="إلغاء الاعتماد وطلب التعديل">🔓 إلغاء وتعديل</button>`;
+    }
 
     const fileLink = t.question_file_url ? `<a class="btn small blue" href="/api/proxy/storage/v1/object/public/exam-questions/${t.question_file_url}" target="_blank">تحميل الأسئلة 📄</a>` : '—';
     const proofAction = `<button class="btn small gold" onclick="AcademicPro.verifyOfflinePrompt('${t.id}')">إثبات تسليم خارجي 📲</button>`;
 
-    return `<tr><td><b>${esc(pText)}</b></td><td>${esc(t.class_name||'—')}</td><td>${esc(t.subject_name||'—')}</td><td>${esc(t.teacher_name||'—')}</td><td><b>${esc(t.exam_date||'—')}</b><br><small class="muted">${t.start_time||''}-${t.end_time||''}</small></td><td>${esc(t.required_topics||'لم تُحدد بعد')}</td><td>${esc(String(t.submission_deadline||'').slice(0,16).replace('T',' '))}</td><td>${stBadge}</td><td>${fileLink}</td><td>${proofAction}</td></tr>`;
+    return `<tr><td><b>${esc(pText)}</b></td><td>${esc(t.class_name||'—')}</td><td>${esc(t.subject_name||'—')}</td><td>${esc(t.teacher_name||'—')}</td><td><b>${esc(t.exam_date||'—')}</b><br><small class="muted">${t.start_time||''}-${t.end_time||''}</small></td><td>${esc(t.required_topics||'لم تُحدد بعد')}</td><td>${esc(String(t.submission_deadline||'').slice(0,16).replace('T',' '))}</td><td>${stBadge}</td><td>${fileLink}</td><td>${actions}</td></tr>`;
   });
 
   const excelBatchHtml = `<div class="card" style="margin-bottom:20px;border-left:4px solid #0B6E4F"><div class="card-head"><h3>🚀 الجدولة السريعة عبر الإكسل (Excel Batch Import)</h3></div><div class="card-body" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">` +
@@ -60,7 +70,7 @@ function renderSchedules() {
     `<div class="field span-2"><label>وقت البداية *</label><input id="schStart" type="time" class="input" value="08:30"></div>` +
     `<div class="field span-2"><label>وقت النهاية *</label><input id="schEnd" type="time" class="input" value="10:00"></div>` +
     `<div class="field span-5"><label>موعد انتهاء صلاحية رفع الأسئلة (Deadline) *</label><input id="schDeadline" type="datetime-local" class="input" value="${new Date(Date.now()+86400000*2).toISOString().slice(0,16)}"></div>` +
-    `<div class="span-12"><button class="btn gold block" onclick="AcademicPro.saveExamScheduleTask()">حفظ الموعد وتكليف المعلم بالمهمة 🚀</button></div>` +
+    `<div class="span-6"><button class="btn gold block" onclick="AcademicPro.saveExamScheduleTask()">حفظ موعد مادة واحدة وتكليف المعلم 🚀</button></div><div class="span-6"><button class="btn blue block" onclick="AcademicPro.autoGenerateClassSchedule()" title="ينشئ مواعيد ومهام لكل مواد الصف تلقائياً بضغطة زر">⚡ توليد ذكي لجدول الصف كامل بضغطة زر ⚡</button></div>` +
     `</div></div></div>`;
 
   $('#view-schedules').innerHTML = `<div class="page-head"><div><h1>جدول ومواعيد الامتحانات ومهام الأسئلة 🗓️</h1><p>تحديد الإدارة لأيام ومواعيد الامتحانات حصراً، وتكليف المعلمين برفع الأسئلة ومتابعة التسليم.</p></div></div>` +
@@ -130,6 +140,54 @@ async function uploadExamExcel() {
   reader.readAsText(file, 'utf-8');
 }
 
+async function autoGenerateClassSchedule() {
+  const period = $('#schPeriod')?.value;
+  const cid = $('#schClass')?.value;
+  const date = $('#schDate')?.value;
+  if (!cid || !date) {
+    toast('تنبيه', 'اختاري الصف وتاريخ بدء الامتحانات أولاً لتوليد الجدول كاملاً', 'red');
+    return;
+  }
+  if (!confirm('هل تريدين توليد مواعيد ومهام تسليم الأسئلة لجميع مواد الصف بضغطة زر واحدة؟')) return;
+
+  try {
+    toast('جاري التوليد الذكي...', 'يرجى الانتظار');
+    const res = await client().rpc('academic_auto_generate_class_schedule', {
+      p_period: period,
+      p_class_id: cid,
+      p_start_date: date
+    });
+    if (res.error) throw res.error;
+    const d = res.data || {};
+    if (d.ok === false) throw new Error(d.message || 'تعذر التوليد');
+    toast('تم التوليد الذكي بنجاح 🚀', d.message, 'green');
+    await load();
+  } catch(e) {
+    toast('خطأ في التوليد', e.message || String(e), 'red');
+  }
+}
+
+async function reviewTask(taskId, status) {
+  let notes = null;
+  if (status === 'rejected') {
+    notes = prompt('أدخلي ملاحظة طلب التعديل للمعلم (مثال: الأسئلة غير واضحة في السؤال الثاني):', 'يرجى مراجعة وتعديل الأسئلة وإعادة الرفع');
+    if (notes === null) return;
+  }
+  try {
+    const res = await client().rpc('academic_review_exam_task', {
+      p_task_id: taskId,
+      p_status: status,
+      p_notes: notes || null
+    });
+    if (res.error) throw res.error;
+    const d = res.data || {};
+    if (d.ok === false) throw new Error(d.message || 'تعذر الاعتماد');
+    toast('تم بنجاح 🟢', d.message, status === 'approved' ? 'green' : 'gold');
+    await load();
+  } catch(e) {
+    toast('خطأ في المراجعة', e.message || String(e), 'red');
+  }
+}
 function onSchClassChange() {
   const cid = $('#schClass')?.value;
   const list = subjectsForClassId(cid);
