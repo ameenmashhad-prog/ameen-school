@@ -131,7 +131,7 @@ begin
   -- إرسال إشعار فوري للإدارة (المدير والمعاون العلمي) بتمكن المعلم من الرفع
   begin
     if to_regclass('public.school_notifications') is not null then
-      insert into public.school_notifications (title, message, type, recipient_role, created_by)
+      insert into public.school_notifications (title, body, notification_type, recipient_role, created_by)
       values (
         'تسليم أسئلة امتحانية جديدة 📤',
         'المعلم (' || v_task.tch_name || ') قام بتسليم أسئلة امتحان مادة (' || coalesce(v_task.sub_name,'—') || ') للصف (' || coalesce(v_task.cls_name,'—') || ').',

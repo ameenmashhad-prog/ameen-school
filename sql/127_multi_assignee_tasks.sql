@@ -51,7 +51,7 @@ begin
 
       begin
         if to_regclass('public.school_notifications') is not null then
-          insert into public.school_notifications (title, message, type, recipient_user_id, created_by)
+          insert into public.school_notifications (title, body, notification_type, recipient_user_id, created_by)
           values (
             'تكليف بمهمة رسمية جديدة 📋',
             'تم تكليفكم بمهمة جديدة: (' || trim(p_title) || '). الموعد النهائي: ' || to_char(coalesce(p_due_date, (now() + interval '3 days')), 'YYYY-MM-DD HH24:MI'),
