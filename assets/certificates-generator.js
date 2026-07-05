@@ -232,6 +232,7 @@
 
     let recName = 'طالب نمونه';
     let recSub = '';
+    let stu = null;
 
     if (t === 'teacher_appreciation') {
       const tid = $('#certTeacher')?.value;
@@ -240,7 +241,7 @@
       recSub = tch ? `الوظيفة: ${roleLabel(tch.role)}` : 'الكادر التعليمي والتربوي';
     } else {
       const sid = $('#certStudent')?.value;
-      const stu = DATA.students.find(s => String(s.id) === String(sid));
+      stu = DATA.students.find(s => String(s.id) === String(sid));
       recName = stu ? (stu.student_name || stu.name) : 'الطالب المتفوق';
       recSub = stu ? `الصف: ${className(stu.class_id)}` : 'المرحلة الدراسية';
     }
