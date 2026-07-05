@@ -85,6 +85,19 @@
     ({ hub: hubView, absent: absentView, overdue: overdueView, top: topView }[id] || hubView)();
   }
 
+  function getStudentGender(stu) {
+    if (!stu) return 'male';
+    if (stu.gender) {
+      const g = String(stu.gender).trim().toLowerCase();
+      if (['أنثى', 'انثى', 'بنت', 'أنثي', 'female', 'f', 'girl'].includes(g)) return 'female';
+      if (['ذكر', 'ولد', 'male', 'm', 'boy'].includes(g)) return 'male';
+    }
+    const name = (stu.student_name || stu.name || '').trim().split(/\s+/)[0] || '';
+    const femaleNames = ['فاطمة','فاطمه','زينب','مريم','سارة','ساره','نور','آية','رقية','زهراء','الزهراء','حوراء','حنين','بتول','هدى','رنا','داليا','ليلى','شهد','علا','ريم','فرح','دينا','ملاك','سمر','منى','رشا','غدير','دعاء','سجا','سجى','اسراء','إسراء','نبا','نبأ','تقى','كوثر','ضحى','دانيا','مروة','مروه','بنين','جنات','روان','صبا','هاجر','صفا','صفاء'];
+    if (femaleNames.includes(name) || name.endsWith('ة') || name.endsWith('اء') || name.endsWith('ى') || name.endsWith('ها')) return 'female';
+    return 'male';
+  }
+
   function getParentPhone(stu) {
     if (!stu) return '';
     if (stu.phone_primary) return stu.phone_primary;
@@ -107,25 +120,38 @@
     if (!stu) return '';
     const name = stu.student_name || stu.name || 'الطالب';
     const cls = (DATA.classMap.get(String(stu.class_id)) || {}).name || '—';
-    const parent = stu.father_name ? `السيد/ة ولي أمر الطالب/ة (${name}) المحترم،` : `ولي أمر الطالب/ة (${name}) المحترم،`;
+    const isFemale = (getStudentGender(stu) === 'female');
+
+    const studentTitle = isFemale ? `الطالبة العزيزة (${name})` : `الطالب العزيز (${name})`;
+    const parent = stu.father_name
+      ? (isFemale ? `السيد/ة ولي أمر الطالبة (${name}) المحترم،` : `السيد/ة ولي أمر الطالب (${name}) المحترم،`)
+      : (isFemale ? `ولي أمر الطالبة (${name}) المحترم،` : `ولي أمر الطالب (${name}) المحترم،`);
 
     if (t === 'absence') {
-      return `${parent}\n\nالسلام عليكم ورحمة الله وبركاته.\nنود إعلامكم بأن نجلكم/كريمتكم في الصف (${cls}) لم يحضر إلى المدرسة اليوم (${iso()}) دون إشعار أو عذر مسبق.\nنرجو من تفضلكم التواصل مع إدارة مجمع أمين الرضا (ع) التعليمي أو المرشد التربوي للاطمئنان عليه وبيان سبب الغياب.\n\nمع خالص التقدير،\nإدارة شؤون الطلاب`;
+      const verbAttend = isFemale ? 'لم تحضر' : 'لم يحضر';
+      const sonDaughter = isFemale ? 'كريمتكم' : 'نجلكم';
+      const checkOn = isFemale ? 'للاطمئنان عليها وبيان سبب غيابها' : 'للاطمئنان عليه وبيان سبب غيابه';
+      return `${parent}\n\nالسلام عليكم ورحمة الله وبركاته.\nنود إعلامكم بأن ${sonDaughter} في الصف (${cls}) ${verbAttend} إلى المدرسة اليوم (${iso()}) دون إشعار أو عذر مسبق.\nنرجو من تفضلكم التواصل مع إدارة مجمع أمين الرضا (ع) التعليمي أو المرشد التربوي ${checkOn}.\n\nمع خالص التقدير،\nإدارة شؤون الطلاب`;
     } else if (t === 'tuition') {
       const unpaid = DATA.installments.filter(i => {
         const feeStuId = i.student_fee_id ? (DATA.students.find(s => String(s.id) === String(i.student_fee_id) || String(s.id) === String(stu.id)) || {}).id : null;
         return String(feeStuId) === String(stu.id) || (num(i.amount_paid) < num(i.amount_due));
       });
       const dueAmt = unpaid.reduce((a, x) => a + (num(x.amount_due) - num(x.amount_paid)), 0) || 150;
-      return `${parent}\n\nطيب الله أوقاتكم بكل خير.\nنود تذكيركم بوجود قسط دراسي مستحق على ملف الطالب (${name}) في الصف (${cls}) وقدره (${dueAmt}$) وتاريخ استحقاقه قد انقضى.\nنرجو تفضلكم بمراجعة القسم المالي في مجمع أمين الرضا (ع) التعليمي لتسوية القسط وضمان انتظام الخدمات الأكاديمية والتقارير.\n\nشاكرين حسن تعاونكم الدائم،\nالقسم المالي`;
+      const sonDaughter = isFemale ? 'كريمتكم' : 'نجلكم';
+      return `${parent}\n\nطيب الله أوقاتكم بكل خير.\nنود تذكيركم بوجود قسط دراسي مستحق على ملف ${sonDaughter} في الصف (${cls}) وقدره (${dueAmt}$) وتاريخ استحقاقه قد انقضى.\nنرجو تفضلكم بمراجعة القسم المالي في مجمع أمين الرضا (ع) التعليمي لتسوية القسط وضمان انتظام الخدمات الأكاديمية والتقارير.\n\nشاكرين حسن تعاونكم الدائم،\nالقسم المالي`;
     } else if (t === 'congratulation') {
       const sum = DATA.summary.find(s => String(s.student_id) === String(stu.id) || String(s.id) === String(stu.id)) || {};
       const avg = sum.overall_average ? `${Number(sum.overall_average).toFixed(1)}%` : 'ممتاز';
-      return `${parent}\n\nيسر إدارة مجمع أمين الرضا (ع) التعليمي أن تبارك لكم ولعائلتكم الكريمة التفوق العلمي المتميز لنجلكم/كريمتكم (${name}) في الصف (${cls}) وحصوله على معدل عام قدره (${avg}).\nنفخر به ونثمن اهتمامكم ودعمكم المستمر، متمنين له دوام التميز والارتقاء.\n\nمع أطيب التحيات،\nالإدارة الأكاديمية`;
+      const sonDaughter = isFemale ? 'كريمتكم المتفوقة' : 'نجلكم المتفوق';
+      const gotAvg = isFemale ? 'وحصولها على معدل عام' : 'وحصوله على معدل عام';
+      const proudOf = isFemale ? 'نفخر بها ونثمن اهتمامكم ودعمكم المستمر، متمنين لها دوام التميز والارتقاء' : 'نفخر به ونثمن اهتمامكم ودعمكم المستمر، متمنين له دوام التميز والارتقاء';
+      return `${parent}\n\nيسر إدارة مجمع أمين الرضا (ع) التعليمي أن تبارك لكم ولعائلتكم الكريمة التفوق العلمي المتميز لـ ${sonDaughter} (${name}) في الصف (${cls}) ${gotAvg} قدره (${avg}).\n${proudOf}.\n\nمع أطيب التحيات،\nالإدارة الأكاديمية`;
     } else if (t === 'summons') {
-      return `${parent}\n\nالسلام عليكم ورحمة الله وبركاته.\nنرجو تفضلكم بزيارة مجمع أمين الرضا (ع) التعليمي في أقرب وقت ممكن لمقابلة (الإدارة / المرشد التربوي) لمناقشة بعض الأمور الهامة الخاصة بالمستوى الدراسي والسلوكي لنجلكم (${name}) في الصف (${cls}).\n\nشاكرين اهتمامكم وحرصكم،\nالإدارة المدرسية`;
+      const sonDaughter = isFemale ? 'كريمتكم' : 'نجلكم';
+      return `${parent}\n\nالسلام عليكم ورحمة الله وبركاته.\nنرجو تفضلكم بزيارة مجمع أمين الرضا (ع) التعليمي في أقرب وقت ممكن لمقابلة (الإدارة / المرشد التربوي) لمناقشة بعض الأمور الهامة الخاصة بالمستوى الدراسي والسلوكي لـ ${sonDaughter} (${name}) في الصف (${cls}).\n\nشاكرين اهتمامكم وحرصكم،\nالإدارة المدرسية`;
     }
-    return `${parent}\n\nتحية طيبة وبعد،\nيرجى الاطلاع والدراسة بخصوص الطالب (${name}) في الصف (${cls}).\n\nإدارة مجمع أمين الرضا (ع) التعليمي`;
+    return `${parent}\n\nتحية طيبة وبعد،\nيرجى الاطلاع والدراسة بخصوص ${studentTitle} في الصف (${cls}).\n\nإدارة مجمع أمين الرضا (ع) التعليمي`;
   }
 
   function num(v) { const n = Number(v); return Number.isFinite(n) ? n : 0; }
@@ -133,19 +159,34 @@
   function hubView() {
     const classOptions = '<option value="">كل الصفوف بالمدرسة...</option>' + DATA.classes.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('');
     
-    $('#view-hub').innerHTML = `<div class="page-head"><div><h1>💬 مركز التواصل المباشر مع أولياء الأمور</h1><p>إرسال رسائل وتنبيهات فورية عبر واتساب أو SMS بضغطة زر واحدة باستخدام قوالب ذكية بدون أي رسوم أو إعدادات برمجية معقدة.</p></div></div>` +
+    $('#view-hub').innerHTML = `<div class="page-head"><div><h1>💬 مركز التواصل المباشر مع أولياء الأمور</h1><p>إرسال رسائل وتنبيهات فورية عبر واتساب أو SMS بضغطة زر واحدة باستخدام قوالب ذكية مع كشف تلقائي لجنس الطالب (ذكر/أنثى) وصياغة قواعدية دقيقة 100%.</p></div></div>` +
       `<div class="card" style="margin-bottom:16px"><div class="card-body" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">` +
       `<div><b>🔍 تصفية الطلاب:</b></div>` +
       `<div style="flex:1;min-width:180px"><select id="filterClass" class="select" onchange="ParentMessagesApp.filterStudentsList()">${classOptions}</select></div>` +
-      `<div style="flex:2;min-width:220px"><input id="searchStudent" class="input" placeholder="بحث باسم الطالب أو الأب..." oninput="ParentMessagesApp.filterStudentsList()"></div>` +
+      `<div style="display:flex;gap:6px">` +
+      `<button type="button" class="btn small blue" id="gBtn_all" onclick="ParentMessagesApp.setGenderFilter('all')">👥 الكل</button>` +
+      `<button type="button" class="btn small gold" id="gBtn_male" onclick="ParentMessagesApp.setGenderFilter('male')">👦 ذكور</button>` +
+      `<button type="button" class="btn small gold" id="gBtn_female" onclick="ParentMessagesApp.setGenderFilter('female')">👧 إناث</button>` +
+      `</div>` +
+      `<div style="flex:2;min-width:200px"><input id="searchStudent" class="input" placeholder="بحث باسم الطالب أو الأب..." oninput="ParentMessagesApp.filterStudentsList()"></div>` +
       `</div></div>` +
       `<div class="msg-container">` +
       `<div class="card"><div class="card-head"><h3>👥 قائمة الطلاب واختيار الطالب المستهدف</h3></div><div class="card-body" id="studentsListBox" style="max-height:500px;overflow-y:auto"></div></div>` +
       `<div class="card" style="border-top:4px solid #25D366"><div class="card-head"><h3>⚡ قوالب الرسائل الذكية وإرسال الواتساب</h3></div><div class="card-body" id="templateEditorBox"></div></div>` +
       `</div>`;
     
+    window._currGenderFilter = 'all';
     filterStudentsList();
     renderTemplateEditor();
+  }
+
+  function setGenderFilter(g) {
+    window._currGenderFilter = g;
+    ['all','male','female'].forEach(k => {
+      const b = $('#gBtn_' + k);
+      if (b) b.className = (k === g) ? 'btn small green' : 'btn small gold';
+    });
+    filterStudentsList();
   }
 
   function filterStudentsList() {
@@ -153,18 +194,28 @@
     if (!box) return;
     const cid = $('#filterClass')?.value;
     const qStr = ($('#searchStudent')?.value || '').toLowerCase();
+    const gFilter = window._currGenderFilter || 'all';
 
-    const list = DATA.students.filter(s => (!cid || String(s.class_id) === String(cid)) && (!qStr || (s.student_name || s.name || '').toLowerCase().includes(qStr) || (s.father_name || '').toLowerCase().includes(qStr))).slice(0, 40);
+    const list = DATA.students.filter(s => {
+      if (cid && String(s.class_id) !== String(cid)) return false;
+      if (qStr && !(s.student_name || s.name || '').toLowerCase().includes(qStr) && !(s.father_name || '').toLowerCase().includes(qStr)) return false;
+      if (gFilter !== 'all') {
+        if (getStudentGender(s) !== gFilter) return false;
+      }
+      return true;
+    }).slice(0, 40);
 
     box.innerHTML = list.map(s => {
       const cls = (DATA.classMap.get(String(s.class_id)) || {}).name || '—';
       const phone = getParentPhone(s);
       const isSel = SELECTED && (String(SELECTED.id) === String(s.id));
+      const isFemale = (getStudentGender(s) === 'female');
+      const gBadge = isFemale ? '<span class="badge purple" style="background:#800080;color:#fff">👧 أنثى</span>' : '<span class="badge blue">👦 ذكر</span>';
       return `<div class="student-select-card ${isSel ? 'active' : ''}" onclick="ParentMessagesApp.selectStudent('${s.id}')">` +
-        `<div><b style="color:#0B6E4F;font-size:15px">${esc(s.student_name || s.name)}</b><br><small class="muted">الأب: ${esc(s.father_name||'—')} · الصف: ${esc(cls)}</small><br><span class="badge gold" style="margin-top:4px;display:inline-block">📞 0${esc(phone)}</span></div>` +
+        `<div><div style="display:flex;align-items:center;gap:6px"><b style="color:#0B6E4F;font-size:15px">${esc(s.student_name || s.name)}</b> ${gBadge}</div><small class="muted">الأب: ${esc(s.father_name||'—')} · الصف: ${esc(cls)}</small><br><span class="badge gold" style="margin-top:4px;display:inline-block">📞 0${esc(phone)}</span></div>` +
         `<div><button class="btn small ${isSel ? 'green' : 'blue'}">${isSel ? 'مختار ✅' : 'اختيار 👈'}</button></div>` +
         `</div>`;
-    }).join('') || '<div class="empty">لا توجد نتائج مطابقة للبحث</div>';
+    }).join('') || '<div class="empty">لا توجد نتائج مطابقة للبحث أو التصفية</div>';
   }
 
   function selectStudent(id) {
@@ -266,7 +317,7 @@
       const clean = cleanPhone(phone);
       const msg = buildMessageText(stu, 'absence');
       return `<div class="card" style="margin-bottom:12px;border-right:5px solid #d32f2f"><div class="card-body" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">` +
-        `<div><b style="font-size:16px;color:#d32f2f">🛑 ${esc(stu.student_name || stu.name || 'طالب غائب')}</b><br><small class="muted">الصف: ${esc(cls)} · الأب: ${esc(stu.father_name||'—')} · الهاتف: 0${esc(phone)}</small></div>` +
+        `<div><b style="font-size:16px;color:#d32f2f">🛑 ${esc(stu.student_name || stu.name || 'طالب غائب')} ${getStudentGender(stu)==='female'?'<span class="badge purple" style="background:#800080;color:#fff;font-size:11px">👧 أنثى</span>':'<span class="badge blue" style="font-size:11px">👦 ذكر</span>'}</b><br><small class="muted">الصف: ${esc(cls)} · الأب: ${esc(stu.father_name||'—')} · الهاتف: 0${esc(phone)}</small></div>` +
         `<button class="whatsapp-btn" style="padding:10px 18px;font-size:14px" onclick="ParentMessagesApp.quickSend('${clean}', '${encodeURIComponent(msg)}')">🟢 إبلاغ الغياب عبر واتساب فوراً</button>` +
         `</div></div>`;
     }).join('') || '<div class="empty">لا يوجد طلاب غائبون مسجلون اليوم 🟢</div>';
@@ -284,7 +335,7 @@
       const msg = buildMessageText(stu, 'tuition');
       const dueAmt = num(i.amount_due) - num(i.amount_paid);
       return `<div class="card" style="margin-bottom:12px;border-right:5px solid #B8860B"><div class="card-body" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">` +
-        `<div><b style="font-size:16px;color:#8b0000">⚠️ ${esc(stu.student_name || stu.name || 'طالب')}</b><br><small class="muted">الصف: ${esc(cls)} · القسط المستحق: <b style="color:#8b0000">${dueAmt}$</b> · تاريخ الاستحقاق: ${esc(i.due_date)}</small></div>` +
+        `<div><b style="font-size:16px;color:#8b0000">⚠️ ${esc(stu.student_name || stu.name || 'طالب')} ${getStudentGender(stu)==='female'?'<span class="badge purple" style="background:#800080;color:#fff;font-size:11px">👧 أنثى</span>':'<span class="badge blue" style="font-size:11px">👦 ذكر</span>'}</b><br><small class="muted">الصف: ${esc(cls)} · القسط المستحق: <b style="color:#8b0000">${dueAmt}$</b> · تاريخ الاستحقاق: ${esc(i.due_date)}</small></div>` +
         `<button class="whatsapp-btn" style="padding:10px 18px;font-size:14px" onclick="ParentMessagesApp.quickSend('${clean}', '${encodeURIComponent(msg)}')">🟢 إرسال مطالبة مالية واتساب</button>` +
         `</div></div>`;
     }).join('') || '<div class="empty">لا توجد أقساط دراسية متأخرة حالياً 🟢</div>';
@@ -300,7 +351,7 @@
       const clean = cleanPhone(phone);
       const msg = buildMessageText(stu, 'congratulation');
       return `<div class="card" style="margin-bottom:12px;border-right:5px solid #0B6E4F"><div class="card-body" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">` +
-        `<div><b style="font-size:16px;color:#0B6E4F">🏆 ${esc(stu.student_name || stu.name || 'متفوق')}</b><br><small class="muted">الصف: ${esc(s.class_name)} · المعدل العام: <b style="color:#0B6E4F">${Number(s.overall_average||0).toFixed(1)}%</b></small></div>` +
+        `<div><b style="font-size:16px;color:#0B6E4F">🏆 ${esc(stu.student_name || stu.name || 'متفوق')} ${getStudentGender(stu)==='female'?'<span class="badge purple" style="background:#800080;color:#fff;font-size:11px">👧 أنثى</span>':'<span class="badge blue" style="font-size:11px">👦 ذكر</span>'}</b><br><small class="muted">الصف: ${esc(s.class_name)} · المعدل العام: <b style="color:#0B6E4F">${Number(s.overall_average||0).toFixed(1)}%</b></small></div>` +
         `<button class="whatsapp-btn" style="padding:10px 18px;font-size:14px" onclick="ParentMessagesApp.quickSend('${clean}', '${encodeURIComponent(msg)}')">🟢 إرسال تهنئة تفوق واتساب</button>` +
         `</div></div>`;
     }).join('') || '<div class="empty">لا يوجد بيانات أوائل مسجلة بعد</div>';
@@ -332,5 +383,5 @@
     await load();
   }
 
-  window.ParentMessagesApp = { init, render, filterStudentsList, selectStudent, setTemplate, sendWhatsApp, sendSMS, copyMsg, logFollowup, quickSend };
+  window.ParentMessagesApp = { init, render, filterStudentsList, selectStudent, setTemplate, sendWhatsApp, sendSMS, copyMsg, logFollowup, quickSend, setGenderFilter, getStudentGender };
 })();
