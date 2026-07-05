@@ -43,6 +43,7 @@
       <button data-view="grades">📊 إدخال الدرجات</button>
       <button data-view="schedule">📅 جدولي</button>
       <button data-view="homeworks">📚 الواجبات</button>
+      <button data-view="leaves">🌴 طلبات الإجازة</button>
       <button onclick="location.href='curriculum-planner.html'">📖 مخطط المنهج</button>
       <button onclick="location.href='teacher-exams.html'">📝 بنك الأسئلة</button>
       <button onclick="location.href='homework-reports.html'">📊 تقارير الواجبات</button>
@@ -70,6 +71,7 @@
     <section id="view-grades" class="view"></section>
     <section id="view-schedule" class="view"></section>
     <section id="view-homeworks" class="view"></section>
+    <section id="view-leaves" class="view"></section>
   </main>
 </div>
 
@@ -283,6 +285,7 @@
     else if(viewId === 'grades') renderGrades();
     else if(viewId === 'schedule') renderSchedule();
     else if(viewId === 'homeworks') renderHomeworks();
+    else if(viewId === 'leaves') renderLeaves();
   }
 
   function renderOverview() {
@@ -377,6 +380,113 @@
     var c=document.getElementById('view-homeworks'); if(!c) return;
     var rows = DATA.homeworks.map(function(h){ return [h.title||'—', getSubjectName(h.subject_id), h.due_date||'—', h.status||'—']; });
     c.innerHTML = wrapCard('الواجبات', buildTable(['العنوان','المادة','التسليم','الحالة'], rows));
+  }
+
+
+  async function renderLeaves() {
+    var c = document.getElementById('view-leaves');
+    if (!c) return;
+    c.innerHTML = '<div class="page-head"><div><h1>طلبات الإجازة 🌴</h1><p>تقديم طلب إجازة جديد ومتابعة حالة الطلبات السابقة مع الموارد البشرية.</p></div></div><div class="empty">جاري تحميل بيانات الإجازات...</div>';
+    
+    var leaves = [];
+    try {
+      var r = await client().rpc('get_my_leave_requests');
+      leaves = r.data || [];
+    } catch(e) {
+      console.warn('Failed to load leaves:', e);
+    }
+    
+    var total = leaves.length;
+    var pending = leaves.filter(function(x){ return x.status === 'pending'; }).length;
+    var approved = leaves.filter(function(x){ return x.status === 'approved' || x.status === 'on_leave'; }).length;
+    var rejected = leaves.filter(function(x){ return x.status === 'rejected'; }).length;
+    
+    var kpisHtml = '<div class="kpis" style="margin-bottom:20px">' +
+      '<div class="kpi blue"><small>إجمالي الطلبات</small><b>'+total+'</b></div>' +
+      '<div class="kpi gold"><small>قيد المراجعة</small><b>'+pending+'</b></div>' +
+      '<div class="kpi green"><small>معتمدة</small><b>'+approved+'</b></div>' +
+      '<div class="kpi red"><small>مرفوضة</small><b>'+rejected+'</b></div>' +
+      '</div>';
+      
+    var formHtml = '<div class="card" style="margin-bottom:20px"><div class="card-head"><h3>تقديم طلب إجازة جديد</h3></div><div class="card-body">' +
+      '<form id="leaveRequestForm" class="hr-form" onsubmit="return false;" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;align-items:end">' +
+      '<div><label>نوع الإجازة *</label><select id="myLeaveType" class="select" required>' +
+      '<option value="annual">إجازة سنوية / اعتيادية</option>' +
+      '<option value="sick">إجازة مرضية</option>' +
+      '<option value="emergency">إجازة طارئة / اضطرارية</option>' +
+      '<option value="unpaid">إجازة بدون راتب</option>' +
+      '<option value="other">أخرى</option>' +
+      '</select></div>' +
+      '<div><label>من تاريخ *</label><input id="myLeaveStart" type="date" class="input" required></div>' +
+      '<div><label>إلى تاريخ *</label><input id="myLeaveEnd" type="date" class="input" required></div>' +
+      '<div style="grid-column:1/-1"><label>السبب أو المبرر</label><input id="myLeaveReason" class="input" placeholder="مثال: ظرف عائلي خاص، مراجعة طبيب..."></div>' +
+      '<div style="grid-column:1/-1"><button type="submit" id="submitLeaveBtn" class="btn gold">إرسال طلب الإجازة</button></div>' +
+      '</form></div></div>';
+      
+    var rowsHtml = '';
+    if (leaves.length === 0) {
+      rowsHtml = '<div class="empty">لم تقم بتقديم أي طلبات إجازة سابقاً</div>';
+    } else {
+      var rows = leaves.map(function(l){
+        var badgeColor = 'gold';
+        var statusText = 'قيد المراجعة';
+        if (l.status === 'approved' || l.status === 'on_leave') { badgeColor = 'green'; statusText = 'معتمدة'; }
+        else if (l.status === 'rejected') { badgeColor = 'red'; statusText = 'مرفوضة'; }
+        
+        var typeText = {annual:'سنوية', sick:'مرضية', unpaid:'بدون راتب', emergency:'طارئة', other:'أخرى'}[l.leave_type] || l.leave_type;
+        return [
+          typeText,
+          l.start_date || '—',
+          l.end_date || '—',
+          (l.days_count || 1) + ' يوم',
+          l.reason || '—',
+          '<span class="badge ' + badgeColor + '">' + statusText + '</span>'
+        ];
+      });
+      rowsHtml = buildTable(['نوع الإجازة', 'من تاريخ', 'إلى تاريخ', 'المدة', 'السبب', 'الحالة'], rows);
+    }
+    
+    c.innerHTML = '<div class="page-head"><div><h1>طلبات الإجازة 🌴</h1><p>تقديم طلب إجازة جديد ومتابعة حالة الطلبات السابقة مع الموارد البشرية.</p></div></div>' + kpisHtml + formHtml + wrapCard('سجل إجازاتي', rowsHtml);
+    
+    var form = document.getElementById('leaveRequestForm');
+    var btn = document.getElementById('submitLeaveBtn');
+    if (form && btn) {
+      btn.addEventListener('click', async function(){
+        if (!form.reportValidity()) return;
+        var t = document.getElementById('myLeaveType').value;
+        var s = document.getElementById('myLeaveStart').value;
+        var e = document.getElementById('myLeaveEnd').value;
+        var r = document.getElementById('myLeaveReason').value;
+        
+        if (new Date(e) < new Date(s)) {
+          toast('خطأ في التاريخ', 'تاريخ انتهاء الإجازة لا يمكن أن يكون قبل تاريخ البداية', 'red');
+          return;
+        }
+        
+        btn.disabled = true;
+        btn.textContent = 'جاري إرسال الطلب...';
+        try {
+          var res = await client().rpc('hr_request_leave', {
+            p_employee_id: null,
+            p_leave_type: t,
+            p_start_date: s,
+            p_end_date: e,
+            p_reason: r || null
+          });
+          if (res.error) throw res.error;
+          var d = res.data || {};
+          if (d.ok === false) throw new Error(d.message || 'تعذر إرسال الطلب');
+          toast('تم الإرسال بنجاح', 'تم تقديم طلب الإجازة للموارد البشرية للمراجعة', 'green');
+          renderLeaves();
+        } catch(err) {
+          console.error('Leave request error:', err);
+          toast('خطأ في الإرسال', err.message || String(err), 'red');
+        } finally {
+          btn.disabled = false;
+          btn.textContent = 'إرسال طلب الإجازة';
+        }
+      });
+    }
   }
 
   function wireNav(){
