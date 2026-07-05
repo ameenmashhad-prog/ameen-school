@@ -92,7 +92,7 @@
     const teacherOptions = '<option value="">اختر المعلم أو الموظف...</option>' + DATA.users.filter(u => ['teacher','staff','counselor','supervisor'].includes(u.role)).map(u => `<option value="${u.id}">${esc(u.name || u.email)} — (${u.role})</option>`).join('');
 
     const controlsHtml = `<div class="card cert-controls no-print" style="margin-bottom:20px;border-left:4px solid #0B6E4F"><div class="card-head"><h3>🎨 إعداد وتخصيص شهادة التقدير المطبوعة</h3></div><div class="card-body"><div class="hr-form" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;align-items:end">` +
-      `<div><label>🎨 قالب الشهادة الاحترافي *</label><select id="certTemplate" class="select" onchange="CertificatesApp.updatePreview()"><option value="royal">👑 القالب الملكي المذهب (Royal Gold)</option><option value="classic">🏛️ قالب التميز الأكاديمي الكلاسيكي (Classic Heritage)</option><option value="emerald">🌟 قالب الزمرد الإسلامي الفاخر (Emerald Green)</option><option value="modern">💎 القالب العصري الماسي (Modern Executive)</option></select></div><div><label>نوع الشهادة *</label><select id="certType" class="select" onchange="CertificatesApp.onTypeChange()"><option value="excellence">🏆 شهادة تفوق أكاديمي (لأوائل الصف)</option><option value="general_exempt">🌟 شهادة إعفاء عام (من الامتحانات النهائية)</option><option value="subject_exempt">📚 شهادة إعفاء في مادة دراسية</option><option value="conduct">🛡️ شهادة تقدير وسلوك وانضباط ممتاز</option><option value="teacher_appreciation">👨‍🏫 شهادة شكر وتقدير للمعلم / الموظف</option></select></div>` +
+      `<div><label>🎨 قالب الشهادة الاحترافي *</label><select id="certTemplate" class="select" onchange="CertificatesApp.updatePreview()"><optgroup label="🎨 القوالب الرسمية الزخرفية (للمراحل العليا والرسمية)"><option value="royal">👑 القالب الملكي المذهب (Royal Gold)</option><option value="classic">🏛️ قالب التميز الأكاديمي الكلاسيكي (Classic Heritage)</option><option value="emerald">🌟 قالب الزمرد الإسلامي الفاخر (Emerald Green)</option><option value="modern">💎 القالب العصري الماسي (Modern Executive)</option></optgroup><optgroup label="🖼️ قوالب مدرسة أمين الرضا المصورة (خاص بالأطفال والمرحلة الابتدائية)"><option value="illustrated_auto">✨ القالب المصور الذكي (تلقائي حسب جنس الطالب: أولاد / بنات)</option><option value="illustrated_anime">🎒 قالب الطالب الأنيق (Anime Student - أولاد وبنات)</option><option value="illustrated_graduate">🎓 قالب خريج المستقبل (Graduation Diploma - أولاد وبنات)</option><option value="illustrated_balloons">🎈 قالب البالونات والفراشات (Festive Balloons & Butterflies)</option><option value="illustrated_trophy">🏆 قالب بطل الكأس والقراءة الأنيقة (Trophy & Reading Girl)</option></optgroup></select></div><div><label>نوع الشهادة *</label><select id="certType" class="select" onchange="CertificatesApp.onTypeChange()"><option value="excellence">🏆 شهادة تفوق أكاديمي (لأوائل الصف)</option><option value="general_exempt">🌟 شهادة إعفاء عام (من الامتحانات النهائية)</option><option value="subject_exempt">📚 شهادة إعفاء في مادة دراسية</option><option value="conduct">🛡️ شهادة تقدير وسلوك وانضباط ممتاز</option><option value="teacher_appreciation">👨‍🏫 شهادة شكر وتقدير للمعلم / الموظف</option></select></div>` +
       `<div id="classBox"><label>الصف *</label><select id="certClass" class="select" onchange="CertificatesApp.onClassChange()">${classOptions}</select></div>` +
       `<div id="studentBox"><label>الطالب المكرم *</label><select id="certStudent" class="select" onchange="CertificatesApp.updatePreview()"><option value="">اختاري الصف أولاً</option></select></div>` +
       `<div id="teacherBox" style="display:none"><label>المعلم / الموظف المكرم *</label><select id="certTeacher" class="select" onchange="CertificatesApp.updatePreview()">${teacherOptions}</select></div>` +
@@ -155,6 +155,46 @@
     const finalReason = reasonText || defaultReason;
     const template = options.template || 'royal';
     const serial = 'CERT-2026-AMN-' + Math.floor(1000 + Math.random() * 9000);
+
+    if (template.startsWith('illustrated_')) {
+      let imgFile = 'boy-anime.jpg';
+      if (template === 'illustrated_auto' || template === 'illustrated_anime') {
+        imgFile = isFemale ? 'girl-anime.jpg' : 'boy-anime.jpg';
+      } else if (template === 'illustrated_graduate') {
+        imgFile = isFemale ? 'girl-graduate.jpg' : 'boy-graduate.jpg';
+      } else if (template === 'illustrated_balloons') {
+        imgFile = isFemale ? 'girl-butterflies.jpg' : 'boy-balloons.jpg';
+      } else if (template === 'illustrated_trophy') {
+        imgFile = isFemale ? 'girl-reading.jpg' : 'boy-trophy.jpg';
+      }
+      const imgUrl = `assets/cert-templates/${imgFile}`;
+
+      return `<div class="cert-card illustrated-card" style="background: url('${imgUrl}') center/cover no-repeat; min-height: 680px; position: relative; padding: 40px; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 4px solid #B8860B; border-radius: 18px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); overflow: hidden;">` +
+        `<div class="illustrated-overlay" style="background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(6px); border: 2px dashed #0B6E4F; border-radius: 18px; padding: 30px 40px; width: 100%; max-width: 720px; margin: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.12); text-align: center; direction: rtl;">` +
+        `<div style="font-size: 26px; font-weight: 800; color: #0B6E4F; margin-bottom: 8px;">` +
+        `${esc(title || (isFemale ? '🌟 شهادة شكر وتقدير للطالبة 🌟' : '🏆 شهادة شكر وتقدير للطالب 🏆'))}` +
+        `</div>` +
+        `<div style="font-size: 16px; color: #555; margin-bottom: 12px;">` +
+        `يسر إدارة مدرسة أمين الرضا (ع) أن تهنئ ${isFemale ? 'الطالبة المتميزة' : 'الطالب المتميز'}:` +
+        `</div>` +
+        `<div style="font-size: 34px; font-weight: 900; color: #8b0000; border-bottom: 3px solid #D4AF37; display: inline-block; padding: 0 25px 8px; margin-bottom: 16px;">` +
+        `${esc(recipientName || 'اسم الطالب')}` +
+        `</div>` +
+        (recipientSubtitle ? `<div style="font-size: 18px; font-weight: 700; color: #1e3a8a; margin-bottom: 14px;">${esc(recipientSubtitle)}</div>` : '') +
+        `<div style="font-size: 19px; color: #333; line-height: 1.7; margin-bottom: 25px; padding: 0 10px;">` +
+        `${esc(finalReason)}` +
+        `</div>` +
+        `<div style="display: flex; justify-content: space-around; align-items: center; border-top: 1px dashed #ccc; padding-top: 18px; font-size: 16px; font-weight: bold; color: #0B6E4F; flex-wrap: wrap; gap: 10px;">` +
+        `<div>المعلمة: <span style="color:#1e3a8a;">أمل الأسود</span> ✍️</div>` +
+        `<div>المديرة: <span style="color:#8b0000;">ريحانة ابراهيمي</span> ✍️</div>` +
+        `<div>التاريخ: <span style="color:#555;">${esc(dateStr || iso())}</span></div>` +
+        `</div>` +
+        `</div>` +
+        `<div style="position: absolute; bottom: 12px; left: 20px; background: rgba(0,0,0,0.65); color: #fff; padding: 4px 12px; border-radius: 6px; font-size: 11px; font-family: monospace; letter-spacing: 1px;">` +
+        `🔒 ${serial}` +
+        `</div>` +
+        `</div>`;
+    }
 
     return `<div class="cert-card theme-${template}">` +
       `<div class="cert-header">` +
@@ -244,7 +284,7 @@
 
     const controlsHtml = `<div class="card cert-controls no-print" style="margin-bottom:20px;border-left:4px solid #B8860B"><div class="card-head"><h3>📚 الإصدار الجماعي السريع للشهادات المدرسية</h3></div><div class="card-body"><div class="hr-form" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;align-items:end">` +
       `<div><label>الصف *</label><select id="batchClass" class="select">${classOptions}</select></div>` +
-      `<div><label>🎨 قالب الشهادة الاحترافي *</label><select id="batchTemplate" class="select"><option value="royal">👑 القالب الملكي المذهب (Royal Gold)</option><option value="classic">🏛️ قالب التميز الأكاديمي الكلاسيكي (Classic Heritage)</option><option value="emerald">🌟 قالب الزمرد الإسلامي الفاخر (Emerald Green)</option><option value="modern">💎 القالب العصري الماسي (Modern Executive)</option></select></div><div><label>الفئة المستهدفة بالشهادات *</label><select id="batchType" class="select"><option value="top5">🏆 أوائل الصف (الخمسة الأوائل حسب المعدل)</option><option value="general_exempt">🌟 الحاصلون على إعفاء عام</option><option value="all_conduct">🛡️ شهادات تقدير وسلوك لجميع طلاب الصف</option></select></div>` +
+      `<div><label>🎨 قالب الشهادة الاحترافي *</label><select id="batchTemplate" class="select"><optgroup label="🎨 القوالب الرسمية الزخرفية (للمراحل العليا والرسمية)"><option value="royal">👑 القالب الملكي المذهب (Royal Gold)</option><option value="classic">🏛️ قالب التميز الأكاديمي الكلاسيكي (Classic Heritage)</option><option value="emerald">🌟 قالب الزمرد الإسلامي الفاخر (Emerald Green)</option><option value="modern">💎 القالب العصري الماسي (Modern Executive)</option></optgroup><optgroup label="🖼️ قوالب مدرسة أمين الرضا المصورة (خاص بالأطفال والمرحلة الابتدائية)"><option value="illustrated_auto">✨ القالب المصور الذكي (تلقائي حسب جنس الطالب: أولاد / بنات)</option><option value="illustrated_anime">🎒 قالب الطالب الأنيق (Anime Student - أولاد وبنات)</option><option value="illustrated_graduate">🎓 قالب خريج المستقبل (Graduation Diploma - أولاد وبنات)</option><option value="illustrated_balloons">🎈 قالب البالونات والفراشات (Festive Balloons & Butterflies)</option><option value="illustrated_trophy">🏆 قالب بطل الكأس والقراءة الأنيقة (Trophy & Reading Girl)</option></optgroup></select></div><div><label>الفئة المستهدفة بالشهادات *</label><select id="batchType" class="select"><option value="top5">🏆 أوائل الصف (الخمسة الأوائل حسب المعدل)</option><option value="general_exempt">🌟 الحاصلون على إعفاء عام</option><option value="all_conduct">🛡️ شهادات تقدير وسلوك لجميع طلاب الصف</option></select></div>` +
       `<div><label>تاريخ التكريم *</label><input id="batchDate" type="date" class="input" value="${iso()}"></div>` +
       `<div style="grid-column:1/-1"><label>نص التكريم الموحد (اختياري)</label><input id="batchReason" class="input" placeholder="اكتبي نصاً موحداً أو اتركيه فارغاً لاستخدام النصوص الرسمية الافتراضية..."></div>` +
       `<div style="grid-column:1/-1;display:flex;gap:10px;justify-content:center"><button class="btn gold block" style="padding:12px 30px;font-size:16px;font-weight:bold" onclick="CertificatesApp.generateBatch()">🚀 توليد الشهادات الجماعية للطباعة الفورية</button> <button class="btn blue" style="padding:12px 30px;font-size:16px;font-weight:bold" onclick="window.print()">🖨️ طباعة الشهادات المولدة</button></div>` +
