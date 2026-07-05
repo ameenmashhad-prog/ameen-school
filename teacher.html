@@ -496,7 +496,7 @@
   async function renderExamTasks() {
     var c = document.getElementById('view-exam_tasks');
     if (!c) return;
-    c.innerHTML = '<div class="page-head"><div><h1>مهام وأسئلة الامتحانات 📑</h1><p>متابعة مواعيد الامتحانات الرسمية المحددة من الإدارة، وكتابة المادة المطلوبة، ورفع ملف الأسئلة قبل انتهاء المهلة.</p></div></div><div class="empty">جاري تحميل المهام...</div>';
+    c.innerHTML = '<div class="page-head"><div><h1>مهام وأسئلة الامتحانات 📑</h1><p>متابعة مواعيد الامتحانات المحددة من الإدارة، وكتابة المادة المطلوبة، ورفع ملف الأسئلة بأسهل وأسرع طريقة.</p></div></div><div class="empty">جاري تحميل المهام...</div>';
 
     var tasks = [];
     try {
@@ -507,12 +507,12 @@
     }
 
     var total = tasks.length;
-    var submitted = tasks.filter(function(x){ return x.status === 'submitted' || x.status === 'offline_verified'; }).length;
+    var submitted = tasks.filter(function(x){ return x.status === 'submitted' || x.status === 'offline_verified' || x.status === 'approved'; }).length;
     var late = tasks.filter(function(x){ return x.status === 'late' || (x.status === 'pending' && new Date(x.submission_deadline) < new Date()); }).length;
 
     var kpisHtml = '<div class="kpis" style="margin-bottom:20px">' +
       '<div class="kpi blue"><small>المهام المكلف بها</small><b>'+total+'</b></div>' +
-      '<div class="kpi green"><small>تم التسليم 📤</small><b>'+submitted+'</b></div>' +
+      '<div class="kpi green"><small>تم الرفع / معتمدة 📤</small><b>'+submitted+'</b></div>' +
       '<div class="kpi red"><small>متأخر / تجاوز المهلة ⚠️</small><b>'+late+'</b></div>' +
       '</div>';
 
@@ -524,19 +524,25 @@
         var pText = {term1_m1:'الشهر 1 (ف1)', term1_m2:'الشهر 2 (ف1)', term1_m3:'الشهر 3 (ف1)', midterm:'نصف السنة', term2_m1:'الشهر 1 (ف2)', term2_m2:'الشهر 2 (ف2)', final:'نهاية السنة', resit2:'الدور الثاني', resit3:'الدور الثالث'}[t.term_period] || t.term_period;
         var stBadge = '<span class="badge gold">بانتظار الرفع</span>';
         var isLate = (t.status === 'late' || (t.status === 'pending' && new Date(t.submission_deadline) < new Date()));
-        if (t.status === 'submitted') stBadge = '<span class="badge green">تم الرفع عبر المنصة 📤</span>';
+        
+        if (t.status === 'approved') stBadge = '<span class="badge green" style="background:#0B6E4F;color:#fff">معتمد رسمياً 🟢</span>';
+        else if (t.status === 'submitted') stBadge = '<span class="badge green">تم الرفع للمنصة 📤</span>';
+        else if (t.status === 'rejected') stBadge = '<span class="badge red">مرفوض يحتاج تعديل 🔄</span>';
         else if (isLate) stBadge = '<span class="badge red">متأخر! تجاوز المهلة ⚠️</span>';
         else if (t.status === 'offline_verified') stBadge = '<span class="badge blue">إثبات: ' + esc(t.delivery_method) + ' 📲</span>';
 
-        var topicsInput = '<div style="display:flex;gap:4px"><input id="top_' + t.schedule_id + '" class="input" value="' + esc(t.required_topics || '') + '" placeholder="اكتبي المادة المطلوبة للامتحان"><button class="btn small gold" onclick="TeacherPortal.saveTopics('' + t.schedule_id + '')">حفظ 📝</button></div>';
+        var topicsInput = '<input id="top_' + t.schedule_id + '" class="input" value="' + esc(t.required_topics || '') + '" placeholder="اكتبي المادة المطلوبة (حفظ تلقائي عند الرفع)">';
         
         var uploadArea = '';
-        if (t.status === 'submitted' || t.status === 'offline_verified') {
-          uploadArea = t.question_file_url ? '<a class="btn small blue" href="/api/proxy/storage/v1/object/public/exam-questions/' + t.question_file_url + '" target="_blank">عرض الأسئلة 📄</a>' : '<span class="muted">' + esc(t.delivery_proof_note || 'تم الإثبات') + '</span>';
+        if (t.status === 'approved') {
+          uploadArea = '<div style="color:#0B6E4F;font-weight:bold;background:#e8f5e9;padding:6px;border-radius:6px;border:1px solid #c8e6c9">✅ تم اعتماد الأسئلة من المعاون العلمي (مقفلة)</div>';
         } else {
-          uploadArea = '<div style="display:flex;flex-direction:column;gap:4px">' +
-            '<div class="upload-box" style="padding:4px;border:1px dashed #ccc;border-radius:4px"><input type="file" id="qf_' + t.id + '" accept=".pdf,.doc,.docx,image/*"><button class="btn small blue block" onclick="TeacherPortal.uploadTaskFile('' + t.id + '')">رفع الأسئلة للمنصة 📤</button></div>' +
-            '<button class="btn small gold block" onclick="TeacherPortal.reportOfflineDelivery('' + t.id + '')">إثبات تسليم (واتساب/إيتا/بله/يدوي) 📲</button>' +
+          var rejectBanner = t.status === 'rejected' ? '<div style="color:#b71c1c;font-weight:bold;background:#ffebee;padding:4px;border-radius:4px;border:1px solid #ffcdd2;margin-bottom:4px;font-size:11px">🔄 الإدارة تطلب تعديل: ' + esc(t.review_notes || 'يرجى مراجعة الأسئلة') + '</div>' : '';
+          var currentFile = t.question_file_url ? '<a class="btn small blue" href="/api/proxy/storage/v1/object/public/exam-questions/' + t.question_file_url + '" target="_blank" style="margin-bottom:4px;display:inline-block">عرض الأسئلة السابقة 📄</a>' : '';
+          
+          uploadArea = rejectBanner + currentFile + '<div style="display:flex;flex-direction:column;gap:4px">' +
+            '<div class="upload-box" style="padding:4px;border:1px dashed #0B6E4F;border-radius:6px;background:#f0fdf4"><label style="font-weight:bold;color:#0B6E4F;font-size:12px;cursor:pointer;display:block;text-align:center">⚡ اضغطي هنا لرفع ملف الأسئلة وحفظ المادة المطلوبة فوراً<input type="file" id="qf_' + t.id + '" accept=".pdf,.doc,.docx,image/*" style="display:none" onchange="TeacherPortal.quickUploadTask(this, '' + t.id + '', '' + t.schedule_id + '')"></label></div>' +
+            '<button class="btn small gold block" onclick="TeacherPortal.reportOfflineDelivery('' + t.id + '', '' + t.schedule_id + '')">إثبات تسليم بديل (واتساب/إيتا/بله/يدوي) 📲</button>' +
             '</div>';
         }
 
@@ -549,62 +555,59 @@
           uploadArea
         ];
       });
-      rowsHtml = buildTable(['الامتحان والصف', 'موعد الامتحان (إدارة)', 'المادة المطلوبة (معلم)', 'مهلة الرفع (Deadline)', 'الحالة', 'إجراء الرفع أو الإثبات'], rows);
+      rowsHtml = buildTable(['الامتحان والصف', 'موعد الامتحان (إدارة)', 'المادة المطلوبة (Syllabus)', 'مهلة الرفع (Deadline)', 'الحالة', 'إجراء الرفع أو الإثبات'], rows);
     }
 
-    c.innerHTML = '<div class="page-head"><div><h1>مهام وأسئلة الامتحانات 📑</h1><p>متابعة مواعيد الامتحانات الرسمية المحددة من الإدارة، وكتابة المادة المطلوبة، ورفع ملف الأسئلة قبل انتهاء المهلة.</p></div></div>' + kpisHtml + wrapCard('مهام تسليم الأسئلة', rowsHtml);
+    c.innerHTML = '<div class="page-head"><div><h1>مهام وأسئلة الامتحانات 📑</h1><p>متابعة مواعيد الامتحانات المحددة من الإدارة، وكتابة المادة المطلوبة، ورفع ملف الأسئلة بأسهل وأسرع طريقة.</p></div></div>' + kpisHtml + wrapCard('مهام تسليم الأسئلة', rowsHtml);
   }
 
-  async function saveTopics(schedId) {
-    var el = document.getElementById('top_' + schedId);
-    if (!el) return;
-    try {
-      var res = await client().rpc('teacher_set_exam_topics', { p_schedule_id: schedId, p_topics: el.value });
-      if (res.error) throw res.error;
-      toast('تم الحفظ', 'تم ربط المادة المطلوبة بجدول الامتحانات والتقويم المدرسي 📚', 'green');
-    } catch(e) {
-      toast('خطأ', e.message || String(e), 'red');
-    }
-  }
+  async function quickUploadTask(inputEl, taskId, schedId) {
+    var file = inputEl && inputEl.files && inputEl.files[0];
+    if (!file) return;
+    var topicsEl = document.getElementById('top_' + schedId);
+    var topicsVal = topicsEl ? topicsEl.value : null;
 
-  async function uploadTaskFile(taskId) {
-    var el = document.getElementById('qf_' + taskId);
-    var file = el && el.files && el.files[0];
-    if (!file) { toast('تنبيه', 'اختاري ملف الأسئلة (PDF/Word/صورة) أولاً', 'red'); return; }
     try {
-      toast('جاري الرفع...', 'يرجى الانتظار');
+      toast('جاري الرفع الفوري...', 'يرجى الانتظار');
       var ext = (file.name.split('.').pop() || 'pdf').toLowerCase();
       var path = 'tasks/' + Date.now() + '-' + Math.random().toString(36).slice(2) + '.' + ext;
       var up = await client().storage.from('exam-questions').upload(path, file, { upsert: false });
       if (up.error) throw up.error;
 
-      var res = await client().rpc('submit_exam_task_questions', {
+      var res = await client().rpc('submit_exam_task_questions_v2', {
         p_task_id: taskId,
         p_file_url: path,
         p_delivery_method: 'platform',
-        p_proof_note: 'تم الرفع عبر المنصة'
+        p_proof_note: 'تم الرفع للمنصة',
+        p_topics: topicsVal
       });
       if (res.error) throw res.error;
-      toast('تم التسليم 🚀', 'تم إرسال ملف الأسئلة للإدارة والمعاون العلمي', 'green');
+      var d = res.data || {};
+      if (d.ok === false) throw new Error(d.message || 'تعذر الرفع');
+      toast('تم التسليم 🚀', 'تم رفع ملف الأسئلة وحفظ المادة المطلوبة وإرسال الإشعار للإدارة بنجاح!', 'green');
       renderExamTasks();
     } catch(e) {
       toast('خطأ في الرفع', e.message || String(e), 'red');
     }
   }
 
-  async function reportOfflineDelivery(taskId) {
+  async function reportOfflineDelivery(taskId, schedId) {
     var method = prompt('اختاري طريقة التسليم البديل (manual / whatsapp / eitaa / bale):', 'whatsapp');
     if (!method) return;
     var note = prompt('ملاحظة إثبات التسليم (مثال: تم إرسال الأسئلة على واتساب للمدير أو تسليم ورقي):', 'تم التسليم عبر ' + method);
+    var topicsEl = document.getElementById('top_' + schedId);
+    var topicsVal = topicsEl ? topicsEl.value : null;
+
     try {
-      var res = await client().rpc('submit_exam_task_questions', {
+      var res = await client().rpc('submit_exam_task_questions_v2', {
         p_task_id: taskId,
         p_file_url: null,
         p_delivery_method: method,
-        p_proof_note: note || null
+        p_proof_note: note || null,
+        p_topics: topicsVal
       });
       if (res.error) throw res.error;
-      toast('تم التوثيق 📲', 'تم تسجيل إثبات التسليم الخارجي بنجاح', 'green');
+      toast('تم التوثيق 📲', 'تم تسجيل إثبات التسليم الخارجي وحفظ المادة المطلوبة بنجاح', 'green');
       renderExamTasks();
     } catch(e) {
       toast('خطأ', e.message || String(e), 'red');
