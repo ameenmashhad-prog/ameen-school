@@ -54,23 +54,23 @@ function renderTabBar(containerId, tabs, activeId, onTabClick) {
 window.SECTIONS = window.SECTIONS || {};
 
 window.SECTIONS.system = {
-  title: 'الحوكمة والتشخيص 🛡️',
+  title: 'الحوكمة والتشخيص',
   load: async function() {
     var c = document.getElementById('main-content');
     if (!c) return;
     
     var head = '<div class="section-page-head" style="margin-bottom:16px;">';
-    head += '<h1>' + getIcon('system', 32) + ' <span style="vertical-align:middle;">مركز الحوكمة والتشخيص الموحد 🛡️</span></h1>';
+    head += '<h1>' + getIcon('system', 32) + ' <span style="vertical-align:middle;">مركز الحوكمة والتشخيص الموحد</span></h1>';
     head += '<p style="color:var(--text-secondary);">دمج أدوات فحص النسخة المنشورة، جاهزية النظام، صيانة قاعدة البيانات، حوكمة الأمن، ونزاهة الاختبارات في واجهة واحدة دون إعادة تحميل.</p>';
     head += '</div><div id="gov-container"></div>';
     c.innerHTML = head;
     
     var tabs = [
-      { id: 'deploy', label: '🔍 فحص النسخة المنشورة' },
-      { id: 'readiness', label: '🚀 الجاهزية النهائية' },
-      { id: 'maintenance', label: '🔧 صيانة وفحص قاعدة البيانات' },
-      { id: 'security', label: '🛡️ حوكمة الأمن والصلاحيات' },
-      { id: 'integrity', label: '⚖️ نزاهة الاختبارات' }
+      { id: 'deploy', label: 'فحص النسخة المنشورة' },
+      { id: 'readiness', label: 'الجاهزية النهائية' },
+      { id: 'maintenance', label: 'صيانة وفحص قاعدة البيانات' },
+      { id: 'security', label: 'حوكمة الأمن والصلاحيات' },
+      { id: 'integrity', label: 'نزاهة الاختبارات' }
     ];
     
     renderTabBar('gov-container', tabs, 'deploy', function(tid, body){
@@ -206,22 +206,22 @@ async function loadGovIntegrity(body) {
 // 2. محور الإرشاد التربوي والنفسي الموحد (view-counseling / counseling)
 // ================================================================
 window.SECTIONS.counseling = {
-  title: 'الإرشاد والسلوك 🧭',
+  title: 'الإرشاد والسلوك',
   load: async function() {
     var c = document.getElementById('main-content');
     if (!c) return;
     
     var head = '<div class="section-page-head" style="margin-bottom:16px;">';
-    head += '<h1>' + getIcon('discipline', 32) + ' <span style="vertical-align:middle;">مركز الإرشاد التربوي والنفسي الموحد 🧭</span></h1>';
+    head += '<h1>' + getIcon('discipline', 32) + ' <span style="vertical-align:middle;">مركز الإرشاد التربوي والنفسي الموحد</span></h1>';
     head += '<p style="color:var(--text-secondary);">إدارة الحالات الإرشادية، الجلسات التربوية، تقارير الأداء النفسي، وسجلات السلوك في واجهة تنفيذية موحدة.</p>';
     head += '</div><div id="couns-container"></div>';
     c.innerHTML = head;
     
     var tabs = [
-      { id: 'cases', label: '📋 الحالات الإرشادية والنشطة' },
-      { id: 'reports', label: '📊 الإحصائيات والتقارير الشاملة' },
-      { id: 'behavior', label: '🚨 سجلات السلوك والانضباط' },
-      { id: 'handover', label: '🤝 تسليم الحالات (Handover)' }
+      { id: 'cases', label: 'الحالات الإرشادية والنشطة' },
+      { id: 'reports', label: 'الإحصائيات والتقارير الشاملة' },
+      { id: 'behavior', label: 'سجلات السلوك والانضباط' },
+      { id: 'handover', label: 'تسليم الحالات (Handover)' }
     ];
     
     renderTabBar('couns-container', tabs, 'cases', function(tid, body){
@@ -319,22 +319,22 @@ async function loadCounsHandover(body) {
 // 3. المركز الأكاديمي والامتحانات والتحليلات (view-academic / academic)
 // ================================================================
 window.SECTIONS.academic = {
-  title: 'الأكاديمي والامتحانات 🎓',
+  title: 'الأكاديمي والامتحانات',
   load: async function() {
     var c = document.getElementById('main-content');
     if (!c) return;
     
     var head = '<div class="section-page-head" style="margin-bottom:16px;">';
-    head += '<h1>' + getIcon('academic', 32) + ' <span style="vertical-align:middle;">المركز الأكاديمي والامتحانات والتحليلات 🎓</span></h1>';
+    head += '<h1>' + getIcon('academic', 32) + ' <span style="vertical-align:middle;">المركز الأكاديمي والامتحانات والتحليلات</span></h1>';
     head += '<p style="color:var(--text-secondary);">إدارة أقفال الدرجات، تصفية المراحل، جداول الاختبارات، استيراد Excel، والتحليلات العلاجية الذكية بالذكاء الاصطناعي.</p>';
     head += '</div><div id="acad-container"></div>';
     c.innerHTML = head;
     
     var tabs = [
-      { id: 'locks', label: '🔒 أقفال الدرجات والمراحل' },
-      { id: 'exams', label: '📅 جداول الاختبارات واستيراد Excel' },
-      { id: 'analytics', label: '🤖 التحليلات الذكية والخطط العلاجية' },
-      { id: 'tasks', label: '📋 مراجعة أسئلة الاختبارات' }
+      { id: 'locks', label: 'أقفال الدرجات والمراحل' },
+      { id: 'exams', label: 'جداول الاختبارات واستيراد Excel' },
+      { id: 'analytics', label: 'التحليلات الذكية والخطط العلاجية' },
+      { id: 'tasks', label: 'مراجعة أسئلة الاختبارات' }
     ];
     
     renderTabBar('acad-container', tabs, 'locks', function(tid, body){
@@ -514,23 +514,23 @@ async function loadAcadTasks(body) {
 // 4. النظام المالي التنفيذي الموحد (view-finance / finance)
 // ================================================================
 window.SECTIONS.finance = {
-  title: 'المالية التنفيذية 💰',
+  title: 'المالية التنفيذية',
   load: async function() {
     var c = document.getElementById('main-content');
     if (!c) return;
     
     var head = '<div class="section-page-head" style="margin-bottom:16px;">';
-    head += '<h1>' + getIcon('finance', 32) + ' <span style="vertical-align:middle;">النظام المالي التنفيذي الموحد 💰</span></h1>';
+    head += '<h1>' + getIcon('finance', 32) + ' <span style="vertical-align:middle;">النظام المالي التنفيذي الموحد</span></h1>';
     head += '<p style="color:var(--text-secondary);">إدارة التحصيل، متابعة الأقساط المتأخرة عبر واتساب، سجل المصروفات المزدوج (USD/IRR)، وإقفال الصندوق اليومي.</p>';
     head += '</div><div id="fin-container"></div>';
     c.innerHTML = head;
     
     var tabs = [
-      { id: 'overview', label: '📈 الملخص التنفيذي ومعدلات التحصيل' },
-      { id: 'collections', label: '⏳ متابعة الأقساط المتأخرة والتحصيل' },
-      { id: 'expenses', label: '💸 سجل المصروفات وإيصالات الصرف' },
-      { id: 'cashbox', label: '🔒 إقفال الصندوق اليومي' },
-      { id: 'credit', label: '📊 تقارير الرصيد الدائن والذمم' }
+      { id: 'overview', label: 'الملخص التنفيذي ومعدلات التحصيل' },
+      { id: 'collections', label: 'متابعة الأقساط المتأخرة والتحصيل' },
+      { id: 'expenses', label: 'سجل المصروفات وإيصالات الصرف' },
+      { id: 'cashbox', label: 'إقفال الصندوق اليومي' },
+      { id: 'credit', label: 'تقارير الرصيد الدائن والذمم' }
     ];
     
     renderTabBar('fin-container', tabs, 'overview', function(tid, body){

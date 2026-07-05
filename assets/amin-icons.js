@@ -1,78 +1,150 @@
-(function(){'use strict';
-function S(inner){return '<svg class="amin-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+inner+'</svg>';}
-function starPath(cx,cy,R,r){var p=[],n=8;for(var i=0;i<2*n;i++){var a=Math.PI/n*i-Math.PI/2,rad=(i%2===0)?R:r;p.push((cx+Math.cos(a)*rad).toFixed(2)+','+(cy+Math.sin(a)*rad).toFixed(2));}return '<path d="M'+p.join('L')+'z"/>';}
-var STAR=S(starPath(12,12,9.4,4));
-var ICONS={  home:S("<path d='M4 11.5 12 4l8 7.5'/><path d='M6 10v9h12v-9'/><path d='M10 19v-5h4v5'/>"),
-  menu:S("<path d='M4 7h16M4 12h16M4 17h16'/>"),
-  users:S("<circle cx='9' cy='8.5' r='3.2'/><path d='M3.5 19a5.5 5.5 0 0 1 11 0'/><circle cx='16.5' cy='9' r='2.4'/><path d='M15 14.3A4.6 4.6 0 0 1 21 18.5'/>"),
-  person:S("<circle cx='12' cy='8.5' r='3.6'/><path d='M5.5 20a6.5 6.5 0 0 1 13 0'/>"),
-  chart:S("<path d='M4 20V12M9 20V6M14 20v-5M19 20v-9'/><path d='M3 20h18'/>"),
-  trendUp:S("<path d='M3 17l5.5-5.5 4 3L21 7'/><path d='M15 7h6v6'/>"),
-  trendDown:S("<path d='M3 7l5.5 5.5 4-3L21 17'/><path d='M15 17h6v-6'/>"),
-  clipboard:S("<rect x='5.5' y='4.5' width='13' height='16.5' rx='2'/><rect x='9' y='2.8' width='6' height='3.4' rx='1'/><path d='M9 12h6M9 15.5h6'/>"),
-  books:S("<path d='M12 6.2c-1.8-1.2-4.4-1.2-6.4 0v11.6c2-1.2 4.6-1.2 6.4 0 1.8-1.2 4.4-1.2 6.4 0V6.2c-2-1.2-4.6-1.2-6.4 0z'/><path d='M12 6.2v11.6'/>"),
-  book:S("<path d='M4 5.5C6 4.5 8 4.5 12 5.5c4-1 6-1 8 .5v12c-2-1.2-4-1.5-8-.5-4-1-6-1-8 0z'/><path d='M12 5.5v12'/>"),
-  note:S("<path d='M4 20l4.2-.9L19 8.9l-3.3-3.3L4.9 15.8z'/><path d='M14.5 6.3l3.2 3.2'/>"),
-  doc:S("<path d='M7 3.5h7l4 4v13H7z'/><path d='M14 3.5v4h4'/><path d='M9.5 12h6M9.5 15.5h6'/>"),
-  mail:S("<rect x='3.5' y='5.5' width='17' height='13' rx='2'/><path d='M4 7l8 6 8-6'/>"),
-  calendar:S("<rect x='4' y='5.5' width='16' height='15.5' rx='2.5'/><path d='M4 10h16M8.5 3.5v4M15.5 3.5v4'/><circle cx='9' cy='14.5' r='.9'/><circle cx='14.5' cy='14.5' r='.9'/>"),
-  bell:S("<path d='M6 17v-5.5a6 6 0 0 1 12 0V17l1.4 1.8H4.6z'/><path d='M10 20a2 2 0 0 0 4 0'/>"),
-  settings:S("<circle cx='12' cy='12' r='3.1'/><path d='M12 2.6v3M12 18.4v3M2.6 12h3M18.4 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2'/>"),
-  shield:S("<path d='M12 3l7 2.8v5.8c0 4.3-3 7.6-7 9.1-4-1.5-7-4.8-7-9.1V5.8z'/><path d='M9 11.8 11 13.8 15.2 9.5'/>"),
-  lock:S("<rect x='5' y='10.5' width='14' height='9.5' rx='2'/><path d='M8 10.5V7.5a4 4 0 0 1 8 0v3'/><circle cx='12' cy='15' r='1.3'/>"),
-  key:S("<circle cx='8' cy='8' r='3.8'/><path d='M10.6 10.6 19 19M16 16l2.2-2.2M13.8 18.2 16 16'/>"),
-  print:S("<path d='M7 9V4h10v5'/><rect x='4' y='9' width='16' height='7.5' rx='1.5'/><rect x='7.5' y='13.5' width='9' height='6' rx='1'/><circle cx='16.5' cy='12' r='.7'/>"),
-  phone:S("<path d='M6.5 3.5h3l1.4 4-2 1.5a11 11 0 0 0 5 5l1.5-2 4 1.4v3a2 2 0 0 1-2.2 2A15.5 15.5 0 0 1 4.5 5.7 2 2 0 0 1 6.5 3.5z'/>"),
-  money:S("<circle cx='12' cy='12' r='8'/><circle cx='12' cy='12' r='4.2'/><path d='M12 7.6v8.8'/>"),
-  cash:S("<rect x='3' y='7' width='18' height='11' rx='2'/><circle cx='12' cy='12.5' r='2.3'/><path d='M6 7V5.5h12V7'/>"),
-  card:S("<rect x='3' y='6' width='18' height='12' rx='2.6'/><path d='M3 10h18'/><path d='M6.5 14.5h4.5'/>"),
-  trophy:S("<path d='M7.5 4.5h9v3.8a4.5 4.5 0 0 1-9 0z'/><path d='M7.5 5.5H4.5v2a3 3 0 0 0 3 3M16.5 5.5h3v2a3 3 0 0 1-3 3'/><path d='M10 13h4l.8 4H9.2z'/><path d='M9.5 20h5'/>"),
-  star:STAR,
-  check:S("<path d='M4.5 12.5 9.5 17.5 19.5 6.5'/>"),
-  close:S("<path d='M6.5 6.5 17.5 17.5M17.5 6.5 6.5 17.5'/>"),
-  warning:S("<path d='M12 3.5 21.5 20H2.5z'/><path d='M12 10v4.5'/><circle cx='12' cy='17' r='.85'/>"),
-  box:S("<path d='M3.5 8 12 4l8.5 4L12 12z'/><path d='M3.5 8v8L12 20l8.5-4V8'/><path d='M12 12v8'/>"),
-  refresh:S("<path d='M20 11a8 8 0 0 0-14.3-4.6M4 5v3.5h3.5'/><path d='M4 13a8 8 0 0 0 14.3 4.6M20 19v-3.5h-3.5'/>"),
-  eye:S("<path d='M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z'/><circle cx='12' cy='12' r='2.6'/>"),
-  crown:S("<path d='M3.5 8 7 12l5-6.5L17 12l3.5-4v9.5H3.5z'/>"),
-  bolt:S("<path d='M13 2.5 5 13.5H11l-1 8 9-12h-6z'/>"),
-  link:S("<path d='M9.5 14.5 14.5 9.5'/><path d='M8.2 12.8 6 15a3.5 3.5 0 0 0 5 5l2.2-2.2'/><path d='M15.8 11.2 18 9a3.5 3.5 0 0 0-5-5L10.8 6.2'/>"),
-  plus:S("<path d='M12 5v14M5 12h14'/>"),
-  minus:S("<path d='M5 12h14'/>"),
-  download:S("<path d='M12 3.5v10.5M8 11l4 4 4-4'/><path d='M5 19.5h14'/>"),
-  upload:S("<path d='M12 20.5V10M8 14l4-4 4 4'/><path d='M5 4.5h14'/>"),
-  folder:S("<path d='M3.5 6.5A1.5 1.5 0 0 1 5 5h4l2 2.3H20a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 20 19.3H5a1.5 1.5 0 0 1-1.5-1.5z'/>"),
-  target:S("<circle cx='12' cy='12' r='8.6'/><circle cx='12' cy='12' r='4.6'/><circle cx='12' cy='12' r='1'/>"),
-  wrench:S("<path d='M15.5 6.5a3.6 3.6 0 0 0-4.7 4.4L4.7 17.4 6.6 19.3 13.1 12.8a3.6 3.6 0 0 0 4.4-4.7L16.2 9.8 14.2 7.8z'/>"),
-  bus:S("<rect x='4.5' y='4' width='15' height='13' rx='2.5'/><path d='M4.5 11h15'/><circle cx='8' cy='18' r='1.6'/><circle cx='16' cy='18' r='1.6'/><path d='M7.5 7.5h9'/>"),
-  heart:S("<path d='M12 20.5S4 15 4 9.4A4 4 0 0 1 12 7.6 4 4 0 0 1 20 9.4C20 15 12 20.5 12 20.5z'/>"),
-  moon:S("<path d='M20 14.8A8 8 0 0 1 9.2 4 7 7 0 1 0 20 14.8z'/>"),
-  sun:S("<circle cx='12' cy='12' r='4'/><path d='M12 2.7v2.4M12 18.9v2.4M2.7 12h2.4M18.9 12h2.4M5.2 5.2l1.7 1.7M17.1 17.1l1.7 1.7M18.8 5.2l-1.7 1.7M6.9 17.1l-1.7 1.7'/>"),
-  paperclip:S("<path d='M8.5 8.5 16 16a3 3 0 0 1-4.3 4.2L4.8 13.2A5 5 0 0 1 11.8 6.2l7.7 7.6'/>"),
-  tag:S("<path d='M3.5 12 11 4.5h7v7L12 20.5a1.6 1.6 0 0 1-2.3 0z'/><circle cx='14.5' cy='8' r='1.2'/>"),
-  clock:S("<circle cx='12' cy='12' r='8.3'/><path d='M12 7.5V12l3 2'/>"),
-  pin:S("<path d='M12 21s6.5-5.8 6.5-11A6.5 6.5 0 0 0 5.5 10c0 5.2 6.5 11 6.5 11z'/><circle cx='12' cy='10' r='2.3'/>"),
-  chat:S("<path d='M4 5.5h16a1.5 1.5 0 0 1 1.5 1.5v8a1.5 1.5 0 0 1-1.5 1.5H9l-4 3.5V5.5z'/>"),
-  image:S("<rect x='3.5' y='5' width='17' height='14' rx='2'/><circle cx='8.5' cy='10' r='1.6'/><path d='M4 17l4.5-4.5 3.5 3.5 3-3L20 16'/>"),
-  monitor:S("<rect x='3.5' y='4.5' width='17' height='12' rx='2'/><path d='M9 20.5h6M12 16.5v4'/>"),
-  dot:S("<circle cx='12' cy='12' r='5' fill='currentColor' stroke='none'/>"),
-  arrowRight:S("<path d='M5 12h13M13 6l6 6-6 6'/>"),
-  arrowUp:S("<path d='M12 19V6M6 12l6-6 6 6'/>"),
-  arrowDown:S("<path d='M12 5v13M6 12l6 6 6-6'/>"),
-  building:S("<rect x='5' y='3.5' width='14' height='17.5' rx='1.5'/><path d='M9 7h2M13 7h2M9 11h2M13 11h2M9 15h2M13 15h2'/><path d='M10.5 21v-2.5h3V21'/>")
+/*
+  Amin Al-Ridha School — 3D Claymorphism Icon & Navigation Engine (v6.0)
+  Strictly implements Master Prompt Claymorphism specifications:
+  - 3D soft plastic/clay finish with specular highlights & gradient fills
+  - Cobalt Blue #5B8CFF, Electric Violet #7C5CFF, Cyan Glow #45D8FF, Mint #00C896, Amber #F6B93B, Coral #FF5D73
+  - Responsive scaling (Sidebar 24-28px, Bottom Nav 22-24px, Topbar 20-22px)
+  - Interactive micro-animations (Hover scale 1.08 + rotate, Active translateY(-2px) + glow, Tap scale 0.94, AI pulse loop)
+*/
+(function(){
+'use strict';
+
+// 1. Inject 3D Claymorphism & Animation Specs CSS
+function inject3DStyles() {
+  if (document.getElementById('amin-3d-clay-style')) return;
+  const css = `
+    .amin-3d-ico {
+      display: inline-block;
+      vertical-align: middle;
+      transition: transform 220ms ease-out, filter 220ms ease-out;
+      filter: drop-shadow(0 2px 5px rgba(27, 35, 53, 0.18));
+      flex-shrink: 0;
+    }
+    .sidebar-nav-item:hover .amin-3d-ico,
+    .bottom-nav-item:hover .amin-3d-ico,
+    button:hover > .amin-3d-ico,
+    a:hover > .amin-3d-ico {
+      transform: scale(1.08) rotate(3deg);
+      filter: drop-shadow(0 4px 10px rgba(91, 140, 255, 0.45));
+    }
+    .sidebar-nav-item.active .amin-3d-ico,
+    .bottom-nav-item.active .amin-3d-ico {
+      transform: translateY(-2px) scale(1.06);
+      filter: drop-shadow(0 4px 14px rgba(69, 216, 255, 0.65));
+    }
+    .sidebar-nav-item:active .amin-3d-ico,
+    .bottom-nav-item:active .amin-3d-ico,
+    button:active > .amin-3d-ico {
+      transform: scale(0.94);
+      transition: transform 150ms ease-in-out;
+    }
+    @keyframes amin-ai-pulse-3d {
+      0%, 100% { filter: drop-shadow(0 0 6px rgba(124, 92, 255, 0.55)) scale(1); }
+      50% { filter: drop-shadow(0 0 16px rgba(69, 216, 255, 0.9)) scale(1.06); }
+    }
+    .amin-3d-ico.ico-ai, .amin-3d-ico.ico-sparkle, .amin-3d-ico.ico-analytics_ai {
+      animation: amin-ai-pulse-3d 1800ms ease-in-out infinite;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .amin-3d-ico, .amin-3d-ico * {
+        animation: none !important;
+        transition: none !important;
+        transform: none !important;
+      }
+    }
+    /* Mobile Navigation & Responsive Scaling */
+    @media (max-width: 639px) {
+      .sidebar-nav-item .amin-3d-ico { width: 24px !important; height: 24px !important; }
+      .bottom-nav-item .amin-3d-ico { width: 24px !important; height: 24px !important; }
+      .app-topbar .amin-3d-ico { width: 22px !important; height: 22px !important; }
+    }
+  `;
+  const s = document.createElement('style');
+  s.id = 'amin-3d-clay-style';
+  s.textContent = css;
+  document.head.appendChild(s);
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', inject3DStyles);
+} else {
+  inject3DStyles();
+}
+
+// 2. 3D SVG Builder Helper
+function make3D(name, innerSvg, pHex, sHex) {
+  const primary = pHex || '#5B8CFF';
+  const secondary = sHex || '#7C5CFF';
+  return `<svg class="amin-3d-ico ico-${name}" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">` +
+    `<defs>` +
+    `<linearGradient id="c-g-${name}" x1="0%" y1="0%" x2="100%" y2="100%">` +
+    `<stop offset="0%" stop-color="${primary}"/>` +
+    `<stop offset="100%" stop-color="${secondary}"/>` +
+    `</linearGradient>` +
+    `<radialGradient id="c-h-${name}" cx="30%" cy="25%" r="65%">` +
+    `<stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.65"/>` +
+    `<stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>` +
+    `</radialGradient>` +
+    `</defs>` +
+    innerSvg.replace(/fill="url\(#grad\)"/g, `fill="url(#c-g-${name})"`)
+            .replace(/fill="url\(#hi\)"/g, `fill="url(#c-h-${name})"`) +
+    `</svg>`;
+}
+
+// 3. Complete 3D Claymorphism Icon Definitions
+const CLAY_ICONS = {
+  overview: make3D('overview', `<rect x="4" y="11" width="24" height="17" rx="5" fill="url(#grad)"/><path d="M3 13 L16 3 L29 13 Z" fill="url(#grad)"/><path d="M4 12 L16 4 L28 12 Z" fill="url(#hi)"/><rect x="13" y="18" width="6" height="10" rx="2" fill="#00C896"/>`),
+  home: make3D('home', `<rect x="4" y="11" width="24" height="17" rx="5" fill="url(#grad)"/><path d="M3 13 L16 3 L29 13 Z" fill="url(#grad)"/><path d="M4 12 L16 4 L28 12 Z" fill="url(#hi)"/><rect x="13" y="18" width="6" height="10" rx="2" fill="#00C896"/>`),
+  students: make3D('students', `<circle cx="16" cy="11" r="6" fill="url(#grad)"/><circle cx="16" cy="10" r="5" fill="url(#hi)"/><path d="M5 28 C5 21 10 18 16 18 C22 18 27 21 27 28 Z" fill="url(#grad)"/><path d="M16 3 L26 7 L16 11 L6 7 Z" fill="#45D8FF"/><path d="M23 7 V13" stroke="#FF5D73" stroke-width="2.5" stroke-linecap="round"/>`),
+  users: make3D('users', `<circle cx="11" cy="11" r="5" fill="url(#grad)"/><circle cx="11" cy="10" r="4" fill="url(#hi)"/><path d="M3 27 C3 21 7 18 11 18 C15 18 19 21 19 27 Z" fill="url(#grad)"/><circle cx="21" cy="13" r="4" fill="#45D8FF"/><path d="M18 27 C18 23 21 21 24 21 C27 21 29 23 29 27 Z" fill="#45D8FF"/>`),
+  person: make3D('person', `<circle cx="16" cy="11" r="6" fill="url(#grad)"/><circle cx="16" cy="10" r="5" fill="url(#hi)"/><path d="M6 27 C6 21 10 18 16 18 C22 18 26 21 26 27 Z" fill="url(#grad)"/>`),
+  academic: make3D('academic', `<rect x="4" y="17" width="24" height="7" rx="3" fill="url(#grad)"/><rect x="4" y="17" width="24" height="4" rx="2" fill="url(#hi)"/><rect x="6" y="10" width="20" height="7" rx="3" fill="#00C896"/><rect x="6" y="10" width="20" height="4" rx="2" fill="rgba(255,255,255,0.4)"/><path d="M12 10 V24" stroke="#FF5D73" stroke-width="2.5"/>`),
+  books: make3D('books', `<rect x="4" y="17" width="24" height="7" rx="3" fill="url(#grad)"/><rect x="4" y="17" width="24" height="4" rx="2" fill="url(#hi)"/><rect x="6" y="10" width="20" height="7" rx="3" fill="#00C896"/><rect x="6" y="10" width="20" height="4" rx="2" fill="rgba(255,255,255,0.4)"/><path d="M12 10 V24" stroke="#FF5D73" stroke-width="2.5"/>`),
+  book: make3D('book', `<path d="M4 8 C7 6 10 6 16 8 C22 6 25 6 28 8 V24 C25 22 22 22 16 24 C10 22 7 22 4 24 Z" fill="url(#grad)"/><path d="M5 8 C8 6.5 11 6.5 16 8 V16 C11 14.5 8 14.5 5 16 Z" fill="url(#hi)"/><path d="M16 8 V24" stroke="#45D8FF" stroke-width="2.5"/>`),
+  finance: make3D('finance', `<rect x="3" y="8" width="26" height="18" rx="5" fill="url(#grad)"/><rect x="3" y="8" width="26" height="9" rx="4" fill="url(#hi)"/><circle cx="22" cy="17" r="5" fill="#F6B93B"/><circle cx="22" cy="16.5" r="3.5" fill="rgba(255,255,255,0.6)"/><rect x="17" y="14" width="12" height="6" rx="3" fill="#1B2335"/>`),
+  money: make3D('money', `<rect x="3" y="8" width="26" height="18" rx="5" fill="url(#grad)"/><rect x="3" y="8" width="26" height="9" rx="4" fill="url(#hi)"/><circle cx="22" cy="17" r="5" fill="#F6B93B"/><circle cx="22" cy="16.5" r="3.5" fill="rgba(255,255,255,0.6)"/><rect x="17" y="14" width="12" height="6" rx="3" fill="#1B2335"/>`),
+  attendance: make3D('attendance', `<rect x="4" y="6" width="24" height="22" rx="5" fill="#F7FAFF"/><path d="M4 12 C4 9 6 7 9 7 H23 C26 7 28 9 28 12 V15 H4 V12 Z" fill="url(#grad)"/><rect x="9" y="3" width="3" height="6" rx="1.5" fill="#FF5D73"/><rect x="20" y="3" width="3" height="6" rx="1.5" fill="#FF5D73"/><path d="M11 20 L15 24 L23 16" stroke="#00C896" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>`),
+  calendar: make3D('calendar', `<rect x="4" y="6" width="24" height="22" rx="5" fill="#F7FAFF"/><path d="M4 12 C4 9 6 7 9 7 H23 C26 7 28 9 28 12 V15 H4 V12 Z" fill="url(#grad)"/><rect x="9" y="3" width="3" height="6" rx="1.5" fill="#FF5D73"/><rect x="20" y="3" width="3" height="6" rx="1.5" fill="#FF5D73"/><circle cx="11" cy="20" r="2" fill="#5B8CFF"/><circle cx="16" cy="20" r="2" fill="#5B8CFF"/><circle cx="21" cy="20" r="2" fill="#5B8CFF"/>`),
+  counseling: make3D('counseling', `<path d="M16 3 L28 7 V16 C28 23 23 27 16 29 C9 27 4 23 4 16 V7 L16 3 Z" fill="url(#grad)"/><path d="M16 4 L26 7.5 V15 C26 20 22 24 16 26 Z" fill="url(#hi)"/><circle cx="16" cy="15" r="5" fill="#00C896"/><path d="M14 15 L15.5 16.5 L19 13" stroke="#FFF" stroke-width="2.5" stroke-linecap="round"/>`),
+  discipline: make3D('discipline', `<path d="M16 3 L28 7 V16 C28 23 23 27 16 29 C9 27 4 23 4 16 V7 L16 3 Z" fill="url(#grad)"/><path d="M16 4 L26 7.5 V15 C26 20 22 24 16 26 Z" fill="url(#hi)"/><rect x="14.5" y="10" width="3" height="7" rx="1.5" fill="#F6B93B"/><circle cx="16" cy="20" r="1.8" fill="#F6B93B"/>`),
+  shield: make3D('shield', `<path d="M16 3 L28 7 V16 C28 23 23 27 16 29 C9 27 4 23 4 16 V7 L16 3 Z" fill="url(#grad)"/><path d="M16 4 L26 7.5 V15 C26 20 22 24 16 26 Z" fill="url(#hi)"/>`),
+  tasks: make3D('tasks', `<rect x="5" y="6" width="22" height="24" rx="5" fill="url(#grad)"/><rect x="5" y="6" width="22" height="13" rx="4" fill="url(#hi)"/><rect x="10" y="3" width="12" height="6" rx="2.5" fill="#45D8FF"/><path d="M11 16 H21 M11 22 H17" stroke="#FFF" stroke-width="3" stroke-linecap="round"/><circle cx="21" cy="22" r="3" fill="#00C896"/><path d="M20 22 L21 23 L23 21" stroke="#FFF" stroke-width="1.5" stroke-linecap="round"/>`),
+  clipboard: make3D('clipboard', `<rect x="5" y="6" width="22" height="24" rx="5" fill="url(#grad)"/><rect x="5" y="6" width="22" height="13" rx="4" fill="url(#hi)"/><rect x="10" y="3" width="12" height="6" rx="2.5" fill="#45D8FF"/><path d="M11 16 H21 M11 22 H17" stroke="#FFF" stroke-width="3" stroke-linecap="round"/>`),
+  certificates: make3D('certificates', `<circle cx="16" cy="13" r="10" fill="#F6B93B"/><circle cx="16" cy="12" r="8" fill="url(#hi)"/><circle cx="16" cy="13" r="5.5" fill="#FF5D73"/><path d="M11 21 L7 30 L14 26 L16 29 L18 26 L25 30 L21 21 Z" fill="url(#grad)"/>`),
+  award: make3D('award', `<circle cx="16" cy="13" r="10" fill="#F6B93B"/><circle cx="16" cy="12" r="8" fill="url(#hi)"/><circle cx="16" cy="13" r="5.5" fill="#FF5D73"/><path d="M11 21 L7 30 L14 26 L16 29 L18 26 L25 30 L21 21 Z" fill="url(#grad)"/>`),
+  trophy: make3D('trophy', `<path d="M8 5 H24 V10 C24 15 20 18 16 18 C12 18 8 15 8 10 Z" fill="url(#grad)"/><path d="M9 5 H23 V9 C23 13 19 15 16 15 C13 15 9 13 9 9 Z" fill="url(#hi)"/><rect x="13" y="18" width="6" height="6" fill="#45D8FF"/><rect x="8" y="24" width="16" height="5" rx="2" fill="#1B2335"/><path d="M8 7 H5 C3.5 7 3.5 12 5 12 H8 M24 7 H27 C28.5 7 28.5 12 27 12 H24" stroke="url(#grad)" stroke-width="3"/>`),
+  messages: make3D('messages', `<path d="M5 8 C5 5 7 3 11 3 H21 C25 3 27 5 27 8 V18 C27 21 25 23 21 23 H14 L7 28 V23 C5 23 5 21 5 18 Z" fill="url(#grad)"/><path d="M6 8 C6 6 8 4 11 4 H21 C24 4 26 6 26 8 V14 C26 17 24 18 21 18 H12 C9 18 7 17 7 14 Z" fill="url(#hi)"/><circle cx="11" cy="13" r="2" fill="#45D8FF"/><circle cx="16" cy="13" r="2" fill="#45D8FF"/><circle cx="21" cy="13" r="2" fill="#45D8FF"/>`),
+  chat: make3D('chat', `<path d="M5 8 C5 5 7 3 11 3 H21 C25 3 27 5 27 8 V18 C27 21 25 23 21 23 H14 L7 28 V23 C5 23 5 21 5 18 Z" fill="url(#grad)"/><path d="M6 8 C6 6 8 4 11 4 H21 C24 4 26 6 26 8 V14 C26 17 24 18 21 18 H12 C9 18 7 17 7 14 Z" fill="url(#hi)"/><circle cx="11" cy="13" r="2" fill="#45D8FF"/><circle cx="16" cy="13" r="2" fill="#45D8FF"/><circle cx="21" cy="13" r="2" fill="#45D8FF"/>`),
+  analytics_ai: make3D('analytics_ai', `<path d="M16 2 C16 11 19 14 28 14 C19 14 16 17 16 26 C16 17 13 14 4 14 C13 14 16 11 16 2 Z" fill="url(#grad)"/><path d="M16 4 C16 11 18 13 25 14 C18 15 16 17 16 24 C16 17 14 15 7 14 C14 13 16 11 16 4 Z" fill="url(#hi)"/><circle cx="25" cy="7" r="3" fill="#00C896"/><circle cx="7" cy="23" r="2.5" fill="#FF5D73"/>`),
+  ai: make3D('ai', `<path d="M16 2 C16 11 19 14 28 14 C19 14 16 17 16 26 C16 17 13 14 4 14 C13 14 16 11 16 2 Z" fill="url(#grad)"/><path d="M16 4 C16 11 18 13 25 14 C18 15 16 17 16 24 C16 17 14 15 7 14 C14 13 16 11 16 4 Z" fill="url(#hi)"/><circle cx="25" cy="7" r="3" fill="#00C896"/><circle cx="7" cy="23" r="2.5" fill="#FF5D73"/>`),
+  sparkle: make3D('sparkle', `<path d="M16 2 C16 11 19 14 28 14 C19 14 16 17 16 26 C16 17 13 14 4 14 C13 14 16 11 16 2 Z" fill="url(#grad)"/><path d="M16 4 C16 11 18 13 25 14 C18 15 16 17 16 24 C16 17 14 15 7 14 C14 13 16 11 16 4 Z" fill="url(#hi)"/>`),
+  chart: make3D('chart', `<rect x="5" y="16" width="5" height="12" rx="2" fill="url(#grad)"/><rect x="13" y="10" width="6" height="18" rx="2" fill="url(#grad)"/><rect x="22" y="4" width="5" height="24" rx="2" fill="#00C896"/><path d="M3 28 H29" stroke="#45D8FF" stroke-width="3" stroke-linecap="round"/>`),
+  chartPie: make3D('chartPie', `<circle cx="16" cy="16" r="12" fill="url(#grad)"/><circle cx="16" cy="15" r="10" fill="url(#hi)"/><path d="M16 16 L16 4 A12 12 0 0 1 28 16 Z" fill="#00C896"/>`),
+  registrations: make3D('registrations', `<path d="M3 8 C3 6 5 5 7 5 H12 L15 8 H25 C27 8 29 10 29 12 V24 C29 26 27 28 25 28 H7 C5 28 3 26 3 24 Z" fill="url(#grad)"/><path d="M4 12 C4 10 6 9 8 9 H24 C26 9 28 10 28 12 V18 C28 21 26 22 24 22 H8 C6 22 4 21 4 18 Z" fill="url(#hi)"/><circle cx="21" cy="19" r="4" fill="#00C896"/><path d="M19 19 H23 M21 17 V21" stroke="#FFF" stroke-width="2" stroke-linecap="round"/>`),
+  folder: make3D('folder', `<path d="M3 8 C3 6 5 5 7 5 H12 L15 8 H25 C27 8 29 10 29 12 V24 C29 26 27 28 25 28 H7 C5 28 3 26 3 24 Z" fill="url(#grad)"/><path d="M4 12 C4 10 6 9 8 9 H24 C26 9 28 10 28 12 V18 C28 21 26 22 24 22 H8 C6 22 4 21 4 18 Z" fill="url(#hi)"/>`),
+  schedule: make3D('schedule', `<rect x="4" y="6" width="24" height="22" rx="5" fill="#F7FAFF"/><path d="M4 12 C4 9 6 7 9 7 H23 C26 7 28 9 28 12 V15 H4 V12 Z" fill="url(#grad)"/><rect x="9" y="3" width="3" height="6" rx="1.5" fill="#FF5D73"/><rect x="20" y="3" width="3" height="6" rx="1.5" fill="#FF5D73"/><circle cx="11" cy="20" r="2" fill="#5B8CFF"/><circle cx="16" cy="20" r="2" fill="#5B8CFF"/><circle cx="21" cy="20" r="2" fill="#5B8CFF"/>`),
+  payroll: make3D('payroll', `<rect x="3" y="8" width="26" height="18" rx="5" fill="url(#grad)"/><rect x="3" y="8" width="26" height="9" rx="4" fill="url(#hi)"/><circle cx="22" cy="17" r="5" fill="#00C896"/><path d="M20 17 L21.5 18.5 L24 15" stroke="#FFF" stroke-width="2" stroke-linecap="round"/>`),
+  settings: make3D('settings', `<circle cx="16" cy="16" r="10" fill="url(#grad)"/><circle cx="16" cy="15" r="8" fill="url(#hi)"/><circle cx="16" cy="16" r="4" fill="#1B2335"/><path d="M16 2 V6 M16 26 V30 M2 16 H6 M26 16 H30 M6 6 L9 9 M23 23 L26 26 M6 26 L9 23 M23 9 L26 6" stroke="url(#grad)" stroke-width="4" stroke-linecap="round"/>`),
+  system: make3D('system', `<path d="M16 3 L28 7 V16 C28 23 23 27 16 29 C9 27 4 23 4 16 V7 L16 3 Z" fill="url(#grad)"/><path d="M16 4 L26 7.5 V15 C26 20 22 24 16 26 Z" fill="url(#hi)"/><path d="M17 9 L11 17 H16 L15 23 L21 15 H16 Z" fill="#F6B93B"/>`),
+  bus: make3D('bus', `<rect x="4" y="8" width="24" height="15" rx="5" fill="url(#grad)"/><rect x="4" y="8" width="24" height="8" rx="4" fill="url(#hi)"/><rect x="7" y="11" width="6" height="5" rx="1.5" fill="#45D8FF"/><rect x="15" y="11" width="6" height="5" rx="1.5" fill="#45D8FF"/><circle cx="9" cy="23" r="3" fill="#1B2335"/><circle cx="23" cy="23" r="3" fill="#1B2335"/><circle cx="9" cy="23" r="1.5" fill="#45D8FF"/><circle cx="23" cy="23" r="1.5" fill="#45D8FF"/>`),
+  menu: make3D('menu', `<rect x="5" y="7" width="22" height="4" rx="2" fill="url(#grad)"/><rect x="5" y="7" width="22" height="2" rx="1" fill="url(#hi)"/><rect x="5" y="14" width="22" height="4" rx="2" fill="url(#grad)"/><rect x="5" y="14" width="22" height="2" rx="1" fill="url(#hi)"/><rect x="5" y="21" width="22" height="4" rx="2" fill="url(#grad)"/><rect x="5" y="21" width="22" height="2" rx="1" fill="url(#hi)"/>`),
+  bell: make3D('bell', `<path d="M8 18 V11 C8 7 11 4 16 4 C21 4 24 7 24 11 V18 L26 21 H6 L8 18 Z" fill="url(#grad)"/><path d="M9 18 V12 C9 8.5 11.5 6 16 6 C20.5 6 23 8.5 23 12 V18 Z" fill="url(#hi)"/><circle cx="16" cy="24" r="3" fill="#FF5D73"/><circle cx="22" cy="7" r="3.5" fill="#FF5D73"/>`),
+  logout: make3D('logout', `<rect x="6" y="5" width="12" height="22" rx="3" fill="#FF5D73"/><rect x="6" y="5" width="12" height="11" rx="2" fill="rgba(255,255,255,0.4)"/><path d="M16 16 L25 16 M22 13 L25 16 L22 19" stroke="#5B8CFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>`),
+  sun: make3D('sun', `<circle cx="16" cy="16" r="7" fill="#F6B93B"/><circle cx="16" cy="15" r="5" fill="url(#hi)"/><path d="M16 3 V6 M16 26 V29 M3 16 H6 M26 16 H29 M7 7 L9 9 M23 23 L25 25 M7 25 L9 23 M23 9 L25 7" stroke="#F6B93B" stroke-width="3" stroke-linecap="round"/>`),
+  moon: make3D('moon', `<path d="M24 19 A10 10 0 1 1 13 6 A7 7 0 0 0 24 19 Z" fill="url(#grad)"/><path d="M23 18 A8 8 0 0 1 14 8 A6 6 0 0 0 23 18 Z" fill="url(#hi)"/>`),
+  refresh: make3D('refresh', `<path d="M26 14 A10 10 0 0 0 10 8 M6 6 V12 H12 M6 18 A10 10 0 0 0 22 24 M26 26 V20 H20" stroke="url(#grad)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>`),
+  print: make3D('print', `<rect x="8" y="4" width="16" height="7" rx="2" fill="url(#grad)"/><rect x="5" y="11" width="22" height="12" rx="4" fill="url(#grad)"/><rect x="5" y="11" width="22" height="6" rx="3" fill="url(#hi)"/><rect x="8" y="18" width="16" height="10" rx="2" fill="#FFF"/><path d="M11 22 H21 M11 25 H18" stroke="#5B8CFF" stroke-width="2" stroke-linecap="round"/>`),
+  check: make3D('check', `<circle cx="16" cy="16" r="12" fill="#00C896"/><circle cx="16" cy="15" r="10" fill="url(#hi)"/><path d="M10 16 L14 20 L22 12" stroke="#FFF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>`),
+  close: make3D('close', `<circle cx="16" cy="16" r="12" fill="#FF5D73"/><circle cx="16" cy="15" r="10" fill="url(#hi)"/><path d="M11 11 L21 21 M21 11 L11 21" stroke="#FFF" stroke-width="3.5" stroke-linecap="round"/>`),
+  eye: make3D('eye', `<path d="M3 16 C7 8 16 8 29 16 C25 24 16 24 3 16 Z" fill="url(#grad)"/><path d="M4 16 C8 10 16 10 28 16 C24 20 16 20 4 16 Z" fill="url(#hi)"/><circle cx="16" cy="16" r="5" fill="#1B2335"/><circle cx="17" cy="15" r="2" fill="#45D8FF"/>`)
 };
-var EMOJI={"\ud83d\udcca": "chart", "\u2630": "menu", "\ud83d\udccb": "clipboard", "\u2705": "check", "\ud83d\udcda": "books", "\ud83d\udcb0": "money", "\u26a0\ufe0f": "warning", "\ud83c\udf93": "grad", "\ud83d\udda8\ufe0f": "print", "\ud83d\udcdd": "note", "\ud83d\udd14": "bell", "\ud83c\udfc6": "trophy", "\ud83c\udfe0": "home", "\ud83d\udc65": "users", "\ud83d\udcc8": "trendUp", "\u274c": "close", "\ud83d\udce6": "box", "\u2699\ufe0f": "settings", "\ud83c\udf1f": "star", "\u2713": "check", "\ud83d\udcb5": "cash", "\ud83d\udcde": "phone", "\ud83c\udfdb\ufe0f": "building", "\ud83d\udce5": "download", "\ud83d\udc51": "crown", "\ud83d\udd04": "refresh", "\ud83d\udee1\ufe0f": "shield", "\ud83d\udcc4": "doc", "\ud83d\udc68\u200d\ud83c\udfeb": "person", "\ud83d\udc9a": "heart", "\u26a1": "bolt", "\ud83d\udc68\u200d\ud83d\udc69\u200d\ud83d\udc67": "users", "\ud83d\udcc9": "trendDown", "\ud83d\udc41\ufe0f": "eye", "\ud83c\udf89": "star", "\ud83d\ude8c": "bus", "\ud83d\uddd3\ufe0f": "calendar", "\ud83e\udde0": "target", "\ud83d\udd12": "lock", "\u2795": "plus", "\ud83d\udd11": "key", "\ud83d\udcd6": "book", "\ud83d\udd17": "link", "\ud83c\udf19": "moon", "\u2600\ufe0f": "sun", "\ud83d\udcce": "paperclip", "\ud83e\udde9": "target", "\ud83c\udfeb": "building", "\ud83d\udcc1": "folder", "\ud83c\udfaf": "target", "\ud83d\udc64": "person", "\ud83d\udd27": "wrench", "\ud83d\udcb3": "card", "\ud83d\uddc2\ufe0f": "folder", "\u270f\ufe0f": "note", "\ud83e\uddea": "box", "\ud83e\uddfe": "doc", "\ud83e\udded": "target", "\ud83c\udf92": "box", "\ud83d\uddbc\ufe0f": "image", "\ud83d\udcd5": "book", "\u270d\ufe0f": "note", "\ud83d\udce3": "bell", "\ud83d\udea8": "warning", "\ud83d\udce2": "bell", "\ud83d\udda5\ufe0f": "monitor", "\ud83d\udc4b": "star", "\u2717": "close", "\ud83d\udc8e": "star", "\ud83c\udff7\ufe0f": "tag", "\ud83d\udcbe": "download", "\ud83d\udcac": "chat", "\ud83d\udd10": "lock", "\ud83d\udcf1": "phone", "\ud83d\udcbb": "monitor", "\ud83c\udfe2": "building", "\ud83d\udd2c": "box", "\ud83d\ude80": "star", "\ud83d\udcf7": "image", "\ud83c\udfc5": "trophy", "\ud83d\udd34": "dot", "\ud83d\udfe1": "dot", "\ud83d\udd35": "dot", "\ud83d\ude0a": "star", "\u2796": "minus", "\ud83d\udcbc": "box", "\ud83c\udf9a\ufe0f": "settings", "\ud83d\uddfa\ufe0f": "target", "\ud83d\udd50": "clock", "\ud83d\uddc4\ufe0f": "box", "\ud83d\uded2": "box", "\ud83d\udccc": "pin", "\ud83d\udc41": "eye", "\u2709\ufe0f": "mail", "\ud83d\udce4": "upload", "\ud83d\udc69\u200d\ud83c\udfeb": "person", "\ud83c\udfe6": "building", "\u2757": "warning", "\ud83d\udc4d": "star", "\ud83d\udc54": "star", "\ud83e\udd47": "trophy", "\ud83e\udd48": "trophy", "\ud83e\udd49": "trophy", "\ud83d\udeaa": "close", "\u2753": "close", "\u2728": "star", "\ud83c\udf10": "link", "\ud83d\udcd8": "book", "\u2605": "star", "\u2715": "close", "\ud83d\udcf2": "phone", "\u2714": "check"};
-var keys=Object.keys(EMOJI).sort(function(a,b){return b.length-a.length;});
-var EMOJI_RE=new RegExp(keys.map(function(k){return k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}).join('|'),'g');
-var FB_RE=/[\u{1F000}-\u{1FAFF}\u2600-\u27BF\u2B00-\u{2BFF}]/gu;
-function wrap(n){return ICONS[n]||STAR;}
-function iconize(t){EMOJI_RE.lastIndex=0;t=t.replace(EMOJI_RE,function(m){return wrap(EMOJI[m]);});t=t.replace(FB_RE,STAR);return t;}
-function isSkip(el){return el.nodeType===1&&(el.nodeName==='SCRIPT'||el.nodeName==='STYLE'||el.nodeName==='TEXTAREA');}
-function walk(node){if(node.nodeType===3){replaceText(node);}else if(node.nodeType===1&&!isSkip(node)){var c=node.childNodes;for(var i=0;i<c.length;i++){walk(c[i]);}}}
-function replaceText(node){var t=node.nodeValue;if(!t)return;var html=iconize(t);if(html===t)return;var span=document.createElement('span');span.innerHTML=html;var frag=document.createDocumentFragment();while(span.firstChild){frag.appendChild(span.firstChild);}if(node.parentNode){node.parentNode.replaceChild(frag,node);}}
-var css='.amin-ico{width:1.18em;height:1.18em;vertical-align:-0.22em;flex:0 0 auto;display:inline-block;overflow:visible}';try{var st=document.createElement('style');st.textContent=css;if(document.head)document.head.appendChild(st);}catch(e){}
-function run(){if(document.body){walk(document.body);}}
-var obs;function start(){run();if('MutationObserver' in window){obs=new MutationObserver(function(muts){obs.disconnect();for(var i=0;i<muts.length;i++){var m=muts[i];if(m.type==='childList'){var an=m.addedNodes;for(var j=0;j<an.length;j++){walk(an[j]);}}else if(m.type==='characterData'){replaceText(m.target);}}obs.observe(document.documentElement,{subtree:true,childList:true,characterData:true});});obs.observe(document.documentElement,{subtree:true,childList:true,characterData:true});}}
-if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',start);}else{start();}
-window.AminIcons={replace:run};
+
+function create(name, size, state) {
+  size = size || 24;
+  const ico = CLAY_ICONS[name] || CLAY_ICONS.star || make3D('default', `<circle cx="16" cy="16" r="10" fill="url(#grad)"/>`);
+  return `<span class="amin-3d-ico-wrap" style="display:inline-flex;align-items:center;justify-content:center;width:${size}px;height:${size}px;">${ico}</span>`;
+}
+
+window.AminIcons = { create, CLAY_ICONS, inject3DStyles };
+window.Icon3D = { create };
 })();
