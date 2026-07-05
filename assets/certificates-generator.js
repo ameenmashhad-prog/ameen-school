@@ -92,7 +92,7 @@
     const teacherOptions = '<option value="">اختر المعلم أو الموظف...</option>' + DATA.users.filter(u => ['teacher','staff','counselor','supervisor'].includes(u.role)).map(u => `<option value="${u.id}">${esc(u.name || u.email)} — (${u.role})</option>`).join('');
 
     const controlsHtml = `<div class="card cert-controls no-print" style="margin-bottom:20px;border-left:4px solid #0B6E4F"><div class="card-head"><h3>🎨 إعداد وتخصيص شهادة التقدير المطبوعة</h3></div><div class="card-body"><div class="hr-form" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;align-items:end">` +
-      `<div><label>نوع الشهادة *</label><select id="certType" class="select" onchange="CertificatesApp.onTypeChange()"><option value="excellence">🏆 شهادة تفوق أكاديمي (لأوائل الصف)</option><option value="general_exempt">🌟 شهادة إعفاء عام (من الامتحانات النهائية)</option><option value="subject_exempt">📚 شهادة إعفاء في مادة دراسية</option><option value="conduct">🛡️ شهادة تقدير وسلوك وانضباط ممتاز</option><option value="teacher_appreciation">👨‍🏫 شهادة شكر وتقدير للمعلم / الموظف</option></select></div>` +
+      `<div><label>🎨 قالب الشهادة الاحترافي *</label><select id="certTemplate" class="select" onchange="CertificatesApp.updatePreview()"><option value="royal">👑 القالب الملكي المذهب (Royal Gold)</option><option value="classic">🏛️ قالب التميز الأكاديمي الكلاسيكي (Classic Heritage)</option><option value="emerald">🌟 قالب الزمرد الإسلامي الفاخر (Emerald Green)</option><option value="modern">💎 القالب العصري الماسي (Modern Executive)</option></select></div><div><label>نوع الشهادة *</label><select id="certType" class="select" onchange="CertificatesApp.onTypeChange()"><option value="excellence">🏆 شهادة تفوق أكاديمي (لأوائل الصف)</option><option value="general_exempt">🌟 شهادة إعفاء عام (من الامتحانات النهائية)</option><option value="subject_exempt">📚 شهادة إعفاء في مادة دراسية</option><option value="conduct">🛡️ شهادة تقدير وسلوك وانضباط ممتاز</option><option value="teacher_appreciation">👨‍🏫 شهادة شكر وتقدير للمعلم / الموظف</option></select></div>` +
       `<div id="classBox"><label>الصف *</label><select id="certClass" class="select" onchange="CertificatesApp.onClassChange()">${classOptions}</select></div>` +
       `<div id="studentBox"><label>الطالب المكرم *</label><select id="certStudent" class="select" onchange="CertificatesApp.updatePreview()"><option value="">اختاري الصف أولاً</option></select></div>` +
       `<div id="teacherBox" style="display:none"><label>المعلم / الموظف المكرم *</label><select id="certTeacher" class="select" onchange="CertificatesApp.updatePreview()">${teacherOptions}</select></div>` +
@@ -153,8 +153,10 @@
     else if (type === 'teacher_appreciation') defaultReason = 'تتقدم إدارة المدرسة بخالص الشكر وعظيم الامتنان تقديراً للجهود العظيمة والإخلاص والتفاني في أداء الرسالة التربوية والتعليمية، ومساهمتكم الفعالة في ارتقاء طلابنا الأبرار.';
 
     const finalReason = reasonText || defaultReason;
+    const template = options.template || 'royal';
+    const serial = 'CERT-2026-AMN-' + Math.floor(1000 + Math.random() * 9000);
 
-    return `<div class="cert-card">` +
+    return `<div class="cert-card theme-${template}">` +
       `<div class="cert-header">` +
       `<div class="cert-logo">ع</div>` +
       `<div class="cert-school-info"><h2>مجمع أمين الرضا (ع) التعليمي</h2><p>الإدارة الأكاديمية والتربوية — العام الدراسي 2026-2027</p></div>` +
@@ -171,6 +173,10 @@
       `<div class="cert-sign-box"><b>المعاون العلمي / المشرف</b><span>التوقيع والاعتماد</span></div>` +
       `<div class="cert-sign-box"><b>التاريخ الرسمي</b><span>${esc(dateStr || iso())}</span></div>` +
       `<div class="cert-sign-box"><b>المدير العام</b><span>سليمان معروف</span></div>` +
+      `</div>` +
+      `<div style="display:flex;justify-content:space-between;align-items:center;margin-top:25px;padding-top:12px;border-top:1px solid rgba(0,0,0,0.1);font-size:11px;color:#666;direction:rtl;">` +
+      `<span>🔒 رمز التحقق الأمني والاعتماد: <b>${serial}</b></span>` +
+      `<span>🏫 مجمع أمين الرضا (ع) التعليمي — نظام الشهادات الإلكترونية</span>` +
       `</div>` +
       `</div>`;
   }
@@ -207,7 +213,19 @@
       teacher_appreciation: '👨‍🏫 شهادة شكر وتقدير 👨‍🏫'
     };
 
-    box.innerHTML = buildCertificateCard({
+    let waButtonHtml = '';
+    if (t !== 'teacher_appreciation') {
+      const sid = $('#certStudent')?.value;
+      const stuObj = DATA.students.find(s => String(s.id) === String(sid));
+      if (stuObj && stuObj.phone) {
+        const cleanPhone = String(stuObj.phone).replace(/\D/g, '');
+        const phoneFormatted = cleanPhone.startsWith('0') ? '964' + cleanPhone.substring(1) : (!cleanPhone.startsWith('964') ? '964' + cleanPhone : cleanPhone);
+        const msgText = `حضرة ولي أمر الطالب/ة (${recName}) المحترم،\nيسعدنا ويشرفنا في مجمع أمين الرضا (ع) التعليمي أن نبعث لكم خالص التهاني والتبريكات بمناسبة صدور شهادة التميز والتفوق لابنكم/ابنتكم تقديراً للجهد المبذول والأداء الأكاديمي المشرف.\nمع تمنياتنا بدوام التوفيق والنجاح الدائم 🌟👑.`;
+        waButtonHtml = `<div class="no-print" style="margin-bottom:15px;text-align:center;"><button class="btn" style="background:#25D366;color:#fff;font-size:15px;font-weight:bold;padding:10px 24px;border-radius:10px;box-shadow:0 4px 12px rgba(37,211,102,0.3);" onclick="window.open('https://wa.me/${phoneFormatted}?text=${encodeURIComponent(msgText)}', '_blank')">💬 إرسال تهنئة الشهادة لولي الأمر عبر واتساب مباشرة</button></div>`;
+      }
+    }
+
+    box.innerHTML = waButtonHtml + buildCertificateCard({
       type: t,
       recipientName: recName,
       recipientSubtitle: recSub,
@@ -216,7 +234,8 @@
       reasonText: customReason,
       dateStr: dateStr,
       subject: subj,
-      gender: getStudentGender(stu)
+      gender: getStudentGender(stu),
+      template: $('#certTemplate')?.value || 'royal'
     });
   }
 
@@ -225,7 +244,7 @@
 
     const controlsHtml = `<div class="card cert-controls no-print" style="margin-bottom:20px;border-left:4px solid #B8860B"><div class="card-head"><h3>📚 الإصدار الجماعي السريع للشهادات المدرسية</h3></div><div class="card-body"><div class="hr-form" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;align-items:end">` +
       `<div><label>الصف *</label><select id="batchClass" class="select">${classOptions}</select></div>` +
-      `<div><label>الفئة المستهدفة بالشهادات *</label><select id="batchType" class="select"><option value="top5">🏆 أوائل الصف (الخمسة الأوائل حسب المعدل)</option><option value="general_exempt">🌟 الحاصلون على إعفاء عام</option><option value="all_conduct">🛡️ شهادات تقدير وسلوك لجميع طلاب الصف</option></select></div>` +
+      `<div><label>🎨 قالب الشهادة الاحترافي *</label><select id="batchTemplate" class="select"><option value="royal">👑 القالب الملكي المذهب (Royal Gold)</option><option value="classic">🏛️ قالب التميز الأكاديمي الكلاسيكي (Classic Heritage)</option><option value="emerald">🌟 قالب الزمرد الإسلامي الفاخر (Emerald Green)</option><option value="modern">💎 القالب العصري الماسي (Modern Executive)</option></select></div><div><label>الفئة المستهدفة بالشهادات *</label><select id="batchType" class="select"><option value="top5">🏆 أوائل الصف (الخمسة الأوائل حسب المعدل)</option><option value="general_exempt">🌟 الحاصلون على إعفاء عام</option><option value="all_conduct">🛡️ شهادات تقدير وسلوك لجميع طلاب الصف</option></select></div>` +
       `<div><label>تاريخ التكريم *</label><input id="batchDate" type="date" class="input" value="${iso()}"></div>` +
       `<div style="grid-column:1/-1"><label>نص التكريم الموحد (اختياري)</label><input id="batchReason" class="input" placeholder="اكتبي نصاً موحداً أو اتركيه فارغاً لاستخدام النصوص الرسمية الافتراضية..."></div>` +
       `<div style="grid-column:1/-1;display:flex;gap:10px;justify-content:center"><button class="btn gold block" style="padding:12px 30px;font-size:16px;font-weight:bold" onclick="CertificatesApp.generateBatch()">🚀 توليد الشهادات الجماعية للطباعة الفورية</button> <button class="btn blue" style="padding:12px 30px;font-size:16px;font-weight:bold" onclick="window.print()">🖨️ طباعة الشهادات المولدة</button></div>` +
@@ -278,7 +297,9 @@
         title: type === 'general_exempt' ? '🌟 شهادة إعفاء عام 🌟' : title,
         subtitle: 'تمنح إدارة مجمع أمين الرضا (ع) التعليمي هذه الشهادة إلى:',
         reasonText: reason,
-        dateStr: dateStr
+        dateStr: dateStr,
+        gender: getStudentGender(s),
+        template: $('#batchTemplate')?.value || 'royal'
       });
     }).join('');
   }
