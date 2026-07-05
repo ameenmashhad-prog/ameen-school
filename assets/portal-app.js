@@ -22,20 +22,20 @@ var ROLE_SECTIONS = {
 var SECTIONS_META = {
   overview: { title: 'لوحة القيادة', icon: 'overview', order: 1 },
   students: { title: 'الطلاب', icon: 'students', order: 2 },
-  academic: { title: 'الأكاديمي والامتحانات 🎓', icon: 'academic', order: 3 },
-  finance: { title: 'المالية التنفيذية 💰', icon: 'finance', order: 4 },
-  counseling: { title: 'الإرشاد والسلوك 🧭', icon: 'discipline', order: 5 },
+  academic: { title: 'الأكاديمي والامتحانات', icon: 'academic', order: 3 },
+  finance: { title: 'المالية التنفيذية', icon: 'finance', order: 4 },
+  counseling: { title: 'الإرشاد والسلوك', icon: 'discipline', order: 5 },
   attendance: { title: 'الحضور', icon: 'attendance', order: 6 },
-  tasks: { title: 'المهام والتكليفات 📋', icon: 'tasks', order: 12, external: 'tasks-management.html' },
-  certificates: { title: 'الشهادات المطبوعة 🖨️', icon: 'award', order: 13, external: 'certificates-generator.html' },
-  messages: { title: 'تواصل أولياء الأمور 💬', icon: 'chat', order: 14, external: 'parent-messages.html' },
-  analytics_ai: { title: 'تحليلات الدعم 🤖', icon: 'chart-pie', order: 15, external: 'academic-analytics.html' },
+  tasks: { title: 'المهام والتكليفات', icon: 'tasks', order: 12, external: 'tasks-management.html' },
+  certificates: { title: 'الشهادات المطبوعة', icon: 'award', order: 13, external: 'certificates-generator.html' },
+  messages: { title: 'تواصل أولياء الأمور', icon: 'chat', order: 14, external: 'parent-messages.html' },
+  analytics_ai: { title: 'تحليلات الدعم', icon: 'chart-pie', order: 15, external: 'academic-analytics.html' },
   discipline: { title: 'السلوك', icon: 'discipline', order: 7 },
   registrations: { title: 'التسجيلات', icon: 'registrations', order: 8 },
   schedule: { title: 'الجدول', icon: 'schedule', order: 9 },
   payroll: { title: 'الرواتب', icon: 'payroll', order: 10 },
   settings: { title: 'الإعدادات', icon: 'settings', order: 11 },
-  system: { title: 'الحوكمة والتشخيص 🛡️', icon: 'system', order: 16 }
+  system: { title: 'الحوكمة والتشخيص', icon: 'system', order: 16 }
 };
 
 var ROLE_LABELS = {
@@ -189,16 +189,16 @@ function buildQuickActions() {
     html += '<button class="btn small blue" style="white-space:nowrap;padding:6px 12px;font-size:13px;border-radius:6px;border:1px solid #1976d2;cursor:pointer;" onclick="location.href=\"academic-pro.html\"">⚡ رصد درجات سريع</button>';
   }
   if (['admin','principal','scientific','academic','teacher','counselor','finance','hr','staff','super_admin'].indexOf(role) !== -1) {
-    html += '<button class="btn small green" style="white-space:nowrap;padding:6px 12px;font-size:13px;background:#25D366;color:white;border:none;border-radius:6px;cursor:pointer;" onclick="location.href=\"parent-messages.html\"">💬 واتساب لولي أمر</button>';
+    html += '<button class="btn small green" style="white-space:nowrap;padding:6px 12px;font-size:13px;background:#25D366;color:white;border:none;border-radius:6px;cursor:pointer;" onclick="location.href=\"parent-messages.html\"">واتساب لولي أمر</button>';
   }
   if (['admin','principal','finance','super_admin'].indexOf(role) !== -1) {
     html += '<button class="btn small red" style="white-space:nowrap;padding:6px 12px;font-size:13px;border-radius:6px;border:1px solid #d32f2f;cursor:pointer;" onclick="location.href=\"parent-messages.html#overdue\"">⚠️ مطالبة أقساط متأخرة</button>';
   }
   if (['admin','principal','hr','super_admin'].indexOf(role) !== -1) {
-    html += '<button class="btn small gold" style="white-space:nowrap;padding:6px 12px;font-size:13px;border-radius:6px;border:1px solid #B8860B;cursor:pointer;" onclick="location.href=\"hr.html#leaves\"">🌴 اعتماد إجازات معلقة</button>';
+    html += '<button class="btn small gold" style="white-space:nowrap;padding:6px 12px;font-size:13px;border-radius:6px;border:1px solid #B8860B;cursor:pointer;" onclick="location.href=\"hr.html#leaves\"">اعتماد إجازات معلقة</button>';
   }
   if (['admin','principal','scientific','academic','teacher','counselor','super_admin'].indexOf(role) !== -1) {
-    html += '<button class="btn small blue" style="white-space:nowrap;padding:6px 12px;font-size:13px;border-radius:6px;border:1px solid #1976d2;cursor:pointer;" onclick="location.href=\"certificates-generator.html\"">🖨️ إصدار شهادة مطبوعة</button>';
+    html += '<button class="btn small blue" style="white-space:nowrap;padding:6px 12px;font-size:13px;border-radius:6px;border:1px solid #1976d2;cursor:pointer;" onclick="location.href=\"certificates-generator.html\"">إصدار شهادة مطبوعة</button>';
   }
   
   box.innerHTML = html;
