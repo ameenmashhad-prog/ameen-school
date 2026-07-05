@@ -13,6 +13,13 @@ create extension if not exists pgcrypto;
 alter table public.users add column if not exists qualification text;
 alter table public.users add column if not exists specialization text;
 alter table public.users add column if not exists avatar_url text;
+alter table public.users add column if not exists updated_at timestamptz default now();
+alter table public.users add column if not exists phone text;
+alter table public.users add column if not exists birth_date date;
+alter table public.users add column if not exists nationality text;
+alter table public.users add column if not exists active boolean default true;
+alter table public.users add column if not exists is_super_admin boolean default false;
+alter table public.users add column if not exists created_at timestamptz default now();
 
 alter table public.students add column if not exists user_id uuid references public.users(id) on delete set null;
 alter table public.students add column if not exists parent_id uuid references public.users(id) on delete set null;
@@ -21,6 +28,7 @@ alter table public.students add column if not exists student_code text;
 alter table public.students add column if not exists class_id uuid;
 alter table public.students add column if not exists gender text;
 alter table public.students add column if not exists birth_date date;
+alter table public.students add column if not exists created_at timestamptz default now();
 
 create or replace function public.activate_registered_user(p_reg_type text, p_reg_id uuid)
 returns jsonb
@@ -116,10 +124,10 @@ begin
     -- إنشاء أو تحديث الملف الشخصي في public.users
     insert into public.users (
       id, name, email, phone, role, qualification, specialization,
-      birth_date, nationality, avatar_url, active, is_super_admin, created_at
+      birth_date, nationality, avatar_url, active, is_super_admin, created_at, updated_at
     ) values (
       v_user_id, v_name, v_email, v_tch.phone, 'teacher', v_tch.qualification, v_tch.specialization,
-      v_tch.birth_date, v_tch.nationality, v_tch.photo_path, true, false, now()
+      v_tch.birth_date, v_tch.nationality, v_tch.photo_path, true, false, now(), now()
     )
     on conflict (id) do update set
       name = excluded.name,
@@ -204,9 +212,9 @@ begin
     end;
     
     insert into public.users (
-      id, name, email, phone, role, birth_date, nationality, active, is_super_admin, created_at
+      id, name, email, phone, role, birth_date, nationality, active, is_super_admin, created_at, updated_at
     ) values (
-      v_parent_id, v_name, v_email, v_fam.phone_primary, 'parent', v_fam.birth_date, v_fam.nationality, true, false, now()
+      v_parent_id, v_name, v_email, v_fam.phone_primary, 'parent', v_fam.birth_date, v_fam.nationality, true, false, now(), now()
     )
     on conflict (id) do update set
       name = excluded.name,
@@ -272,9 +280,9 @@ begin
       end;
       
       insert into public.users (
-        id, name, email, role, birth_date, avatar_url, active, is_super_admin, created_at
+        id, name, email, role, birth_date, avatar_url, active, is_super_admin, created_at, updated_at
       ) values (
-        v_stu_user_id, v_stu_name, v_stu_email, 'student', v_stu.birth_date, v_stu.photo_path, true, false, now()
+        v_stu_user_id, v_stu_name, v_stu_email, 'student', v_stu.birth_date, v_stu.photo_path, true, false, now(), now()
       )
       on conflict (id) do update set
         name = excluded.name,
