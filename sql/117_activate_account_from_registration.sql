@@ -9,6 +9,19 @@
 create extension if not exists pgcrypto schema extensions;
 create extension if not exists pgcrypto;
 
+-- ضمان وجود جميع الأعمدة المطلوبة في جدول users وجدول students لتفادي خطأ column does not exist
+alter table public.users add column if not exists qualification text;
+alter table public.users add column if not exists specialization text;
+alter table public.users add column if not exists avatar_url text;
+
+alter table public.students add column if not exists user_id uuid references public.users(id) on delete set null;
+alter table public.students add column if not exists parent_id uuid references public.users(id) on delete set null;
+alter table public.students add column if not exists student_name text;
+alter table public.students add column if not exists student_code text;
+alter table public.students add column if not exists class_id uuid;
+alter table public.students add column if not exists gender text;
+alter table public.students add column if not exists birth_date date;
+
 create or replace function public.activate_registered_user(p_reg_type text, p_reg_id uuid)
 returns jsonb
 language plpgsql
