@@ -12,7 +12,7 @@ async function ensure(){const {data:{session}}=await client().auth.getSession();
 async function load(){const [classes,students,subjects,periods,weights,continuous,exams,scores,results,summary,decisions,locks,tasks,settings]=await Promise.all([q('classes',{order:'name'}),q('students',{order:'name'}),q('subjects',{order:'name'}),q('academic_periods'),q('grade_weights'),q('continuous_assessments'),q('exams'),q('exam_scores'),q('v_academic_subject_results'),q('v_academic_student_summary'),q('academic_exemption_decisions',{order:'created_at',ascending:false}),q('academic_grade_locks',{order:'period_name'}),q('v_my_exam_submission_tasks',{order:'submission_deadline'}),q('school_academic_settings')]);DATA={classes,students,subjects,periods,weights,continuous,exams,scores,results,summary,decisions,locks,tasks,settings:(settings&&settings[0])||{},classMap:new Map(classes.map(x=>[String(x.id),x])),studentMap:new Map(students.map(x=>[String(x.id),x])),subjectMap:new Map(subjects.map(x=>[String(x.id),x]))};render(ACTIVE)}
 function fullName(s){return s?[s.name,s.father_name,s.last_name].filter(Boolean).join(' ')||s.name:'—'}
 function normAr(v){return String(v||'').toLowerCase().replace(/[إأآا]/g,'ا').replace(/[ىي]/g,'ي').replace(/ة/g,'ه').replace(/ـ/g,'').replace(/\s+/g,'')}
-function classStage(cls){const n=normAr(cls&&cls.name);if(n.includes('ابتدائي'))return'primary';if(n.includes('متوسط'))return'middle';if(n.includes('اعدادي'))return'preparatory';return'primary'}
+function classStage(cls){if(!cls)return 'all';if(cls.stage_type&&['primary','middle','preparatory'].includes(cls.stage_type))return cls.stage_type;if(cls.stage&&['primary','middle','preparatory'].includes(cls.stage))return cls.stage;const n=normAr(cls.name||'');if(n.includes('ابتدائي')||n.includes('ابتداي')||n.includes('الابتدائ'))return'primary';if(n.includes('متوسط')||n.includes('المتوسط'))return'middle';if(n.includes('اعدادي')||n.includes('إعدادي')||n.includes('الاعدادي')||n.includes('ثانوي')||n.includes('علمي')||n.includes('ادبي'))return'preparatory';return'primary'}
 function gradeNo(cls){const n=normAr(cls&&cls.name);const arr=[['الاول',1],['اول',1],['الثاني',2],['ثاني',2],['الثالث',3],['ثالث',3],['الرابع',4],['رابع',4],['الخامس',5],['خامس',5],['السادس',6],['سادس',6]];const h=arr.find(([k])=>n.includes(k));return h?h[1]:0}
 function subjectAllowedForClass(sub,cls){const s=normAr(sub&&sub.name),st=classStage(cls),g=gradeNo(cls);if(s.includes('اسلام')||s.includes('قران')||s.includes('عربي')||s.includes('انجليزي')||s.includes('انكليزي')||s.includes('english')||s.includes('رياضيات'))return true;if(st==='primary'){if(s.includes('علوم')||s.includes('فني')||s.includes('فن')||s.includes('بدني')||s.includes('رياضه'))return true;if(g>=4&&g<=6&&s.includes('اجتماع'))return true;return false}if(st==='middle'){return s.includes('فيزياء')||s.includes('كيمياء')||s.includes('احياء')||s.includes('اجتماع')||s.includes('فني')||s.includes('فن')||s.includes('بدني')||s.includes('رياضه')}if(st==='preparatory'){return s.includes('فيزياء')||s.includes('كيمياء')||s.includes('احياء')||s.includes('فني')||s.includes('فن')||s.includes('بدني')||s.includes('رياضه')}return true}
 function subjectsForClassId(classId){const cls=DATA.classMap.get(String(classId));return cls?DATA.subjects.filter(s=>subjectAllowedForClass(s,cls)):DATA.subjects}
@@ -27,6 +27,169 @@ function entry(){if(!isTeacher()&&!isAdmin())return;$('#view-entry').innerHTML=`
 function continuousView(){const rows=DATA.continuous.map(r=>`<tr><td>${esc(fullName(DATA.studentMap.get(String(r.student_id))))}</td><td>${esc(subjectName(r.subject_id))}</td><td>${esc(r.component_type)}</td><td>${r.score}</td><td>${esc(r.assessment_date)}</td></tr>`);$('#view-continuous').innerHTML=`<div class="page-head"><div><h1>سجل التقييم المستمر</h1></div></div>${table(['الطالب','المادة','النوع','الدرجة','التاريخ'],rows)}`}
 function examsView(){const rows=DATA.scores.map(sc=>{const ex=DATA.exams.find(e=>e.id===sc.exam_id);return`<tr><td>${esc(fullName(DATA.studentMap.get(String(sc.student_id))))}</td><td>${esc(ex?subjectName(ex.subject_id):'—')}</td><td>${esc(ex&&ex.exam_name||'—')}</td><td>${sc.absent?'غائب':sc.score}</td><td>${esc(ex&&ex.exam_date||'—')}</td></tr>`});$('#view-exams').innerHTML=`<div class="page-head"><div><h1>الاختبارات الشهرية</h1></div></div>${table(['الطالب','المادة','الاختبار','الدرجة','التاريخ'],rows)}`}
 async function saveContinuous(){const sid=$('#contStudent').value,sub=$('#contSubject').value,cid=$('#contClass').value,score=num($('#contScore').value);if(!sid||!sub||!score){toast('تنبيه','أكملي الطالب والمادة والدرجة','red');return}const {error}=await client().from('continuous_assessments').insert({student_id:sid,subject_id:sub,class_id:cid,teacher_id:ME.id,component_type:$('#contType').value,score,notes:$('#contNotes').value,assessment_month:new Date().getMonth()+1});if(error)toast('خطأ',error.message,'red');else{toast('تم الحفظ','سيتم تحديث الحسابات تلقائياً','green');await load()}}
+
+function renderSchedules() {
+  const list = DATA.tasks || [];
+  const teachers = (DATA.users||[]).filter(u => u.role === 'teacher' || u.role === 'staff');
+
+  const rows = list.map(t => {
+    const pText = {term1_m1:'الشهر 1 (ف1)', term1_m2:'الشهر 2 (ف1)', term1_m3:'الشهر 3 (ف1)', midterm:'نصف السنة', term2_m1:'الشهر 1 (ف2)', term2_m2:'الشهر 2 (ف2)', final:'نهاية السنة', resit2:'الدور الثاني', resit3:'الدور الثالث'}[t.term_period] || t.term_period;
+    let stBadge = '<span class="badge gold">بانتظار الرفع</span>';
+    if (t.status === 'submitted') stBadge = '<span class="badge green">تم الرفع 📤</span>';
+    else if (t.status === 'late') stBadge = '<span class="badge red">متأخر! تجاوز المهلة ⚠️</span>';
+    else if (t.status === 'offline_verified') stBadge = `<span class="badge blue">إثبات: ${esc(t.delivery_method)} 📲</span>`;
+
+    const fileLink = t.question_file_url ? `<a class="btn small blue" href="/api/proxy/storage/v1/object/public/exam-questions/${t.question_file_url}" target="_blank">تحميل الأسئلة 📄</a>` : '—';
+    const proofAction = `<button class="btn small gold" onclick="AcademicPro.verifyOfflinePrompt('${t.id}')">إثبات تسليم خارجي 📲</button>`;
+
+    return `<tr><td><b>${esc(pText)}</b></td><td>${esc(t.class_name||'—')}</td><td>${esc(t.subject_name||'—')}</td><td>${esc(t.teacher_name||'—')}</td><td><b>${esc(t.exam_date||'—')}</b><br><small class="muted">${t.start_time||''}-${t.end_time||''}</small></td><td>${esc(t.required_topics||'لم تُحدد بعد')}</td><td>${esc(String(t.submission_deadline||'').slice(0,16).replace('T',' '))}</td><td>${stBadge}</td><td>${fileLink}</td><td>${proofAction}</td></tr>`;
+  });
+
+  const excelBatchHtml = `<div class="card" style="margin-bottom:20px;border-left:4px solid #0B6E4F"><div class="card-head"><h3>🚀 الجدولة السريعة عبر الإكسل (Excel Batch Import)</h3></div><div class="card-body" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">` +
+    `<button class="btn blue" onclick="AcademicPro.downloadExamTemplate()">📥 تحميل قالب إكسل الامتحانات (CSV Template)</button>` +
+    `<div style="flex:1;min-width:230px"><input type="file" id="examExcelFile" accept=".csv,.xlsx,.xls" class="input" style="padding:4px"></div>` +
+    `<button class="btn gold" onclick="AcademicPro.uploadExamExcel()">📤 رفع الإكسل وتوليد مواعيد الامتحانات والمهام فوراً</button>` +
+    `</div></div>`;
+
+  const formHtml = `<div class="card" style="margin-bottom:20px"><div class="card-head"><h3>إعداد موعد امتحان وتكليف المعلم بتسليم الأسئلة يدوياً (حصري بالإدارة)</h3></div><div class="card-body"><div class="academic-form">` +
+    `<div class="field span-3"><label>الفترة الامتحانية *</label><select id="schPeriod" class="select"><option value="term1_m1">الشهر الأول (الفصل الأول)</option><option value="term1_m2">الشهر الثاني (الفصل الأول)</option><option value="term1_m3">الشهر الثالث (الفصل الأول)</option><option value="midterm">امتحان نصف السنة</option><option value="term2_m1">الشهر الأول (الفصل الثاني)</option><option value="term2_m2">الشهر الثاني (الفصل الثاني)</option><option value="final">امتحان نهاية السنة</option><option value="resit2">امتحان الدور الثاني</option><option value="resit3">امتحان الدور الثالث</option></select></div>` +
+    `<div class="field span-3"><label>الصف *</label><select id="schClass" class="select" onchange="AcademicPro.onSchClassChange()"><option value="">اختر الصف</option>${DATA.classes.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('')}</select></div>` +
+    `<div class="field span-3"><label>المادة *</label><select id="schSubj" class="select"><option value="">اختر المادة</option></select></div>` +
+    `<div class="field span-3"><label>المعلم المكلف بوضع الأسئلة *</label><select id="schTeacher" class="select"><option value="">اختر المعلم</option>${teachers.map(u=>`<option value="${u.id}">${esc(u.name||u.email)}</option>`).join('')}</select></div>` +
+    `<div class="field span-3"><label>يوم وتاريخ الامتحان *</label><input id="schDate" type="date" class="input" value="${new Date().toISOString().slice(0,10)}"></div>` +
+    `<div class="field span-2"><label>وقت البداية *</label><input id="schStart" type="time" class="input" value="08:30"></div>` +
+    `<div class="field span-2"><label>وقت النهاية *</label><input id="schEnd" type="time" class="input" value="10:00"></div>` +
+    `<div class="field span-5"><label>موعد انتهاء صلاحية رفع الأسئلة (Deadline) *</label><input id="schDeadline" type="datetime-local" class="input" value="${new Date(Date.now()+86400000*2).toISOString().slice(0,16)}"></div>` +
+    `<div class="span-12"><button class="btn gold block" onclick="AcademicPro.saveExamScheduleTask()">حفظ الموعد وتكليف المعلم بالمهمة 🚀</button></div>` +
+    `</div></div></div>`;
+
+  $('#view-schedules').innerHTML = `<div class="page-head"><div><h1>جدول ومواعيد الامتحانات ومهام الأسئلة 🗓️</h1><p>تحديد الإدارة لأيام ومواعيد الامتحانات حصراً، وتكليف المعلمين برفع الأسئلة ومتابعة التسليم.</p></div></div>` +
+    `<div class="kpis">${kpi('إجمالي المهام', list.length, 'blue')}${kpi('تم التسليم 📤', list.filter(x=>x.status==='submitted'||x.status==='offline_verified').length, 'green')}${kpi('متأخر / تجاوز المهلة ⚠️', list.filter(x=>x.status==='late').length, 'red')}</div>` +
+    excelBatchHtml + formHtml + table(['الفترة', 'الصف', 'المادة', 'المعلم المكلف', 'موعد الامتحان', 'المادة المطلوبة', 'مهلة الرفع', 'الحالة', 'ملف الأسئلة', 'إجراء'], rows, 'لا توجد مواعيد امتحانات مسجلة');
+}
+
+function downloadExamTemplate() {
+  const headers = ['period', 'class_name', 'subject_name', 'teacher_email', 'exam_date', 'start_time', 'end_time', 'deadline'];
+  const sample1 = ['term1_m1', 'الأول الابتدائي', 'الرياضيات', 'slyman@ameen.iq', '2026-10-15', '08:30', '10:00', '2026-10-12 23:59'];
+  const sample2 = ['midterm', 'الثاني المتوسط', 'الفيزياء', 'teacher@ameen.iq', '2026-12-20', '09:00', '11:00', '2026-12-17 23:59'];
+  
+  const csvContent = '\uFEFF' + [headers.join(','), sample1.join(','), sample2.join(',')].join('\n');
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'exam_schedules_template.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('تم التحميل 📥', 'تم تحميل قالب جدول الامتحانات بنجاح', 'green');
+}
+
+async function uploadExamExcel() {
+  const fileEl = $('#examExcelFile');
+  const file = fileEl && fileEl.files && fileEl.files[0];
+  if (!file) { toast('تنبيه', 'اختاري ملف الإكسل (CSV) أولاً', 'red'); return; }
+
+  const reader = new FileReader();
+  reader.onload = async function(e) {
+    const text = e.target.result;
+    const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+    if (lines.length < 2) { toast('خطأ', 'الملف فارغ أو لا يحتوي على بيانات بعد السطر الأول', 'red'); return; }
+
+    const rows = [];
+    for (let i = 1; i < lines.length; i++) {
+      const cols = lines[i].split(',').map(c => c.trim().replace(/^["']|["']$/g, ''));
+      if (cols.length < 5) continue;
+      rows.push({
+        period: cols[0],
+        class_name: cols[1],
+        subject_name: cols[2],
+        teacher_email: cols[3],
+        exam_date: cols[4],
+        start_time: cols[5] || '08:30',
+        end_time: cols[6] || '10:00',
+        deadline: cols[7] || null
+      });
+    }
+
+    if (!rows.length) { toast('خطأ', 'لم يتم العثور على أسطر صالحة للاستيراد', 'red'); return; }
+
+    try {
+      toast('جاري الاستيراد...', 'تم إرسال ' + rows.length + ' موعد للتوليد');
+      const res = await client().rpc('academic_batch_import_exam_schedules', { p_rows: rows });
+      if (res.error) throw res.error;
+      const d = res.data || {};
+      if (d.ok === false) throw new Error(d.message || 'فشل الاستيراد');
+      toast('تم الاستيراد بنجاح 🚀', d.message, 'green');
+      await load();
+    } catch(err) {
+      toast('خطأ في الاستيراد', err.message || String(err), 'red');
+    }
+  };
+  reader.readAsText(file, 'utf-8');
+}
+
+function onSchClassChange() {
+  const cid = $('#schClass')?.value;
+  const list = subjectsForClassId(cid);
+  if ($('#schSubj')) $('#schSubj').innerHTML = '<option value="">اختر المادة</option>' + list.map(s => `<option value="${s.id}">${esc(s.name)}</option>`).join('');
+}
+
+async function saveExamScheduleTask() {
+  const period = $('#schPeriod')?.value;
+  const cid = $('#schClass')?.value;
+  const sid = $('#schSubj')?.value;
+  const tid = $('#schTeacher')?.value;
+  const date = $('#schDate')?.value;
+  const start = $('#schStart')?.value;
+  const end = $('#schEnd')?.value;
+  const deadline = $('#schDeadline')?.value;
+
+  if (!cid || !sid || !tid || !date) {
+    toast('تنبيه', 'أكملي اختيار الصف والمادة والمعلم وتاريخ الامتحان', 'red');
+    return;
+  }
+
+  try {
+    const res = await client().rpc('academic_create_exam_schedule_with_task', {
+      p_period: period,
+      p_class_id: cid,
+      p_subject_id: sid,
+      p_teacher_id: tid,
+      p_exam_date: date,
+      p_start_time: start || '08:30',
+      p_end_time: end || '10:00',
+      p_deadline: deadline ? new Date(deadline).toISOString() : null
+    });
+    if (res.error) throw res.error;
+    const d = res.data || {};
+    if (d.ok === false) throw new Error(d.message || 'تعذر الحفظ');
+    toast('تم بنجاح', d.message, 'green');
+    await load();
+  } catch(e) {
+    toast('خطأ في الحفظ', e.message || String(e), 'red');
+  }
+}
+
+async function verifyOfflinePrompt(taskId) {
+  const method = prompt('أدخلي طريقة التسليم الخارجي أو اليدوي (manual / whatsapp / eitaa / bale):', 'manual');
+  if (!method) return;
+  const note = prompt('ملاحظة إثبات التسليم (مثال: تم الاستلام ورقي عند انقطاع الإنترنت):', 'تم الاستلام يدوياً ورقي');
+  try {
+    const res = await client().rpc('submit_exam_task_questions', {
+      p_task_id: taskId,
+      p_file_url: null,
+      p_delivery_method: method,
+      p_proof_note: note || null
+    });
+    if (res.error) throw res.error;
+    toast('تم التوثيق', 'تم توثيق التسليم الخارجي بنجاح 📲', 'green');
+    await load();
+  } catch(e) {
+    toast('خطأ', e.message || String(e), 'red');
+  }
+}
 function renderLocks() {
   const list = DATA.locks || [];
   const lockedCount = list.filter(x => x.is_locked).length;
@@ -143,5 +306,5 @@ function settingsView(){if(!isAdmin()){$('#view-settings').innerHTML='<div class
 async function saveWeight(stage){const cw=num($('#cw_'+stage).value),ew=num($('#ew_'+stage).value);if(cw+ew!==100&&!confirm('مجموع الأوزان ليس 100. هل تريدين الحفظ؟'))return;const {error}=await client().from('grade_weights').upsert({academic_year:'2026-2027',stage_type:stage,continuous_weight:cw,monthly_exam_weight:ew,updated_by:ME.id},{onConflict:'academic_year,stage_type'});if(error)toast('خطأ',error.message,'red');else{toast('تم الحفظ','تم تحديث الأوزان','green');await load()}}
 function printActive(){window.print()}function bind(){ $$('.nav button[data-view]').forEach(b=>b.addEventListener('click',()=>render(b.dataset.view)));$('#mobileMenuBtn')?.addEventListener('click',()=>$('#sidebar').classList.toggle('open'));$('#logoutBtn').addEventListener('click',async()=>{await client().auth.signOut({scope:'local'});location.href='index.html'});$('#refreshBtn').addEventListener('click',load)}
 async function init(){client();if(!await ensure())return;bind();await load()}
-window.AcademicPro={init,render,fillStudents,fillSubjects,onClassChange,saveContinuous,saveExamScore,approveSubject,approveGeneral,saveWeight,printActive};
+window.AcademicPro={init,render,fillStudents,fillSubjects,onClassChange,saveContinuous,saveExamScore,approveSubject,approveGeneral,saveWeight,printActive,renderLocks,toggleGradeLock,saveNewGradeLock,onLockStageChange,toggleAllLockClasses,toggleExemptionPublish,renderSchedules,downloadExamTemplate,uploadExamExcel,onSchClassChange,saveExamScheduleTask,verifyOfflinePrompt};
 }());
