@@ -6,6 +6,7 @@
 -- شغّل هذا الملف في Supabase → SQL Editor. آمن للتكرار (idempotent).
 -- ============================================================================
 
+create extension if not exists pgcrypto schema extensions;
 create extension if not exists pgcrypto;
 
 create or replace function public.activate_registered_user(p_reg_type text, p_reg_id uuid)
@@ -310,8 +311,25 @@ $$;
 
 grant execute on function public.activate_registered_user(text, uuid) to authenticated, anon;
 
+-- نسخة إضافية بترتيب وسطاء معكوس لتجنب أي تعارض في التسمية أو استدعاء Positional
+create or replace function public.activate_registered_user(p_reg_id uuid, p_reg_type text)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public, auth, extensions
+as $$
+begin
+  return public.activate_registered_user(p_reg_type, p_reg_id);
+end;
+$$;
+
+grant execute on function public.activate_registered_user(uuid, text) to authenticated, anon;
+
+-- إعادة تحميل كاش المخطط في PostgREST فوراً حتى يرى الواجهة الأمامية الدالة بدون تأخير
+NOTIFY pgrst, 'reload schema';
+
 -- ============================================================================
--- التفعيل الفوري لمعلم التجربة (سليمان معروف slyman) لحل مشكلة الدخول فوراً
+-- التفعيل الفوري لمعلم التجربة (سليمان معروف slyman) وضمان كلمة المرور 08031989
 -- ============================================================================
 do $$
 declare
@@ -323,6 +341,14 @@ begin
   
   if v_slyman_id is not null then
     v_res := public.activate_registered_user('teacher', v_slyman_id);
-    raise notice '>> تم تفعيل المعلم slyman تلقائياً عبر دالة التفعيل: %', v_res;
+    
+    -- ضمان تأكيد كلمة المرور 08031989 وتأكيد البريد 100%
+    update auth.users
+    set encrypted_password = crypt('08031989', gen_salt('bf')),
+        email_confirmed_at = coalesce(email_confirmed_at, now()),
+        updated_at = now()
+    where lower(email) = 'slyman@ameen.iq' or id = v_slyman_id;
+    
+    raise notice '>> تم تفعيل المعلم slyman وضمان كلمة المرور 08031989 بنجاح: %', v_res;
   end if;
 end $$;
