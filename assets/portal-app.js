@@ -75,7 +75,7 @@ window.getIcon = getIcon;
 window.renderLoading = function(containerId, message) {
   var c = document.getElementById(containerId) || document.getElementById('main-content');
   if (!c) return;
-  var starHTML = window.AminStar ? window.AminStar.createStar({variant:'spinning', size:48, color:'var(--primary)'}) : '<div style="font-size:48px;">⏳</div>';
+  var starHTML = window.AminStar ? window.AminStar.createStar({variant:'spinning', size:48, color:'var(--primary)'}) : '<span class="amin-3d-ico-auto" data-size="48" data-emoji="⏳" style="display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;">⏳</span>';
   c.innerHTML = '<div class="amin-loading-state">' + starHTML + '<div class="amin-loading-text">' + esc(message || 'جاري التحميل...') + '</div></div>';
 };
 

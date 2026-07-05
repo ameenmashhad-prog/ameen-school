@@ -174,7 +174,7 @@ var SmartAlerts = {
   renderEmptyBar: function() {
     var bar = document.createElement('div');
     bar.id = 'smartAlertsBar';
-    bar.innerHTML = '<style>' + this._buildCSS() + '</style><div class="alert-toggle" onclick="SmartAlerts.toggle()" style="background:linear-gradient(135deg,#10b981,#059669);"><span style="font-size:20px;">✅</span><span>كل شيء طبيعي</span></div><div class="alerts-panel"><div class="alert-header"><b style="color:#1f2937;">✅ لا توجد تنبيهات</b><button class="alert-close" onclick="SmartAlerts.toggle()">×</button></div><div style="padding:30px;text-align:center;color:#666;"><div style="font-size:48px;">🎉</div><p style="margin-top:12px;">كل شيء على ما يرام!</p></div></div>';
+    bar.innerHTML = '<style>' + this._buildCSS() + '</style><div class="alert-toggle" onclick="SmartAlerts.toggle()" style="background:linear-gradient(135deg,#10b981,#059669);"><span class="amin-3d-ico-auto" data-size="20" data-emoji="✅" style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;">✅</span><span>كل شيء طبيعي</span></div><div class="alerts-panel"><div class="alert-header"><b style="color:#1f2937;">✅ لا توجد تنبيهات</b><button class="alert-close" onclick="SmartAlerts.toggle()">×</button></div><div style="padding:30px;text-align:center;color:#666;"><span class="amin-3d-ico-auto" data-size="48" data-emoji="🎉" style="display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;">🎉</span><p style="margin-top:12px;">كل شيء على ما يرام!</p></div></div>';
     document.body.appendChild(bar);
   },
 
@@ -184,7 +184,7 @@ var SmartAlerts = {
     var itemsHTML = this.alerts.map(function(a) {
       return '<div class="alert-item ' + a.type + '" onclick="' + (a.link ? "location.href='" + a.link + "'" : '') + '"><div class="alert-title">' + a.icon + ' ' + self._esc(a.title) + '</div><div class="alert-msg">' + self._esc(a.msg) + '</div></div>';
     }).join('');
-    return '<style>' + css + '</style><div class="alerts-panel"><div class="alert-header"><b style="color:#1f2937;">🔔 التنبيهات (' + this.alerts.length + ')</b><button class="alert-close" onclick="SmartAlerts.toggle()">×</button></div>' + itemsHTML + '</div><div class="alert-toggle" onclick="SmartAlerts.toggle()"><span style="font-size:20px;">🔔</span><span>التنبيهات</span><span class="alert-count">' + this.alerts.length + '</span></div>';
+    return '<style>' + css + '</style><div class="alerts-panel"><div class="alert-header"><b style="color:#1f2937;">🔔 التنبيهات (' + this.alerts.length + ')</b><button class="alert-close" onclick="SmartAlerts.toggle()">×</button></div>' + itemsHTML + '</div><div class="alert-toggle" onclick="SmartAlerts.toggle()"><span class="amin-3d-ico-auto" data-size="20" data-emoji="🔔" style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;">🔔</span><span>التنبيهات</span><span class="alert-count">' + this.alerts.length + '</span></div>';
   },
 
   _buildCSS: function() {

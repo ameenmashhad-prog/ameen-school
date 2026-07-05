@@ -339,10 +339,10 @@
     // إجراءات سريعة
     html += '<h3 style="margin-bottom:12px;">⚡ إجراءات سريعة</h3>';
     html += '<div class="cards" style="margin-bottom:24px;">';
-    html += '<div onclick="CounselorPortal.showView(\'students\')" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">👥</div><div style="font-weight:bold;margin-top:8px;">الطلاب المتابعون</div></div>';
-    html += '<div onclick="CounselorPortal.showView(\'behavior\')" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">🌟</div><div style="font-weight:bold;margin-top:8px;">سجل السلوك</div></div>';
-    html += '<div onclick="CounselorPortal.showView(\'attendance\')" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">📋</div><div style="font-weight:bold;margin-top:8px;">متابعة الغياب</div></div>';
-    html += '<div onclick="CounselorPortal.showView(\'reports\')" class="card" style="cursor:pointer;text-align:center;padding:20px"><div style="font-size:36px;">📈</div><div style="font-weight:bold;margin-top:8px;">التقارير</div></div>';
+    html += '<div onclick="CounselorPortal.showView(\'students\')" class="card" style="cursor:pointer;text-align:center;padding:20px"><span class="amin-3d-ico-auto" data-size="36" data-emoji="👥" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;">👥</span><div style="font-weight:bold;margin-top:8px;">الطلاب المتابعون</div></div>';
+    html += '<div onclick="CounselorPortal.showView(\'behavior\')" class="card" style="cursor:pointer;text-align:center;padding:20px"><span class="amin-3d-ico-auto" data-size="36" data-emoji="🌟" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;">🌟</span><div style="font-weight:bold;margin-top:8px;">سجل السلوك</div></div>';
+    html += '<div onclick="CounselorPortal.showView(\'attendance\')" class="card" style="cursor:pointer;text-align:center;padding:20px"><span class="amin-3d-ico-auto" data-size="36" data-emoji="📋" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;">📋</span><div style="font-weight:bold;margin-top:8px;">متابعة الغياب</div></div>';
+    html += '<div onclick="CounselorPortal.showView(\'reports\')" class="card" style="cursor:pointer;text-align:center;padding:20px"><span class="amin-3d-ico-auto" data-size="36" data-emoji="📈" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;">📈</span><div style="font-weight:bold;margin-top:8px;">التقارير</div></div>';
     html += '</div>';
 
     // الطلاب الذين يحتاجون متابعة عاجلة
@@ -524,7 +524,7 @@
     const cases = stats.needAttentionList;
     
     if(cases.length === 0) {
-      html += '<div class="empty" style="text-align:center;padding:60px;"><div style="font-size:64px;">😊</div><h3 style="margin-top:16px;">لا توجد حالات تحتاج متابعة!</h3><p style="color:#666;margin-top:8px;">كل الطلاب في حالة جيدة.</p></div>';
+      html += '<div class="empty" style="text-align:center;padding:60px;"><span class="amin-3d-ico-auto" data-size="64" data-emoji="😊" style="display:inline-flex;align-items:center;justify-content:center;width:64px;height:64px;">😊</span><h3 style="margin-top:16px;">لا توجد حالات تحتاج متابعة!</h3><p style="color:#666;margin-top:8px;">كل الطلاب في حالة جيدة.</p></div>';
     } else {
       html += '<div class="kpis" style="margin-bottom:24px;">';
       html += '<div class="kpi red"><small>حالات مفتوحة</small><b>' + cases.length + '</b></div>';
@@ -574,7 +574,7 @@
     let html = '<div class="page-head"><div><h1>📅 الجلسات الإرشادية</h1><p>إدارة المواعيد والجلسات</p></div></div>';
     
     html += '<div class="empty" style="text-align:center;padding:60px;background:#E6F4EF;border-radius:12px;">';
-    html += '<div style="font-size:64px;">📅</div>';
+    html += '<span class="amin-3d-ico-auto" data-size="64" data-emoji="📅" style="display:inline-flex;align-items:center;justify-content:center;width:64px;height:64px;">📅</span>';
     html += '<h3 style="margin-top:16px;">نظام الجلسات قيد التطوير</h3>';
     html += '<p style="color:#666;margin-top:8px;">سيتم إضافة:</p>';
     html += '<ul style="text-align:right;display:inline-block;padding-right:20px;margin-top:12px;color:#444;">';
@@ -619,7 +619,7 @@
     html += '</div></div>';
     
     html += '<div class="card" style="cursor:pointer" onclick="location.href=\'counseling-report.html\'"><div class="card-body" style="text-align:center;">';
-    html += '<div style="font-size:48px;">📊</div>';
+    html += '<span class="amin-3d-ico-auto" data-size="48" data-emoji="📊" style="display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;">📊</span>';
     html += '<h3 style="margin-top:12px;">تقارير الإرشاد المتقدمة</h3>';
     html += '<p style="opacity:0.95;">فتح صفحة التقارير الكاملة</p>';
     html += '</div></div>';
