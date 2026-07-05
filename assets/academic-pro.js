@@ -9,7 +9,7 @@ function client(){if(sb)return sb;sb=supabase.createClient(cfg().supabaseUrl,cfg
 async function q(table,opts={}){try{let query=client().from(table).select(opts.columns||'*');(opts.filters||[]).forEach(f=>query=query[f.op](f.col,f.val));if(opts.order)query=query.order(opts.order,{ascending:opts.ascending!==false});if(opts.limit)query=query.limit(opts.limit);const {data,error}=await query;if(error){console.warn(table,error);return[]}return data||[]}catch(e){console.warn(table,e);return[]}}
 function isAdmin(){return ME&&(ME.role==='admin'||ME.is_super_admin||['academic','academic_admin','scientific','supervisor'].includes(ME.role))}function isTeacher(){return ME&&ME.role==='teacher'}
 async function ensure(){const {data:{session}}=await client().auth.getSession();if(!session){location.href='index.html';return false}const {data:u}=await client().from('users').select('*').eq('id',session.user.id).maybeSingle();ME=u;if(!u){location.href='index.html';return false}if(!(isAdmin()||isTeacher())){document.body.innerHTML='<main class="login-page"><section class="login-card"><h1>غير مصرح</h1><p>نظام الدرجات متاح للإدارة والمعلمين فقط.</p></section></main>';return false}$('#profileName').textContent=u.name||u.email;$('#profileRole').textContent=u.role;return true}
-async function load(){const [classes,students,subjects,periods,weights,continuous,exams,scores,results,summary,decisions]=await Promise.all([q('classes',{order:'name'}),q('students',{order:'name'}),q('subjects',{order:'name'}),q('academic_periods'),q('grade_weights'),q('continuous_assessments'),q('exams'),q('exam_scores'),q('v_academic_subject_results'),q('v_academic_student_summary'),q('academic_exemption_decisions',{order:'created_at',ascending:false})]);DATA={classes,students,subjects,periods,weights,continuous,exams,scores,results,summary,decisions,classMap:new Map(classes.map(x=>[String(x.id),x])),studentMap:new Map(students.map(x=>[String(x.id),x])),subjectMap:new Map(subjects.map(x=>[String(x.id),x]))};render(ACTIVE)}
+async function load(){const [classes,students,subjects,periods,weights,continuous,exams,scores,results,summary,decisions,locks]=await Promise.all([q('classes',{order:'name'}),q('students',{order:'name'}),q('subjects',{order:'name'}),q('academic_periods'),q('grade_weights'),q('continuous_assessments'),q('exams'),q('exam_scores'),q('v_academic_subject_results'),q('v_academic_student_summary'),q('academic_exemption_decisions',{order:'created_at',ascending:false}),q('academic_grade_locks',{order:'period_name'})]);DATA={classes,students,subjects,periods,weights,continuous,exams,scores,results,summary,decisions,locks,classMap:new Map(classes.map(x=>[String(x.id),x])),studentMap:new Map(students.map(x=>[String(x.id),x])),subjectMap:new Map(subjects.map(x=>[String(x.id),x]))};render(ACTIVE)}
 function fullName(s){return s?[s.name,s.father_name,s.last_name].filter(Boolean).join(' ')||s.name:'—'}
 function normAr(v){return String(v||'').toLowerCase().replace(/[إأآا]/g,'ا').replace(/[ىي]/g,'ي').replace(/ة/g,'ه').replace(/ـ/g,'').replace(/\s+/g,'')}
 function classStage(cls){const n=normAr(cls&&cls.name);if(n.includes('ابتدائي'))return'primary';if(n.includes('متوسط'))return'middle';if(n.includes('اعدادي'))return'preparatory';return'primary'}
@@ -17,7 +17,7 @@ function gradeNo(cls){const n=normAr(cls&&cls.name);const arr=[['الاول',1],
 function subjectAllowedForClass(sub,cls){const s=normAr(sub&&sub.name),st=classStage(cls),g=gradeNo(cls);if(s.includes('اسلام')||s.includes('قران')||s.includes('عربي')||s.includes('انجليزي')||s.includes('انكليزي')||s.includes('english')||s.includes('رياضيات'))return true;if(st==='primary'){if(s.includes('علوم')||s.includes('فني')||s.includes('فن')||s.includes('بدني')||s.includes('رياضه'))return true;if(g>=4&&g<=6&&s.includes('اجتماع'))return true;return false}if(st==='middle'){return s.includes('فيزياء')||s.includes('كيمياء')||s.includes('احياء')||s.includes('اجتماع')||s.includes('فني')||s.includes('فن')||s.includes('بدني')||s.includes('رياضه')}if(st==='preparatory'){return s.includes('فيزياء')||s.includes('كيمياء')||s.includes('احياء')||s.includes('فني')||s.includes('فن')||s.includes('بدني')||s.includes('رياضه')}return true}
 function subjectsForClassId(classId){const cls=DATA.classMap.get(String(classId));return cls?DATA.subjects.filter(s=>subjectAllowedForClass(s,cls)):DATA.subjects}
 function className(id){return (DATA.classMap.get(String(id))||{}).name||'—'}function subjectName(id){return (DATA.subjectMap.get(String(id))||{}).name||'—'}function table(h,rows,empty='لا توجد بيانات'){const body=Array.isArray(rows)?rows.join(''):String(rows||'');return body.trim()?`<div class="table-wrap"><table><thead><tr>${h.map(x=>`<th>${esc(x)}</th>`).join('')}</tr></thead><tbody>${body}</tbody></table></div>`:`<div class="empty">${esc(empty)}</div>`}function kpi(l,v,c='gold'){return`<div class="kpi ${c}"><small>${esc(l)}</small><b>${esc(v)}</b></div>`}
-function render(id){ACTIVE=id;$$('.view').forEach(v=>v.classList.toggle('active',v.id==='view-'+id));$$('.nav button[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===id));if(!DATA)return;({overview:overview,entry:entry,continuous:continuousView,exams:examsView,exemptions:exemptionsView,reports:reports,settings:settingsView}[id]||overview)()}
+function render(id){ACTIVE=id;$$('.view').forEach(v=>v.classList.toggle('active',v.id==='view-'+id));$$('.nav button[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===id));if(!DATA)return;({overview:overview,entry:entry,continuous:continuousView,exams:examsView,exemptions:exemptionsView,reports:reports,settings:settingsView,locks:renderLocks}[id]||overview)()}
 function overview(){const total=DATA.students.length,subj=DATA.results.filter(r=>r.subject_exemption_status==='إعفاء مادة').length,general=DATA.summary.filter(s=>s.general_exemption_status==='إعفاء عام').length,cand=DATA.summary.filter(s=>s.general_exemption_status==='مرشح للإعفاء').length,avg=DATA.summary.length?pct(DATA.summary.reduce((a,b)=>a+num(b.overall_average),0)/DATA.summary.length):0;const top=DATA.summary.slice().sort((a,b)=>num(b.overall_average)-num(a.overall_average)).slice(0,10).map((s,i)=>`<tr><td><span class="rank">${i+1}</span></td><td>${esc(s.student_name)}</td><td>${esc(s.class_name)}</td><td>${pct(s.overall_average)}%</td><td><span class="badge ${s.general_exemption_status==='إعفاء عام'?'status-exempt':s.general_exemption_status==='مرشح للإعفاء'?'status-candidate':'status-none'}">${esc(s.general_exemption_status)}</span></td></tr>`);$('#view-overview').innerHTML=`<div class="page-head"><div><h1>لوحة المتابعة الأكاديمية</h1><p>درجات، تقييم مستمر، اختبارات، إعفاءات، وترتيب الطلاب والصفوف.</p></div></div><div class="kpis">${kpi('الطلاب',total,'gold')}${kpi('إعفاء مادة',subj,'green')}${kpi('إعفاء عام',general,'green')}${kpi('مرشحون',cand,'blue')}</div><div class="cards"><div class="card"><div class="card-head"><h3>أوائل الطلاب</h3></div><div class="card-body">${table(['#','الطالب','الصف','المتوسط','الحالة'],top)}</div></div><div class="card"><div class="card-head"><h3>مؤشرات عامة</h3></div><div class="card-body"><div class="list"><div class="item"><b>المتوسط العام</b><span class="badge gold">${avg}%</span></div><div class="item"><b>عدد المواد المقيمة</b><span class="badge blue">${DATA.results.length}</span></div><div class="item"><b>قرارات إدارية</b><span class="badge green">${DATA.decisions.length}</span></div></div></div></div></div>`}
 function selectors(prefix){return`<div class="academic-form no-print"><div class="field span-3"><label>الصف</label><select id="${prefix}Class" class="select" onchange="AcademicPro.onClassChange('${prefix}')"><option value="">اختر الصف</option>${DATA.classes.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('')}</select></div><div class="field span-3"><label>الطالب</label><select id="${prefix}Student" class="select"><option value="">اختر الطالب</option></select></div><div class="field span-3"><label>المادة المناسبة للصف</label><select id="${prefix}Subject" class="select"><option value="">اختاري الصف أولاً</option></select></div></div>`}
 function fillStudents(prefix){const cid=$('#'+prefix+'Class').value;$('#'+prefix+'Student').innerHTML='<option value="">اختر الطالب</option>'+DATA.students.filter(s=>!cid||String(s.class_id)===String(cid)).map(s=>`<option value="${s.id}">${esc(fullName(s))}</option>`).join('')}
@@ -27,7 +27,81 @@ function entry(){if(!isTeacher()&&!isAdmin())return;$('#view-entry').innerHTML=`
 function continuousView(){const rows=DATA.continuous.map(r=>`<tr><td>${esc(fullName(DATA.studentMap.get(String(r.student_id))))}</td><td>${esc(subjectName(r.subject_id))}</td><td>${esc(r.component_type)}</td><td>${r.score}</td><td>${esc(r.assessment_date)}</td></tr>`);$('#view-continuous').innerHTML=`<div class="page-head"><div><h1>سجل التقييم المستمر</h1></div></div>${table(['الطالب','المادة','النوع','الدرجة','التاريخ'],rows)}`}
 function examsView(){const rows=DATA.scores.map(sc=>{const ex=DATA.exams.find(e=>e.id===sc.exam_id);return`<tr><td>${esc(fullName(DATA.studentMap.get(String(sc.student_id))))}</td><td>${esc(ex?subjectName(ex.subject_id):'—')}</td><td>${esc(ex&&ex.exam_name||'—')}</td><td>${sc.absent?'غائب':sc.score}</td><td>${esc(ex&&ex.exam_date||'—')}</td></tr>`});$('#view-exams').innerHTML=`<div class="page-head"><div><h1>الاختبارات الشهرية</h1></div></div>${table(['الطالب','المادة','الاختبار','الدرجة','التاريخ'],rows)}`}
 async function saveContinuous(){const sid=$('#contStudent').value,sub=$('#contSubject').value,cid=$('#contClass').value,score=num($('#contScore').value);if(!sid||!sub||!score){toast('تنبيه','أكملي الطالب والمادة والدرجة','red');return}const {error}=await client().from('continuous_assessments').insert({student_id:sid,subject_id:sub,class_id:cid,teacher_id:ME.id,component_type:$('#contType').value,score,notes:$('#contNotes').value,assessment_month:new Date().getMonth()+1});if(error)toast('خطأ',error.message,'red');else{toast('تم الحفظ','سيتم تحديث الحسابات تلقائياً','green');await load()}}
-async function saveExamScore(){const sid=$('#examStudent').value,sub=$('#examSubject').value,cid=$('#examClass').value,score=num($('#examScore').value);if(!sid||!sub){toast('تنبيه','أكملي الطالب والمادة','red');return}let {data:exam,error:e1}=await client().from('exams').insert({class_id:cid,subject_id:sub,teacher_id:ME.id,exam_name:$('#examName').value,exam_order:num($('#examOrder').value),exam_date:$('#examDate').value}).select().single();if(e1){toast('خطأ',e1.message,'red');return}const {error}=await client().from('exam_scores').upsert({exam_id:exam.id,student_id:sid,score,entered_by:ME.id},{onConflict:'exam_id,student_id'});if(error)toast('خطأ',error.message,'red');else{toast('تم الحفظ','تم تحديث نتيجة الاختبار','green');await load()}}
+async 
+function renderLocks() {
+  const list = DATA.locks || [];
+  const lockedCount = list.filter(x => x.is_locked).length;
+  const openCount = list.filter(x => !x.is_locked).length;
+
+  const rows = list.map(l => {
+    const pText = {m1:'الشهر الأول', m2:'الشهر الثاني', midterm:'امتحان نصف السنة', m3:'الشهر الثالث', m4:'الشهر الرابع', final:'امتحان نهاية السنة'}[l.period_name] || l.period_name;
+    const stText = {all:'كل المراحل', primary:'الابتدائية', middle:'المتوسطة', preparatory:'الإعدادية'}[l.stage_type] || l.stage_type;
+    const clsText = l.class_id ? className(l.class_id) : 'كل الصفوف';
+    const badge = l.is_locked ? '<span class="badge red">🔒 مقفل</span>' : '<span class="badge green">🔓 مفتوح</span>';
+    const actionBtn = l.is_locked
+      ? `<button class="btn small green" onclick="AcademicPro.toggleGradeLock('${l.period_name}', '${l.stage_type}', ${l.class_id ? `'${l.class_id}'` : 'null'}, false)">فتح الرصد 🔓</button>`
+      : `<button class="btn small red" onclick="AcademicPro.toggleGradeLock('${l.period_name}', '${l.stage_type}', ${l.class_id ? `'${l.class_id}'` : 'null'}, true)">قفل الرصد 🔒</button>`;
+    return `<tr><td><b>${esc(pText)}</b></td><td><span class="badge blue">${esc(stText)}</span></td><td>${esc(clsText)}</td><td>${badge}</td><td>${esc(l.notes||'—')}</td><td>${actionBtn}</td></tr>`;
+  });
+
+  const formHtml = `<div class="card" style="margin-bottom:20px"><div class="card-head"><h3>تعديل قفل فترة دراسية</h3></div><div class="card-body"><div class="academic-form">` +
+    `<div class="field span-3"><label>الفترة الدراسية *</label><select id="lockPeriod" class="select"><option value="m1">الشهر الأول</option><option value="m2">الشهر الثاني</option><option value="midterm">امتحان نصف السنة</option><option value="m3">الشهر الثالث</option><option value="m4">الشهر الرابع</option><option value="final">امتحان نهاية السنة</option></select></div>` +
+    `<div class="field span-3"><label>المرحلة المستهدفة *</label><select id="lockStage" class="select"><option value="all">كل المراحل</option><option value="primary">المرحلة الابتدائية</option><option value="middle">المرحلة المتوسطة</option><option value="preparatory">المرحلة الإعدادية</option></select></div>` +
+    `<div class="field span-3"><label>صف محدد (اختياري)</label><select id="lockClass" class="select"><option value="">كل الصفوف بالمرحلة</option>${DATA.classes.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('')}</select></div>` +
+    `<div class="field span-3"><label>حالة القفل *</label><select id="lockState" class="select"><option value="true">🔒 قفل وإغلاق الرصد</option><option value="false">🔓 فتح الرصد للتعديل</option></select></div>` +
+    `<div class="field span-9"><label>ملاحظات إدارية</label><input id="lockNotes" class="input" placeholder="مثال: تم إغلاق رصد درجات الشهر الأول بعد انتهاء المهلة الرسمية"></div>` +
+    `<div class="field span-3"><label>&nbsp;</label><button class="btn gold block" onclick="AcademicPro.saveNewGradeLock()">حفظ حالة القفل</button></div>` +
+    `</div></div></div>`;
+
+  $('#view-locks').innerHTML = `<div class="page-head"><div><h1>قفل الدرجات والصلاحيات 🔒</h1><p>التحكم في إغلاق وفتح رصد وتعديل الدرجات للمعلمين حسب الفترات الدراسية والمراحل.</p></div></div>` +
+    `<div class="kpis">${kpi('إجمالي الفترات', list.length, 'blue')}${kpi('فترات مقفلة 🔒', lockedCount, 'red')}${kpi('فترات مفتوحة 🔓', openCount, 'green')}</div>` +
+    formHtml + table(['الفترة الدراسية', 'المرحلة', 'الصف', 'حالة القفل', 'ملاحظات', 'إجراء'], rows, 'لا توجد فترات مقفلة حالياً (الرصد مفتوح لجميع الفترات)');
+}
+
+async function toggleGradeLock(period, stage, classId, lockState) {
+  try {
+    const res = await client().rpc('academic_set_grade_lock', {
+      p_period: period,
+      p_stage: stage || 'all',
+      p_class_id: classId || null,
+      p_is_locked: lockState,
+      p_notes: null
+    });
+    if (res.error) throw res.error;
+    const d = res.data || {};
+    if (d.ok === false) throw new Error(d.message || 'تعذر التحديث');
+    toast('تم التحديث بنجاح', d.message, lockState ? 'red' : 'green');
+    await load();
+  } catch(e) {
+    toast('خطأ في التحديث', e.message || String(e), 'red');
+  }
+}
+
+async function saveNewGradeLock() {
+  const period = $('#lockPeriod')?.value;
+  const stage = $('#lockStage')?.value || 'all';
+  const cid = $('#lockClass')?.value || null;
+  const isLocked = ($('#lockState')?.value === 'true');
+  const notes = $('#lockNotes')?.value || null;
+
+  try {
+    const res = await client().rpc('academic_set_grade_lock', {
+      p_period: period,
+      p_stage: stage,
+      p_class_id: cid,
+      p_is_locked: isLocked,
+      p_notes: notes
+    });
+    if (res.error) throw res.error;
+    const d = res.data || {};
+    if (d.ok === false) throw new Error(d.message || 'تعذر حفظ القفل');
+    toast('تم الحفظ بنجاح', d.message, 'green');
+    await load();
+  } catch(e) {
+    toast('خطأ في الحفظ', e.message || String(e), 'red');
+  }
+}
+function saveExamScore(){const sid=$('#examStudent').value,sub=$('#examSubject').value,cid=$('#examClass').value,score=num($('#examScore').value);if(!sid||!sub){toast('تنبيه','أكملي الطالب والمادة','red');return}let {data:exam,error:e1}=await client().from('exams').insert({class_id:cid,subject_id:sub,teacher_id:ME.id,exam_name:$('#examName').value,exam_order:num($('#examOrder').value),exam_date:$('#examDate').value}).select().single();if(e1){toast('خطأ',e1.message,'red');return}const {error}=await client().from('exam_scores').upsert({exam_id:exam.id,student_id:sid,score,entered_by:ME.id},{onConflict:'exam_id,student_id'});if(error)toast('خطأ',error.message,'red');else{toast('تم الحفظ','تم تحديث نتيجة الاختبار','green');await load()}}
 function exemptionsView(){const rows=DATA.results.map(r=>`<tr><td>${esc(r.student_name)}</td><td>${esc(r.class_name)}</td><td>${esc(r.subject_name)}</td><td>${pct(r.final_average)}%</td><td>${pct(r.attendance_rate)}%</td><td><span class="badge ${r.subject_exemption_status==='إعفاء مادة'?'status-exempt':r.subject_exemption_status==='مرشح للإعفاء'?'status-candidate':'status-none'}">${esc(r.subject_exemption_status)}</span></td><td>${r.points_to_subject_exemption?`يحتاج ${pct(r.points_to_subject_exemption)} درجة`:''}</td><td>${isAdmin()?`<button class="btn green" onclick="AcademicPro.approveSubject('${r.student_id}','${r.subject_id}',${r.final_average})">اعتماد</button>`:''}</td></tr>`);const gen=DATA.summary.map(s=>`<tr><td>${esc(s.student_name)}</td><td>${esc(s.class_name)}</td><td>${pct(s.overall_average)}%</td><td>${s.subjects_below_85}</td><td><span class="badge ${s.general_exemption_status==='إعفاء عام'?'status-exempt':s.general_exemption_status==='مرشح للإعفاء'?'status-candidate':'status-none'}">${esc(s.general_exemption_status)}</span></td><td>${isAdmin()?`<button class="btn green" onclick="AcademicPro.approveGeneral('${s.student_id}',${s.overall_average})">اعتماد عام</button>`:''}</td></tr>`);$('#view-exemptions').innerHTML=`<div class="page-head"><div><h1>الإعفاءات والمرشحون</h1><p>الإعفاء لا يطبق على الابتدائي. المرشحون يحتاجون مراجعة الإدارة.</p></div></div><div class="card"><div class="card-head"><h3>إعفاء مادة</h3></div><div class="card-body">${table(['الطالب','الصف','المادة','النهائي','الحضور','الحالة','الدعم',''],rows)}</div></div><div class="card"><div class="card-head"><h3>الإعفاء العام</h3></div><div class="card-body">${table(['الطالب','الصف','المتوسط','مواد أقل من 85','الحالة',''],gen)}</div></div>`}
 async function approveSubject(student,subject,avg){await client().from('academic_exemption_decisions').insert({student_id:student,subject_id:subject,exemption_kind:'subject',status_ar:'إعفاء مادة',calculated_average:avg,approved_by:ME.id,approved_at:new Date().toISOString()});toast('تم الاعتماد','تم اعتماد إعفاء المادة','green');await load()}
 async function approveGeneral(student,avg){await client().from('academic_exemption_decisions').insert({student_id:student,exemption_kind:'general',status_ar:'إعفاء عام',calculated_average:avg,approved_by:ME.id,approved_at:new Date().toISOString()});toast('تم الاعتماد','تم اعتماد الإعفاء العام','green');await load()}
