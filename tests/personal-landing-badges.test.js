@@ -5,7 +5,7 @@ const path = require('path');
 const root = path.join(__dirname, '..');
 function read(p){return fs.readFileSync(path.join(root,p),'utf8')}
 function assert(c,m){if(!c)throw new Error(m)}
-const sql = read('sql/109_personal_landing_dashboard_badge_progress.sql');
+const sql = read('sql/archive/109_personal_landing_dashboard_badge_progress.sql');
 assert(sql.includes('get_my_badge_progress'), 'badge progress RPC missing');
 assert(sql.includes('get_my_landing_home'), 'landing home RPC missing');
 assert(sql.includes('student_perfect_attendance_30'), 'student attendance badge missing');

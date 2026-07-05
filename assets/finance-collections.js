@@ -53,7 +53,7 @@ async function remindStudent(studentId){
     await load();
   }catch(e){
     const msg=e.message||String(e);
-    if(msg.includes('send_finance_overdue_reminders_detailed')) toast('شغلي SQL 86 أولاً','sql/86_finance_overdue_reminders_diagnostics_fix.sql','red');
+    if(msg.includes('send_finance_overdue_reminders_detailed')) toast('شغلي SQL 86 أولاً','sql/archive/86_finance_overdue_reminders_diagnostics_fix.sql','red');
     else toast('تعذر إرسال التذكير',msg,'red');
   }
 }
@@ -70,7 +70,7 @@ async function remindAll(){
     await load();
   }catch(e){
     const msg=e.message||String(e);
-    if(msg.includes('send_finance_overdue_reminders_detailed')) toast('شغلي SQL 86 أولاً','sql/86_finance_overdue_reminders_diagnostics_fix.sql','red');
+    if(msg.includes('send_finance_overdue_reminders_detailed')) toast('شغلي SQL 86 أولاً','sql/archive/86_finance_overdue_reminders_diagnostics_fix.sql','red');
     else toast('تعذر إرسال التذكيرات',msg,'red');
   }
 }

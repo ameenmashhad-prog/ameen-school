@@ -113,8 +113,8 @@ project-root/
 أضيفت ملفات SQL جديدة:
 
 ```txt
-sql/02_role_split_and_views.sql
-sql/03_optional_rls_policies.sql
+sql/archive/02_role_split_and_views.sql
+sql/archive/03_optional_rls_policies.sql
 ```
 
 ### `02_role_split_and_views.sql`
@@ -156,7 +156,7 @@ registrations-admin.html      # مراجعة طلبات التسجيل للإد�
 assets/registration.css
 assets/registration.js
 libs/calendar-lib.js
-sql/04_registration_forms_schema.sql
+sql/archive/04_registration_forms_schema.sql
 ```
 
 ### قبل استخدام النماذج
@@ -164,7 +164,7 @@ sql/04_registration_forms_schema.sql
 شغّلي في Supabase SQL Editor محتوى الملف:
 
 ```txt
-sql/04_registration_forms_schema.sql
+sql/archive/04_registration_forms_schema.sql
 ```
 
 هذا ينشئ جداول طلبات التسجيل وسياسات الإدخال العامة، ولا يغيّر جداول الطلاب والمعلمين القديمة.
@@ -219,7 +219,7 @@ schedule-management.html
 شغّلي:
 
 ```txt
-sql/05_schedule_management_schema.sql
+sql/archive/05_schedule_management_schema.sql
 ```
 
 هذا الملف يضيف:
@@ -247,7 +247,7 @@ sql/05_schedule_management_schema.sql
 أضيف ملف SQL جديد:
 
 ```txt
-sql/07_cleanup_academic_periods_keep_two.sql
+sql/archive/07_cleanup_academic_periods_keep_two.sql
 ```
 
 وظيفته:
@@ -275,7 +275,7 @@ sql/07_cleanup_academic_periods_keep_two.sql
 أضيف ملف SQL جديد:
 
 ```txt
-sql/08_schedule_calendar_homework_payroll.sql
+sql/archive/08_schedule_calendar_homework_payroll.sql
 ```
 
 يشمل:
@@ -317,7 +317,7 @@ admin-finance-rules.html
 أضيف ملف SQL:
 
 ```txt
-sql/09_admin_teacher_rates_and_class_fees.sql
+sql/archive/09_admin_teacher_rates_and_class_fees.sql
 ```
 
 يشمل:
@@ -340,7 +340,7 @@ finance-pro.html
 وأضيف ملف SQL:
 
 ```txt
-sql/10_finance_professional_schema.sql
+sql/archive/10_finance_professional_schema.sql
 ```
 
 يشمل:
@@ -371,7 +371,7 @@ academic-pro.html
 وأضيف ملف SQL:
 
 ```txt
-sql/11_academic_grading_system.sql
+sql/archive/11_academic_grading_system.sql
 ```
 
 يشمل:
@@ -398,7 +398,7 @@ sql/11_academic_grading_system.sql
 أضيف ملف:
 
 ```txt
-sql/14_academic_subject_stage_filter.sql
+sql/archive/14_academic_subject_stage_filter.sql
 ```
 
 وظيفته منع ظهور مواد غير مناسبة للمرحلة في نتائج الطلاب، مثل:
@@ -450,7 +450,7 @@ sql/14_academic_subject_stage_filter.sql
 أضيف ملف SQL:
 
 ```txt
-sql/15_finance_runtime_hotfix.sql
+sql/archive/15_finance_runtime_hotfix.sql
 ```
 
 شغليه إذا ظهر خطأ:
@@ -478,8 +478,8 @@ api/exchange-tgju.js
 أضيفت ملفات SQL جديدة:
 
 ```txt
-sql/17_cleanup_duplicate_student_fees.sql
-sql/18_teacher_activity_homework_fix.sql
+sql/archive/17_cleanup_duplicate_student_fees.sql
+sql/archive/18_teacher_activity_homework_fix.sql
 ```
 
 ### `17_cleanup_duplicate_student_fees.sql`
@@ -519,7 +519,7 @@ create_session_homework
 أضيف ملف SQL:
 
 ```txt
-sql/19_teacher_workflow_policies.sql
+sql/archive/19_teacher_workflow_policies.sql
 ```
 
 يشمل:
@@ -536,7 +536,7 @@ sql/19_teacher_workflow_policies.sql
 أضيف ملف SQL جديد:
 
 ```txt
-sql/20_academic_structure_sections_assignments.sql
+sql/archive/20_academic_structure_sections_assignments.sql
 ```
 
 ينقل النظام تدريجياً إلى النموذج الصحيح:
@@ -594,7 +594,7 @@ teacher_assignment_id
 الملف المطلوب تشغيله:
 
 ```txt
-sql/21_sections_assignments_admin.sql
+sql/archive/21_sections_assignments_admin.sql
 ```
 
 ---
@@ -604,7 +604,7 @@ sql/21_sections_assignments_admin.sql
 أضيف ملف SQL جديد:
 
 ```txt
-sql/23_assignment_edit_and_bulk_ui.sql
+sql/archive/23_assignment_edit_and_bulk_ui.sql
 ```
 
 ويضيف:
@@ -659,7 +659,7 @@ section-assignment-management.html
 عند تشغيل الدالة من Supabase SQL Editor، شغّلي:
 
 ```txt
-sql/25_regenerate_sessions_permission_fix.sql
+sql/archive/25_regenerate_sessions_permission_fix.sql
 ```
 
 السبب أن `auth.uid()` يكون `null` داخل SQL Editor، بينما يكون موجوداً عند التشغيل من الواجهة بحساب مدير.
@@ -673,7 +673,7 @@ sql/25_regenerate_sessions_permission_fix.sql
 أضيف ملف SQL:
 
 ```txt
-sql/27_schedule_required_subjects_report.sql
+sql/archive/27_schedule_required_subjects_report.sql
 ```
 
 ويضيف دالة:
@@ -703,7 +703,7 @@ schedule_required_subjects_report(academic_period_id)
 أضيف ملف SQL:
 
 ```txt
-sql/28_schedule_missing_subject_suggestions.sql
+sql/archive/28_schedule_missing_subject_suggestions.sql
 ```
 
 ويضيف:
@@ -746,7 +746,7 @@ sql/28_schedule_missing_subject_suggestions.sql
 يعتمد على دالة SQL من ملف:
 
 ```txt
-sql/30_teacher_daily_workflow_enhancements.sql
+sql/archive/30_teacher_daily_workflow_enhancements.sql
 ```
 
 خصوصاً:
@@ -772,8 +772,8 @@ online-exams.html    # للطالب: الاختبارات المتاحة، بد�
 assets/teacher-exams.js
 assets/online-exams.js
 assets/exams.css
-sql/31_question_bank_online_exams.sql
-sql/32_online_exam_payload_and_submit.sql
+sql/archive/31_question_bank_online_exams.sql
+sql/archive/32_online_exam_payload_and_submit.sql
 ```
 
 خطوات الاستخدام:
@@ -795,7 +795,7 @@ sql/32_online_exam_payload_and_submit.sql
 أضيف ملف SQL:
 
 ```txt
-sql/33_online_exams_enhancements.sql
+sql/archive/33_online_exams_enhancements.sql
 ```
 
 ويضيف:
@@ -828,7 +828,7 @@ assets/online-exams.js
 أضيف ملف SQL:
 
 ```txt
-sql/34_question_exam_edit_delete.sql
+sql/archive/34_question_exam_edit_delete.sql
 ```
 
 ويضيف دوال آمنة:
@@ -866,7 +866,7 @@ teacher-exams.html
 أضيف ملف SQL:
 
 ```txt
-sql/35_online_exam_resume_drafts_reports.sql
+sql/archive/35_online_exam_resume_drafts_reports.sql
 ```
 
 ويضيف:
@@ -910,7 +910,7 @@ assets/exams.css
 أضيف ملف SQL:
 
 ```txt
-sql/36_online_exam_teacher_review_tools.sql
+sql/archive/36_online_exam_teacher_review_tools.sql
 ```
 
 ويضيف:
@@ -968,7 +968,7 @@ assets/teacher-exams.js
 أضيف ملف SQL:
 
 ```txt
-sql/37_advanced_exam_question_types_and_generator.sql
+sql/archive/37_advanced_exam_question_types_and_generator.sql
 ```
 
 ويضيف دعم أنواع أسئلة جديدة داخل بنك الأسئلة والاختبارات:
@@ -1031,7 +1031,7 @@ assets/exams.css
 أضيف ملف SQL:
 
 ```txt
-sql/38_exam_integrity_similarity_ai_flags.sql
+sql/archive/38_exam_integrity_similarity_ai_flags.sql
 ```
 
 ويضيف نظام كشف محلي بدون أي روابط خارجية:
@@ -1084,7 +1084,7 @@ v_exam_integrity_answer_flags
 أضيف ملف SQL:
 
 ```txt
-sql/39_homework_grades_attachments_notifications_audit.sql
+sql/archive/39_homework_grades_attachments_notifications_audit.sql
 ```
 
 ويضيف:
@@ -1172,7 +1172,7 @@ assets/exams.css
 أضيف ملف SQL:
 
 ```txt
-sql/40_homework_grade_save_hotfix_and_forms_ui.sql
+sql/archive/40_homework_grade_save_hotfix_and_forms_ui.sql
 ```
 
 ويصلح مشكلة بقاء واجهة درجة الواجب على:
@@ -1225,7 +1225,7 @@ homework_grade_save_health_check()
 أضيف ملف SQL:
 
 ```txt
-sql/41_homework_grade_no_on_conflict_fix.sql
+sql/archive/41_homework_grade_no_on_conflict_fix.sql
 ```
 
 سبب خطأ:
@@ -1269,7 +1269,7 @@ save_function_contains_on_conflict: false
 أضيف ملف SQL:
 
 ```txt
-sql/42_student_homeworks_notifications_ui.sql
+sql/archive/42_student_homeworks_notifications_ui.sql
 ```
 
 ويضيف:
@@ -1347,7 +1347,7 @@ assets/core.js
 أضيف ملف SQL:
 
 ```txt
-sql/43_notifications_view_and_backfill_fix.sql
+sql/archive/43_notifications_view_and_backfill_fix.sql
 ```
 
 يحل خطأ:
@@ -1390,7 +1390,7 @@ select public.notifications_health_check();
 أضيف ملف SQL:
 
 ```txt
-sql/44_student_homeworks_view_fix.sql
+sql/archive/44_student_homeworks_view_fix.sql
 ```
 
 يحل خطأ:
@@ -1434,7 +1434,7 @@ select public.student_homeworks_health_check();
 أضيف ملف SQL:
 
 ```txt
-sql/45_student_homeworks_rpc_health_fix.sql
+sql/archive/45_student_homeworks_rpc_health_fix.sql
 ```
 
 هذا الملف يحل حالتين:
@@ -1506,7 +1506,7 @@ JWT expired
 أضيف ملف SQL:
 
 ```txt
-sql/46_student_homeworks_visibility_diagnostics.sql
+sql/archive/46_student_homeworks_visibility_diagnostics.sql
 ```
 
 ويضيف:
@@ -1548,7 +1548,7 @@ select public.sync_students_from_active_enrollments(true);
 أضيف ملف SQL:
 
 ```txt
-sql/47_homework_submissions_student_teacher.sql
+sql/archive/47_homework_submissions_student_teacher.sql
 ```
 
 ويضيف:
@@ -1627,7 +1627,7 @@ teacher.html → الواجبات
 أضيف ملف SQL:
 
 ```txt
-sql/48_homework_submission_attachments_access.sql
+sql/archive/48_homework_submission_attachments_access.sql
 ```
 
 ويحسن صلاحيات عرض مرفقات تسليم الطالب ويضيف View اختيارية:
@@ -1660,7 +1660,7 @@ homework-submissions
 أضيف ملف SQL:
 
 ```txt
-sql/49_homework_followup_reports_reminders.sql
+sql/archive/49_homework_followup_reports_reminders.sql
 ```
 
 ويضيف:
@@ -1707,7 +1707,7 @@ teacher.html → الواجبات
 أضيف ملف SQL:
 
 ```txt
-sql/50_homework_followup_payload_reports_page.sql
+sql/archive/50_homework_followup_payload_reports_page.sql
 ```
 
 ويضيف RPC مباشر:
@@ -1757,7 +1757,7 @@ assets/core.js
 أضيف ملف SQL:
 
 ```txt
-sql/51_homework_batch_operations_dashboard.sql
+sql/archive/51_homework_batch_operations_dashboard.sql
 ```
 
 ويضيف دفعة تحسينات:
@@ -1829,7 +1829,7 @@ homework_batch_operations_health_check
 أضيف ملف SQL:
 
 ```txt
-sql/52_homework_fast_batch_actions_audit.sql
+sql/archive/52_homework_fast_batch_actions_audit.sql
 ```
 
 ويضيف دفعة جديدة:
@@ -1918,7 +1918,7 @@ assets/core.js
 أضيف ملف SQL:
 
 ```txt
-sql/53_homework_engagement_comments_mega_batch.sql
+sql/archive/53_homework_engagement_comments_mega_batch.sql
 ```
 
 ويضيف دفعة كبيرة:
@@ -2007,7 +2007,7 @@ homework-reports.html
 أضيف ملف SQL:
 
 ```txt
-sql/54_homework_final_operations.sql
+sql/archive/54_homework_final_operations.sql
 ```
 
 ويضيف:
@@ -2069,7 +2069,7 @@ assets/homework-reports.js
 أضيف ملف SQL:
 
 ```txt
-sql/55_library_management.sql
+sql/archive/55_library_management.sql
 ```
 
 ويضيف وحدة مكتبة كاملة:
@@ -2156,7 +2156,7 @@ select public.library_health_check();
 أضيف ملف SQL:
 
 ```txt
-sql/56_inventory_procurement_and_library_seed.sql
+sql/archive/56_inventory_procurement_and_library_seed.sql
 ```
 
 ويضيف:
@@ -2248,7 +2248,7 @@ select public.inventory_health_check();
 أضيف ملف SQL:
 
 ```txt
-sql/57_fixed_assets_custody_maintenance.sql
+sql/archive/57_fixed_assets_custody_maintenance.sql
 ```
 
 ويضيف:
@@ -2319,7 +2319,7 @@ select public.assets_health_check();
 أضيف ملف SQL:
 
 ```txt
-sql/58_hr_employee_payroll.sql
+sql/archive/58_hr_employee_payroll.sql
 ```
 
 ويضيف:
@@ -2440,7 +2440,7 @@ assets/ux-enhancements.js
 أضيف ملف SQL:
 
 ```txt
-sql/60_transportation_policy_fix_and_ui.sql
+sql/archive/60_transportation_policy_fix_and_ui.sql
 ```
 
 هذا الملف يستبدل SQL 59 عند ظهور خطأ:
@@ -2493,7 +2493,7 @@ select public.transport_health_check();
 أضيف ملف SQL:
 
 ```txt
-sql/62_unified_portal_permissions.sql
+sql/archive/62_unified_portal_permissions.sql
 ```
 
 ويضيف:
@@ -2601,7 +2601,7 @@ teacher.html
 أضيف ملف SQL:
 
 ```txt
-sql/63_homework_missing_rpc_restore.sql
+sql/archive/63_homework_missing_rpc_restore.sql
 ```
 
 يحل خطأ:
@@ -2641,7 +2641,7 @@ labs-activities.html
 أضيف ملف SQL:
 
 ```txt
-sql/66_finance_payment_receiver.sql
+sql/archive/66_finance_payment_receiver.sql
 ```
 
 ويضيف إلى جدول:
@@ -2710,8 +2710,8 @@ assets/documents.css
 وتعمل مع:
 
 ```txt
-sql/64_documents_archive_management.sql
-sql/65_documents_ui_security_helpers.sql
+sql/archive/64_documents_archive_management.sql
+sql/archive/65_documents_ui_security_helpers.sql
 ```
 
 الميزات:
@@ -2741,7 +2741,7 @@ portal.html
 أضيف ملف SQL:
 
 ```txt
-sql/67_documents_policy_idempotent_seed.sql
+sql/archive/67_documents_policy_idempotent_seed.sql
 ```
 
 يحل خطأ:
@@ -2775,7 +2775,7 @@ categories_count > 0
 أضيف ملف SQL:
 
 ```txt
-sql/69_permissions_management_ui.sql
+sql/archive/69_permissions_management_ui.sql
 ```
 
 ويضيف:
@@ -2836,7 +2836,7 @@ select public.permissions_management_health_check();
 أضيف ملف SQL:
 
 ```txt
-sql/70_finance_cashbox_receiver_reports.sql
+sql/archive/70_finance_cashbox_receiver_reports.sql
 ```
 
 ويضيف:
@@ -2906,7 +2906,7 @@ select public.finance_cashbox_health_check();
 أضيف ملف SQL:
 
 ```txt
-sql/71_finance_cashbox_view_recreate_fix.sql
+sql/archive/71_finance_cashbox_view_recreate_fix.sql
 ```
 
 يحل خطأ:
@@ -2954,7 +2954,7 @@ select public.finance_cashbox_health_check();
 أضيف ملف SQL:
 
 ```txt
-sql/73_finance_receiver_analytics_voiding.sql
+sql/archive/73_finance_receiver_analytics_voiding.sql
 ```
 
 ويضيف:
@@ -3023,7 +3023,7 @@ finance-cashbox.html
 أضيف ملف SQL:
 
 ```txt
-sql/75_smart_calendar_existing_academic_years_fix.sql
+sql/archive/75_smart_calendar_existing_academic_years_fix.sql
 ```
 
 يحل خطأ:
@@ -3039,13 +3039,13 @@ column "school_id" of relation "academic_years" does not exist
 1. شغّل:
 
 ```txt
-sql/75_smart_calendar_existing_academic_years_fix.sql
+sql/archive/75_smart_calendar_existing_academic_years_fix.sql
 ```
 
 2. ثم أعد تشغيل:
 
 ```txt
-sql/74_smart_calendar_agenda_completed.sql
+sql/archive/74_smart_calendar_agenda_completed.sql
 ```
 
 تم أيضاً تحديث SQL 74 نفسه ليعالج هذه الحالة مستقبلاً.
@@ -3057,7 +3057,7 @@ sql/74_smart_calendar_agenda_completed.sql
 أضيف ملف SQL:
 
 ```txt
-sql/78_smart_calendar_healthcheck_core_restore.sql
+sql/archive/78_smart_calendar_healthcheck_core_restore.sql
 ```
 
 يحل حالة أن:
@@ -3108,7 +3108,7 @@ assets/finance-executive.css
 وتعمل مع:
 
 ```txt
-sql/79_finance_executive_reports.sql
+sql/archive/79_finance_executive_reports.sql
 ```
 
 الواجهة تعرض:
@@ -3155,7 +3155,7 @@ assets/finance-collections.css
 وتعمل مع:
 
 ```txt
-sql/80_finance_collections_followups.sql
+sql/archive/80_finance_collections_followups.sql
 ```
 
 تم ربط الصفحة في:
@@ -3187,7 +3187,7 @@ finance
 أضيف ملف SQL:
 
 ```txt
-sql/81_final_system_readiness_check.sql
+sql/archive/81_final_system_readiness_check.sql
 ```
 
 ويضيف دالة:
@@ -3245,7 +3245,7 @@ select public.final_system_readiness_check();
 أضيف ملف SQL:
 
 ```txt
-sql/83_users_final_rls_enable_safe.sql
+sql/archive/83_users_final_rls_enable_safe.sql
 ```
 
 يقوم بـ:
@@ -3281,7 +3281,7 @@ select public.final_system_readiness_check();
 إذا حصلت مشكلة دخول أو صلاحيات، يوجد Rollback طارئ:
 
 ```txt
-sql/84_users_rls_rollback_disable.sql
+sql/archive/84_users_rls_rollback_disable.sql
 ```
 
 ملاحظة: هذه خطوة آمنة وتوافقية. لاحقاً يمكن تضييق قراءة users تدريجياً بعد تحويل كل الصفحات إلى `v_user_public_profiles`.
@@ -3293,7 +3293,7 @@ sql/84_users_rls_rollback_disable.sql
 أضيف ملف SQL:
 
 ```txt
-sql/85_users_rls_final_standalone_fix.sql
+sql/archive/85_users_rls_final_standalone_fix.sql
 ```
 
 استخدميه إذا ظهر:
@@ -3339,7 +3339,7 @@ select public.users_rls_final_health_check();
 أضيف ملف SQL:
 
 ```txt
-sql/86_finance_overdue_reminders_diagnostics_fix.sql
+sql/archive/86_finance_overdue_reminders_diagnostics_fix.sql
 ```
 
 يعالج حالة ظهور:
@@ -3391,7 +3391,7 @@ select public.finance_overdue_reminders_health_check();
 أضيف ملف SQL:
 
 ```txt
-sql/87_finance_overdue_reminders_health_sql_editor_fix.sql
+sql/archive/87_finance_overdue_reminders_health_sql_editor_fix.sql
 ```
 
 يعالج ظهور:
@@ -3442,7 +3442,7 @@ select public.finance_overdue_reminders_health_check();
 أضيف ملف SQL:
 
 ```txt
-sql/94_finance_credit_balance_ui_support.sql
+sql/archive/94_finance_credit_balance_ui_support.sql
 ```
 
 ويضيف دعم `credit_balance` في:
@@ -3484,7 +3484,7 @@ select public.finance_credit_ui_support_health_check();
 أضيف ملف SQL:
 
 ```txt
-sql/95_finance_credit_health_sql_editor_fix.sql
+sql/archive/95_finance_credit_health_sql_editor_fix.sql
 ```
 
 إذا ظهر:
@@ -3524,7 +3524,7 @@ assets/finance-credit-report.css
 وتعمل مع:
 
 ```txt
-sql/96_finance_credit_report.sql
+sql/archive/96_finance_credit_report.sql
 ```
 
 الصفحة تعرض:

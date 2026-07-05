@@ -35,7 +35,7 @@ async function bulkCloseOverdue(apply=false){
   }catch(e){
     const msg=e.message||String(e);
     if(msg.includes('schema cache')||msg.includes('Could not find the function')){
-      toast('يجب تشغيل SQL 63','تمت إضافة ملف إصلاح: sql/63_homework_missing_rpc_restore.sql','red');
+      toast('يجب تشغيل SQL 63','تمت إضافة ملف إصلاح: sql/archive/63_homework_missing_rpc_restore.sql','red');
     }else{
       toast('تعذر إغلاق المتأخرة',msg,'red');
     }

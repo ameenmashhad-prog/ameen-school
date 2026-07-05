@@ -7,7 +7,7 @@
 - `curriculum-planner.html`
 - `assets/curriculum-planner.js`
 - `assets/curriculum-planner.css`
-- `sql/110_curriculum_planner_editable.sql`
+- `sql/archive/110_curriculum_planner_editable.sql`
 
 ## الميزات
 
@@ -26,7 +26,7 @@
 ## SQL المطلوب
 
 ```txt
-sql/110_curriculum_planner_editable.sql
+sql/archive/110_curriculum_planner_editable.sql
 ```
 
 ثم افحص:
@@ -40,7 +40,7 @@ select public.curriculum_planner_health_check();
 تمت إضافة ملف:
 
 ```txt
-sql/112_curriculum_holidays_weekly_schedule_fix.sql
+sql/archive/112_curriculum_holidays_weekly_schedule_fix.sql
 ```
 
 وظيفته:
@@ -78,7 +78,7 @@ column "start_date" does not exist
 أو إذا كانت صفحة الإنجازات لا تفتح رغم نجاح Health Check، شغّل:
 
 ```txt
-sql/113_runtime_fix_achievements_curriculum.sql
+sql/archive/113_runtime_fix_achievements_curriculum.sql
 ```
 
 ثم افحص:
@@ -93,7 +93,7 @@ select public.runtime_fix_achievements_curriculum_health_check();
 أضيف الملف:
 
 ```txt
-sql/116_curriculum_homework_link_badge_levels.sql
+sql/archive/116_curriculum_homework_link_badge_levels.sql
 ```
 
 المزايا:

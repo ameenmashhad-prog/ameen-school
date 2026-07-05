@@ -5,7 +5,7 @@ const path = require('path');
 const root = path.join(__dirname, '..');
 function read(p){return fs.readFileSync(path.join(root,p),'utf8')}
 function assert(c,m){if(!c)throw new Error(m)}
-const sql = read('sql/107_counseling_handover_protocol.sql');
+const sql = read('sql/archive/107_counseling_handover_protocol.sql');
 assert(sql.includes('counseling_handover_notes'), 'handover table missing');
 assert(sql.includes('create_counseling_handover'), 'create handover RPC missing');
 assert(sql.includes('accept_counseling_handover'), 'accept handover RPC missing');

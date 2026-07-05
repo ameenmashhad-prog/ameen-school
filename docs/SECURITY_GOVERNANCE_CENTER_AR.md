@@ -7,7 +7,7 @@
 - `security-governance.html`
 - `assets/security-governance.js`
 - `assets/security-governance.css`
-- `sql/105_security_governance_health_check.sql`
+- `sql/archive/105_security_governance_health_check.sql`
 - `tests/security-governance.test.js`
 
 ## ما يفحصه المركز
@@ -24,7 +24,7 @@
 ## SQL المطلوب تشغيله
 
 ```txt
-sql/105_security_governance_health_check.sql
+sql/archive/105_security_governance_health_check.sql
 ```
 
 ثم افحص:
@@ -59,7 +59,7 @@ node tests/security-governance.test.js
 أضيف فحص جديد:
 
 ```txt
-sql/106_role_access_matrix_check.sql
+sql/archive/106_role_access_matrix_check.sql
 ```
 
 ويتحقق من:

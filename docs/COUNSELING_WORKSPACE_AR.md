@@ -7,7 +7,7 @@
 - `counselor.html`
 - `assets/counselor.js`
 - `assets/counselor.css`
-- `sql/98_counseling_psychological_workspace.sql`
+- `sql/archive/98_counseling_psychological_workspace.sql`
 
 ## الملفات المعدلة
 
@@ -70,7 +70,7 @@
 شغّل الملف التالي من Supabase SQL Editor:
 
 ```txt
-sql/98_counseling_psychological_workspace.sql
+sql/archive/98_counseling_psychological_workspace.sql
 ```
 
 ثم افحص:
@@ -136,7 +136,7 @@ counselor.html
 SQL المطلوب:
 
 ```txt
-sql/107_counseling_handover_protocol.sql
+sql/archive/107_counseling_handover_protocol.sql
 ```
 
 الفحص:
@@ -150,7 +150,7 @@ select public.counseling_handover_health_check();
 إذا لم يوجد حساب مرشد، استخدم الملف:
 
 ```txt
-sql/108_counselor_account_bootstrap.sql
+sql/archive/108_counselor_account_bootstrap.sql
 ```
 
 الخطوات:
