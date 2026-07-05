@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>مركز الشهادات المدرسية المطبوعة — مدارس أمين الرضا</title>
+<link rel="stylesheet" href="assets/amin.css">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="stylesheet" href="assets/i18n.css">
+<style>
+.cert-preview-wrap { display: flex; flex-direction: column; gap: 30px; margin-top: 20px; align-items: center; }
+.cert-card { width: 100%; max-width: 900px; background: #fffaf0; border: 12px double #B8860B; padding: 40px; border-radius: 16px; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; font-family: inherit; overflow: hidden; }
+.cert-card::before { content: "★"; position: absolute; top: 15px; right: 20px; font-size: 36px; color: #0B6E4F; opacity: 0.3; }
+.cert-card::after { content: "★"; position: absolute; top: 15px; left: 20px; font-size: 36px; color: #0B6E4F; opacity: 0.3; }
+.cert-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #B8860B; padding-bottom: 20px; margin-bottom: 25px; }
+.cert-logo { width: 70px; height: 70px; background: linear-gradient(135deg, #0B6E4F, #3A3565); color: #fff; font-size: 32px; font-weight: bold; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid #B8860B; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+.cert-school-info { text-align: right; }
+.cert-school-info h2 { font-size: 22px; color: #0B6E4F; margin: 0; font-weight: bold; }
+.cert-school-info p { font-size: 13px; color: #666; margin: 4px 0 0; }
+.cert-title { font-size: 38px; color: #8b0000; font-weight: bold; margin: 15px 0 10px; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
+.cert-subtitle { font-size: 18px; color: #B8860B; font-weight: bold; margin-bottom: 30px; letter-spacing: 1px; }
+.cert-body { font-size: 20px; color: #333; line-height: 1.8; margin-bottom: 40px; padding: 0 20px; }
+.cert-recipient { font-size: 36px; color: #0B6E4F; font-weight: bold; display: inline-block; border-bottom: 3px solid #B8860B; padding: 0 20px 5px; margin: 10px 0; }
+.cert-reason { font-size: 22px; color: #444; margin: 15px 0; font-weight: 500; }
+.cert-footer { display: flex; justify-content: space-around; align-items: flex-end; margin-top: 40px; border-top: 1px dashed #ccc; padding-top: 25px; }
+.cert-sign-box { text-align: center; min-width: 180px; }
+.cert-sign-box b { display: block; font-size: 16px; color: #0B6E4F; margin-bottom: 35px; }
+.cert-sign-box span { display: block; font-size: 15px; color: #333; border-top: 1px solid #999; padding-top: 6px; }
+.cert-seal { width: 85px; height: 85px; border: 3px dashed #B8860B; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #B8860B; font-weight: bold; transform: rotate(-15deg); margin: 0 auto; background: rgba(184,134,11,0.05); }
+
+@media print {
+  body { background: #fff !important; margin: 0 !important; padding: 0 !important; }
+  .shell > aside, .topbar, .no-print, .kpis, #toast, .cert-controls { display: none !important; }
+  .main { margin: 0 !important; padding: 0 !important; width: 100% !important; }
+  .cert-preview-wrap { gap: 0 !important; margin: 0 !important; }
+  .cert-card { width: 100% !important; max-width: 100% !important; border: 8px double #B8860B !important; border-radius: 0 !important; box-shadow: none !important; page-break-after: always !important; break-after: page !important; min-height: 95vh !important; display: flex !important; flex-direction: column !important; justify-content: space-between !important; padding: 30px !important; margin: 0 !important; }
+}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#mainContent">تخطي إلى المحتوى</a>
+<div class="shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-mark">إ</div>
+      <div><h1>مركز الشهادات</h1><small>تفوق · إعفاء · تقدير</small></div>
+    </div>
+    <div class="profile-mini">
+      <div class="avatar">👑</div>
+      <div><b id="profileName">...</b><small id="profileRole">...</small></div>
+    </div>
+    <nav class="nav">
+      <button data-view="generator" class="active">🖨️ إصدار الشهادات</button>
+      <button data-view="batch">📚 الإصدار الجماعي للأوائل</button>
+      <div class="nav-section">روابط سريعة</div>
+      <button onclick="location.href='portal.html'">🏛️ البوابة الموحدة</button>
+      <button onclick="location.href='academic-pro.html'">🎓 النظام الأكاديمي</button>
+      <button onclick="location.href='teacher.html'">👨‍🏫 لوحة المعلم</button>
+      <button onclick="history.back()">↩️ رجوع</button>
+    </nav>
+    <div class="side-footer"><button id="logoutBtn" class="btn red block">تسجيل الخروج</button></div>
+  </aside>
+  <main class="main" id="mainContent" tabindex="-1">
+    <header class="topbar no-print">
+      <button class="btn mobile-menu" id="mobileMenuBtn">☰</button>
+      <h2>مركز الشهادات المدرسية المطبوعة 🖨️</h2>
+      <div class="top-actions">
+        <button onclick="window.print()" class="btn gold">🖨️ طباعة الشهادات / حفظ كـ PDF</button>
+      </div>
+    </header>
+    <section id="view-generator" class="view active"></section>
+    <section id="view-batch" class="view"></section>
+  </main>
+</div>
+<div id="toast" class="toast"></div>
+<script src="libs/supabase.min.js"></script>
+<script src="assets/config.js"></script>
+<script src="assets/platform-modules.js"></script>
+<script src="assets/i18n.js"></script>
+<script src="assets/certificates-generator.js"></script>
+<script>window.addEventListener('load',()=>CertificatesApp.init());</script>
+<script src="assets/ux-enhancements.js"></script>
+<script src="assets/amin-theme-injector.js"></script>
+<script src="assets/amin-icons.js" defer></script>
+</body>
+</html>
