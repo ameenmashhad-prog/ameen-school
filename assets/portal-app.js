@@ -12,9 +12,9 @@ var ROLE_SECTIONS = {
   counselor: ['overview','students','attendance','discipline'],
   psychologist: ['overview','students','attendance','discipline'],
   discipline: ['overview','students','attendance','discipline'],
-  teacher: ['overview','students','academic','attendance','schedule','tasks','certificates','messages'],
-  staff: ['overview','attendance','tasks','certificates','messages'],
-  hr: ['overview','attendance','tasks','certificates','messages'],
+  teacher: ['overview','students','academic','attendance','schedule','tasks','certificates','messages','analytics_ai'],
+  staff: ['overview','attendance','tasks','certificates','messages','analytics_ai'],
+  hr: ['overview','attendance','tasks','certificates','messages','analytics_ai'],
   parent: ['overview','students','academic','attendance','finance'],
   student: ['overview','academic','attendance','schedule']
 };
@@ -28,6 +28,7 @@ var SECTIONS_META = {
   tasks: { title: 'المهام والتكليفات 📋', icon: 'tasks', order: 12, external: 'tasks-management.html' },
   certificates: { title: 'الشهادات المطبوعة 🖨️', icon: 'award', order: 13, external: 'certificates-generator.html' },
   messages: { title: 'تواصل أولياء الأمور 💬', icon: 'chat', order: 14, external: 'parent-messages.html' },
+  analytics_ai: { title: 'تحليلات الدعم 🤖', icon: 'chart-pie', order: 15, external: 'academic-analytics.html' },
   discipline: { title: 'السلوك', icon: 'discipline', order: 6 },
   registrations: { title: 'التسجيلات', icon: 'registrations', order: 7 },
   schedule: { title: 'الجدول', icon: 'schedule', order: 8 },
