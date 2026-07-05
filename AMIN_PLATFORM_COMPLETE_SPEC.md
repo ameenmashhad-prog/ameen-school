@@ -9,20 +9,20 @@
 | رمز المتطلب | الوصف والميزة الأساسية | الحالة | ملفات واجهات الويب | ملفات قاعدة البيانات (SQL Migrations) |
 | :---: | :--- | :---: | :--- | :--- |
 | **R1** | إعداد كلمات المرور وتأمين التسجيل الأولي | ✅ مكتمل | `family-registration.html`<br>`teacher-registration.html` | `sql/101_...`<br>`sql/111_...` |
-| **R2** | نظام إجازات المعلمين والموظفين ذاتي الخدمة | ✅ مكتمل | `teacher.html`<br>`hr.html` | `sql/119_hr_leave_requests_teacher_portal.sql` |
-| **R3** | الأرشيف الإلكتروني وإدارة الوثائق والملفات | ✅ مكتمل | `documents.html` | `sql/125_inventory_dual_currency_and_archive.sql` |
-| **R4** | محرك عرض ورفع صور الطلاب والمعلمين | ✅ مكتمل | `assets/avatar.js`<br>`assets/registration.js` | `sql/110_student_photo.sql`<br>`sql/118_fix_registration_photos_storage.sql` |
-| **R5** | إرفاق صور السندات والإيصالات في المالية | ✅ مكتمل | `finance-pro.html`<br>`assets/finance-pro.js` | `sql/120_finance_expenses_and_receipts.sql` |
-| **R6** | قفل الدرجات والصلاحيات الأكاديمية (مع Checkbox متعدد) | ✅ مكتمل | `academic-pro.html`<br>`assets/academic-pro.js` | `sql/121_...`<br>`sql/123_academic_governance_and_exam_excel.sql` |
-| **R7** | نظام المهام والتكليفات الرسمية (مع التكليف المتعدد ☑) | ✅ مكتمل | `tasks-management.html`<br>`assets/tasks-management.js` | `sql/126_...`<br>`sql/127_multi_assignee_tasks.sql` |
-| **R8** | إدارة المصروفات والنفقات التشغيلية وتقاريرها | ✅ مكتمل | `finance-pro.html`<br>`assets/finance-pro.js` | `sql/120_finance_expenses_and_receipts.sql` |
-| **R9** | التقييم المالي المزدوج للمخزون والجرد (USD / IRR) | ✅ مكتمل | `inventory.html`<br>`assets/inventory.js` | `sql/125_inventory_dual_currency_and_archive.sql` |
+| **R2** | نظام إجازات المعلمين والموظفين ذاتي الخدمة | ✅ مكتمل | `teacher.html`<br>`hr.html` | `sql/archive/119_hr_leave_requests_teacher_portal.sql` |
+| **R3** | الأرشيف الإلكتروني وإدارة الوثائق والملفات | ✅ مكتمل | `documents.html` | `sql/archive/125_inventory_dual_currency_and_archive.sql` |
+| **R4** | محرك عرض ورفع صور الطلاب والمعلمين | ✅ مكتمل | `assets/avatar.js`<br>`assets/registration.js` | `sql/archive/110_student_photo.sql`<br>`sql/archive/118_fix_registration_photos_storage.sql` |
+| **R5** | إرفاق صور السندات والإيصالات في المالية | ✅ مكتمل | `finance-pro.html`<br>`assets/finance-pro.js` | `sql/archive/120_finance_expenses_and_receipts.sql` |
+| **R6** | قفل الدرجات والصلاحيات الأكاديمية (مع Checkbox متعدد) | ✅ مكتمل | `academic-pro.html`<br>`assets/academic-pro.js` | `sql/121_...`<br>`sql/archive/123_academic_governance_and_exam_excel.sql` |
+| **R7** | نظام المهام والتكليفات الرسمية (مع التكليف المتعدد ☑) | ✅ مكتمل | `tasks-management.html`<br>`assets/tasks-management.js` | `sql/126_...`<br>`sql/archive/127_multi_assignee_tasks.sql` |
+| **R8** | إدارة المصروفات والنفقات التشغيلية وتقاريرها | ✅ مكتمل | `finance-pro.html`<br>`assets/finance-pro.js` | `sql/archive/120_finance_expenses_and_receipts.sql` |
+| **R9** | التقييم المالي المزدوج للمخزون والجرد (USD / IRR) | ✅ مكتمل | `inventory.html`<br>`assets/inventory.js` | `sql/archive/125_inventory_dual_currency_and_archive.sql` |
 | **R10** | مكوّن سعر الصرف المباشر المحفوظ محلياً | ✅ مكتمل | `assets/exchange-rate.js` | *Frontend LocalStorage Module* |
 | **R11** | تصدير كشوفات قوائم الفصول والطلاب | ✅ مكتمل | `assets/report-export.js` | *Integrated Roster Exporter* |
 | **R12** | تصدير كشوفات الدرجات بوضعين (مع/بدون درجات) | ✅ مكتمل | `assets/report-export.js` | *Integrated Grades Exporter* |
 | **R13** | تصدير كشوفات وسجلات الحضور والغياب | ✅ مكتمل | `assets/report-export.js` | *Integrated Attendance Exporter* |
-| **R14** | حوكمة الصلاحيات وقصر رؤية المعلم على مواده | ✅ مكتمل | `teacher.html`<br>`assets/academic-pro.js` | `sql/123_academic_governance_and_exam_excel.sql` |
-| **R15** | التفعيل الفوري للحسابات من طلب التسجيل مباشرة | ✅ مكتمل | `registrations-admin.html` | `sql/117_activate_account_from_registration.sql` |
+| **R14** | حوكمة الصلاحيات وقصر رؤية المعلم على مواده | ✅ مكتمل | `teacher.html`<br>`assets/academic-pro.js` | `sql/archive/123_academic_governance_and_exam_excel.sql` |
+| **R15** | التفعيل الفوري للحسابات من طلب التسجيل مباشرة | ✅ مكتمل | `registrations-admin.html` | `sql/archive/117_activate_account_from_registration.sql` |
 
 ---
 

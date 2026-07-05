@@ -30,11 +30,11 @@ assert(headers.includes('X-Frame-Options'), 'vercel must define X-Frame-Options'
 const platform = read('assets/platform-modules.js');
 assert(platform.includes("key:'securityGovernance'"), 'security governance module missing');
 assert(fs.existsSync(path.join(root,'security-governance.html')), 'security-governance.html missing');
-assert(fs.existsSync(path.join(root,'sql/105_security_governance_health_check.sql')), 'SQL 105 missing');
+assert(fs.existsSync(path.join(root,'sql/archive/105_security_governance_health_check.sql')), 'SQL 105 missing');
 
 
 const sg = read('assets/security-governance.js');
 assert(sg.includes('security_role_access_matrix_check'), 'security page must load role access matrix');
-assert(fs.existsSync(path.join(root,'sql/106_role_access_matrix_check.sql')), 'SQL 106 missing');
+assert(fs.existsSync(path.join(root,'sql/archive/106_role_access_matrix_check.sql')), 'SQL 106 missing');
 
 console.log('security governance static tests passed');

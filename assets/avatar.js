@@ -8,7 +8,7 @@
       img(photoUrl,name)  -> HTML string <img> with onerror fallback to initials
       mount(scope)        -> replaces .profile-mini .avatar content when ME.avatar_url exists
       rosterImg(student)  -> HTML string for teacher/admin roster photos
-  Requires the `avatar_url` column on public.users (see sql/110_student_photo.sql).
+  Requires the `avatar_url` column on public.users (see sql/archive/110_student_photo.sql).
 */
 (function () {
   'use strict';

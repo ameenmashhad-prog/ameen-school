@@ -70,11 +70,11 @@
 ## 7. ملفات Migration وRollback
 ### Migration
 ```txt
-sql/74_smart_calendar_agenda_completed.sql
+sql/archive/74_smart_calendar_agenda_completed.sql
 ```
 ### Rollback اختياري
 ```txt
-sql/74_smart_calendar_agenda_completed_rollback.sql
+sql/archive/74_smart_calendar_agenda_completed_rollback.sql
 ```
 
 ## 8. ملفات Seed
@@ -145,7 +145,7 @@ assets/smart-calendar.css
 شغّل من Supabase SQL Editor:
 ```sql
 -- من الملف وليس من نسخ المحادثة
-sql/74_smart_calendar_agenda_completed.sql
+sql/archive/74_smart_calendar_agenda_completed.sql
 ```
 
 ## 13. طريقة تشغيل Seeds

@@ -4,7 +4,7 @@
 
 ## الملفات المضافة
 
-- `sql/104_counseling_referrals_requests_reports.sql`
+- `sql/archive/104_counseling_referrals_requests_reports.sql`
 - `counseling-report.html`
 - `assets/counseling-report.js`
 - `assets/counseling-report.css`
@@ -68,7 +68,7 @@ counseling.report
 ## SQL المطلوب تشغيله
 
 ```txt
-sql/104_counseling_referrals_requests_reports.sql
+sql/archive/104_counseling_referrals_requests_reports.sql
 ```
 
 ثم افحص:

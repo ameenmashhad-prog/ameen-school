@@ -7,7 +7,7 @@
 - `achievements.html`
 - `assets/achievements.js`
 - `assets/achievements.css`
-- `sql/97_achievements_badges_system.sql`
+- `sql/archive/97_achievements_badges_system.sql`
 - تحديث `assets/platform-modules.js` لإظهار الوحدة في البوابة الموحدة
 - تحديث `student.html` و `teacher.html` لإضافة رابط الإنجازات
 - تحديث `smart-calendar.js` لربط إنجازات الأجندة بالشارات
@@ -56,7 +56,7 @@
 شغّل الملف التالي من Supabase SQL Editor:
 
 ```txt
-sql/97_achievements_badges_system.sql
+sql/archive/97_achievements_badges_system.sql
 ```
 
 ثم افتح الصفحة:

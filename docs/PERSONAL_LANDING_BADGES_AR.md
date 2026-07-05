@@ -34,7 +34,7 @@
 ## SQL المطلوب
 
 ```txt
-sql/109_personal_landing_dashboard_badge_progress.sql
+sql/archive/109_personal_landing_dashboard_badge_progress.sql
 ```
 
 ثم افحص:
@@ -57,5 +57,5 @@ select public.personal_landing_home_health_check();
 إذا ظهر خطأ متعلق بأعمدة مثل `due_date_gregorian` أو `exam_date_gregorian` عند تشغيل SQL 109 أو فتح البوابة، شغّل:
 
 ```txt
-sql/111_personal_landing_health_compat.sql
+sql/archive/111_personal_landing_health_compat.sql
 ```

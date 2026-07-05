@@ -5,7 +5,7 @@ const path = require('path');
 const root = path.join(__dirname, '..');
 function read(p){return fs.readFileSync(path.join(root,p),'utf8')}
 function assert(c,m){if(!c)throw new Error(m)}
-const sql = read('sql/116_curriculum_homework_link_badge_levels.sql');
+const sql = read('sql/archive/116_curriculum_homework_link_badge_levels.sql');
 ['curriculum_slot_id','get_teacher_curriculum_topics','link_homework_to_curriculum','_achievement_level_info'].forEach(x=>assert(sql.includes(x),'missing '+x));
 const teacher = read('assets/teacher-dashboard.js');
 assert(teacher.includes('hwCurriculumSlot'), 'teacher homework form missing curriculum slot select');

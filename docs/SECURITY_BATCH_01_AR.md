@@ -31,7 +31,7 @@
 - `assets/platform-modules.js`
 - `assets/unified-portal.js`
 - `assets/ux-enhancements.js`
-- `sql/100_security_quick_hardening.sql`
+- `sql/archive/100_security_quick_hardening.sql`
 
 التحسينات:
 
@@ -56,7 +56,7 @@ select public.security_quick_hardening_health_check();
 - `assets/registration.js`
 - `family-registration.html`
 - `teacher-registration.html`
-- `sql/101_registration_password_policy.sql`
+- `sql/archive/101_registration_password_policy.sql`
 
 التحسينات:
 
@@ -87,8 +87,8 @@ select public.registration_password_policy_health_check();
 بعد رفع الحزمة، شغل بالترتيب:
 
 ```txt
-sql/100_security_quick_hardening.sql
-sql/101_registration_password_policy.sql
+sql/archive/100_security_quick_hardening.sql
+sql/archive/101_registration_password_policy.sql
 ```
 
 ## فحوصات محلية نجحت
@@ -113,7 +113,7 @@ node tests/smart-calendar.test.js
 بعد ظهور `weak_existing_preview` أكبر من صفر، أضيف الملف:
 
 ```txt
-sql/102_registration_weak_password_cleanup.sql
+sql/archive/102_registration_weak_password_cleanup.sql
 ```
 
 وظيفته:
