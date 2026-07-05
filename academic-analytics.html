@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>تحليلات الذكاء الاصطناعي وخطط الدعم الأكاديمي — مدارس أمين الرضا</title>
+<link rel="stylesheet" href="assets/amin.css">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="stylesheet" href="assets/i18n.css">
+<style>
+.tier-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin: 16px 0; }
+.tier-card { background: #fff; border: 2px solid #ddd; border-radius: 12px; padding: 16px; transition: transform 0.2s, box-shadow 0.2s; position: relative; }
+.tier-card:hover { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0,0,0,0.08); }
+.tier-1 { border-color: #d32f2f; background: #fff8f8; }
+.tier-2 { border-color: #B8860B; background: #fffdf5; }
+.tier-3 { border-color: #1976d2; background: #f8fbff; }
+.tier-4 { border-color: #0B6E4F; background: #f0fdf4; }
+.tier-title { font-size: 16px; font-weight: bold; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
+.remedial-box { background: #fff; border: 1px solid #ccc; border-radius: 10px; padding: 20px; margin-top: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+.remedial-section { margin-bottom: 16px; border-bottom: 1px dashed #eee; padding-bottom: 12px; }
+.remedial-section h4 { font-size: 15px; color: #0B6E4F; margin: 0 0 6px; font-weight: bold; }
+.remedial-section textarea { width: 100%; min-height: 70px; font-size: 14px; line-height: 1.6; padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-family: inherit; }
+.weak-chip { display: inline-block; background: #ffebee; color: #c62828; font-weight: bold; font-size: 12px; padding: 4px 10px; border-radius: 12px; margin: 2px; border: 1px solid #ffcdd2; }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#mainContent">تخطي إلى المحتوى</a>
+<div class="shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-mark">إ</div>
+      <div><h1>تحليلات الأداء</h1><small>الذكاء الاصطناعي والدعم</small></div>
+    </div>
+    <div class="profile-mini">
+      <div class="avatar">🤖</div>
+      <div><b id="profileName">...</b><small id="profileRole">...</small></div>
+    </div>
+    <nav class="nav">
+      <button data-view="dashboard" class="active">🤖 لوحة التشخيص والتقييم</button>
+      <button data-view="plans">📋 سجل الخطط العلاجية</button>
+      <div class="nav-section">روابط سريعة</div>
+      <button onclick="location.href='portal.html'">🏛️ البوابة الموحدة</button>
+      <button onclick="location.href='academic-pro.html'">🎓 النظام الأكاديمي</button>
+      <button onclick="location.href='counselor.html'">🧠 الإرشاد والسلوك</button>
+      <button onclick="location.href='teacher.html'">👨‍🏫 لوحة المعلم</button>
+      <button onclick="location.href='parent-messages.html'">💬 تواصل واتساب</button>
+      <button onclick="history.back()">↩️ رجوع</button>
+    </nav>
+    <div class="side-footer"><button id="logoutBtn" class="btn red block">تسجيل الخروج</button></div>
+  </aside>
+  <main class="main" id="mainContent" tabindex="-1">
+    <header class="topbar">
+      <button class="btn mobile-menu" id="mobileMenuBtn">☰</button>
+      <h2>🤖 تحليلات الذكاء الاصطناعي وخطط الدعم الأكاديمي والعلاجي</h2>
+      <div class="top-actions">
+        <button id="refreshBtn" class="btn blue">تحديث التشخيص</button>
+      </div>
+    </header>
+    <section id="view-dashboard" class="view active"></section>
+    <section id="view-plans" class="view"></section>
+  </main>
+</div>
+<div id="toast" class="toast"></div>
+<script src="libs/supabase.min.js"></script>
+<script src="assets/config.js"></script>
+<script src="assets/platform-modules.js"></script>
+<script src="assets/i18n.js"></script>
+<script src="assets/academic-analytics.js"></script>
+<script>window.addEventListener('load',()=>AcademicAnalyticsApp.init());</script>
+<script src="assets/ux-enhancements.js"></script>
+<script src="assets/amin-theme-injector.js"></script>
+<script src="assets/amin-icons.js" defer></script>
+</body>
+</html>
