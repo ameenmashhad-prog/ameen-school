@@ -5,13 +5,13 @@
 'use strict';
 
 var ROLE_SECTIONS = {
-  super_admin: ['overview','tasks','tasks','students','academic','finance','attendance','discipline','registrations','schedule','payroll','settings','system'],
-  admin: ['overview','students','academic','finance','attendance','discipline','registrations','schedule','payroll','settings','system'],
+  super_admin: ['overview','tasks','students','academic','counseling','finance','attendance','discipline','registrations','schedule','payroll','settings','system'],
+  admin: ['overview','students','academic','counseling','finance','attendance','discipline','registrations','schedule','payroll','settings','system'],
   finance: ['overview','finance'],
   academic: ['overview','tasks','students','academic','attendance','registrations','schedule'],
-  counselor: ['overview','students','attendance','discipline'],
-  psychologist: ['overview','students','attendance','discipline'],
-  discipline: ['overview','students','attendance','discipline'],
+  counselor: ['overview','counseling','students','attendance','discipline'],
+  psychologist: ['overview','counseling','students','attendance','discipline'],
+  discipline: ['overview','counseling','students','attendance','discipline'],
   teacher: ['overview','students','academic','attendance','schedule','tasks','certificates','messages','analytics_ai'],
   staff: ['overview','attendance','tasks','certificates','messages','analytics_ai'],
   hr: ['overview','attendance','tasks','certificates','messages','analytics_ai'],
@@ -22,19 +22,20 @@ var ROLE_SECTIONS = {
 var SECTIONS_META = {
   overview: { title: 'لوحة القيادة', icon: 'overview', order: 1 },
   students: { title: 'الطلاب', icon: 'students', order: 2 },
-  academic: { title: 'الأكاديمي', icon: 'academic', order: 3 },
-  finance: { title: 'المالية', icon: 'finance', order: 4 },
-  attendance: { title: 'الحضور', icon: 'attendance', order: 5 },
+  academic: { title: 'الأكاديمي والامتحانات 🎓', icon: 'academic', order: 3 },
+  finance: { title: 'المالية التنفيذية 💰', icon: 'finance', order: 4 },
+  counseling: { title: 'الإرشاد والسلوك 🧭', icon: 'discipline', order: 5 },
+  attendance: { title: 'الحضور', icon: 'attendance', order: 6 },
   tasks: { title: 'المهام والتكليفات 📋', icon: 'tasks', order: 12, external: 'tasks-management.html' },
   certificates: { title: 'الشهادات المطبوعة 🖨️', icon: 'award', order: 13, external: 'certificates-generator.html' },
   messages: { title: 'تواصل أولياء الأمور 💬', icon: 'chat', order: 14, external: 'parent-messages.html' },
   analytics_ai: { title: 'تحليلات الدعم 🤖', icon: 'chart-pie', order: 15, external: 'academic-analytics.html' },
-  discipline: { title: 'السلوك', icon: 'discipline', order: 6 },
-  registrations: { title: 'التسجيلات', icon: 'registrations', order: 7 },
-  schedule: { title: 'الجدول', icon: 'schedule', order: 8 },
-  payroll: { title: 'الرواتب', icon: 'payroll', order: 9 },
-  settings: { title: 'الإعدادات', icon: 'settings', order: 10 },
-  system: { title: 'النظام', icon: 'system', order: 11 }
+  discipline: { title: 'السلوك', icon: 'discipline', order: 7 },
+  registrations: { title: 'التسجيلات', icon: 'registrations', order: 8 },
+  schedule: { title: 'الجدول', icon: 'schedule', order: 9 },
+  payroll: { title: 'الرواتب', icon: 'payroll', order: 10 },
+  settings: { title: 'الإعدادات', icon: 'settings', order: 11 },
+  system: { title: 'الحوكمة والتشخيص 🛡️', icon: 'system', order: 16 }
 };
 
 var ROLE_LABELS = {
@@ -69,6 +70,7 @@ function getIcon(name, size) {
   }
   return '<span style="font-size:' + size + 'px;">•</span>';
 }
+window.getIcon = getIcon;
 
 window.renderLoading = function(containerId, message) {
   var c = document.getElementById(containerId) || document.getElementById('main-content');
@@ -485,7 +487,7 @@ window._filterStudents = function() {
 };
 
 // باقي الأقسام كـ placeholders
-var placeholderSections = ['academic','finance','attendance','discipline','registrations','schedule','payroll','settings','system'];
+var placeholderSections = ['attendance','discipline','registrations','schedule','payroll','settings'];
 placeholderSections.forEach(function(sectionId){
   window.SECTIONS[sectionId] = {
     title: SECTIONS_META[sectionId].title,
