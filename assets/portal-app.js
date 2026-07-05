@@ -174,6 +174,34 @@ async function checkAuth() {
   }
 }
 
+function buildQuickActions() {
+  var role = window.currentUserRole;
+  var box = document.getElementById('quick-actions-buttons');
+  if (!box) return;
+  
+  var html = '';
+  if (['admin','principal','supervisor','discipline','teacher','counselor','super_admin'].indexOf(role) !== -1) {
+    html += '<button class="btn small gold" style="white-space:nowrap;padding:6px 12px;font-size:13px;border-radius:6px;border:1px solid #B8860B;cursor:pointer;" onclick="location.href=\"attendance.html\"">⚡ تسجيل غياب يومي</button>';
+  }
+  if (['admin','principal','scientific','academic','academic_admin','teacher','super_admin'].indexOf(role) !== -1) {
+    html += '<button class="btn small blue" style="white-space:nowrap;padding:6px 12px;font-size:13px;border-radius:6px;border:1px solid #1976d2;cursor:pointer;" onclick="location.href=\"academic-pro.html\"">⚡ رصد درجات سريع</button>';
+  }
+  if (['admin','principal','scientific','academic','teacher','counselor','finance','hr','staff','super_admin'].indexOf(role) !== -1) {
+    html += '<button class="btn small green" style="white-space:nowrap;padding:6px 12px;font-size:13px;background:#25D366;color:white;border:none;border-radius:6px;cursor:pointer;" onclick="location.href=\"parent-messages.html\"">💬 واتساب لولي أمر</button>';
+  }
+  if (['admin','principal','finance','super_admin'].indexOf(role) !== -1) {
+    html += '<button class="btn small red" style="white-space:nowrap;padding:6px 12px;font-size:13px;border-radius:6px;border:1px solid #d32f2f;cursor:pointer;" onclick="location.href=\"parent-messages.html#overdue\"">⚠️ مطالبة أقساط متأخرة</button>';
+  }
+  if (['admin','principal','hr','super_admin'].indexOf(role) !== -1) {
+    html += '<button class="btn small gold" style="white-space:nowrap;padding:6px 12px;font-size:13px;border-radius:6px;border:1px solid #B8860B;cursor:pointer;" onclick="location.href=\"hr.html#leaves\"">🌴 اعتماد إجازات معلقة</button>';
+  }
+  if (['admin','principal','scientific','academic','teacher','counselor','super_admin'].indexOf(role) !== -1) {
+    html += '<button class="btn small blue" style="white-space:nowrap;padding:6px 12px;font-size:13px;border-radius:6px;border:1px solid #1976d2;cursor:pointer;" onclick="location.href=\"certificates-generator.html\"">🖨️ إصدار شهادة مطبوعة</button>';
+  }
+  
+  box.innerHTML = html;
+}
+
 function buildSidebar() {
   var role = window.currentUserRole;
   var allowed = ROLE_SECTIONS[role] || [];
