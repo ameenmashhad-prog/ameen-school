@@ -144,7 +144,12 @@ grant select on public.v_teacher_payroll_daily to authenticated;
 
 -- -------------------------------------------------------------
 -- 4) Update: الملخص الشهري الحالي يستخدم الوحدات اليومية بدل مجرد وجود نشاط واحد
+-- ملاحظة مهمة:
+-- نُسقط الـ View أولاً لأن PostgreSQL لا يسمح بتغيير أسماء/ترتيب أعمدة View
+-- عبر create or replace view إذا كانت النسخة السابقة مختلفة.
 -- -------------------------------------------------------------
+drop view if exists public.v_teacher_payroll_preview;
+
 create or replace view public.v_teacher_payroll_preview
 with (security_invoker=true) as
 select

@@ -293,6 +293,7 @@ grant select on public.v_teacher_lateness_today to authenticated;
 do $$
 begin
   if to_regclass('public.v_teacher_payroll_daily') is not null then
+    execute 'drop view if exists public.v_teacher_payroll_preview';
     execute $sql$
       create or replace view public.v_teacher_payroll_preview
       with (security_invoker=true) as
