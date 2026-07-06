@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>لوحة المالك التنفيذية — مدارس أمين الرضا</title>
+<link rel="stylesheet" href="assets/amin.css?v=20260706-5">
+<link rel="stylesheet" href="assets/i18n.css">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+.owner-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:16px}.owner-card{background:#fff;border:1px solid var(--border-subtle);border-radius:18px;padding:16px;box-shadow:var(--shadow-soft)}.owner-card h3{margin-bottom:12px}.owner-note{padding:12px 14px;border-radius:14px;background:#f8fafc;color:var(--text-secondary)}.owner-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.owner-box{padding:12px 14px;border-radius:16px;background:#fff;border:1px solid var(--border-subtle)}.owner-box small{display:block;color:var(--text-secondary);margin-bottom:4px}.owner-box b{font-size:20px}.owner-actions{display:flex;gap:8px;flex-wrap:wrap}.owner-bars{display:grid;gap:10px}.owner-bar-row{display:grid;grid-template-columns:170px 1fr 160px;gap:10px;align-items:center}.owner-bar-track{height:12px;border-radius:999px;background:#eef2f7;overflow:hidden}.owner-bar-track i{display:block;height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));border-radius:999px}@media(max-width:920px){.owner-grid,.owner-strip{grid-template-columns:1fr}.owner-bar-row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#mainContent">تخطي إلى المحتوى</a>
+<div class="shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><div class="brand-mark">م</div><div><h1>لوحة المالك</h1><small>قرار مالي وتنفيذي</small></div></div>
+    <div class="profile-mini"><div class="avatar">👑</div><div><b id="profileName">...</b><small id="profileRole">...</small></div></div>
+    <nav class="nav">
+      <button onclick="location.href='finance-growth-dashboard.html'">📈 نمو المؤسسة مالياً</button>
+      <button onclick="location.href='finance-monthly-close.html'">📘 الإقفال الشهري</button>
+      <button onclick="location.href='teacher-payroll-finance.html'">💵 رواتب المعلمين</button>
+      <button onclick="location.href='finance-pro.html'">💰 النظام المالي</button>
+      <button onclick="location.href='portal.html'">🏛️ البوابة الموحدة</button>
+    </nav>
+    <div class="side-footer"><button id="logoutBtn" class="btn red block">تسجيل الخروج</button></div>
+  </aside>
+  <main class="main" id="mainContent" tabindex="-1">
+    <header class="topbar"><button class="btn mobile-menu" id="mobileMenuBtn">☰</button><h2>لوحة المالك التنفيذية</h2><div class="top-actions"><button id="refreshBtn" class="btn blue">تحديث</button></div></header>
+    <section id="ownerRoot"></section>
+  </main>
+</div>
+<div id="toast" class="toast"></div>
+<script src="libs/supabase.min.js"></script>
+<script src="assets/config.js"></script>
+<script src="assets/i18n.js"></script>
+<script src="assets/owner-executive-board.js?v=20260706-1"></script>
+<script src="assets/ux-enhancements.js?v=20260706-3"></script>
+<script src="assets/amin-theme-injector.js"></script>
+<script src="assets/amin-icons.js?v=20260706-5" defer></script>
+</body>
+</html>
