@@ -107,10 +107,18 @@ async function fetchTgjuRate(){
     toast('تم جلب سعر الصرف',`${esc(d.source_label||d.source||'TGJU + مصادر إيرانية')}: ${irr(d.rate)}`,'green');
     updateUsdPreview();
   }catch(e){
-    LIVE_RATE={rate:0,source:'غير متوفر',source_label:'تعذر الوصول إلى TGJU والمصادر الإيرانية'};
-    if($('#payRate')) $('#payRate').value='0';
-    updateUsdPreview();
-    toast('تعذر جلب السعر','تعذر الوصول إلى TGJU والمصادر الإيرانية. تم وضع سعر الصرف = 0 لمنع استخدام سعر قديم. أدخلي السعر يدوياً. '+e.message,'red');
+    const archived=(DATA&&DATA.rates&&DATA.rates[0])?DATA.rates[0]:null;
+    if(archived&&num(archived.rate)>0){
+      LIVE_RATE={rate:num(archived.rate),source:archived.source||'archived',source_label:'آخر سعر محفوظ',sources_checked:0};
+      if($('#payRate')) $('#payRate').value=String(num(archived.rate));
+      updateUsdPreview();
+      toast('تعذر الجلب المباشر','تم استخدام آخر سعر محفوظ مؤقتاً ('+irr(archived.rate)+'). تحققي منه قبل الحفظ. '+e.message,'gold');
+    }else{
+      LIVE_RATE={rate:0,source:'غير متوفر',source_label:'تعذر الوصول إلى TGJU والمصادر الإيرانية'};
+      if($('#payRate')) $('#payRate').value='0';
+      updateUsdPreview();
+      toast('تعذر جلب السعر','تعذر الوصول إلى TGJU والمصادر الإيرانية. تم وضع سعر الصرف = 0 لمنع استخدام سعر قديم. أدخلي السعر يدوياً. '+e.message,'red');
+    }
   }finally{if(btn)btn.disabled=false}
 }
 function toggleTransfer(){$$('.transfer-fields').forEach(x=>x.style.display=$('#payMethod').value==='transfer'?'block':'none')}function toggleReceiverName(){const manual=$('#receivedBy')?.value==='__other__';const box=$('#receiverNameBox');if(box)box.style.display=manual?'block':'none'}function toggleCurrency(){}
