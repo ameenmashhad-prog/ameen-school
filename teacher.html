@@ -322,9 +322,97 @@
     if(progressRows.length) {
       html += '<div class="quick-note"><b>تقدم التأخير الشهري:</b><br>' + progressRows.map(function(rule){ return rule.rule_name+': مسجل '+num(rule.late_events)+' / المتبقي قبل الحسم '+num(rule.remaining_before_next_penalty); }).join('<br>') + '</div>';
     }
-    html += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button class="btn blue" onclick="location.href=\'teacher-session-checkin.html\'">فتح تسجيل دخول الحصة</button><button class="btn gold" onclick="TeacherPortal.showView(\'homeworks\')">فتح الواجبات</button></div>';
+    html += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button class="btn blue" onclick="TeacherPortal.showView(\'schedule\')">حصصي اليوم</button><button class="btn gold" onclick="TeacherPortal.showView(\'homeworks\')">فتح الواجبات</button></div>';
     html += '</div></div>';
     return html;
+  }
+
+  function renderTodaySessionWorkflowCard() {
+    var rows = (DATA.payrollTracking && DATA.payrollTracking.today_sessions) || [];
+    if(!rows.length) return '';
+    var cards = rows.map(function(x){
+      var checked = x.late_status && x.late_status !== 'not_checked_in';
+      var complete = num(x.payroll_units) >= 1;
+      var statusBadge = checked ? (x.late_status === 'late' ? '<span class="badge red">تم مع تأخير</span>' : '<span class="badge green">تم في الوقت</span>') : '<span class="badge blue">غير مسجلة</span>';
+      return '<div class="card" style="margin-bottom:12px"><div class="card-body">'
+        + '<div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap">'
+        + '<div><b>الحصة '+esc(x.period_number || '—')+'</b><div class="muted">'+esc(x.start_time || '—')+' · '+esc(x.class_name || '—')+' · '+esc(x.subject_name || '—')+'</div></div>'
+        + statusBadge
+        + '</div>'
+        + '<div class="quick-note" style="margin-top:10px">'
+        + '<b>حالة الراتب:</b> '+esc(x.payroll_status || '—')+'<br>'
+        + 'الوحدات المكتسبة: <b>'+num(x.payroll_units || 0)+'</b><br>'
+        + (complete ? '✅ الحصة مكتملة راتبياً<br>' : '⚠️ '+esc(x.recommended_next_step || 'ما زالت الحصة غير مكتملة')+'<br>')
+        + '</div>'
+        + '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">'
+        + '<button class="btn blue" onclick="TeacherPortal.checkInSession(\''+x.class_session_id+'\')">'+(checked?'إعادة تسجيل الدخول':'تسجيل الدخول')+'</button>'
+        + '<button class="btn gold" onclick="TeacherPortal.quickLessonPlan(\''+x.class_session_id+'\', \''+esc((x.subject_name||'').replace(/'/g,'&#039;'))+'\')">تحضير سريع</button>'
+        + '<button class="btn" style="background:#3A3565;color:white" onclick="TeacherPortal.quickHomework(\''+x.class_session_id+'\', \''+esc((x.subject_name||'').replace(/'/g,'&#039;'))+'\')">واجب سريع</button>'
+        + '</div>'
+        + '</div></div>';
+    }).join('');
+    return '<div class="card" style="margin-top:16px"><div class="card-head"><h3>حصصي اليوم — التنفيذ السريع</h3></div><div class="card-body">'+cards+'</div></div>';
+  }
+
+  async function checkInSession(id) {
+    try {
+      var res = await client().rpc('teacher_check_in_session', { p_session_id: id, p_checked_in_at: new Date().toISOString(), p_notes: null });
+      if (res.error) throw res.error;
+      if (res.data && res.data.ok === false) throw new Error(res.data.message || 'تعذر تسجيل الدخول');
+      toast('تم', (res.data && res.data.message) || 'تم تسجيل الدخول للحصة', 'green');
+      await loadAllData();
+      showView('overview');
+    } catch (e) {
+      toast('تعذر تسجيل الدخول', e.message || String(e), 'red');
+    }
+  }
+
+  async function quickLessonPlan(sessionId, subjectName) {
+    var title = prompt('عنوان الدرس:', subjectName ? ('درس ' + subjectName) : 'تحضير درس');
+    if(title === null) return;
+    title = (title || '').trim();
+    if(!title) { toast('تنبيه','أدخلي عنوان الدرس','red'); return; }
+    try {
+      var res = await client().rpc('save_lesson_plan', {
+        p_session_id: sessionId,
+        p_title: title,
+        p_objectives: null,
+        p_lesson_summary: null,
+        p_resources: null,
+        p_homework_hint: null
+      });
+      if (res.error) throw res.error;
+      if (res.data && res.data.ok === false) throw new Error(res.data.message || 'تعذر حفظ التحضير');
+      toast('تم','تم حفظ التحضير وتثبيت نشاط الحصة','green');
+      await loadAllData();
+      showView('overview');
+    } catch (e) {
+      toast('تعذر حفظ التحضير', e.message || String(e), 'red');
+    }
+  }
+
+  async function quickHomework(sessionId, subjectName) {
+    var title = prompt('عنوان الواجب:', subjectName ? ('واجب ' + subjectName) : 'واجب');
+    if(title === null) return;
+    title = (title || '').trim();
+    if(!title) { toast('تنبيه','أدخلي عنوان الواجب','red'); return; }
+    var dueDate = prompt('تاريخ التسليم (YYYY-MM-DD):', iso());
+    if(dueDate === null) return;
+    try {
+      var res = await client().rpc('create_session_homework', {
+        p_session_id: sessionId,
+        p_title: title,
+        p_description: null,
+        p_due_date: dueDate || null
+      });
+      if (res.error) throw res.error;
+      if (res.data && res.data.ok === false) throw new Error(res.data.message || 'تعذر إنشاء الواجب');
+      toast('تم','تم إنشاء الواجب وتثبيت نشاط الحصة','green');
+      await loadAllData();
+      showView('overview');
+    } catch (e) {
+      toast('تعذر إنشاء الواجب', e.message || String(e), 'red');
+    }
   }
 
   function showView(viewId) {
@@ -374,6 +462,7 @@
     }
 
     html += renderPayrollStatusCard();
+    html += renderTodaySessionWorkflowCard();
 
     container.innerHTML = html;
   }
@@ -429,7 +518,7 @@
     var rows = DATA.schedule.filter(function(s){return num(s.day)===todayDay;}).map(function(s){
       return [getSubjectName(s.subject_id), (s.start||'')+' - '+(s.end||''), getClassName(s.class_id)];
     });
-    c.innerHTML = wrapCard('جدولي', buildTable(['المادة','الوقت','الصف'], rows));
+    c.innerHTML = wrapCard('جدولي', buildTable(['المادة','الوقت','الصف'], rows)) + renderTodaySessionWorkflowCard();
   }
 
   function renderHomeworks(){
@@ -678,7 +767,7 @@
     if(mm){ mm.addEventListener('click', function(){ var sb=document.getElementById('sidebar'); if(sb){ sb.classList.toggle('open'); } }); }
   }
 
-  window.TeacherPortal = { showView: showView };
+  window.TeacherPortal = { showView: showView, checkInSession: checkInSession, quickLessonPlan: quickLessonPlan, quickHomework: quickHomework };
 
   init().catch(function(e){ console.error('Teacher init error:', e); }).finally(function(){
     try{ wireNav(); showView('overview'); }catch(e){ console.error(e); }
