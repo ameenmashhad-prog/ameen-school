@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>رواتب المعلمين اليومية — مدارس أمين الرضا</title>
+<link rel="stylesheet" href="assets/amin.css?v=20260706-5">
+<link rel="stylesheet" href="assets/i18n.css">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+.payroll-grid{display:grid;grid-template-columns:2fr 1fr;gap:16px}.payroll-card{background:#fff;border:1px solid var(--border-subtle);border-radius:18px;padding:16px;box-shadow:var(--shadow-soft)}.payroll-card h3{margin-bottom:12px}.quick-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.quick-box{padding:12px 14px;border-radius:16px;background:#fff;border:1px solid var(--border-subtle)}.quick-box small{display:block;color:var(--text-secondary);margin-bottom:4px}.quick-box b{font-size:20px}.muted-note{padding:12px 14px;border-radius:14px;background:#f8fafc;color:var(--text-secondary)}@media(max-width:920px){.payroll-grid,.quick-strip{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#mainContent">تخطي إلى المحتوى</a>
+<div class="shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><div class="brand-mark">ر</div><div><h1>رواتب المعلمين</h1><small>حصص · خصومات · صافي</small></div></div>
+    <div class="profile-mini"><div class="avatar">💵</div><div><b id="profileName">...</b><small id="profileRole">...</small></div></div>
+    <nav class="nav">
+      <button onclick="location.href='finance-pro.html'">💰 النظام المالي</button>
+      <button onclick="location.href='teacher-punctuality-admin.html'">⏱️ تأخير المعلمين والحسميات</button>
+      <button onclick="location.href='finance-growth-dashboard.html'">📈 نمو المؤسسة مالياً</button>
+      <button onclick="location.href='portal.html'">🏛️ البوابة الموحدة</button>
+    </nav>
+    <div class="side-footer"><button id="logoutBtn" class="btn red block">تسجيل الخروج</button></div>
+  </aside>
+  <main class="main" id="mainContent" tabindex="-1">
+    <header class="topbar"><button class="btn mobile-menu" id="mobileMenuBtn">☰</button><h2>رواتب المعلمين اليومية</h2><div class="top-actions"><button id="refreshBtn" class="btn blue">تحديث</button></div></header>
+    <section id="teacherPayrollRoot"></section>
+  </main>
+</div>
+<div id="toast" class="toast"></div>
+<script src="libs/supabase.min.js"></script>
+<script src="assets/config.js"></script>
+<script src="assets/i18n.js"></script>
+<script src="assets/teacher-payroll-finance.js?v=20260706-1"></script>
+<script src="assets/ux-enhancements.js?v=20260706-3"></script>
+<script src="assets/amin-theme-injector.js"></script>
+<script src="assets/amin-icons.js?v=20260706-5" defer></script>
+</body>
+</html>
