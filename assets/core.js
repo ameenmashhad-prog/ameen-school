@@ -1,7 +1,16 @@
 /* مدارس أمين الرضا (ع) — Clean Role Portals
-   Vanilla JS + local Supabase + Vercel /api proxy. */
+   Vanilla JS + local Supabase + Vercel /api proxy.
+   ملاحظة صيانة:
+   - هذا الملف هو runtime الفعلي لصفحات index.html و staff.html وبعض البوابات الدورّية.
+   - لا يُعتبر بديلاً عن assets/portal-app.js لصفحة portal.html.
+*/
 (function(){
 'use strict';
+window.AMIN_RUNTIME_INFO = Object.assign({}, window.AMIN_RUNTIME_INFO || {}, {
+  core: 'assets/core.js',
+  core_mode: 'role-portals',
+  core_active: true
+});
 
 const cfg = () => window.AMIN_CONFIG || {};
 let sb = null;

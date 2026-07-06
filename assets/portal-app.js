@@ -1,8 +1,17 @@
 /* ================================================================
-   AMIN PORTAL APP - منطق البوابة الموحدة (مُصلَح)
+   AMIN PORTAL APP - منطق البوابة الموحدة (المسار الرسمي الحالي)
+   ملاحظة صيانة:
+   - هذا هو runtime المعتمد فعلياً لصفحة portal.html في الإنتاج.
+   - لا يعتمد على assets/unified-portal.js حالياً.
+   - أي تعديلات تخص البوابة الرئيسية يجب أن تبدأ من هذا الملف أولاً.
    ================================================================ */
 (function(){
 'use strict';
+window.AMIN_RUNTIME_INFO = Object.assign({}, window.AMIN_RUNTIME_INFO || {}, {
+  portal: 'assets/portal-app.js',
+  portal_mode: 'production',
+  portal_active: true
+});
 
 var ROLE_SECTIONS = {
   super_admin: ['overview','tasks','students','academic','counseling','finance','attendance','discipline','registrations','schedule','payroll','settings','system'],

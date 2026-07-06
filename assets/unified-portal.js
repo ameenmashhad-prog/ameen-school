@@ -1,6 +1,16 @@
-/* Unified Portal — permission-aware grouped gateway */
+/* Unified Portal — permission-aware grouped gateway
+   ملاحظة صيانة:
+   - هذا الملف موجود كمسار بديل/تجريبي أو مرجعي.
+   - portal.html في الإنتاج لا يحمّله حالياً، بل يعتمد على assets/portal-app.js.
+   - لا تفعّله في الإنتاج إلا بعد refactor مقصود واختبار كامل.
+*/
 (function(){
   'use strict';
+  window.AMIN_RUNTIME_INFO = Object.assign({}, window.AMIN_RUNTIME_INFO || {}, {
+    unified_portal: 'assets/unified-portal.js',
+    unified_portal_mode: 'legacy-or-experimental',
+    unified_portal_active: false
+  });
 
   let sb = null;
   let ME = null;
