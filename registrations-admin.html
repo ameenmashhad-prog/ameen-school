@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>طلبات التسجيل — مدارس أمين الرضا</title>
-  <link rel="stylesheet" href="assets/amin.css?v=20260706-4">
+  <link rel="stylesheet" href="assets/amin.css?v=20260706-5">
 <link rel="icon" href="/favicon.ico" sizes="any"><link rel="stylesheet" href="assets/registration.css">
 <link rel="stylesheet" href="assets/i18n.css">
 <link rel="manifest" href="manifest.webmanifest">
@@ -33,7 +33,7 @@ async function loadFamilies(){const {data,error}=await sb.from('v_registration_f
 async function loadTeachers(){const {data,error}=await sb.from('registration_teachers').select('*').order('created_at',{ascending:false});if(error){$('#teachersBox').innerHTML='<div class="empty">'+esc(error.message)+'</div>';return}const rows=(data||[]).map(r=>'<tr><td>'+esc(r.full_name)+'</td><td>'+esc(r.qualification||'—')+'</td><td>'+esc(r.specialization||'—')+'</td><td>'+esc(r.phone||'—')+'</td><td>'+esc(r.email||'—')+'</td><td><span class="badge gold">'+esc(r.status)+'</span></td><td><button class="btn blue" onclick="activateAccount(\'teacher\',\''+r.id+'\')">تفعيل الحساب</button> <button class="btn green" onclick="setStatus(\'registration_teachers\',\''+r.id+'\',\'approved\')">اعتماد</button> <button class="btn red" onclick="setStatus(\'registration_teachers\',\''+r.id+'\',\'rejected\')">رفض</button></td></tr>');$('#teachersBox').innerHTML=table(['المعلم','المؤهل','التخصص','الهاتف','البريد','الحالة','إجراء'],rows)}
 async function loadAll(){if(!await ensure())return;await Promise.all([loadFamilies(),loadTeachers()])}
 window.addEventListener('load',loadAll);
-</script><script src="assets/ux-enhancements.js?v=20260706-2"></script>
+</script><script src="assets/ux-enhancements.js?v=20260706-3"></script>
 <script src="assets/amin-theme-injector.js"></script>
 <script src="assets/amin-icons.js?v=20260706-3" defer></script>
 </body></html>

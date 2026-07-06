@@ -268,8 +268,8 @@
   }
   function setupLiteMode(){
     const params=new URLSearchParams(location.search);
-    const hasLegacySidebar=!!document.querySelector('#sidebar') && (document.body.dataset.portal||'') !== 'unified';
-    if(params.get('lite')!=='1' && !hasLegacySidebar)return;
+    const explicitLite=params.get('lite')==='1' || document.body.dataset.forceLite==='1';
+    if(!explicitLite)return;
     document.body.classList.add('unified-lite');
     const build=()=>{
       if(document.querySelector('.unified-lite-nav'))return;
