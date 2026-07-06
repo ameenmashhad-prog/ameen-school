@@ -1,7 +1,10 @@
 -- ============================================================================
--- 130) Payload موحد للوحة نمو المؤسسة مالياً
--- يجمع الدخل + المصروف + رواتب HR + أجور المعلمين + المشتريات + المتأخرات
--- مع اتجاه 6 أشهر وتوقع أولي للشهر القادم.
+-- 134) Hotfix: تصحيح معدل التحصيل في لوحة النمو المالي
+-- يعالج القيم المضللة مثل 7081% عندما يكون التحصيل النقدي أعلى من مستحقات الشهر.
+--
+-- المنهج الجديد:
+-- collectionRate = ما تم تسديده فعلياً على أقساط هذا الشهر / مجموع مستحقات هذا الشهر
+-- مع سقف أعلى 100%
 -- ============================================================================
 
 create or replace function public.finance_growth_month_snapshot(
@@ -128,90 +131,6 @@ $$;
 
 grant execute on function public.finance_growth_month_snapshot(date) to authenticated;
 
-create or replace function public.get_finance_growth_payload(
-  p_month text default null
-)
-returns jsonb
-language plpgsql
-security definer
-set search_path = public
-stable
-as $$
-declare
-  base_month date;
-  trend jsonb := '[]'::jsonb;
-  stats jsonb;
-  previous_stats jsonb;
-  forecast jsonb := '{}'::jsonb;
-begin
-  if coalesce(p_month,'') <> '' then
-    base_month := to_date(p_month || '-01', 'YYYY-MM-DD');
-  else
-    base_month := date_trunc('month', current_date)::date;
-  end if;
-
-  stats := public.finance_growth_month_snapshot(base_month);
-  previous_stats := public.finance_growth_month_snapshot((base_month - interval '1 month')::date);
-
-  with months as (
-    select (date_trunc('month', base_month) - (g.n || ' months')::interval)::date as month_start
-    from generate_series(5,0,-1) as g(n)
-  )
-  select coalesce(jsonb_agg(public.finance_growth_month_snapshot(month_start) order by month_start), '[]'::jsonb)
-    into trend
-  from months;
-
-  with recent as (
-    select public.finance_growth_month_snapshot((date_trunc('month', base_month) - (g.n || ' months')::interval)::date) as s
-    from generate_series(2,0,-1) as g(n)
-  )
-  select jsonb_build_object(
-    'month', to_char((base_month + interval '1 month')::date, 'YYYY-MM'),
-    'cashIncome', round(avg((s->>'cashIncome')::numeric), 2),
-    'payrollTotal', round(avg((s->>'payrollTotal')::numeric), 2),
-    'operatingExpense', round(avg((s->>'operatingExpense')::numeric), 2),
-    'procurementCommitted', round(avg((s->>'procurementCommitted')::numeric), 2),
-    'operatingSurplus', round(avg((s->>'cashIncome')::numeric), 2) - round(avg((s->>'operatingExpense')::numeric), 2)
-  )
-  into forecast
-  from recent;
-
-  return jsonb_build_object(
-    'ok', true,
-    'month', to_char(base_month, 'YYYY-MM'),
-    'stats', stats,
-    'previous', previous_stats,
-    'trend_6_months', trend,
-    'forecast_next_month', forecast
-  );
-end;
-$$;
-
-grant execute on function public.get_finance_growth_payload(text) to authenticated;
-
-create or replace function public.finance_growth_payload_health_check()
-returns jsonb
-language plpgsql
-security definer
-set search_path = public
-stable
-as $$
-begin
-  return jsonb_build_object(
-    'ok', true,
-    'checked_at', now(),
-    'month_snapshot_rpc', to_regprocedure('public.finance_growth_month_snapshot(date)') is not null,
-    'growth_payload_rpc', to_regprocedure('public.get_finance_growth_payload(text)') is not null,
-    'teacher_payroll_view', to_regclass('public.v_teacher_payroll_preview') is not null,
-    'hr_payroll_view', to_regclass('public.v_hr_payroll_detailed') is not null,
-    'purchase_requests_view', to_regclass('public.v_purchase_requests_detailed') is not null,
-    'expenses_view', to_regclass('public.v_finance_expenses_detailed') is not null
-  );
-end;
-$$;
-
-grant execute on function public.finance_growth_payload_health_check() to authenticated;
-
 notify pgrst, 'reload schema';
 
-select public.finance_growth_payload_health_check() as finance_growth_payload_health;
+select 'finance_growth_collection_rate_hotfix_ready' as status;

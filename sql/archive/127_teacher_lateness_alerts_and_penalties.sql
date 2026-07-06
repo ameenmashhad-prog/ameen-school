@@ -53,6 +53,21 @@ create table if not exists public.teacher_lateness_rules (
   updated_at timestamptz not null default now()
 );
 
+with ranked as (
+  select id,
+         row_number() over (
+           partition by min_late_minutes, coalesce(max_late_minutes,-1), repeat_count, penalty_session_units
+           order by created_at asc, id asc
+         ) as rn
+  from public.teacher_lateness_rules
+)
+delete from public.teacher_lateness_rules t
+using ranked r
+where t.id = r.id and r.rn > 1;
+
+create unique index if not exists uq_teacher_lateness_rules_logic
+  on public.teacher_lateness_rules(min_late_minutes, coalesce(max_late_minutes,-1), repeat_count, penalty_session_units);
+
 insert into public.teacher_lateness_rules(rule_name,min_late_minutes,max_late_minutes,repeat_count,penalty_session_units,is_active,sort_order,notes)
 values
   ('تأخير 5 إلى 9 دقائق',5,9,5,1,true,10,'كل 5 مرات = خصم حصة واحدة'),
