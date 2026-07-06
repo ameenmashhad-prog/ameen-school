@@ -11,7 +11,6 @@ create extension if not exists pgcrypto;
 create table if not exists public.finance_monthly_closes (
   id uuid primary key default gen_random_uuid(),
   month_start date not null unique,
-  month_key text generated always as (to_char(month_start,'YYYY-MM')) stored,
   status text not null default 'draft' check (status in ('draft','approved')),
   snapshot jsonb not null,
   notes text,
@@ -22,6 +21,8 @@ create table if not exists public.finance_monthly_closes (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+alter table public.finance_monthly_closes drop column if exists month_key;
 
 create index if not exists idx_finance_monthly_closes_month on public.finance_monthly_closes(month_start desc);
 
@@ -40,7 +41,7 @@ with (security_invoker=true) as
 select
   c.id,
   c.month_start,
-  c.month_key,
+  to_char(c.month_start,'YYYY-MM') as month_key,
   c.status,
   c.notes,
   c.closed_by,
