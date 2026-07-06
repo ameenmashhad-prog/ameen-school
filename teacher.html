@@ -115,7 +115,8 @@
     classes: [],
     subjects: [],
     homeworks: [],
-    notifications: []
+    notifications: [],
+    payrollTracking: null
   };
   let SUBJECTS_MAP = {};
   let CLASSES_MAP = {};
@@ -216,7 +217,8 @@
         c.from('subjects').select('id, name'),
         c.from('classes').select('id, name'),
         c.from('weekly_schedule').select('*').eq('teacher_id', ME.id),
-        c.from('school_notifications').select('*').eq('recipient_user_id', ME.id).order('created_at', {ascending: false}).limit(10).then(function(r){ return r; }).catch(function(){ return {data: []}; })
+        c.from('school_notifications').select('*').eq('recipient_user_id', ME.id).order('created_at', {ascending: false}).limit(10).then(function(r){ return r; }).catch(function(){ return {data: []}; }),
+        c.rpc('get_my_teacher_payroll_tracking', { p_month: iso().slice(0,7) }).then(function(r){ return r; }).catch(function(){ return {data:null}; })
       ]);
       
       // المواد والصفوف
@@ -226,6 +228,7 @@
       DATA.classes = results[1].data || [];
       DATA.schedule = results[2].data || [];
       DATA.notifications = results[3].data || [];
+      DATA.payrollTracking = (results[4] && results[4].data && results[4].data.ok !== false) ? results[4].data : null;
       
       // جلب الطلاب من الصفوف التي يدرّسها المعلم
       const classIds = Array.from(new Set(DATA.schedule.map(function(s){ return s.class_id; }).filter(Boolean)));
@@ -277,8 +280,51 @@
     if(needAttention.length > 0) {
       alerts.push({type:'warning',icon:'👥',title:'طلاب يحتاجون متابعة',message:needAttention.length+' طلاب غيابهم مرتفع'});
     }
+
+    if(DATA.payrollTracking && DATA.payrollTracking.monthly_summary) {
+      var sum = DATA.payrollTracking.monthly_summary;
+      var todaySessions = DATA.payrollTracking.today_sessions || [];
+      var missing = todaySessions.filter(function(x){ return num(x.payroll_units) < 1; }).length;
+      if(missing > 0) {
+        alerts.push({type:'warning',icon:'🧾',title:'حصص غير مكتملة راتبياً',message:missing+' حصة اليوم تحتاج تحضيراً أو واجباً أو تسجيل دخول'});
+      }
+      if(num(sum.penalty_units) > 0) {
+        alerts.push({type:'danger',icon:'⏱️',title:'حسميات تأخير هذا الشهر',message:'تم خصم '+sum.penalty_units+' وحدة من استحقاقك الشهري'});
+      }
+      (DATA.payrollTracking.lateness_progress || []).forEach(function(rule){
+        if(num(rule.remaining_before_next_penalty) > 0 && num(rule.remaining_before_next_penalty) <= 1) {
+          alerts.push({type:'warning',icon:'🚨',title:'أنت قريب من حسم جديد',message:'بقي '+rule.remaining_before_next_penalty+' فقط على قاعدة: '+rule.rule_name});
+        }
+      });
+    }
     
     return alerts;
+  }
+
+  function renderPayrollStatusCard() {
+    if(!DATA.payrollTracking || !DATA.payrollTracking.monthly_summary) return '';
+    var sum = DATA.payrollTracking.monthly_summary;
+    var todayRows = DATA.payrollTracking.today_sessions || [];
+    var progressRows = DATA.payrollTracking.lateness_progress || [];
+    var missing = todayRows.filter(function(x){ return num(x.payroll_units) < 1; });
+    var statusColor = num(sum.penalty_units) > 0 ? 'red' : (missing.length ? 'gold' : 'green');
+    var html = '<div class="card" style="margin-top:16px">';
+    html += '<div class="card-head"><h3>وضعي الراتبي هذا الشهر</h3></div><div class="card-body">';
+    html += '<div class="kpis" style="margin-bottom:12px">';
+    html += '<div class="kpi blue"><small>الوحدات المكتسبة</small><b>'+num(sum.gross_units)+'</b></div>';
+    html += '<div class="kpi red"><small>الوحدات المخصومة</small><b>'+num(sum.penalty_units)+'</b></div>';
+    html += '<div class="kpi green"><small>صافي الوحدات</small><b>'+num(sum.net_units)+'</b></div>';
+    html += '<div class="kpi '+statusColor+'"><small>المبلغ التقديري</small><b>'+money(sum.estimated_amount||0)+'</b></div>';
+    html += '</div>';
+    if(missing.length) {
+      html += '<div class="quick-note" style="margin-bottom:12px"><b>حصص اليوم التي تحتاج استكمال:</b><br>' + missing.map(function(x){ return 'الحصة '+(x.period_number || '—')+' — '+(x.recommended_next_step || 'استكملي الخطوات المطلوبة'); }).join('<br>') + '</div>';
+    }
+    if(progressRows.length) {
+      html += '<div class="quick-note"><b>تقدم التأخير الشهري:</b><br>' + progressRows.map(function(rule){ return rule.rule_name+': مسجل '+num(rule.late_events)+' / المتبقي قبل الحسم '+num(rule.remaining_before_next_penalty); }).join('<br>') + '</div>';
+    }
+    html += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button class="btn blue" onclick="location.href=\'teacher-session-checkin.html\'">فتح تسجيل دخول الحصة</button><button class="btn gold" onclick="TeacherPortal.showView(\'homeworks\')">فتح الواجبات</button></div>';
+    html += '</div></div>';
+    return html;
   }
 
   function showView(viewId) {
@@ -326,6 +372,8 @@
     } else {
       html += '<div class="amin-empty"><div class="amin-empty-mark"></div><div class="amin-empty-title">لا توجد تنبيهات حالياً</div></div>';
     }
+
+    html += renderPayrollStatusCard();
 
     container.innerHTML = html;
   }
@@ -546,8 +594,8 @@
           var currentFile = t.question_file_url ? '<a class="btn small blue" href="/api/proxy/storage/v1/object/public/exam-questions/' + t.question_file_url + '" target="_blank" style="margin-bottom:4px;display:inline-block">عرض الأسئلة السابقة 📄</a>' : '';
           
           uploadArea = rejectBanner + currentFile + '<div style="display:flex;flex-direction:column;gap:4px">' +
-            '<div class="upload-box" style="padding:4px;border:1px dashed #0B6E4F;border-radius:6px;background:#f0fdf4"><label style="font-weight:bold;color:#0B6E4F;font-size:12px;cursor:pointer;display:block;text-align:center">⚡ اضغطي هنا لرفع ملف الأسئلة وحفظ المادة المطلوبة فوراً<input type="file" id="qf_' + t.id + '" accept=".pdf,.doc,.docx,image/*" style="display:none" onchange="TeacherPortal.quickUploadTask(this, '' + t.id + '', '' + t.schedule_id + '')"></label></div>' +
-            '<button class="btn small gold block" onclick="TeacherPortal.reportOfflineDelivery('' + t.id + '', '' + t.schedule_id + '')">إثبات تسليم بديل (واتساب/إيتا/بله/يدوي) 📲</button>' +
+            '<div class="upload-box" style="padding:4px;border:1px dashed #0B6E4F;border-radius:6px;background:#f0fdf4"><label style="font-weight:bold;color:#0B6E4F;font-size:12px;cursor:pointer;display:block;text-align:center">⚡ اضغطي هنا لرفع ملف الأسئلة وحفظ المادة المطلوبة فوراً<input type="file" id="qf_' + t.id + '" accept=".pdf,.doc,.docx,image/*" style="display:none" onchange="TeacherPortal.quickUploadTask(this, \'" + t.id + "\', \'" + t.schedule_id + "\')"></label></div>' +
+            '<button class="btn small gold block" onclick="TeacherPortal.reportOfflineDelivery(\'' + t.id + '\', \'' + t.schedule_id + '\')">إثبات تسليم بديل (واتساب/إيتا/بله/يدوي) 📲</button>' +
             '</div>';
         }
 
