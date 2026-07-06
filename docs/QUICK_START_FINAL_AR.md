@@ -8,6 +8,10 @@
 5. `sql/archive/130_finance_growth_payload.sql`
 6. `sql/archive/132_finance_monthly_close_generated_column_hotfix.sql`
 7. `sql/archive/131_finance_monthly_close_and_approval.sql`
+8. `sql/archive/133_teacher_lateness_rules_deduplicate_hotfix.sql`
+9. `sql/archive/134_finance_growth_collection_rate_hotfix.sql`
+10. `sql/archive/135_teacher_homework_permission_hotfix.sql`
+11. `sql/archive/137_teacher_payroll_evidence_hard_rebuild_hotfix.sql`
 
 ## 2) الصفحات الأساسية
 ### للمعلم

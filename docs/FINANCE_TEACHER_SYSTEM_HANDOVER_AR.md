@@ -76,6 +76,10 @@
 5. `130_finance_growth_payload.sql`
 6. `132_finance_monthly_close_generated_column_hotfix.sql`
 7. `131_finance_monthly_close_and_approval.sql`
+8. `133_teacher_lateness_rules_deduplicate_hotfix.sql`
+9. `134_finance_growth_collection_rate_hotfix.sql`
+10. `135_teacher_homework_permission_hotfix.sql`
+11. `137_teacher_payroll_evidence_hard_rebuild_hotfix.sql`
 
 > ملاحظة مهمة:
 > اسم الملف الصحيح هو:
