@@ -20,6 +20,39 @@ function inject3DStyles() {
       filter: drop-shadow(0 2px 5px rgba(27, 35, 53, 0.18));
       flex-shrink: 0;
     }
+    .amin-3d-with-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .amin-3d-icon-only {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .amin-3d-label {
+      display: inline-block;
+      min-width: 0;
+    }
+    .brand-mark.amin-3d-icon-only,
+    .avatar.amin-3d-icon-only,
+    .mobile-toggle.amin-3d-icon-only,
+    #amin-floating-controls button.amin-3d-icon-only {
+      padding: 0;
+    }
+    .topbar h1.amin-3d-with-label,
+    .topbar h2.amin-3d-with-label,
+    .topbar h3.amin-3d-with-label,
+    .app-topbar h1.amin-3d-with-label,
+    .app-topbar h2.amin-3d-with-label,
+    .app-topbar h3.amin-3d-with-label,
+    .page-head h1.amin-3d-with-label,
+    .page-head h2.amin-3d-with-label,
+    .page-head h3.amin-3d-with-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
     .sidebar-nav-item:hover .amin-3d-ico,
     .bottom-nav-item:hover .amin-3d-ico,
     button:hover > .amin-3d-ico,
@@ -139,9 +172,35 @@ const CLAY_ICONS = {
   eye: make3D('eye', `<path d="M3 16 C7 8 16 8 29 16 C25 24 16 24 3 16 Z" fill="url(#grad)"/><path d="M4 16 C8 10 16 10 28 16 C24 20 16 20 4 16 Z" fill="url(#hi)"/><circle cx="16" cy="16" r="5" fill="#1B2335"/><circle cx="17" cy="15" r="2" fill="#45D8FF"/>`)
 };
 
+const ICON_ALIASES = {
+  doc:'clipboard',
+  note:'clipboard',
+  card:'finance',
+  trendUp:'chart',
+  crown:'award',
+  star:'sparkle',
+  box:'folder',
+  warning:'shield',
+  heart:'counseling',
+  key:'settings',
+  lock:'shield',
+  target:'tasks',
+  download:'folder',
+  upload:'folder',
+  phone:'chat',
+  mail:'messages'
+};
+
+function resolveIconName(name) {
+  if (CLAY_ICONS[name]) return name;
+  if (ICON_ALIASES[name] && CLAY_ICONS[ICON_ALIASES[name]]) return ICON_ALIASES[name];
+  return CLAY_ICONS.sparkle ? 'sparkle' : 'overview';
+}
+
 function create(name, size, state) {
   size = size || 24;
-  const ico = CLAY_ICONS[name] || CLAY_ICONS.star || make3D('default', `<circle cx="16" cy="16" r="10" fill="url(#grad)"/>`);
+  const iconName = resolveIconName(name);
+  const ico = CLAY_ICONS[iconName] || make3D('default', `<circle cx="16" cy="16" r="10" fill="url(#grad)"/>`);
   return `<span class="amin-3d-ico-wrap" style="display:inline-flex;align-items:center;justify-content:center;width:${size}px;height:${size}px;">${ico}</span>`;
 }
 
@@ -150,36 +209,106 @@ function create(name, size, state) {
 const EMOJI_MAP = {
   '📚':'books', '📖':'book', '📄':'doc', '📝':'note', '🧾':'doc', '📋':'clipboard',
   '💰':'finance', '💵':'money', '💳':'card',
-  '👥':'users', '👨‍👩‍👧':'users', '👨‍🏫':'person', '👨‍🎓':'students', '👨':'person', '👩':'person', '👧':'person', '👦':'person',
+  '👥':'users', '👨‍👩‍👧':'users', '👨‍🏫':'person', '👨‍🎓':'students', '👨':'person', '👩':'person', '👧':'person', '👦':'person', '👔':'users',
   '📅':'calendar', '🗓️':'calendar', '🗓':'calendar', '⏱️':'calendar', '⏱':'calendar',
   '📊':'chart', '📈':'trendUp',
-  '🏆':'trophy', '👑':'crown', '🏅':'award', '🌟':'star', '⭐':'star',
+  '🏆':'trophy', '👑':'crown', '🏅':'award', '🌟':'star', '⭐':'star', '🎓':'academic',
   '📦':'box',
-  '🏢':'home', '🏫':'home', '🏠':'home',
-  '🔬':'sparkle', '🧪':'sparkle', '✨':'sparkle', '🤖':'ai',
+  '🏢':'home', '🏫':'home', '🏠':'home', '🏛️':'home', '🏛':'home',
+  '🔬':'sparkle', '🧪':'sparkle', '✨':'sparkle', '🤖':'ai', '🚀':'system', '💻':'academic',
   '🚌':'bus',
   '⚙️':'settings', '⚙':'settings', '🔧':'settings',
   '🛡️':'shield', '🛡':'shield', '⚠️':'warning', '⚠':'warning', '🚨':'warning',
   '✅':'check', '✔':'check', '🟢':'check', '🎯':'target', '😊':'check', '💚':'heart',
   '🔑':'key', '🔐':'lock',
-  '🔄':'refresh',
+  '🔄':'refresh', '☰':'menu',
   '📥':'download', '📤':'upload',
-  '📞':'phone', '💬':'chat', '✉️':'mail', '✉':'mail', '🔔':'bell', '📣':'bell',
-  '🖨️':'print', '🖨':'print', '🌴':'sun'
+  '📞':'phone', '💬':'chat', '✉️':'mail', '✉':'mail', '🔔':'bell', '📣':'bell', '📢':'bell',
+  '🖨️':'print', '🖨':'print', '🌴':'sun', '☀️':'sun', '☀':'sun', '🌙':'moon'
 };
+const EMOJI_KEYS = Object.keys(EMOJI_MAP).sort((a,b) => b.length - a.length);
+const SCAN_SELECTORS = [
+  '.amin-3d-ico-auto',
+  '.brand-mark',
+  '.avatar',
+  '.nav button',
+  '.sidebar button',
+  '.topbar h1', '.topbar h2', '.topbar h3',
+  '.topbar button',
+  '.app-topbar h1', '.app-topbar h2', '.app-topbar h3',
+  '.app-topbar button',
+  '.page-head h1', '.page-head h2', '.page-head h3',
+  '.bottom-nav-item',
+  '.logout-btn',
+  '#amin-floating-controls button'
+].join(',');
+
+function escHtml(v) {
+  return String(v == null ? '' : v)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function findEmojiMeta(text) {
+  const raw = String(text || '').trim();
+  for (const key of EMOJI_KEYS) {
+    if (raw.includes(key)) {
+      return { emoji: key, icon: EMOJI_MAP[key] };
+    }
+  }
+  return null;
+}
+
+function labelWithoutEmoji(text, emoji) {
+  return String(text || '').replace(emoji, '').replace(/\s{2,}/g, ' ').trim();
+}
+
+function sizeForElement(el) {
+  if (!el || !el.matches) return 24;
+  if (el.matches('.brand-mark')) return 28;
+  if (el.matches('.avatar')) return 22;
+  if (el.matches('.topbar h1, .topbar h2, .topbar h3, .app-topbar h1, .app-topbar h2, .app-topbar h3, .page-head h1, .page-head h2, .page-head h3')) return 24;
+  if (el.matches('.topbar button, .app-topbar button, .nav button, .sidebar button, .bottom-nav-item, .logout-btn, #amin-floating-controls button')) return 22;
+  return Number(el.getAttribute('data-size') || 24);
+}
+
+function upgradeAutoIcon(el) {
+  const size = Number(el.getAttribute('data-size') || 36);
+  const emoji = (el.getAttribute('data-emoji') || el.textContent || '').trim();
+  const meta = findEmojiMeta(emoji);
+  el.outerHTML = create(meta ? meta.icon : 'sparkle', size);
+}
+
+function upgradeTextElement(el) {
+  if (!el || el.getAttribute('data-amin-emoji-upgraded') === '1') return;
+  if (el.querySelector && el.querySelector('.amin-3d-ico-wrap')) return;
+
+  const meta = findEmojiMeta(el.textContent || '');
+  if (!meta) return;
+
+  const label = labelWithoutEmoji(el.textContent, meta.emoji);
+  const iconHtml = create(meta.icon, sizeForElement(el));
+  const isIconOnly = !label;
+
+  el.setAttribute('data-amin-emoji-upgraded', '1');
+  el.setAttribute('data-amin-icon-name', resolveIconName(meta.icon));
+  el.classList.add(isIconOnly ? 'amin-3d-icon-only' : 'amin-3d-with-label');
+  el.innerHTML = isIconOnly
+    ? iconHtml
+    : `${iconHtml}<span class="amin-3d-label">${escHtml(label)}</span>`;
+}
 
 function autoReplaceEmojis(root) {
   root = root || document.body;
   if (!root) return;
-  
-  root.querySelectorAll('.amin-3d-ico-auto').forEach(el => {
-    const size = Number(el.getAttribute('data-size') || 36);
-    const emoji = (el.getAttribute('data-emoji') || '').trim();
-    let icoName = 'star';
-    for (const k in EMOJI_MAP) {
-      if (emoji.includes(k)) { icoName = EMOJI_MAP[k]; break; }
-    }
-    el.outerHTML = create(icoName, size);
+
+  root.querySelectorAll('.amin-3d-ico-auto').forEach(upgradeAutoIcon);
+  root.querySelectorAll(SCAN_SELECTORS).forEach(el => {
+    if (el.classList && el.classList.contains('amin-3d-ico-auto')) return;
+    upgradeTextElement(el);
   });
 }
 
@@ -189,11 +318,12 @@ function initAutoReplacer() {
     let needs = false;
     for (const m of muts) {
       if (m.addedNodes.length) { needs = true; break; }
+      if (m.type === 'characterData') { needs = true; break; }
     }
     if (needs) autoReplaceEmojis();
   });
   if (document.body) {
-    obs.observe(document.body, { childList: true, subtree: true });
+    obs.observe(document.body, { childList: true, subtree: true, characterData: true });
   }
 }
 
@@ -203,6 +333,6 @@ if (document.readyState === 'loading') {
   initAutoReplacer();
 }
 
-window.AminIcons = { create, CLAY_ICONS, inject3DStyles, autoReplaceEmojis };
+window.AminIcons = { create, CLAY_ICONS, inject3DStyles, autoReplaceEmojis, resolveIconName };
 window.Icon3D = { create };
 })();
