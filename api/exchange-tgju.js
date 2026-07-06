@@ -11,10 +11,10 @@ function originAllowed(req) {
 }
 
 const SOURCES = [
-  { name: 'iranjib_home', label: 'IranJib.ir', url: 'https://www.iranjib.ir/' },
-  { name: 'iranjib_price', label: 'IranJib.ir / price', url: 'https://www.iranjib.ir/price/' },
-  { name: 'tala_ir', label: 'Tala.ir', url: 'https://www.tala.ir/' },
-  { name: 'ice_ir', label: 'ICE.ir', url: 'https://www.ice.ir/' }
+  { name: 'tgju_profile', label: 'TGJU.org', url: 'https://www.tgju.org/profile/price_dollar_rl', parser: 'tgju' },
+  { name: 'tgju_exchange', label: 'TGJU.org / currency-exchange', url: 'https://www.tgju.org/currency-exchange', parser: 'tgju' },
+  { name: 'iranjib_dollar', label: 'IranJib.ir', url: 'https://www.iranjib.ir/showgroup/23/realtime_price/', parser: 'iranjib' },
+  { name: 'tala_dollar', label: 'Tala.ir', url: 'https://www.tala.ir/price/dolar', parser: 'tala' }
 ];
 
 function faToEnDigits(s) {
@@ -27,6 +27,15 @@ function cleanNumber(raw) {
   return Number(String(raw || '').replace(/[٬,\s]/g, ''));
 }
 
+function normalizeRate(rate, unitHint) {
+  let n = cleanNumber(rate);
+  if (!Number.isFinite(n) || n <= 0) return null;
+  const unit = String(unitHint || '').toLowerCase();
+  if (unit.includes('تومان') || unit.includes('toman')) n *= 10;
+  if (n < 10000 || n > 50000000) return null;
+  return n;
+}
+
 function median(values) {
   const sorted = values.slice().sort((a, b) => a - b);
   const mid = Math.floor(sorted.length / 2);
@@ -34,51 +43,77 @@ function median(values) {
   return sorted.length % 2 ? sorted[mid] : Math.round((sorted[mid - 1] + sorted[mid]) / 2);
 }
 
-function pickRate(html) {
+function pickWithPatterns(text, patterns) {
+  for (const rx of patterns) {
+    const m = text.match(rx);
+    if (!m || !m[1]) continue;
+    const rate = normalizeRate(m[1], m[2]);
+    if (rate) return rate;
+  }
+  return null;
+}
+
+function genericRate(html) {
   const raw = faToEnDigits(String(html || '').replace(/&nbsp;/g, ' '));
   const compact = raw.replace(/\s+/g, ' ');
-  const patterns = [
+  return pickWithPatterns(compact, [
     /(?:قیمت|نرخ)\s*دلار(?:\s*آمریکا)?[^0-9]{0,80}([0-9][0-9٬,]{4,})\s*(تومان|ریال)?/i,
     /دلار(?:\s*آمریکا)?[^0-9]{0,40}([0-9][0-9٬,]{4,})\s*(تومان|ریال)?/i,
     /usd[^0-9]{0,40}([0-9][0-9٬,]{4,})\s*(toman|rial)?/i,
-    /([0-9][0-9٬,]{4,})\s*(تومان|ریال)\s*[^<]{0,30}دلار/i
-  ];
+    /([0-9][0-9٬,]{4,})\s*(تومان|ریال)\s*[^<]{0,30}دلار/i,
+    /قیمت\s*زنده[^0-9]{0,50}([0-9][0-9٬,]{4,})\s*(تومان|ریال)?/i
+  ]);
+}
 
-  for (const rx of patterns) {
-    const m = compact.match(rx);
-    if (!m || !m[1]) continue;
-    let rate = cleanNumber(m[1]);
-    const unit = String(m[2] || '').toLowerCase();
-    if (!Number.isFinite(rate) || rate <= 0) continue;
-    if (unit.includes('تومان') || unit.includes('toman')) rate *= 10;
-    if (rate < 10000 || rate > 50000000) continue;
-    return rate;
+function parseRate(html, parser) {
+  const raw = faToEnDigits(String(html || '').replace(/&nbsp;/g, ' '));
+  const compact = raw.replace(/\s+/g, ' ');
+
+  if (parser === 'tgju') {
+    const rate = pickWithPatterns(compact, [
+      /price_dollar_rl[^0-9]{0,240}([0-9][0-9٬,]{4,})\s*(تومان|ریال)?/i,
+      /دلار\s*[^0-9]{0,50}قیمت\s*زنده[^0-9]{0,50}([0-9][0-9٬,]{4,})\s*(تومان|ریال)?/i,
+      /قیمت\s*زنده[^0-9]{0,50}([0-9][0-9٬,]{4,})\s*(تومان|ریال)?/i,
+      /currency-exchange[^]{0,500}?([0-9][0-9٬,]{4,})\s*(تومان|ریال)?/i
+    ]);
+    return rate || genericRate(compact);
   }
 
-  const keywordHits = [];
-  const generic = [...compact.matchAll(/(?:دلار|usd)[^0-9]{0,60}([0-9][0-9٬,]{4,})/ig)];
-  for (const hit of generic) {
-    const rate = cleanNumber(hit[1]);
-    if (Number.isFinite(rate) && rate >= 10000 && rate <= 50000000) keywordHits.push(rate);
+  if (parser === 'iranjib') {
+    const rate = pickWithPatterns(compact, [
+      /دلار\s*\/\s*اسکناس[^0-9]{0,60}([0-9][0-9٬,]{4,})\s*(تومان|ریال)?/i,
+      /دلار\s*\/\s*حواله[^0-9]{0,60}([0-9][0-9٬,]{4,})\s*(تومان|ریال)?/i
+    ]);
+    return rate || genericRate(compact);
   }
-  return keywordHits.length ? keywordHits[0] : null;
+
+  if (parser === 'tala') {
+    const rate = pickWithPatterns(compact, [
+      /قیمت\s*دلار\s*آمریکا[^0-9]{0,80}([0-9][0-9٬,]{4,})\s*(تومان|ریال)?/i,
+      /price\/dolar[^0-9]{0,200}([0-9][0-9٬,]{4,})\s*(تومان|ریال)?/i
+    ]);
+    return rate || genericRate(compact);
+  }
+
+  return genericRate(compact);
 }
 
 async function fetchSource(src) {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 8000);
+  const timer = setTimeout(() => controller.abort(), 12000);
   try {
     const response = await fetch(src.url, {
       signal: controller.signal,
       headers: {
         'user-agent': 'Mozilla/5.0 (compatible; AminSchoolFinance/1.0)',
-        'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+        'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'accept-language': 'fa-IR,fa;q=0.9,en;q=0.7'
       }
     });
     clearTimeout(timer);
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const html = await response.text();
-    const rate = pickRate(html);
+    const rate = parseRate(html, src.parser);
     if (!rate) throw new Error('parse_failed');
     return { ok: true, ...src, rate };
   } catch (e) {
@@ -107,7 +142,7 @@ export default async function handler(req, res) {
       ok: false,
       error: 'all_ir_sources_failed',
       source: 'all_failed',
-      source_label: 'تعذر الوصول إلى مصادر .ir',
+      source_label: 'تعذر الوصول إلى TGJU والمصادر الإيرانية',
       rate: 0,
       errors,
       fetched_at: new Date().toISOString()
@@ -119,8 +154,8 @@ export default async function handler(req, res) {
 
   return res.status(200).json({
     ok: true,
-    source: success.length === 1 ? primary.name : 'multi_ir_consensus',
-    source_label: success.length === 1 ? primary.label : `متوسط ${success.length} مصادر إيرانية (.ir)`,
+    source: success.length === 1 ? primary.name : 'multi_iran_consensus',
+    source_label: success.length === 1 ? primary.label : `متوسط ${success.length} مصادر إيرانية + TGJU`,
     url: primary.url,
     rate: usedRate,
     currency: 'IRR',
