@@ -121,6 +121,24 @@
 
 <nav class="bottom-nav" id="bottomNav"></nav>
 
+<div id="portal-home-shell" hidden aria-hidden="true">
+  <div class="portal-tabs">
+    <button type="button" data-portal-tab="home" class="active">الرئيسية</button>
+    <button type="button" data-portal-tab="modules">الواجهات</button>
+    <button type="button" data-portal-tab="notifications">الإشعارات</button>
+  </div>
+  <section id="tab-home" class="portal-tab-panel active">
+    <div id="homeDashboard"></div>
+  </section>
+  <section id="tab-modules" class="portal-tab-panel">
+    <div id="quickNav"></div>
+    <div id="modulesGrid"></div>
+  </section>
+  <section id="tab-notifications" class="portal-tab-panel">
+    <div id="notificationsList"></div>
+  </section>
+</div>
+
 <div id="modalContainer"></div>
 
 <script src="libs/supabase.min.js"></script>

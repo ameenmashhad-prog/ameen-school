@@ -44,6 +44,7 @@
       <button data-view="attendance">📋 متابعة الغياب</button>
       <button data-view="cases">📁 الحالات</button>
       <button data-view="sessions">📅 الجلسات</button>
+      <button data-view="handover">🤝 تسليم الحالات</button>
       <button data-view="reports">📈 التقارير</button>
       <hr style="border:none;border-top:1px solid rgba(255,255,255,0.1);margin:8px 0;">
       <button onclick="location.href='counseling-report.html'">📊 تقارير الإرشاد</button>
@@ -60,7 +61,9 @@
     <header class="topbar">
       <button class="btn mobile-menu" id="mobileMenuBtn">☰</button>
       <h2>💚 الإرشاد النفسي والمتابعة</h2>
-      <div class="top-actions">
+      <div class="top-actions" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <span id="offlineStatus" class="badge blue">متصل</span>
+        <button id="draftsBtn" class="btn gold" type="button">📝 المسودات <span id="draftCount">0</span></button>
         <button class="btn" style="background:#3A3565;color:white;" onclick="CounselorPortal.refresh()">🔄 تحديث</button>
       </div>
     </header>
@@ -71,6 +74,7 @@
     <section id="view-attendance" class="view"></section>
     <section id="view-cases" class="view"></section>
     <section id="view-sessions" class="view"></section>
+    <section id="view-handover" class="view"></section>
     <section id="view-reports" class="view"></section>
   </main>
 </div>
@@ -300,6 +304,7 @@
     else if(viewId === 'attendance') renderAttendance();
     else if(viewId === 'cases') renderCases();
     else if(viewId === 'sessions') renderSessions();
+    else if(viewId === 'handover') renderHandover();
     else if(viewId === 'reports') renderReports();
   }
 
@@ -588,6 +593,20 @@
     html += '<button class="btn blue" onclick="location.href=\'smart-calendar.html\'">📅 افتح التقويم</button>';
     html += '</div></div>';
     
+    container.innerHTML = html;
+  }
+
+  // ========== تسليم الحالات ==========
+  function renderHandover() {
+    const container = $('#view-handover');
+    let html = '<div class="page-head"><div><h1>🤝 تسليم الحالات</h1><p>واجهة تمهيدية لتسليم الحالات بين المرشدين بشكل منظم وآمن.</p></div></div>';
+    html += '<div class="card"><div class="card-head"><h3>الحالة الحالية</h3></div><div class="card-body">';
+    html += '<p>تم تجهيز عناصر الواجهة الأساسية لتتوافق مع وحدة <b>assets/counselor.js</b> المتقدمة.</p>';
+    html += '<p class="muted">إذا كانت قاعدة البيانات تحتوي على RPCs الخاصة بالتسليم، يمكن لاحقاً ربط هذه الصفحة مباشرة بالوحدة الكاملة.</p>';
+    html += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">';
+    html += '<button class="btn gold" onclick="location.href=\'counseling-report.html\'">فتح تقارير الإرشاد</button>';
+    html += '<button class="btn" style="background:#3A3565;color:white;" onclick="CounselorPortal.showView(\'cases\')">العودة إلى الحالات</button>';
+    html += '</div></div></div>';
     container.innerHTML = html;
   }
 

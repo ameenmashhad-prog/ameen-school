@@ -14,9 +14,25 @@ let currentLang=localStorage.getItem(STORAGE_KEY)||'ar';
 if(!SUPPORTED.includes(currentLang)) currentLang='ar';
 let applying=false;
 
-const dict = { ar: {} };
-if (window.AMIN_I18N_DICT && window.AMIN_I18N_DICT.en) dict.en = window.AMIN_I18N_DICT.en;
-if (window.AMIN_I18N_DICT && window.AMIN_I18N_DICT.fa) dict.fa = window.AMIN_I18N_DICT.fa;
+const fallbackSmokeDict={en:{
+  'البوابة الموحدة':'Unified Portal',
+  'تسجيل الخروج':'Logout',
+  'النظام المالي':'Financial System',
+  'الواجبات':'Homework',
+  'التقويم الذكي':'Smart Calendar',
+  'الرصيد الدائن':'Credit Balance'
+},fa:{
+  'البوابة الموحدة':'درگاه یکپارچه',
+  'تسجيل الخروج':'خروج',
+  'النظام المالي':'سیستم مالی',
+  'الواجبات':'تکالیف',
+  'التقويم الذكي':'تقویم هوشمند',
+  'الرصيد الدائن':'مانده بستانکار'
+}};
+
+const dict = { ar: {}, en: fallbackSmokeDict.en, fa: fallbackSmokeDict.fa };
+if (window.AMIN_I18N_DICT && window.AMIN_I18N_DICT.en) dict.en = Object.assign({}, dict.en, window.AMIN_I18N_DICT.en);
+if (window.AMIN_I18N_DICT && window.AMIN_I18N_DICT.fa) dict.fa = Object.assign({}, dict.fa, window.AMIN_I18N_DICT.fa);
 
 function loadLangDict(lang, cb) {
   if (lang === 'ar' || (dict[lang] && Object.keys(dict[lang]).length > 0)) {
