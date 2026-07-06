@@ -188,7 +188,25 @@ const ICON_ALIASES = {
   download:'folder',
   upload:'folder',
   phone:'chat',
-  mail:'messages'
+  mail:'messages',
+  darkmode:'moon',
+  lightmode:'sun',
+  'chart-pie':'chartPie',
+  wallet:'finance',
+  cash:'money',
+  receipt:'clipboard',
+  credit:'finance',
+  archive:'folder',
+  people:'users',
+  forms:'registrations',
+  megaphone:'bell',
+  teacher:'person',
+  student:'students',
+  school:'academic',
+  exam:'tasks',
+  tag:'tasks',
+  lab:'sparkle',
+  grid:'overview'
 };
 
 function resolveIconName(name) {
