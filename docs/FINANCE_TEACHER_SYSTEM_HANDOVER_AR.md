@@ -80,6 +80,7 @@
 9. `134_finance_growth_collection_rate_hotfix.sql`
 10. `135_teacher_homework_permission_hotfix.sql`
 11. `137_teacher_payroll_evidence_hard_rebuild_hotfix.sql`
+12. `138_teacher_payroll_bonuses_and_extra_sessions.sql`
 
 > ملاحظة مهمة:
 > اسم الملف الصحيح هو:

@@ -12,6 +12,7 @@
 9. `sql/archive/134_finance_growth_collection_rate_hotfix.sql`
 10. `sql/archive/135_teacher_homework_permission_hotfix.sql`
 11. `sql/archive/137_teacher_payroll_evidence_hard_rebuild_hotfix.sql`
+12. `sql/archive/138_teacher_payroll_bonuses_and_extra_sessions.sql`
 
 ## 2) الصفحات الأساسية
 ### للمعلم
