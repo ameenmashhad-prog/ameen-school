@@ -161,6 +161,10 @@ img,svg{max-width:100%;}
 .page-head h1{font-size:var(--text-h1);color:var(--primary);}
 .page-head p{color:var(--text-secondary);margin:0;}
 
+/* شاشات التبويب الداخلية: لا تعرض إلا القسم النشط */
+.main > .view{display:none;}
+.main > .view.active{display:block;}
+
 /* ============================ 4) الشريط الجانبي + القائمة ============================ */
 .sidebar,.app-sidebar{
   position:sticky;top:var(--space-5);align-self:start;height:calc(100vh - 40px);overflow:auto;
