@@ -243,6 +243,29 @@
     const view=activeSource.getAttribute('data-view'); if(!view)return;
     $$('button[data-lite-view]',nav).forEach(b=>b.classList.toggle('active',b.dataset.liteView===view));
   }
+  function liteIconName(orig){
+    const byView={overview:'overview',students:'students',teachers:'person',parents:'users',registrations:'registrations',finance:'finance',academic:'academic',resources:'folder',reports:'chart',system:'settings',attendance:'attendance',counseling:'counseling',evaluation:'chart',grades:'academic',schedule:'calendar',behavior:'shield',cases:'counseling',analytics:'chart',alerts:'bell',mine:'award',badges:'award',leaderboard:'trophy',award:'award'};
+    if(!orig)return 'sparkle';
+    const explicit=orig.getAttribute('data-amin-icon-name');
+    if(explicit) return explicit;
+    const view=orig.getAttribute('data-view');
+    if(view&&byView[view]) return byView[view];
+    const txt=normalizeText(orig.textContent||'');
+    if(txt.includes('البوابة')) return 'home';
+    if(txt.includes('بحث')) return 'sparkle';
+    if(txt.includes('المالية')) return 'finance';
+    if(txt.includes('الأكاديمي')) return 'academic';
+    if(txt.includes('التقارير')) return 'chart';
+    if(txt.includes('النظام')) return 'settings';
+    if(txt.includes('الطلاب')) return 'students';
+    if(txt.includes('المعلمون')) return 'person';
+    if(txt.includes('أولياء الأمور')) return 'users';
+    return 'sparkle';
+  }
+  function liteButtonHTML(label, iconName, extra){
+    const icon=(window.AminIcons&&window.AminIcons.create)?window.AminIcons.create(iconName||'sparkle',18):'';
+    return `${icon}<span class="lite-label">${esc(label)}</span>${extra||''}`;
+  }
   function setupLiteMode(){
     const params=new URLSearchParams(location.search);
     const hasLegacySidebar=!!document.querySelector('#sidebar') && (document.body.dataset.portal||'') !== 'unified';
@@ -256,11 +279,11 @@
       const nav=document.createElement('div');
       nav.className='unified-lite-nav';
       const back=document.createElement('button');
-      back.type='button'; back.className='unified-lite-back'; back.textContent='البوابة الموحدة';
+      back.type='button'; back.className='unified-lite-back'; back.innerHTML=liteButtonHTML('البوابة الموحدة','home');
       back.addEventListener('click',()=>location.href='portal.html');
       nav.appendChild(back);
       const search=document.createElement('button');
-      search.type='button'; search.className='command-launch no-ripple'; search.innerHTML='بحث سريع <span class="command-shortcut">Ctrl K</span>';
+      search.type='button'; search.className='command-launch no-ripple'; search.innerHTML=liteButtonHTML('بحث سريع','sparkle',' <span class="command-shortcut">Ctrl K</span>');
       search.addEventListener('click',openCommandPalette);
       nav.appendChild(search);
       const seen=new Set();
@@ -276,7 +299,7 @@
         const b=document.createElement('button');
         b.type='button';
         if(view) b.dataset.liteView=view;
-        b.textContent=stripEmoji(orig.textContent||'');
+        b.innerHTML=liteButtonHTML(stripEmoji(orig.textContent||''), liteIconName(orig));
         if(orig.classList.contains('active'))b.classList.add('active');
         b.addEventListener('click',()=>{orig.click();setTimeout(()=>syncLiteNav(orig),80);});
         nav.appendChild(b);

@@ -377,7 +377,16 @@ body.dark .tabs button.active{background:var(--primary-strong);color:#fff;}
 body.dark .pagination button.active{background:var(--primary-strong);border-color:transparent;color:#fff;}
 body.dark .nav button:hover,.nav-child-btn:hover,.sidebar-nav-item:hover{color:#fff;}
 
-/* ============================ 15) الاستجابة (mobile-first) ============================ */
+/* ============================ 15) شريط الوضع الخفيف ============================ */
+.unified-lite-nav{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:0 0 var(--space-4);padding:12px 14px;background:var(--surface);border:1px solid var(--border-subtle);border-radius:var(--radius-xl);box-shadow:var(--shadow-soft);}
+.unified-lite-nav button{display:inline-flex;align-items:center;gap:10px;min-height:42px;padding:10px 14px;border:1px solid var(--border-subtle);border-radius:var(--radius-pill);background:var(--surface-2);color:var(--text-primary);font-weight:700;box-shadow:none;}
+.unified-lite-nav button:hover{background:var(--primary-tint);color:var(--primary);transform:translateY(-1px);}
+.unified-lite-nav button.active{background:linear-gradient(135deg,var(--primary-strong),var(--accent-strong));color:#fff;border-color:transparent;box-shadow:0 8px 20px var(--tactile-primary);}
+.unified-lite-nav .lite-label{display:inline-block;white-space:nowrap;}
+.unified-lite-nav .command-shortcut{font-size:12px;opacity:.8;direction:ltr;unicode-bidi:isolate;}
+.unified-lite-nav .amin-3d-ico-wrap{width:18px!important;height:18px!important;}
+
+/* ============================ 16) الاستجابة (mobile-first) ============================ */
 @media (max-width:1023px){
   .shell{grid-template-columns:var(--sidebar-w-rail) minmax(0,1fr);gap:var(--space-3);padding:var(--space-3);}
   .nav-label,.brand-text,.brand small,.profile-mini > div:last-child{display:none;}
