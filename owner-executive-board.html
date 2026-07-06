@@ -9,7 +9,7 @@
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="manifest" href="manifest.webmanifest">
 <style>
-.owner-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:16px}.owner-card{background:#fff;border:1px solid var(--border-subtle);border-radius:18px;padding:16px;box-shadow:var(--shadow-soft)}.owner-card h3{margin-bottom:12px}.owner-note{padding:12px 14px;border-radius:14px;background:#f8fafc;color:var(--text-secondary)}.owner-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.owner-box{padding:12px 14px;border-radius:16px;background:#fff;border:1px solid var(--border-subtle)}.owner-box small{display:block;color:var(--text-secondary);margin-bottom:4px}.owner-box b{font-size:20px}.owner-actions{display:flex;gap:8px;flex-wrap:wrap}.owner-bars{display:grid;gap:10px}.owner-bar-row{display:grid;grid-template-columns:170px 1fr 160px;gap:10px;align-items:center}.owner-bar-track{height:12px;border-radius:999px;background:#eef2f7;overflow:hidden}.owner-bar-track i{display:block;height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));border-radius:999px}@media(max-width:920px){.owner-grid,.owner-strip{grid-template-columns:1fr}.owner-bar-row{grid-template-columns:1fr}}
+.owner-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:16px}.owner-card{background:#fff;border:1px solid var(--border-subtle);border-radius:18px;padding:16px;box-shadow:var(--shadow-soft)}.owner-card h3{margin-bottom:12px}.owner-note{padding:12px 14px;border-radius:14px;background:#f8fafc;color:var(--text-secondary)}.owner-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.owner-box{padding:12px 14px;border-radius:16px;background:#fff;border:1px solid var(--border-subtle)}.owner-box small{display:block;color:var(--text-secondary);margin-bottom:4px}.owner-box b{font-size:20px}.owner-actions{display:flex;gap:8px;flex-wrap:wrap}.owner-bars{display:grid;gap:10px}.owner-bar-row{display:grid;grid-template-columns:170px 1fr 160px;gap:10px;align-items:center}.owner-bar-track{height:12px;border-radius:999px;background:#eef2f7;overflow:hidden}.owner-bar-track i{display:block;height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));border-radius:999px}.owner-toolbar{display:grid;grid-template-columns:220px 1fr auto auto;gap:10px;align-items:end}.owner-chip-row{display:flex;gap:8px;flex-wrap:wrap}.owner-chip{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:999px;background:#fff;border:1px solid var(--border-subtle);font-weight:700}.owner-chip b{font-size:13px}@media(max-width:920px){.owner-grid,.owner-strip,.owner-toolbar{grid-template-columns:1fr}.owner-bar-row{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -28,7 +28,7 @@
     <div class="side-footer"><button id="logoutBtn" class="btn red block">تسجيل الخروج</button></div>
   </aside>
   <main class="main" id="mainContent" tabindex="-1">
-    <header class="topbar"><button class="btn mobile-menu" id="mobileMenuBtn">☰</button><h2>لوحة المالك التنفيذية</h2><div class="top-actions"><button id="refreshBtn" class="btn blue">تحديث</button></div></header>
+    <header class="topbar"><button class="btn mobile-menu" id="mobileMenuBtn">☰</button><h2>لوحة المالك التنفيذية</h2><div class="top-actions"><button id="refreshBtn" class="btn blue">تحديث</button><button id="exportBtn" class="btn gold">تصدير</button><button id="printBtn" class="btn">طباعة</button></div></header>
     <section id="ownerRoot"></section>
   </main>
 </div>
@@ -36,7 +36,7 @@
 <script src="libs/supabase.min.js"></script>
 <script src="assets/config.js"></script>
 <script src="assets/i18n.js"></script>
-<script src="assets/owner-executive-board.js?v=20260706-1"></script>
+<script src="assets/owner-executive-board.js?v=20260706-2"></script>
 <script src="assets/ux-enhancements.js?v=20260706-3"></script>
 <script src="assets/amin-theme-injector.js"></script>
 <script src="assets/amin-icons.js?v=20260706-5" defer></script>

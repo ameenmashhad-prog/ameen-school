@@ -9,7 +9,7 @@
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="manifest" href="manifest.webmanifest">
 <style>
-.close-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:16px}.close-card{background:#fff;border:1px solid var(--border-subtle);border-radius:18px;padding:16px;box-shadow:var(--shadow-soft)}.close-card h3{margin-bottom:12px}.close-note{padding:12px 14px;border-radius:14px;background:#f8fafc;color:var(--text-secondary)}.close-form{display:grid;grid-template-columns:220px 1fr auto auto;gap:10px;align-items:end}@media(max-width:920px){.close-grid,.close-form{grid-template-columns:1fr}}
+.close-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:16px}.close-card{background:#fff;border:1px solid var(--border-subtle);border-radius:18px;padding:16px;box-shadow:var(--shadow-soft)}.close-card h3{margin-bottom:12px}.close-note{padding:12px 14px;border-radius:14px;background:#f8fafc;color:var(--text-secondary)}.close-form{display:grid;grid-template-columns:220px 1fr auto auto;gap:10px;align-items:end}.close-chip-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.close-chip{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:999px;background:#fff;border:1px solid var(--border-subtle);font-weight:700}@media(max-width:920px){.close-grid,.close-form{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -27,7 +27,7 @@
     <div class="side-footer"><button id="logoutBtn" class="btn red block">تسجيل الخروج</button></div>
   </aside>
   <main class="main" id="mainContent" tabindex="-1">
-    <header class="topbar"><button class="btn mobile-menu" id="mobileMenuBtn">☰</button><h2>الإقفال المالي الشهري</h2><div class="top-actions"><button id="refreshBtn" class="btn blue">تحديث</button></div></header>
+    <header class="topbar"><button class="btn mobile-menu" id="mobileMenuBtn">☰</button><h2>الإقفال المالي الشهري</h2><div class="top-actions"><button id="refreshBtn" class="btn blue">تحديث</button><button id="exportBtn" class="btn gold">تصدير</button><button id="printBtn" class="btn">طباعة</button></div></header>
     <section id="monthlyCloseRoot"></section>
   </main>
 </div>
@@ -35,7 +35,7 @@
 <script src="libs/supabase.min.js"></script>
 <script src="assets/config.js"></script>
 <script src="assets/i18n.js"></script>
-<script src="assets/finance-monthly-close.js?v=20260706-1"></script>
+<script src="assets/finance-monthly-close.js?v=20260706-2"></script>
 <script src="assets/ux-enhancements.js?v=20260706-3"></script>
 <script src="assets/amin-theme-injector.js"></script>
 <script src="assets/amin-icons.js?v=20260706-5" defer></script>
