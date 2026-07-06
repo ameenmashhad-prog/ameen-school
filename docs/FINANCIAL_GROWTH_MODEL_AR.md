@@ -526,6 +526,20 @@ finance_monthly_close
 - نسبة المشتريات
 - ضغط المتأخرات
 
+## هـ) طبقة Backend موحدة
+تمت إضافة RPC موحد لتجميع بيانات اللوحة من الخادم:
+- `sql/archive/130_finance_growth_payload.sql`
+
+ويضيف:
+- `finance_growth_month_snapshot(date)`
+- `get_finance_growth_payload(text)`
+- `finance_growth_payload_health_check()`
+
+وهدفه:
+- تقليل الاعتماد على تجميع frontend فقط
+- رفع موثوقية الأرقام
+- تجهيز اللوحة للتوسع لاحقاً بشكل أسرع
+
 هذا هو أسرع طريق يعطي الإدارة **صورة نمو مالي حقيقية للمؤسسة**.
 
 ---
