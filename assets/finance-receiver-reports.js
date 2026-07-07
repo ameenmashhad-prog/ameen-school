@@ -15,14 +15,57 @@ function monthValue(){return RT().currentSolarMonthKey?RT().currentSolarMonthKey
 function monthMeta(key){return RT().solarMonthRangeFromKey?RT().solarMonthRangeFromKey(key):{key,label:key,gregorianLabel:'—',start:'',end:''}}
 function monthSelect(id,value){return RT().buildMonthSelect?RT().buildMonthSelect(id,value,[value],14,2):`<input id="${id}" class="input" value="${esc(value)}">`}
 function currentMonth(){return $('#monthFilter')?.value||monthValue()}
-function currentRange(){const m=monthMeta(currentMonth());return {from:m.start||new Date().toISOString().slice(0,10),to:m.end||new Date().toISOString().slice(0,10),label:m.label||currentMonth(),gregorian:m.gregorianLabel||'—'}}
+function currentRange(){const m=monthMeta(currentMonth());const today=new Date().toISOString().slice(0,10);return {from:m.start||today,to:m.end||today,label:m.label||currentMonth(),gregorian:m.gregorianLabel||'—'}}
 function fmt(v){if(!v)return'—';try{return new Date(v).toLocaleString('ar-IQ')}catch{return v}}
 function csvCell(v){const s=String(v==null?'':v).replace(/"/g,'""');return /[",\n]/.test(s)?`"${s}"`:s}
 function downloadCsv(filename,headers,rows){const csv='\ufeff'+[headers.map(csvCell).join(','),...rows.map(r=>headers.map(h=>csvCell(r[h])).join(','))].join('\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)}
 async function q(table,opts={}){try{let query=client().from(table).select(opts.columns||'*');(opts.filters||[]).forEach(f=>query=query[f.op](f.col,f.val));if(opts.order)query=query.order(opts.order,{ascending:opts.ascending!==false});if(opts.limit)query=query.limit(opts.limit);const {data,error}=await query;if(error){console.warn(table,error);return[]}return data||[]}catch(e){console.warn(table,e);return[]}}
 async function ensure(){const {data:{session}}=await client().auth.getSession();if(!session){location.href='index.html';return false}const {data:u}=await client().from('users').select('*').eq('id',session.user.id).maybeSingle();if(!u){location.href='index.html';return false}ME=u;const ok=u.is_super_admin||['admin','finance','staff','accountant','cashier'].includes(u.role);if(!ok){document.body.innerHTML='<main class="login-page"><section class="login-card"><h1>غير مصرح</h1><p>هذه الصفحة للمالية والإدارة فقط.</p></section></main>';return false}$('#profileName').textContent=u.name||u.email;$('#profileRole').textContent=roleLabel(u.role);return true}
 function ensureMonthToolbar(){const mount=$('#monthTools');if(!mount)return;mount.innerHTML=`${monthSelect('monthFilter',currentMonth())}<span class="muted" style="padding:0 8px;white-space:nowrap">${esc(currentRange().gregorian)}</span>`}
-async function load(){const range=currentRange();try{const [rep,users,rates]=await Promise.all([client().rpc('get_finance_receiver_report',{p_from:range.from,p_to:range.to}),q('users',{order:'name',limit:500}),q('exchange_rates',{order:'fetched_at',ascending:false,limit:10})]);if(rep.error)throw rep.error;if(rep.data&&rep.data.ok===false)throw new Error(rep.data.message||'تعذر تحميل التقرير');DATA={stats:rep.data.stats||{},by_receiver:rep.data.by_receiver||[],by_method:rep.data.by_method||[],payments:rep.data.payments||[],users,rates};const latest=(rates||[])[0];if(latest&&Number(latest.rate)>0)FX={rate:Number(latest.rate),label:latest.source||'آخر سعر محفوظ'}}catch(e){toast('تعذر تحميل التقرير',e.message||String(e),'red');DATA={stats:{},by_receiver:[],by_method:[],payments:[],users:[],rates:[]}}render(ACTIVE);ensureMonthToolbar();bindMonthFilter()}
+function receiverLabel(p,userMap){const byUser=p.received_by&&(userMap.get(String(p.received_by))||{}).name;const raw=(p.receiver_name||'').trim();if(raw && !/مجمع أمين الرضا التعليمي/.test(raw))return raw;return byUser||raw||p.created_by_name||'غير محدد'}
+async function load(){const range=currentRange();try{const [payments,users,rates,fees,students,classes]=await Promise.all([
+  q('fee_payments',{columns:'id,receipt_number,payment_date,created_at,student_fee_id,amount_usd,amount_irr,amount,currency,payment_method,payer_name,receiver_name,receiver_role,received_by,transfer_number,voided,void_reason,voided_at,created_by_name',order:'created_at',ascending:false,limit:5000}),
+  q('users',{columns:'id,name,role',order:'name',limit:1000}),
+  q('exchange_rates',{order:'fetched_at',ascending:false,limit:10}),
+  q('student_fees',{columns:'id,student_id',limit:5000}),
+  q('students',{columns:'id,name,class_id',limit:5000}),
+  q('classes',{columns:'id,name',limit:1000})
+]);
+  const latest=(rates||[])[0];if(latest&&Number(latest.rate)>0)FX={rate:Number(latest.rate),label:latest.source||'آخر سعر محفوظ'};
+  const userMap=new Map((users||[]).map(u=>[String(u.id),u]));
+  const feeMap=new Map((fees||[]).map(f=>[String(f.id),f]));
+  const studentMap=new Map((students||[]).map(s=>[String(s.id),s]));
+  const classMap=new Map((classes||[]).map(c=>[String(c.id),c]));
+  const d1=range.from, d2=range.to;
+  const filtered=(payments||[]).filter(p=>{
+    const d=String((p.payment_date||String(p.created_at||'').slice(0,10))||'').slice(0,10);
+    return d && d>=d1 && d<=d2;
+  }).map(p=>{
+    const fee=feeMap.get(String(p.student_fee_id))||{};
+    const stu=studentMap.get(String(fee.student_id))||{};
+    const cls=classMap.get(String(stu.class_id))||{};
+    return Object.assign({},p,{payment_date:String((p.payment_date||String(p.created_at||'').slice(0,10))||'').slice(0,10),student_id:fee.student_id||null,student_name:stu.name||'—',class_name:cls.name||'—',receiver_name:receiverLabel(p,userMap),receiver_role:(userMap.get(String(p.received_by))||{}).role||p.receiver_role||null,amount_usd:Number(p.amount_usd||p.amount||0),amount_irr:Number(p.amount_irr||0),voided:!!p.voided});
+  });
+  const byReceiverMap=new Map(), byMethodMap=new Map();
+  let totalUsd=0,totalIrr=0,voidedCount=0,paymentsCount=0;
+  filtered.forEach(p=>{
+    if(p.voided) voidedCount+=1; else {paymentsCount+=1; totalUsd+=p.amount_usd; totalIrr+=p.amount_irr||0;}
+    const rk=[p.receiver_name||'غير محدد',p.received_by||'',p.receiver_role||''].join('|');
+    const rv=byReceiverMap.get(rk)||{receiver_name:p.receiver_name||'غير محدد',received_by:p.received_by||null,receiver_role:p.receiver_role||null,payments_count:0,voided_count:0,total_usd:0,total_irr:0};
+    if(p.voided) rv.voided_count+=1; else {rv.payments_count+=1; rv.total_usd+=p.amount_usd; rv.total_irr+=(p.amount_irr||0);} byReceiverMap.set(rk,rv);
+    const mk=p.payment_method||'cash';
+    const mv=byMethodMap.get(mk)||{payment_method:mk,payments_count:0,total_usd:0,total_irr:0};
+    if(!p.voided){mv.payments_count+=1; mv.total_usd+=p.amount_usd; mv.total_irr+=(p.amount_irr||0);} byMethodMap.set(mk,mv);
+  });
+  DATA={
+    stats:{from:d1,to:d2,payments_count:paymentsCount,voided_count:voidedCount,total_usd:totalUsd,total_irr:totalIrr,receivers_count:byReceiverMap.size},
+    by_receiver:[...byReceiverMap.values()].sort((a,b)=>b.total_usd-a.total_usd),
+    by_method:[...byMethodMap.values()].sort((a,b)=>b.total_usd-a.total_usd),
+    payments:filtered.slice().sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||''))),
+    users,rates
+  };
+}catch(e){toast('تعذر تحميل التقرير',e.message||String(e),'red');DATA={stats:{},by_receiver:[],by_method:[],payments:[],users:[],rates:[]}}
+render(ACTIVE);ensureMonthToolbar();bindMonthFilter()}
 function render(id){ACTIVE=id;$$('.view').forEach(v=>v.classList.toggle('active',v.id==='view-'+id));$$('.nav button[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===id));({overview,receivers:receiversView,methods:methodsView,payments:paymentsView,voided:voidedView}[id]||overview)()}
 function kpi(l,v,c='blue'){return `<div class="kpi ${c}"><small>${esc(l)}</small><b>${esc(v??0)}</b></div>`}
 function overview(){const s=DATA.stats;const range=currentRange();$('#view-overview').innerHTML=`<div class="page-head"><div><h1>تقارير المستلمين</h1><p>تحليل التحصيل حسب المستلم والطريقة للشهر الشمسي المحدد.</p></div><span class="report-period">${esc(range.label)} — ${esc(range.gregorian)}</span></div><div class="kpis">${kpi('عدد الدفعات',s.payments_count,'gold')}${kpi('الإجمالي',dualMoney(s.total_usd,s.total_irr),'green')}${kpi('عدد المستلمين',s.receivers_count,'blue')}${kpi('ملغاة',s.voided_count,'red')}</div><div class="cards"><div class="card"><div class="card-head"><h3>أعلى المستلمين</h3></div><div class="card-body">${receiverCards(DATA.by_receiver.slice(0,8))}</div></div><div class="card"><div class="card-head"><h3>حسب طريقة الدفع</h3></div><div class="card-body">${methodCards(DATA.by_method)}</div></div></div>`}
