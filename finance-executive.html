@@ -35,7 +35,7 @@
     <div class="side-footer"><button id="logoutBtn" class="btn red block">تسجيل الخروج</button></div>
   </aside>
   <main class="main" id="mainContent" tabindex="-1">
-    <header class="topbar"><button class="btn mobile-menu" id="mobileMenuBtn">☰</button><h2>المركز المالي التنفيذي</h2><div class="top-actions"><input id="fromDate" type="date" class="input" style="width:auto"><input id="toDate" type="date" class="input" style="width:auto"><button id="exportBtn" class="btn gold">تصدير CSV</button><button id="refreshBtn" class="btn blue">تحديث</button></div></header>
+    <header class="topbar"><button class="btn mobile-menu" id="mobileMenuBtn">☰</button><h2>المركز المالي التنفيذي</h2><div class="top-actions"><span id="monthTools"></span><button id="exportBtn" class="btn gold">تصدير CSV</button><button id="refreshBtn" class="btn blue">تحديث</button></div></header>
     <section id="view-overview" class="view active"></section>
     <section id="view-classes" class="view"></section>
     <section id="view-receivers" class="view"></section>
@@ -46,7 +46,7 @@
   </main>
 </div>
 <div id="toast" class="toast"></div>
-<script src="libs/supabase.min.js"></script><script src="libs/calendar-lib.js"></script><script src="assets/config.js"></script><script src="assets/platform-modules.js"></script><script src="assets/i18n.js"></script><script src="assets/finance-runtime.js?v=20260707-1"></script><script src="assets/finance-executive.js?v=20260707-2"></script><script src="assets/ux-enhancements.js?v=20260706-3"></script>
+<script src="libs/supabase.min.js"></script><script src="libs/calendar-lib.js"></script><script src="assets/config.js"></script><script src="assets/platform-modules.js"></script><script src="assets/i18n.js"></script><script src="assets/finance-runtime.js?v=20260707-1"></script><script src="assets/finance-executive.js?v=20260707-3"></script><script src="assets/ux-enhancements.js?v=20260706-3"></script>
 <script>window.addEventListener('load',()=>FinanceExecutive.init());</script>
 <script src="assets/amin-theme-injector.js"></script>
 <script src="assets/amin-icons.js?v=20260706-3" defer></script>
