@@ -45,7 +45,8 @@ function teacherOptions(){return [...teacherMap().entries()].map(([id,name])=>`<
 function selectedTeacherOptions(){return '<option value="">كل المعلمين</option>'+teacherOptions()}
 function categoryLabel(v){return ({substitute_absent_teacher:'حلول مكان معلم غائب',holiday_work:'دوام يوم عطلة',online_session:'حصة إلكترونية',extra_support:'دعم إضافي',exam_supervision:'مراقبة/إشراف',other:'أخرى'}[v]||v||'—')}
 function adjustmentTypeLabel(v){return ({bonus:'مكافأة',deduction:'خصم'}[v]||v||'—')}
-function table(h,rows,empty){const body=rows.join('');return body?`<div class="table-wrap"><table><thead><tr>${h.map(x=>`<th>${esc(x)}</th>`).join('')}</tr></thead><tbody>${body}</tbody></table></div>`:`<div class="empty">${esc(empty||'لا توجد بيانات')}</div>`}
+function emptyState(title,hint,actions=''){return `<div class="finance-empty"><b>${esc(title)}</b><small>${esc(hint||'')}</small>${actions?`<div class="empty-actions">${actions}</div>`:''}</div>`}
+function table(h,rows,empty){const body=rows.join('');return body?`<div class="table-wrap"><table><thead><tr>${h.map(x=>`<th>${esc(x)}</th>`).join('')}</tr></thead><tbody>${body}</tbody></table></div>`:emptyState(empty||'لا توجد بيانات','يمكنك تغيير الشهر الشمسي أو فلترة المعلم أو العودة لاحقًا بعد توفر البيانات.')}
 function csvEscape(v){const s=String(v==null?'':v);return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s}
 function penaltyRows(){
   const ym=currentMonth(), tid=currentTeacher();
