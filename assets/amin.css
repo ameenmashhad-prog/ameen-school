@@ -434,6 +434,18 @@ tbody tr:hover{background:var(--primary-tint)}
 @media (prefers-reduced-motion: reduce){*{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}}
 
 /* ============================================================
+   Shared finance/ops polish helpers (modals, empty states, print)
+   ============================================================ */
+.modal-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.45);display:grid;place-items:center;z-index:1000;padding:18px;backdrop-filter:blur(2px)}
+.modal-card{background:#fff;border-radius:24px;box-shadow:0 24px 80px rgba(15,23,42,.25);padding:20px;max-width:720px;width:min(100%,720px);display:grid;gap:12px}
+.finance-empty{display:grid;gap:10px;place-items:center;text-align:center;padding:24px;border:1px dashed var(--border-subtle);border-radius:20px;background:#fff;color:var(--text-secondary)}
+.finance-empty b{color:var(--text-primary)}
+.finance-empty small{max-width:420px;line-height:1.8}
+.finance-empty .empty-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.table-wrap{overflow:auto;-webkit-overflow-scrolling:touch}
+@media print{.sidebar,.topbar,.no-print,.toast,.modal-backdrop,.mobile-menu,.btn.mobile-menu{display:none!important}.shell{display:block;padding:0}.main{padding:0}.table-wrap{overflow:visible}.table-wrap table{font-size:11px}th,td{padding:6px 8px!important}}
+
+/* ============================================================
    Amin Tactile — Appearance polish (additive, spec-compliant)
    Only transform/opacity animated; reduced-motion handled globally.
    ============================================================ */
