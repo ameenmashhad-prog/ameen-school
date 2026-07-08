@@ -403,9 +403,10 @@
     let html = '<div class="page-head" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;"><div><h1>📊 درجات '+esc(childName)+'</h1></div>';
     html += '<button class="btn" style="background:#0B6E4F;color:white;padding:10px 18px;" onclick="ParentPortal.printChildReport(\'grades\')">🖨️ طباعة الكشف</button>';
     html += '</div>';
+    html += quickLinksBar();
     
     if(!data.grades.length) {
-      html += '<div class="empty" style="text-align:center;padding:60px;">لا توجد درجات مسجلة بعد.</div>';
+      html += emptyState('لا توجد درجات مسجلة بعد','ستظهر درجات هذا الطالب هنا بعد اعتمادها من المعلم أو الإدارة.');
     } else {
       html += '<div class="table-wrap"><table><thead><tr><th>المادة</th><th>الدرجة</th><th>ملاحظة</th></tr></thead><tbody>';
       data.grades.forEach(function(g) {
@@ -442,7 +443,7 @@
         const status = a.status || '—';
         const color = status === 'present' ? 'green' : status === 'absent' ? 'red' : 'gold';
         const label = status === 'present' ? 'حاضر' : status === 'absent' ? 'غائب' : status === 'late' ? 'متأخر' : status;
-        html += '<tr><td>'+esc(String(a.date).slice(0,10))+'</td><td><span class="badge '+color+'">'+esc(label)+'</span></td><td>'+esc(a.note || '—')+'</td></tr>';
+        html += '<tr><td>'+esc(dualDate(a.date))+'</td><td><span class="badge '+color+'">'+esc(label)+'</span></td><td>'+esc(a.note || '—')+'</td></tr>';
       });
       html += '</tbody></table></div>';
     }
@@ -490,6 +491,7 @@
     const childName = (child && child.users && child.users.name) || (child && child.name) || 'الطالب';
     
     let html = '<div class="page-head"><div><h1>🌟 سلوك '+esc(childName)+'</h1></div></div>';
+    html += quickLinksBar();
     
     if(!data.behavior.length) {
       html += emptyState('لا توجد ملاحظات سلوكية','لا توجد سجلات سلوكية لهذا الطالب حتى الآن.');

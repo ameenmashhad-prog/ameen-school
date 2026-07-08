@@ -537,6 +537,7 @@
     const container = $('#view-behavior');
     
     let html = '<div class="page-head"><div><h1>🌟 سلوكي</h1></div></div>';
+    html += quickLinksBar();
     
     if(!DATA.behavior.length) {
       html += emptyState('لا توجد ملاحظات سلوكية','أداؤك السلوكي مستقر حتى الآن. استمر 👍');
