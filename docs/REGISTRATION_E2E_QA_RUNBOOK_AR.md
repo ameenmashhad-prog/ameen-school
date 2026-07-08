@@ -20,6 +20,7 @@
 شغّل على Supabase:
 - `sql/archive/141_registration_qa_cleanup_rpc.sql`
 - `sql/archive/142_fix_activate_registered_user_rpc_ambiguity.sql`
+- `sql/archive/143_fix_registration_family_activation_students_name.sql`
 
 ### 2) استخدام وسم QA موحد
 استخدم هذا الوسم في هذه الجولة:
