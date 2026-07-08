@@ -322,7 +322,7 @@
         `</div></div>`;
     }).join('') || '<div class="empty">لا يوجد طلاب غائبون مسجلون اليوم 🟢</div>';
 
-    $('#view-absent').innerHTML = `<div class="page-head"><div><h1>🛑 الطلاب الغائبون اليوم (${iso()})</h1><p>إبلاغ أولياء أمور الطلاب الغائبين اليوم فوراً بضغطة زر عبر الواتساب.</p></div></div>` + cards;
+    $('#view-absent').innerHTML = `<div class="page-head"><div><h1>🛑 الطلاب الغائبون اليوم (${dualDate(iso())})</h1><p>إبلاغ أولياء أمور الطلاب الغائبين اليوم فوراً بضغطة زر عبر الواتساب.</p></div></div>` + cards;
   }
 
   function overdueView() {
@@ -374,6 +374,7 @@
       location.href = 'index.html';
     });
     $('#refreshBtn').addEventListener('click', load);
+    $('#printBtn')?.addEventListener('click', printView);
   }
 
   async function init() {

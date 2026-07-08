@@ -51,6 +51,7 @@
       <button class="btn mobile-menu" id="mobileMenuBtn">☰</button>
       <h2>💬 مركز التواصل ورسائل الواتساب المباشرة لأولياء الأمور</h2>
       <div class="top-actions">
+        <button id="printBtn" class="btn">طباعة</button>
         <button id="refreshBtn" class="btn blue">تحديث البيانات</button>
       </div>
     </header>
@@ -62,10 +63,12 @@
 </div>
 <div id="toast" class="toast"></div>
 <script src="libs/supabase.min.js"></script>
+<script src="libs/calendar-lib.js"></script>
 <script src="assets/config.js"></script>
 <script src="assets/platform-modules.js"></script>
 <script src="assets/i18n.js"></script>
-<script src="assets/parent-messages.js"></script>
+<script src="assets/finance-runtime.js?v=20260707-1"></script>
+<script src="assets/parent-messages.js?v=20260708-1"></script>
 <script>window.addEventListener('load',()=>ParentMessagesApp.init());</script>
 <script src="assets/ux-enhancements.js?v=20260706-3"></script>
 <script src="assets/amin-theme-injector.js"></script>
