@@ -29,16 +29,17 @@
   .preview-empty p,.result-empty p{margin:0;color:var(--muted);line-height:1.8}
   .status-chip{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;font-size:12px;font-weight:800;border:1px solid transparent;white-space:nowrap}
   .status-chip.ready{background:#ecfdf3;color:#0b6e4f;border-color:#b9efcf}
-  .status-chip.issue{background:#fff7df;color:#946200;border-color:#f4d38a}
-  .status-chip.error{background:#fff0f0;color:#b42318;border-color:#f5c1c1}
+  .status-chip.warning{background:#fff7df;color:#946200;border-color:#f4d38a}
+  .status-chip.issue{background:#fff0f0;color:#b42318;border-color:#f5c1c1}
   .status-chip.info{background:#eef5ff;color:#29549e;border-color:#bed6ff}
   .preview-table{width:100%;border-collapse:collapse}
   .preview-table th,.preview-table td{padding:12px 14px;border-bottom:1px solid #eef1f6;text-align:right;vertical-align:top}
   .preview-table th{background:#f7f9fc;color:#304258;font-size:13px}
   .preview-table-wrap{overflow:auto;border:1px solid var(--line);border-radius:22px;background:#fff}
-  .error-list{display:grid;gap:8px;max-height:280px;overflow:auto}
+  .error-list{display:grid;gap:8px;max-height:320px;overflow:auto}
   .error-item{padding:10px 12px;border-radius:16px;background:#fff;border:1px solid #f1d0d0}
   .small-muted{color:var(--muted);font-size:13px}
+  .small-ok{color:#0b6e4f;font-size:13px}
   @media (max-width:900px){.import-hero{grid-template-columns:1fr}}
   @media (max-width:640px){.dropzone{padding:24px}.import-card{padding:18px}}
   @media print{
@@ -96,7 +97,7 @@
         <section class="import-hero">
           <div class="import-card">
             <h2 style="color:#0B6E4F;margin-bottom:12px">📋 كيف تعمل عملية الاستيراد؟</h2>
-            <p>ارفع ملف الاستجابات القادم من Google Forms أو Excel أو CSV، ثم راجع السجلات الجاهزة قبل إرسالها إلى طلبات التسجيل. السجلات الناقصة لن تُفشل العملية كلها؛ سيتم تجاوزها مع توضيح السبب.</p>
+            <p>ارفع ملف الاستجابات القادم من Google Forms أو Excel أو CSV، ثم راجع السجلات الجاهزة قبل تحويلها إلى طلبات أسر وطلاب داخل النظام. السجلات الناقصة لن توقف الدفعة كلها؛ سيتم تجاوزها مع توضيح السبب.</p>
             <div class="import-steps" style="margin-top:16px">
               <div class="import-step"><b>1</b><span>أرسل رابط Google Form لأولياء الأمور لتعبئة بياناتهم</span></div>
               <div class="import-step"><b>2</b><span>افتح Google Sheet المرتبط بالفورم ثم نزّل الردود كملف Excel (.xlsx)</span></div>
@@ -106,7 +107,7 @@
           </div>
           <div class="import-card">
             <h3>ما الأعمدة التي ندعمها عادة؟</h3>
-            <p>اسم ولي الأمر، اسم الطالب، الهاتف، البريد، الصف، الجنس، تاريخ الميلاد. الأسماء قد تختلف قليلاً، لذلك نحاول التعرف تلقائياً على أشهر العناوين.</p>
+            <p>اسم ولي الأمر، اسم الطالب، الهاتف، البريد، الصف، الجنس، تاريخ الميلاد. الأسماء قد تختلف قليلاً، لذلك نحاول التعرف تلقائياً على أشهر العناوين وربط الصف قدر الإمكان بصفوف النظام.</p>
             <div class="import-chips" style="margin-bottom:14px">
               <span class="import-chip">اسم ولي الأمر</span>
               <span class="import-chip">اسم الطالب</span>
@@ -116,7 +117,7 @@
               <span class="import-chip">الجنس</span>
               <span class="import-chip">تاريخ الميلاد</span>
             </div>
-            <div class="import-note">كلما كان اسم ولي الأمر واسم الطالب أوضح، كانت مراجعة التسجيلات اللاحقة أسرع وأسهل.</div>
+            <div class="import-note">الاستيراد يحول الملف مباشرة إلى <b>طلبات أسر وطلاب</b> متوافقة مع صفحة مراجعة التسجيلات الحالية، وليس إلى جدول قديم منفصل.</div>
             <div class="import-links" style="margin-top:14px">
               <button class="btn" type="button" onclick="location.href='registrations-admin.html'">مراجعة التسجيلات</button>
               <button class="btn" type="button" onclick="location.href='family-registration.html'">تسجيل يدوي</button>
@@ -149,7 +150,7 @@
               <p>أو اسحب الملف هنا (.xlsx أو .xls أو .csv)</p>
               <div class="import-actions" style="justify-content:center;margin-top:14px">
                 <span class="import-chip">يدعم Google Forms</span>
-                <span class="import-chip">يعرض السجلات الجاهزة</span>
+                <span class="import-chip">يربط الصفوف المتاحة</span>
                 <span class="import-chip">يتجاوز السجلات الناقصة</span>
               </div>
             </div>
@@ -192,11 +193,14 @@
 
   function $(s,r=document){return r.querySelector(s)}
   function esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;')}
+  function uuid(){return crypto.randomUUID?crypto.randomUUID():'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0,v=c==='x'?r:(r&3|8);return v.toString(16)})}
 
   let sb = null;
   let ME = null;
+  let CLASSES = [];
   let RAW_ROWS = [];
   let ANALYSIS = null;
+  const USERNAME_SALT = Math.random().toString(36).slice(2,6);
 
   function cfg(){ return window.AMIN_CONFIG || {}; }
   function client(){
@@ -222,6 +226,16 @@
     }
     return '';
   }
+  function normalizeArabic(v){
+    return String(v || '')
+      .replace(/[إأآا]/g,'ا')
+      .replace(/[ىي]/g,'ي')
+      .replace(/ة/g,'ه')
+      .replace(/[\u064B-\u065F]/g,'')
+      .replace(/\s+/g,' ')
+      .trim()
+      .toLowerCase();
+  }
   function normalizeGender(value){
     const v = String(value || '').trim();
     if(/^(ذكر|male|boy)$/i.test(v)) return 'male';
@@ -243,34 +257,46 @@
     }catch(err){}
     return null;
   }
-  function analyzeRows(rows){
-    const headers = rows.length ? Object.keys(rows[0]) : [];
-    const analyzed = rows.map((raw,index)=>{
-      const item = {
-        index:index+1,
-        raw,
-        parentName:pick(raw, ALIASES.parentName),
-        parentPhone:pick(raw, ALIASES.parentPhone),
-        parentEmail:pick(raw, ALIASES.parentEmail),
-        studentName:pick(raw, ALIASES.studentName),
-        studentBirth:pick(raw, ALIASES.studentBirth),
-        studentGrade:pick(raw, ALIASES.studentGrade),
-        studentGender:pick(raw, ALIASES.studentGender),
-        issues:[]
-      };
-      if(!item.parentName) item.issues.push('اسم ولي الأمر مفقود');
-      if(!item.studentName) item.issues.push('اسم الطالب مفقود');
-      if(!item.parentPhone && !item.parentEmail) item.issues.push('لا يوجد هاتف أو بريد للتواصل');
-      item.status = item.issues.length ? 'issue' : 'ready';
-      return item;
-    });
-    return {
-      headers,
-      rows:analyzed,
-      total:analyzed.length,
-      ready:analyzed.filter(x=>x.status==='ready').length,
-      issues:analyzed.filter(x=>x.status!=='ready').length
-    };
+  function passwordFromIso(iso){
+    const parts = String(iso || '').split('-');
+    if(parts.length !== 3) return '';
+    return parts[2] + parts[1] + parts[0];
+  }
+  function randomTempPassword(){
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#%';
+    const bytes = new Uint32Array(10);
+    crypto.getRandomValues(bytes);
+    return Array.from(bytes, b => chars[b % chars.length]).join('');
+  }
+  function latinize(raw){
+    let s = String(raw || '').trim().toLowerCase();
+    const map = {'ا':'a','أ':'a','إ':'i','آ':'a','ب':'b','ت':'t','ث':'th','ج':'j','ح':'h','خ':'kh','د':'d','ذ':'th','ر':'r','ز':'z','س':'s','ش':'sh','ص':'s','ض':'d','ط':'t','ظ':'z','ع':'a','غ':'gh','ف':'f','ق':'q','ك':'k','ل':'l','م':'m','ن':'n','ه':'h','ة':'h','و':'w','ي':'y','ى':'a','ء':'','ئ':'y','ؤ':'w'};
+    s = s.replace(/[\u0600-\u06FF]/g,ch => map[ch] || '');
+    return s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'').replace(/^\.+|\.+$/g,'');
+  }
+  function makeUniqueUsername(kind, seed, used){
+    const base = (latinize(seed) || kind).slice(0,14) || kind;
+    let i = 0;
+    while(i < 500){
+      const candidate = (base + kind.slice(0,1) + USERNAME_SALT + (i ? i : '')).slice(0,28).toLowerCase();
+      if(!used.has(candidate)){
+        used.add(candidate);
+        return candidate;
+      }
+      i++;
+    }
+    const fallback = (kind + USERNAME_SALT + Date.now().toString().slice(-4)).slice(0,28).toLowerCase();
+    used.add(fallback);
+    return fallback;
+  }
+  function classMatch(rawGrade){
+    const text = normalizeArabic(rawGrade);
+    if(!text) return {id:null,name:null};
+    let exact = CLASSES.find(c => normalizeArabic(c.name) === text);
+    if(exact) return {id:exact.id,name:exact.name};
+    let includes = CLASSES.find(c => normalizeArabic(c.name).includes(text) || text.includes(normalizeArabic(c.name)));
+    if(includes) return {id:includes.id,name:includes.name};
+    return {id:null,name:null};
   }
   function renderFileInfo(file, success){
     const cls = success ? '#eefcf3' : '#fff1f1';
@@ -284,24 +310,134 @@
   function renderPreviewEmpty(title,detail){
     $('#previewSection').innerHTML = '<div class="preview-empty"><b>'+esc(title)+'</b><p>'+esc(detail)+'</p></div>';
   }
+  function analyzeRows(rows){
+    const headers = rows.length ? Object.keys(rows[0]) : [];
+    const analyzed = rows.map((raw,index)=>{
+      const item = {
+        index:index+1,
+        raw,
+        parentName:pick(raw, ALIASES.parentName),
+        parentPhone:pick(raw, ALIASES.parentPhone),
+        parentEmail:pick(raw, ALIASES.parentEmail),
+        studentName:pick(raw, ALIASES.studentName),
+        studentBirth:pick(raw, ALIASES.studentBirth),
+        studentGrade:pick(raw, ALIASES.studentGrade),
+        studentGenderRaw:pick(raw, ALIASES.studentGender),
+        issues:[],
+        warnings:[]
+      };
+      item.studentBirthIso = parseDate(item.studentBirth);
+      item.studentGender = normalizeGender(item.studentGenderRaw);
+      const cls = classMatch(item.studentGrade);
+      item.classId = cls.id;
+      item.classNameMatched = cls.name;
+
+      if(!item.parentName) item.issues.push('اسم ولي الأمر مفقود');
+      if(!item.studentName) item.issues.push('اسم الطالب مفقود');
+      if(!item.parentPhone && !item.parentEmail) item.issues.push('لا يوجد هاتف أو بريد للتواصل');
+      if(item.studentGrade && !item.classId) item.warnings.push('تعذر مطابقة الصف داخل النظام');
+      if(item.studentBirth && !item.studentBirthIso) item.warnings.push('تاريخ الميلاد غير واضح وسيُترك فارغاً');
+      if(item.studentGenderRaw && !item.studentGender) item.warnings.push('قيمة الجنس غير معروفة وسيُترك الحقل فارغاً');
+
+      item.status = item.issues.length ? 'issue' : (item.warnings.length ? 'ready-note' : 'ready');
+      return item;
+    });
+    return {
+      headers,
+      rows:analyzed,
+      total:analyzed.length,
+      ready:analyzed.filter(x=>x.status!=='issue').length,
+      cleanReady:analyzed.filter(x=>x.status==='ready').length,
+      readyNotes:analyzed.filter(x=>x.status==='ready-note').length,
+      issues:analyzed.filter(x=>x.status==='issue').length,
+      plan:buildImportPlan(analyzed)
+    };
+  }
+  function buildImportPlan(rows){
+    const groupsMap = new Map();
+    const usedUsernames = new Set();
+    rows.filter(r => r.status !== 'issue').forEach(row => {
+      const familyKey = normalizeArabic(row.parentName) + '|' + normalizeArabic(row.parentPhone || row.parentEmail || ('row' + row.index));
+      if(!groupsMap.has(familyKey)){
+        const parentUsername = row.parentEmail || makeUniqueUsername('parent', row.parentName || row.parentPhone || ('family'+row.index), usedUsernames);
+        groupsMap.set(familyKey, {
+          key:familyKey,
+          displayName:row.parentName,
+          contact:row.parentPhone || row.parentEmail || '—',
+          familyPayload:{
+            id:uuid(),
+            academic_year:'2026-2027',
+            guardian_name:row.parentName,
+            father_name:'',
+            family_name:'',
+            generated_username:parentUsername,
+            initial_password:randomTempPassword(),
+            phone_primary:row.parentPhone || '',
+            phone_whatsapp:row.parentPhone || '',
+            phone_emergency:'',
+            status:'pending'
+          },
+          students:[]
+        });
+      }
+      const group = groupsMap.get(familyKey);
+      const studentUsername = makeUniqueUsername('student', row.studentName || ('student'+row.index), usedUsernames);
+      group.students.push({
+        id:uuid(),
+        family_id:group.familyPayload.id,
+        academic_year:'2026-2027',
+        student_name:row.studentName,
+        generated_username:studentUsername,
+        initial_password:passwordFromIso(row.studentBirthIso) || randomTempPassword(),
+        birth_date:row.studentBirthIso || null,
+        age_years:null,
+        gender:row.studentGender || null,
+        class_id:row.classId || null,
+        section:null,
+        birth_place:'',
+        passport_number:'',
+        passport_expiry_date:null,
+        photo_path:null,
+        status:'pending'
+      });
+    });
+    return {
+      groups:Array.from(groupsMap.values()),
+      readyRows:rows.filter(r => r.status !== 'issue'),
+      skippedRows:rows.filter(r => r.status === 'issue')
+    };
+  }
+  function rowStatusChip(row){
+    if(row.status === 'ready') return '<span class="status-chip ready">جاهز</span>';
+    if(row.status === 'ready-note') return '<span class="status-chip warning">جاهز مع ملاحظة</span>';
+    return '<span class="status-chip issue">بحاجة مراجعة</span>';
+  }
+  function rowNotesHtml(row){
+    if(row.status === 'issue') return '<div class="small-muted">'+esc(row.issues.join('، '))+'</div>';
+    const notes = [];
+    if(row.classNameMatched) notes.push('تمت مطابقة الصف: ' + row.classNameMatched);
+    if(row.warnings.length) notes.push.apply(notes, row.warnings);
+    if(!notes.length) return '<div class="small-ok">السجل جاهز للاستيراد</div>';
+    return '<div class="small-muted">'+esc(notes.join('، '))+'</div>';
+  }
   function renderPreview(){
     if(!ANALYSIS || !ANALYSIS.total){
       renderPreviewEmpty('لا توجد بيانات صالحة للعرض', 'تأكد من أن الملف غير فارغ ثم جرّب مرة أخرى.');
       return;
     }
     const rowsHtml = ANALYSIS.rows.slice(0,12).map(row => {
-      const issueHtml = row.issues.length ? '<div class="small-muted">'+esc(row.issues.join('، '))+'</div>' : '<div class="small-muted">سجل جاهز للاستيراد</div>';
       return '<tr>'
         + '<td>'+esc(row.index)+'</td>'
         + '<td><b>'+esc(row.parentName || '—')+'</b></td>'
         + '<td><b>'+esc(row.studentName || '—')+'</b></td>'
         + '<td>'+esc(row.parentPhone || row.parentEmail || '—')+'</td>'
-        + '<td>'+esc(row.studentGrade || '—')+'</td>'
-        + '<td>'+issueHtml+'</td>'
-        + '<td><span class="status-chip '+(row.status==='ready'?'ready':'issue')+'">'+esc(row.status==='ready'?'جاهز للاستيراد':'بحاجة مراجعة')+'</span></td>'
+        + '<td>'+(row.classNameMatched ? esc(row.classNameMatched) : esc(row.studentGrade || '—'))+'</td>'
+        + '<td>'+rowNotesHtml(row)+'</td>'
+        + '<td>'+rowStatusChip(row)+'</td>'
         + '</tr>';
     }).join('');
     const moreText = ANALYSIS.total > 12 ? '<p class="small-muted" style="margin-top:12px;text-align:center">تم عرض أول 12 سجل فقط من أصل '+esc(ANALYSIS.total)+' سجل.</p>' : '';
+    const groupsCount = ANALYSIS.plan.groups.length;
     $('#previewSection').innerHTML = ''
       + '<div class="import-card">'
       +   '<div class="card-head" style="padding:0;border:0;background:transparent;margin-bottom:16px">'
@@ -309,12 +445,12 @@
       +   '</div>'
       +   '<div class="kpis" style="margin-bottom:16px">'
       +     '<div class="kpi blue"><small>إجمالي السجلات</small><b>'+esc(ANALYSIS.total)+'</b></div>'
-      +     '<div class="kpi green"><small>سجلات جاهزة</small><b>'+esc(ANALYSIS.ready)+'</b></div>'
-      +     '<div class="kpi gold"><small>سجلات تحتاج مراجعة</small><b>'+esc(ANALYSIS.issues)+'</b></div>'
-      +     '<div class="kpi"><small>عدد الأعمدة</small><b>'+esc(ANALYSIS.headers.length)+'</b></div>'
+      +     '<div class="kpi green"><small>جاهزة بالكامل</small><b>'+esc(ANALYSIS.cleanReady)+'</b></div>'
+      +     '<div class="kpi gold"><small>جاهزة مع ملاحظات</small><b>'+esc(ANALYSIS.readyNotes)+'</b></div>'
+      +     '<div class="kpi"><small>أسر مستنتجة</small><b>'+esc(groupsCount)+'</b></div>'
       +   '</div>'
       +   '<div class="import-note" style="margin-bottom:16px">اكتشفنا الأعمدة التالية: '+ANALYSIS.headers.map(h=>'<span class="import-chip">'+esc(h)+'</span>').join(' ')+'</div>'
-      +   '<div class="import-note" style="margin-bottom:16px">سيتم تخطي السجلات الناقصة تلقائياً مع عرض سبب التجاوز في النتيجة النهائية.</div>'
+      +   '<div class="import-note" style="margin-bottom:16px">سيتم تحويل الملف إلى <b>'+esc(groupsCount)+'</b> طلب أسرة و <b>'+esc(ANALYSIS.plan.readyRows.length)+'</b> سجل طالب جاهز، مع تجاوز السجلات الناقصة تماماً.</div>'
       +   '<div class="preview-table-wrap">'
       +     '<table class="preview-table">'
       +       '<thead><tr><th>#</th><th>ولي الأمر</th><th>الطالب</th><th>التواصل</th><th>الصف</th><th>ملاحظات</th><th>الحالة</th></tr></thead>'
@@ -323,11 +459,19 @@
       +   '</div>'
       +   moreText
       +   '<div class="import-actions no-print" style="margin-top:18px">'
-      +     '<button class="btn" style="background:#10b981;color:#fff" '+(ANALYSIS.ready ? '' : 'disabled')+' onclick="ImportStudents.importAll()">✅ استيراد السجلات الجاهزة ('+esc(ANALYSIS.ready)+')</button>'
+      +     '<button class="btn" style="background:#10b981;color:#fff" '+(ANALYSIS.plan.readyRows.length ? '' : 'disabled')+' onclick="ImportStudents.importAll()">✅ استيراد السجلات الجاهزة ('+esc(ANALYSIS.plan.readyRows.length)+')</button>'
       +     '<button class="btn" type="button" onclick="window.print()">🖨️ طباعة المعاينة</button>'
       +     '<button class="btn" style="background:#6b7280;color:#fff" type="button" onclick="ImportStudents.cancel()">❌ إلغاء</button>'
       +   '</div>'
       + '</div>';
+  }
+  async function loadClasses(){
+    try{
+      const res = await client().from('classes').select('id,name').order('name');
+      CLASSES = res.data || [];
+    }catch(err){
+      CLASSES = [];
+    }
   }
   async function init(){
     const c = client();
@@ -354,6 +498,7 @@
     if(savedLink) $('#formLink').value = savedLink;
     bindDropzone();
     bindMobileMenu();
+    await loadClasses();
     renderPreviewEmpty('لم يتم اختيار ملف بعد', 'ارفع ملف Excel أو CSV لعرض السجلات الجاهزة قبل الاستيراد.');
   }
   function bindMobileMenu(){
@@ -405,7 +550,7 @@
     $('#resultsSection').style.display = 'none';
     $('#resultsSection').innerHTML = '';
     renderFileInfo(file, true);
-    $('#fileInfo').innerHTML += '<div class="file-box" style="margin-top:10px;background:#eef5ff;border-color:#d7e3f9;color:#29549e"><b>جاري قراءة الملف...</b><small>لحظات وسيتم تحليل السجلات</small></div>';
+    $('#fileInfo').innerHTML += '<div class="file-box" style="margin-top:10px;background:#eef5ff;border-color:#d7e3f9;color:#29549e"><b>جاري قراءة الملف...</b><small>لحظات وسيتم تحليل السجلات وربط الصفوف المتاحة</small></div>';
     const reader = new FileReader();
     reader.onload = function(e){
       try{
@@ -436,72 +581,75 @@
     reader.readAsArrayBuffer(file);
   }
   async function importAll(){
-    if(!ANALYSIS || !ANALYSIS.rows || !ANALYSIS.ready){
+    if(!ANALYSIS || !ANALYSIS.plan || !ANALYSIS.plan.readyRows.length){
       toast('تنبيه', 'لا توجد سجلات جاهزة للاستيراد', 'red');
       return;
     }
-    const readyRows = ANALYSIS.rows.filter(r => r.status === 'ready');
-    const skippedRows = ANALYSIS.rows.filter(r => r.status !== 'ready');
-    if(!confirm('سيتم استيراد '+readyRows.length+' سجل جاهز، وتخطي '+skippedRows.length+' سجل يحتاج مراجعة.\n\nهل تريد المتابعة؟')) return;
+    const groups = ANALYSIS.plan.groups;
+    const skippedRows = ANALYSIS.plan.skippedRows;
+    if(!confirm('سيتم إنشاء '+groups.length+' طلب أسرة و '+ANALYSIS.plan.readyRows.length+' سجل طالب جاهز، مع تجاوز '+skippedRows.length+' سجل ناقص.\n\nهل تريد المتابعة؟')) return;
 
     const section = $('#resultsSection');
     section.style.display = 'block';
     section.innerHTML = '<div class="import-card"><h3>⏳ جاري الاستيراد...</h3><div id="progress" class="file-box" style="margin-top:16px">بدء العملية...</div></div>';
     const progress = $('#progress');
-    let success = 0;
-    let failed = 0;
-    const errors = [];
     const c = client();
+    let familiesSuccess = 0;
+    let studentsSuccess = 0;
+    let studentsFailed = 0;
+    const errors = [];
 
-    for(let i = 0; i < readyRows.length; i++){
-      const row = readyRows[i];
-      progress.innerHTML = '<b>معالجة '+(i+1)+' من '+readyRows.length+'</b><br><small>'+esc(row.studentName || row.parentName || ('سجل '+row.index))+'</small>';
+    for(let i = 0; i < groups.length; i++){
+      const group = groups[i];
+      progress.innerHTML = '<b>معالجة الأسرة '+(i+1)+' من '+groups.length+'</b><br><small>'+esc(group.displayName || ('أسرة '+(i+1)))+' — '+esc(group.students.length)+' طالب/طلاب</small>';
       try{
-        const regPayload = {
-          parent_name: row.parentName,
-          parent_phone: row.parentPhone,
-          parent_email: row.parentEmail,
-          student_name: row.studentName,
-          student_birth_date: parseDate(row.studentBirth),
-          student_grade: row.studentGrade,
-          student_gender: normalizeGender(row.studentGender),
-          notes: JSON.stringify(row.raw || {}),
-          status: 'pending',
-          created_at: new Date().toISOString(),
-          imported_from: 'google_forms'
-        };
-        const regRes = await c.from('registrations').insert(regPayload);
-        if(regRes.error){
-          throw regRes.error;
+        const familyRes = await c.from('registration_families').insert(group.familyPayload);
+        if(familyRes.error) throw familyRes.error;
+        familiesSuccess++;
+
+        for(let s = 0; s < group.students.length; s++){
+          try{
+            const stu = group.students[s];
+            const studentRes = await c.from('registration_students').insert(stu);
+            if(studentRes.error) throw studentRes.error;
+            studentsSuccess++;
+          }catch(studentErr){
+            studentsFailed++;
+            errors.push({
+              scope:'student',
+              family:group.displayName,
+              name:group.students[s].student_name,
+              error:studentErr.message || String(studentErr)
+            });
+          }
         }
-        success++;
       }catch(err){
-        failed++;
-        errors.push({row:row.index,name:row.studentName || row.parentName || ('سجل '+row.index),error:err.message || String(err)});
+        errors.push({scope:'family',family:group.displayName,name:group.displayName,error:err.message || String(err)});
       }
     }
 
     const skippedHtml = skippedRows.length ? skippedRows.map(row => '<div class="error-item"><b>السجل '+esc(row.index)+':</b> '+esc(row.studentName || row.parentName || 'سجل غير مكتمل')+'<br><small style="color:#946200">'+esc(row.issues.join('، '))+'</small></div>').join('') : '';
-    const failedHtml = errors.length ? errors.map(item => '<div class="error-item"><b>السجل '+esc(item.row)+':</b> '+esc(item.name)+'<br><small style="color:#b42318">'+esc(item.error)+'</small></div>').join('') : '';
+    const failedHtml = errors.length ? errors.map(item => '<div class="error-item"><b>'+esc(item.scope === 'family' ? 'الأسرة' : 'الطالب')+':</b> '+esc(item.name || item.family)+'<br><small style="color:#b42318">'+esc(item.error)+'</small></div>').join('') : '';
 
     section.innerHTML = ''
       + '<div class="import-card">'
       +   '<h2 style="color:#10b981;margin-bottom:16px">✅ اكتمل الاستيراد</h2>'
       +   '<div class="kpis" style="margin-bottom:20px">'
-      +     '<div class="kpi green"><small>نجح</small><b>'+esc(success)+'</b></div>'
-      +     '<div class="kpi red"><small>فشل أثناء الحفظ</small><b>'+esc(failed)+'</b></div>'
+      +     '<div class="kpi green"><small>أسر محفوظة</small><b>'+esc(familiesSuccess)+'</b></div>'
+      +     '<div class="kpi blue"><small>طلاب محفوظون</small><b>'+esc(studentsSuccess)+'</b></div>'
+      +     '<div class="kpi red"><small>طلاب/طلبات فشلت</small><b>'+esc(errors.length)+'</b></div>'
       +     '<div class="kpi gold"><small>تم تجاوزه</small><b>'+esc(skippedRows.length)+'</b></div>'
-      +     '<div class="kpi blue"><small>الإجمالي</small><b>'+esc(ANALYSIS.total)+'</b></div>'
       +   '</div>'
-      +   (failedHtml ? '<h3>سجلات فشل حفظها</h3><div class="error-list" style="margin-bottom:18px">'+failedHtml+'</div>' : '')
-      +   (skippedHtml ? '<h3>سجلات بحاجة مراجعة</h3><div class="error-list" style="margin-bottom:18px">'+skippedHtml+'</div>' : '')
+      +   '<div class="import-note" style="margin-bottom:18px">تم التحويل مباشرة إلى جداول <b>registration_families</b> و <b>registration_students</b> ليظهر كل شيء في صفحة مراجعة التسجيلات الحالية.</div>'
+      +   (failedHtml ? '<h3>عناصر تعذر حفظها</h3><div class="error-list" style="margin-bottom:18px">'+failedHtml+'</div>' : '')
+      +   (skippedHtml ? '<h3>سجلات تم تجاوزها</h3><div class="error-list" style="margin-bottom:18px">'+skippedHtml+'</div>' : '')
       +   '<div class="import-actions no-print">'
       +     '<button class="btn" style="background:#3A3565;color:#fff" onclick="location.href=\'registrations-admin.html\'">📋 مراجعة التسجيلات</button>'
       +     '<button class="btn" style="background:#10b981;color:#fff" onclick="location.href=\'super-admin.html\'">🏠 لوحة المدير</button>'
       +     '<button class="btn" style="background:#6b7280;color:#fff" onclick="ImportStudents.resetPage()">🔄 استيراد ملف آخر</button>'
       +   '</div>'
       + '</div>';
-    toast('اكتمل', 'تم استيراد '+success+' سجل بنجاح', success ? 'green' : '');
+    toast('اكتمل', 'تم حفظ '+familiesSuccess+' أسرة و '+studentsSuccess+' طالب/طلاب', 'green');
   }
   function cancel(){
     if(!confirm('هل تريد إلغاء العملية الحالية ومسح المعاينة؟')) return;

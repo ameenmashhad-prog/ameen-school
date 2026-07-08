@@ -4,7 +4,7 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#F9FAFB">
 <title>تسجيل المعلمين 2026-2027 — مدارس أمين الرضا</title>
-  <link rel="stylesheet" href="assets/amin.css?v=20260706-5">
+<link rel="stylesheet" href="assets/amin.css?v=20260706-5">
 <link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="stylesheet" href="assets/registration.css?v=20260709-1">
 <link rel="stylesheet" href="assets/i18n.css">
@@ -20,17 +20,44 @@
   <div class="reg-container">
     <header class="reg-header no-print">
       <div class="reg-brand"><div class="reg-logo">ع</div><div><h1>مدارس أمين الرضا (ع)</h1><small>نموذج تسجيل المعلمين للعام 2026-2027</small></div></div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn" href="index.html">الدخول</a><a class="btn blue" href="family-registration.html">تسجيل ولي أمر/طالب</a></div>
+      <div class="reg-actions"><a class="btn" href="index.html">الدخول</a><a class="btn blue" href="family-registration.html">تسجيل ولي أمر/طالب</a><button class="btn" type="button" onclick="document.getElementById('teacherPrintBtn').click()">طباعة سريعة</button></div>
     </header>
 
     <section class="reg-hero no-print">
-      <div class="reg-title"><h2>تسجيل المعلمين</h2><p>استمارة العام الدراسي 2026-2027</p></div>
+      <div class="reg-title"><h2>تسجيل المعلمين</h2><p>استمارة العام الدراسي 2026-2027 مع توليد تلقائي لاسم المستخدم وكلمة المرور الأولية، ثم حفظ المواد المختارة داخل الطلب نفسه.</p></div>
       <aside class="reg-side"><div class="steps"><div class="step"><b>1</b><span>البيانات الأساسية</span></div><div class="step"><b>2</b><span>المؤهل والمواد</span></div><div class="step"><b>3</b><span>الإرسال والطباعة</span></div></div></aside>
+    </section>
+
+    <section class="reg-callout no-print">
+      <div>
+        <b>جهّز معلوماتك قبل البدء</b>
+        <p>الاسم الكامل، تاريخ الميلاد، الهاتف، المؤهل، التخصص، والمواد التي سيتم تدريسها. كلما كانت المعلومات أوضح سهل اعتماد الطلب وتفعيل الحساب.</p>
+      </div>
+      <span class="badge blue">قبل الإرسال</span>
+    </section>
+
+    <section class="reg-mini-grid no-print">
+      <div class="info-card"><h4>البيانات الشخصية</h4><p>أدخل الاسم الثلاثي بدقة لأن اسم المستخدم المقترح يُشتق منه ويُعتمد لاحقاً عند التفعيل.</p></div>
+      <div class="info-card"><h4>المؤهل والتخصص</h4><p>وضّح المؤهل العلمي والتخصص الرئيسي بالشكل الإداري المناسب لتسهيل الفرز والمراجعة.</p></div>
+      <div class="info-card"><h4>المواد التعليمية</h4><p>اختر مادة واحدة على الأقل من قاعدة البيانات حتى يظهر الطلب بصورة واضحة في المراجعة.</p></div>
+      <div class="info-card"><h4>الصورة والجواز</h4><p>الصورة اختيارية ويمكن تجاهلها مؤقتاً، كما أن بيانات الجواز تساعد عند الحاجة إلى التوثيق الإداري.</p></div>
+    </section>
+
+    <section class="reg-subnav no-print">
+      <div>
+        <b style="display:block;margin-bottom:4px">الانتقال إلى القسم</b>
+        <small class="reg-muted">يمكنك التنقل سريعاً بين بيانات المعلم وقسم المواد ثم العودة للطباعة أو الإرسال.</small>
+      </div>
+      <div class="reg-subnav-links">
+        <a href="#teacherBasicSection">بيانات المعلم</a>
+        <a href="#teacherSubjectsSection">المواد المختارة</a>
+        <span class="reg-link-pill" id="teacherSubjectsCountBadge">دون مواد</span>
+      </div>
     </section>
 
     <form id="teacherForm">
       <div class="form-grid">
-        <section class="reg-card">
+        <section class="reg-card" id="teacherBasicSection">
           <h3>بيانات المعلم</h3>
           <div class="form-grid">
             <div class="field col-6"><label>الاسم الثلاثي *</label><input id="teacherName" class="input" required></div>
@@ -54,8 +81,8 @@
           </div>
         </section>
 
-        <section class="reg-card">
-          <h3>المواد التي يدرسها</h3>
+        <section class="reg-card" id="teacherSubjectsSection">
+          <div class="section-head"><div><h3>المواد التي يدرسها</h3><p>اختر المواد من قاعدة البيانات، وستظهر داخل الطلب والنسخة المطبوعة بشكل منظم.</p></div><span class="badge gold">مطلوب اختيار مادة واحدة على الأقل</span></div>
           <div class="form-grid">
             <div class="field col-8"><label>اختر مادة من قاعدة البيانات</label><select id="subjectSelect" class="select"></select></div>
             <div class="field col-4"><label>&nbsp;</label><button type="button" id="addSubjectBtn" class="btn blue block">إضافة المادة</button></div>
@@ -70,7 +97,7 @@
   </div>
 </main>
 <div id="toast" class="toast"></div>
-<script src="libs/supabase.min.js"></script><script src="libs/calendar-lib.js"></script><script src="assets/config.js"></script><script src="assets/platform-modules.js"></script><script src="assets/i18n.js"></script><script src="assets/registration.js?v=20260709-1"></script>
+<script src="libs/supabase.min.js"></script><script src="libs/calendar-lib.js"></script><script src="assets/config.js"></script><script src="assets/platform-modules.js"></script><script src="assets/i18n.js"></script><script src="assets/registration.js?v=20260709-2"></script>
 <script>window.addEventListener('load',()=>RegistrationForms.init('teacher'));</script>
 <script src="assets/ux-enhancements.js?v=20260706-3"></script>
 <script src="assets/amin-theme-injector.js"></script>
