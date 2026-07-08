@@ -316,7 +316,28 @@ async function setStatus(table,id,status){
 }
 async function activateAccount(type,id){
   toast('جاري تفعيل الحساب...', 'يرجى الانتظار');
-  const {data,error} = await sb.rpc('activate_registered_user',{p_reg_type:type,p_reg_id:id});
+  let data = null;
+  let error = null;
+
+  const primary = await sb.rpc('activate_registered_user_rpc',{p_reg_type:type,p_reg_id:id});
+  data = primary.data;
+  error = primary.error;
+
+  if(error){
+    const msg = String(error.message || '');
+    const isMissingWrapper = msg.includes('activate_registered_user_rpc');
+    const isOldAmbiguous = msg.includes('Could not choose the best candidate function') || msg.includes('PGRST203');
+
+    if(isMissingWrapper || isOldAmbiguous){
+      toast('يلزم تحديث SQL', 'شغّل الملف sql/archive/142_fix_activate_registered_user_rpc_ambiguity.sql ثم أعد المحاولة');
+      return;
+    }
+
+    const fallback = await sb.rpc('activate_registered_user',{p_reg_type:type,p_reg_id:id});
+    data = fallback.data;
+    error = fallback.error;
+  }
+
   if(error){
     toast('خطأ في التفعيل', error.message);
     return;
