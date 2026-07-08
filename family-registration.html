@@ -6,7 +6,7 @@
 <title>تسجيل ولي أمر وطلاب 2026-2027 — مدارس أمين الرضا</title>
   <link rel="stylesheet" href="assets/amin.css?v=20260706-5">
 <link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<link rel="stylesheet" href="assets/registration.css">
+<link rel="stylesheet" href="assets/registration.css?v=20260709-1">
 <link rel="stylesheet" href="assets/i18n.css">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="assets/amin-logo-small.png">
@@ -20,17 +20,45 @@
   <div class="reg-container">
     <header class="reg-header no-print">
       <div class="reg-brand"><div class="reg-logo">ع</div><div><h1>مدارس أمين الرضا (ع)</h1><small>نموذج تسجيل الأسرة والطلاب للعام الدراسي 2026-2027</small></div></div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn" href="index.html">الدخول</a><a class="btn blue" href="teacher-registration.html">تسجيل معلم</a></div>
+      <div class="reg-actions"><a class="btn" href="index.html">الدخول</a><a class="btn blue" href="teacher-registration.html">تسجيل معلم</a><button class="btn" type="button" onclick="document.getElementById('printBtn').click()">طباعة سريعة</button></div>
     </header>
 
     <section class="reg-hero no-print">
-      <div class="reg-title"><h2>تسجيل أولياء الأمور والطلاب</h2><p>استمارة العام الدراسي 2026-2027</p></div>
+      <div class="reg-title"><h2>تسجيل أولياء الأمور والطلاب</h2><p>استمارة العام الدراسي 2026-2027 مع توليد تلقائي لاسم المستخدم وكلمة المرور الأولية بحسب البيانات المدخلة.</p></div>
       <aside class="reg-side"><div class="steps"><div class="step"><b>1</b><span>بيانات ولي الأمر والأم</span></div><div class="step"><b>2</b><span>بيانات الطلاب</span></div><div class="step"><b>3</b><span>الإرسال والطباعة</span></div></div></aside>
+    </section>
+
+    <section class="reg-callout no-print">
+      <div>
+        <b>جهزي قبل البدء</b>
+        <p>هواتف التواصل، تواريخ الميلاد، أرقام الجوازات، والصفوف المطلوبة لكل طالب. كلما كانت البيانات أدق كان تفعيل الحساب أسرع.</p>
+      </div>
+      <span class="badge blue">قبل الإرسال</span>
+    </section>
+
+    <section class="reg-mini-grid no-print">
+      <div class="info-card"><h4>هواتف التواصل</h4><p>يفضّل إدخال هاتف أساسي واضح مع واتساب لتسريع المتابعة والاعتماد.</p></div>
+      <div class="info-card"><h4>تواريخ الميلاد والجوازات</h4><p>أدخلي التواريخ بعناية لأن كلمة المرور الأولية تُبنى منها وتُستخدم أيضاً في التحقق الإداري.</p></div>
+      <div class="info-card"><h4>الصفوف والشعب المطلوبة</h4><p>اختيار الصف الصحيح لكل طالب من البداية يخفف التعديل اللاحق على الإدارة.</p></div>
+      <div class="info-card"><h4>اسم المستخدم وكلمة المرور</h4><p>يُولَّدان تلقائياً من البيانات ويمكن تعديل اسم المستخدم لاحقاً من الإدارة إذا لزم.</p></div>
+    </section>
+
+    <section class="reg-subnav no-print">
+      <div>
+        <b style="display:block;margin-bottom:4px">الانتقال إلى القسم</b>
+        <small class="reg-muted">يمكنك التنقل سريعاً بين الأقسام ثم العودة للطباعة أو الإرسال في النهاية.</small>
+      </div>
+      <div class="reg-subnav-links">
+        <a href="#guardianSection">بيانات ولي الأمر</a>
+        <a href="#motherSection">بيانات الأم</a>
+        <a href="#studentsSection">بيانات الطلاب</a>
+        <span class="reg-link-pill" id="studentsCountBadge">طالب واحد</span>
+      </div>
     </section>
 
     <form id="familyForm">
       <div class="form-grid">
-        <section class="reg-card">
+        <section class="reg-card" id="guardianSection">
           <h3>القسم الأول — بيانات ولي الأمر</h3>
           <div class="form-grid">
             <div class="field col-4"><label>اسم ولي الأمر *</label><input id="guardianName" class="input" required></div>
@@ -56,7 +84,7 @@
           </div>
         </section>
 
-        <section class="reg-card">
+        <section class="reg-card" id="motherSection">
           <h3>بيانات الأم</h3>
           <div class="form-grid">
             <div class="field col-4"><label>اسم الأم</label><input id="motherName" class="input"></div>
@@ -75,7 +103,7 @@
           </div>
         </section>
 
-        <section class="reg-card">
+        <section class="reg-card" id="studentsSection">
           <div class="student-card-head"><h3>القسم الثاني — بيانات الطلاب</h3></div>
           <div id="studentsWrap"></div>
         </section>
@@ -88,7 +116,7 @@
   </div>
 </main>
 <div id="toast" class="toast"></div>
-<script src="libs/supabase.min.js"></script><script src="libs/calendar-lib.js"></script><script src="assets/config.js"></script><script src="assets/platform-modules.js"></script><script src="assets/i18n.js"></script><script src="assets/registration.js"></script>
+<script src="libs/supabase.min.js"></script><script src="libs/calendar-lib.js"></script><script src="assets/config.js"></script><script src="assets/platform-modules.js"></script><script src="assets/i18n.js"></script><script src="assets/registration.js?v=20260709-1"></script>
 <script>window.addEventListener('load',()=>RegistrationForms.init('family'));</script>
 <script src="assets/ux-enhancements.js?v=20260706-3"></script>
 <script src="assets/amin-theme-injector.js"></script>

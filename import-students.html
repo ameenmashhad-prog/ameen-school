@@ -4,22 +4,63 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>استيراد الطلاب من Excel — مدارس أمين الرضا</title>
-  <link rel="stylesheet" href="assets/amin.css?v=20260706-5">
+<link rel="stylesheet" href="assets/amin.css?v=20260706-5">
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="stylesheet" href="assets/i18n.css">
+<style>
+  .import-wrap{display:grid;gap:24px}
+  .import-hero{display:grid;grid-template-columns:1.2fr .8fr;gap:18px}
+  .import-card{background:linear-gradient(145deg,#fff,var(--surface));border:1px solid rgba(255,255,255,.94);box-shadow:var(--neu);border-radius:28px;padding:22px}
+  .import-card h3,.import-card h2{margin-top:0}
+  .import-card p{color:var(--muted)}
+  .import-steps{display:grid;gap:10px}
+  .import-step{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:18px;background:rgba(158,188,236,.12);border:1px solid rgba(158,188,236,.22)}
+  .import-step b{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--primary);color:#193B68;flex:0 0 auto}
+  .import-chips,.import-actions,.import-links,.import-stats{display:flex;gap:8px;flex-wrap:wrap}
+  .import-chip{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:999px;background:rgba(158,188,236,.12);border:1px solid rgba(158,188,236,.22);font-size:13px;font-weight:700}
+  .import-note{padding:14px 16px;border-radius:20px;background:#fff8e8;border:1px solid #f3ddb0;color:#7a5712}
+  .dropzone{border:2px dashed rgba(158,188,236,.55);border-radius:24px;padding:34px;text-align:center;background:linear-gradient(145deg,#f9fbff,rgba(158,188,236,.08));cursor:pointer;transition:.2s}
+  .dropzone:hover,.dropzone.is-dragover{border-color:var(--focus);background:linear-gradient(145deg,#fff,rgba(0,207,204,.08))}
+  .dropzone .icon{font-size:58px;display:block;margin-bottom:8px}
+  .file-box{margin-top:14px;padding:14px 16px;border-radius:18px;background:#eef5ff;border:1px solid #d7e3f9}
+  .file-box b{display:block;margin-bottom:4px}
+  .preview-empty,.result-empty{padding:28px;border-radius:24px;text-align:center;background:linear-gradient(145deg,#fff,var(--surface));border:1px solid rgba(255,255,255,.94);box-shadow:var(--neu)}
+  .preview-empty b,.result-empty b{display:block;font-size:18px;margin-bottom:8px}
+  .preview-empty p,.result-empty p{margin:0;color:var(--muted);line-height:1.8}
+  .status-chip{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;font-size:12px;font-weight:800;border:1px solid transparent;white-space:nowrap}
+  .status-chip.ready{background:#ecfdf3;color:#0b6e4f;border-color:#b9efcf}
+  .status-chip.issue{background:#fff7df;color:#946200;border-color:#f4d38a}
+  .status-chip.error{background:#fff0f0;color:#b42318;border-color:#f5c1c1}
+  .status-chip.info{background:#eef5ff;color:#29549e;border-color:#bed6ff}
+  .preview-table{width:100%;border-collapse:collapse}
+  .preview-table th,.preview-table td{padding:12px 14px;border-bottom:1px solid #eef1f6;text-align:right;vertical-align:top}
+  .preview-table th{background:#f7f9fc;color:#304258;font-size:13px}
+  .preview-table-wrap{overflow:auto;border:1px solid var(--line);border-radius:22px;background:#fff}
+  .error-list{display:grid;gap:8px;max-height:280px;overflow:auto}
+  .error-item{padding:10px 12px;border-radius:16px;background:#fff;border:1px solid #f1d0d0}
+  .small-muted{color:var(--muted);font-size:13px}
+  @media (max-width:900px){.import-hero{grid-template-columns:1fr}}
+  @media (max-width:640px){.dropzone{padding:24px}.import-card{padding:18px}}
+  @media print{
+    aside.sidebar,.topbar,.side-footer,.profile-mini,.nav,.mobile-menu,.no-print,.toast{display:none!important}
+    .shell,.main{display:block!important}
+    .main{padding:0!important}
+    .import-card,.preview-empty,.result-empty{box-shadow:none!important;border:0!important;background:#fff!important}
+    body{background:#fff}
+  }
+</style>
 </head>
 <body data-portal="admin">
-
 <div class="shell">
   <aside class="sidebar" id="sidebar">
     <div class="brand">
       <div class="brand-mark">📥</div>
       <div>
         <h1>استيراد الطلاب</h1>
-        <small>من Google Forms / Excel</small>
+        <small>من نماذج Google أو ملف Excel</small>
       </div>
     </div>
-    
+
     <div class="profile-mini">
       <div class="avatar">👑</div>
       <div>
@@ -31,7 +72,7 @@
     <nav class="nav">
       <button onclick="location.href='super-admin.html'">🏠 لوحة المدير</button>
       <button onclick="location.href='family-registration.html'">📝 تسجيل يدوي</button>
-      <button onclick="location.href='registrations-admin.html'">📋 التسجيلات</button>
+      <button onclick="location.href='registrations-admin.html'">📋 مراجعة التسجيلات</button>
       <button onclick="location.href='portal.html'">🏛️ البوابة الموحدة</button>
     </nav>
 
@@ -41,66 +82,91 @@
   </aside>
 
   <main class="main" id="mainContent">
-    <header class="topbar">
+    <header class="topbar no-print">
       <button class="btn mobile-menu" id="mobileMenuBtn">☰</button>
       <h2>📥 استيراد الطلاب من Excel</h2>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn" type="button" onclick="window.print()">طباعة المعاينة</button>
+        <button class="btn blue" type="button" onclick="ImportStudents.resetPage()">إعادة اختيار الملف</button>
+      </div>
     </header>
 
     <div style="padding:24px;">
-      
-      <!-- شرح -->
-      <div class="card" style="border-right:4px solid #0B6E4F;margin-bottom:24px">
-        <div class="card-body">
-          <h2 style="color:#0B6E4F;margin-bottom:12px;">📋 كيف تعمل عملية الاستيراد؟</h2>
-          <ol style="color:#2E2A52;line-height:2;padding-right:20px;">
-            <li>📝 أرسل رابط Google Form لأولياء الأمور لتعبئة بياناتهم</li>
-            <li>📊 افتح Google Sheet المرتبط بالفورم</li>
-            <li>💾 نزّل الردود كملف Excel (.xlsx)</li>
-            <li>📥 ارفع الملف هنا للمراجعة</li>
-            <li>✅ تأكد من البيانات ثم اضغط "استيراد الكل"</li>
-            <li>🎉 سيتم إنشاء حسابات أولياء الأمور والطلاب تلقائياً</li>
-          </ol>
-        </div>
-      </div>
-
-      <!-- روابط Google Forms -->
-      <div class="card" style="margin-bottom:24px;">
-        <div class="card-head">
-          <h3>🔗 رابط Google Form للتسجيل</h3>
-        </div>
-        <div class="card-body">
-          <p style="margin-bottom:12px;">انسخ هذا الرابط وأرسله لأولياء الأمور:</p>
-          <div class="finance-quick-links" style="margin-bottom:12px"><button class="btn blue" onclick="location.href='registrations-admin.html'">مراجعة التسجيلات</button><button class="btn" onclick="location.href='family-registration.html'">تسجيل يدوي</button></div><div style="display:flex;gap:8px;flex-wrap:wrap;">
-            <input type="text" id="formLink" class="input" placeholder="https://forms.gle/..." style="flex:1;min-width:300px;padding:10px;" value="">
-            <button class="btn" style="background:#10b981;color:white;padding:10px 20px;" onclick="ImportStudents.saveLink()">💾 حفظ</button>
-            <button class="btn" style="background:#3A3565;color:white;padding:10px 20px;" onclick="ImportStudents.copyLink()">📋 نسخ</button>
-            <button class="btn" style="background:#25d366;color:white;padding:10px 20px;" onclick="ImportStudents.shareWhatsApp()">💬 مشاركة واتساب</button>
+      <div class="import-wrap">
+        <section class="import-hero">
+          <div class="import-card">
+            <h2 style="color:#0B6E4F;margin-bottom:12px">📋 كيف تعمل عملية الاستيراد؟</h2>
+            <p>ارفع ملف الاستجابات القادم من Google Forms أو Excel أو CSV، ثم راجع السجلات الجاهزة قبل إرسالها إلى طلبات التسجيل. السجلات الناقصة لن تُفشل العملية كلها؛ سيتم تجاوزها مع توضيح السبب.</p>
+            <div class="import-steps" style="margin-top:16px">
+              <div class="import-step"><b>1</b><span>أرسل رابط Google Form لأولياء الأمور لتعبئة بياناتهم</span></div>
+              <div class="import-step"><b>2</b><span>افتح Google Sheet المرتبط بالفورم ثم نزّل الردود كملف Excel (.xlsx)</span></div>
+              <div class="import-step"><b>3</b><span>ارفع الملف هنا للمراجعة، ثم راجع السجلات الجاهزة فقط</span></div>
+              <div class="import-step"><b>4</b><span>اضغط استيراد السجلات الجاهزة، وبعدها افتح مراجعة التسجيلات عند الحاجة</span></div>
+            </div>
           </div>
-        </div>
-      </div>
-
-      <!-- رفع الملف -->
-      <div class="card" style="margin-bottom:24px;">
-        <div class="card-head">
-          <h3>📥 رفع ملف Excel</h3>
-        </div>
-        <div class="card-body">
-          <div style="border:3px dashed #cbd5e1;border-radius:12px;padding:40px;text-align:center;cursor:pointer;background:#f8fafc;" onclick="document.getElementById('fileInput').click()">
-            <div style="font-size:64px;margin-bottom:12px;">📊</div>
-            <h3 style="margin-bottom:8px;">اضغط لاختيار ملف Excel</h3>
-            <p style="color:#64748b;">أو اسحب الملف هنا (.xlsx أو .csv)</p>
-            <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" style="display:none;" onchange="ImportStudents.handleFile(event)">
+          <div class="import-card">
+            <h3>ما الأعمدة التي ندعمها عادة؟</h3>
+            <p>اسم ولي الأمر، اسم الطالب، الهاتف، البريد، الصف، الجنس، تاريخ الميلاد. الأسماء قد تختلف قليلاً، لذلك نحاول التعرف تلقائياً على أشهر العناوين.</p>
+            <div class="import-chips" style="margin-bottom:14px">
+              <span class="import-chip">اسم ولي الأمر</span>
+              <span class="import-chip">اسم الطالب</span>
+              <span class="import-chip">رقم الهاتف</span>
+              <span class="import-chip">البريد الإلكتروني</span>
+              <span class="import-chip">الصف</span>
+              <span class="import-chip">الجنس</span>
+              <span class="import-chip">تاريخ الميلاد</span>
+            </div>
+            <div class="import-note">كلما كان اسم ولي الأمر واسم الطالب أوضح، كانت مراجعة التسجيلات اللاحقة أسرع وأسهل.</div>
+            <div class="import-links" style="margin-top:14px">
+              <button class="btn" type="button" onclick="location.href='registrations-admin.html'">مراجعة التسجيلات</button>
+              <button class="btn" type="button" onclick="location.href='family-registration.html'">تسجيل يدوي</button>
+              <button class="btn" type="button" onclick="location.href='super-admin.html'">العودة للمدير</button>
+            </div>
           </div>
-          <div id="fileInfo" style="margin-top:16px;"></div>
-        </div>
+        </section>
+
+        <section class="import-card no-print">
+          <div class="card-head" style="padding:0;border:0;background:transparent;margin-bottom:16px">
+            <h3>🔗 رابط Google Form للتسجيل</h3>
+          </div>
+          <p>انسخ هذا الرابط وأرسله لأولياء الأمور، ثم احتفظ به هنا للوصول السريع عند الحاجة.</p>
+          <div class="import-actions">
+            <input type="text" id="formLink" class="input" placeholder="https://forms.gle/..." style="flex:1;min-width:260px" value="">
+            <button class="btn" style="background:#10b981;color:#fff" onclick="ImportStudents.saveLink()">💾 حفظ</button>
+            <button class="btn" style="background:#3A3565;color:#fff" onclick="ImportStudents.copyLink()">📋 نسخ</button>
+            <button class="btn" style="background:#25d366;color:#fff" onclick="ImportStudents.shareWhatsApp()">💬 مشاركة واتساب</button>
+          </div>
+        </section>
+
+        <section class="import-card no-print">
+          <div class="card-head" style="padding:0;border:0;background:transparent;margin-bottom:16px">
+            <h3>📥 رفع ملف Excel أو CSV</h3>
+          </div>
+          <div class="dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()">
+            <div>
+              <span class="icon">📊</span>
+              <h3>اضغط لاختيار ملف Excel</h3>
+              <p>أو اسحب الملف هنا (.xlsx أو .xls أو .csv)</p>
+              <div class="import-actions" style="justify-content:center;margin-top:14px">
+                <span class="import-chip">يدعم Google Forms</span>
+                <span class="import-chip">يعرض السجلات الجاهزة</span>
+                <span class="import-chip">يتجاوز السجلات الناقصة</span>
+              </div>
+            </div>
+            <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" style="display:none" onchange="ImportStudents.handleFile(event)">
+          </div>
+          <div id="fileInfo"></div>
+        </section>
+
+        <section id="previewSection">
+          <div class="preview-empty">
+            <b>لم يتم اختيار ملف بعد</b>
+            <p>ارفع ملف Excel أو CSV لعرض السجلات الجاهزة قبل الاستيراد.</p>
+          </div>
+        </section>
+
+        <section id="resultsSection" style="display:none"></section>
       </div>
-
-      <!-- معاينة البيانات -->
-      <div id="previewSection" style="display:none;"></div>
-
-      <!-- نتائج الاستيراد -->
-      <div id="resultsSection" style="display:none;"></div>
-
     </div>
   </main>
 </div>
@@ -109,334 +175,360 @@
 
 <script src="libs/supabase.min.js"></script>
 <script src="assets/config.js"></script>
-
-<!-- SheetJS لقراءة ملفات Excel -->
 <script src="libs/xlsx.full.min.js"></script>
-
 <script>
 (function(){
   'use strict';
 
-  function $(s){return document.querySelector(s)}
+  const ALIASES = {
+    parentName:['اسم ولي الأمر الكامل','اسم ولي الأمر','ولي الأمر','Guardian Name'],
+    parentPhone:['رقم الهاتف','هاتف','Phone Number','Phone'],
+    parentEmail:['البريد الإلكتروني','Email Address','email','Email'],
+    studentName:['اسم الطالب الكامل','اسم الطالب','الطالب','Student Name'],
+    studentBirth:['تاريخ الميلاد','تاريخ ميلاد الطالب','Birth Date','DOB'],
+    studentGrade:['الصف المطلوب','الصف','Class','Grade'],
+    studentGender:['الجنس','Gender']
+  };
+
+  function $(s,r=document){return r.querySelector(s)}
   function esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;')}
-  
+
   let sb = null;
   let ME = null;
-  let PARSED_DATA = [];
+  let RAW_ROWS = [];
+  let ANALYSIS = null;
 
-  function cfg() { return window.AMIN_CONFIG || {}; }
-  
-  function client() {
+  function cfg(){ return window.AMIN_CONFIG || {}; }
+  function client(){
     if(sb) return sb;
     sb = window.supabase.createClient(
-      cfg().supabaseUrl, 
-      cfg().supabaseAnonKey, 
+      cfg().supabaseUrl,
+      cfg().supabaseAnonKey,
       {auth:{persistSession:true, autoRefreshToken:true, storageKey:(cfg().authStorageKey||'amin-ovcjzsrqqgjsbqswtkro-auth-v2')}}
     );
     return sb;
   }
-
-  function toast(title, msg, type) {
+  function toast(title,msg,type){
     const t = $('#toast');
     if(!t) return;
     t.innerHTML = '<b>'+esc(title)+'</b><br><span class="muted">'+esc(msg||'')+'</span>';
     t.className = 'toast show ' + (type||'');
     clearTimeout(t._to);
-    t._to = setTimeout(function(){t.classList.remove('show')}, 4000);
+    t._to = setTimeout(()=>t.classList.remove('show'), 4000);
   }
-
-  async function init() {
+  function pick(row, aliases){
+    for(const key of aliases){
+      if(row && row[key] != null && String(row[key]).trim()) return String(row[key]).trim();
+    }
+    return '';
+  }
+  function normalizeGender(value){
+    const v = String(value || '').trim();
+    if(/^(ذكر|male|boy)$/i.test(v)) return 'male';
+    if(/^(أنثى|female|girl)$/i.test(v)) return 'female';
+    return null;
+  }
+  function parseDate(value){
+    if(value == null || value === '') return null;
+    try{
+      if(typeof value === 'number'){
+        const d = new Date((value - 25569) * 86400 * 1000);
+        if(!Number.isNaN(d.getTime())) return d.toISOString().slice(0,10);
+      }
+      const text = String(value).trim();
+      if(/^\d{4}-\d{2}-\d{2}$/.test(text)) return text;
+      const normalized = text.replace(/\./g,'/').replace(/-/g,'/');
+      const d = new Date(normalized);
+      if(!Number.isNaN(d.getTime())) return d.toISOString().slice(0,10);
+    }catch(err){}
+    return null;
+  }
+  function analyzeRows(rows){
+    const headers = rows.length ? Object.keys(rows[0]) : [];
+    const analyzed = rows.map((raw,index)=>{
+      const item = {
+        index:index+1,
+        raw,
+        parentName:pick(raw, ALIASES.parentName),
+        parentPhone:pick(raw, ALIASES.parentPhone),
+        parentEmail:pick(raw, ALIASES.parentEmail),
+        studentName:pick(raw, ALIASES.studentName),
+        studentBirth:pick(raw, ALIASES.studentBirth),
+        studentGrade:pick(raw, ALIASES.studentGrade),
+        studentGender:pick(raw, ALIASES.studentGender),
+        issues:[]
+      };
+      if(!item.parentName) item.issues.push('اسم ولي الأمر مفقود');
+      if(!item.studentName) item.issues.push('اسم الطالب مفقود');
+      if(!item.parentPhone && !item.parentEmail) item.issues.push('لا يوجد هاتف أو بريد للتواصل');
+      item.status = item.issues.length ? 'issue' : 'ready';
+      return item;
+    });
+    return {
+      headers,
+      rows:analyzed,
+      total:analyzed.length,
+      ready:analyzed.filter(x=>x.status==='ready').length,
+      issues:analyzed.filter(x=>x.status!=='ready').length
+    };
+  }
+  function renderFileInfo(file, success){
+    const cls = success ? '#eefcf3' : '#fff1f1';
+    const border = success ? '#c7ebd4' : '#f3caca';
+    const color = success ? '#0b6e4f' : '#b42318';
+    $('#fileInfo').innerHTML = '<div class="file-box" style="background:'+cls+';border-color:'+border+';color:'+color+'">'
+      + '<b>الملف: '+esc(file.name)+'</b>'
+      + '<small>الحجم: '+Math.round(file.size/1024)+' KB</small>'
+      + '</div>';
+  }
+  function renderPreviewEmpty(title,detail){
+    $('#previewSection').innerHTML = '<div class="preview-empty"><b>'+esc(title)+'</b><p>'+esc(detail)+'</p></div>';
+  }
+  function renderPreview(){
+    if(!ANALYSIS || !ANALYSIS.total){
+      renderPreviewEmpty('لا توجد بيانات صالحة للعرض', 'تأكد من أن الملف غير فارغ ثم جرّب مرة أخرى.');
+      return;
+    }
+    const rowsHtml = ANALYSIS.rows.slice(0,12).map(row => {
+      const issueHtml = row.issues.length ? '<div class="small-muted">'+esc(row.issues.join('، '))+'</div>' : '<div class="small-muted">سجل جاهز للاستيراد</div>';
+      return '<tr>'
+        + '<td>'+esc(row.index)+'</td>'
+        + '<td><b>'+esc(row.parentName || '—')+'</b></td>'
+        + '<td><b>'+esc(row.studentName || '—')+'</b></td>'
+        + '<td>'+esc(row.parentPhone || row.parentEmail || '—')+'</td>'
+        + '<td>'+esc(row.studentGrade || '—')+'</td>'
+        + '<td>'+issueHtml+'</td>'
+        + '<td><span class="status-chip '+(row.status==='ready'?'ready':'issue')+'">'+esc(row.status==='ready'?'جاهز للاستيراد':'بحاجة مراجعة')+'</span></td>'
+        + '</tr>';
+    }).join('');
+    const moreText = ANALYSIS.total > 12 ? '<p class="small-muted" style="margin-top:12px;text-align:center">تم عرض أول 12 سجل فقط من أصل '+esc(ANALYSIS.total)+' سجل.</p>' : '';
+    $('#previewSection').innerHTML = ''
+      + '<div class="import-card">'
+      +   '<div class="card-head" style="padding:0;border:0;background:transparent;margin-bottom:16px">'
+      +     '<h3>👁️ معاينة السجلات قبل الاستيراد</h3>'
+      +   '</div>'
+      +   '<div class="kpis" style="margin-bottom:16px">'
+      +     '<div class="kpi blue"><small>إجمالي السجلات</small><b>'+esc(ANALYSIS.total)+'</b></div>'
+      +     '<div class="kpi green"><small>سجلات جاهزة</small><b>'+esc(ANALYSIS.ready)+'</b></div>'
+      +     '<div class="kpi gold"><small>سجلات تحتاج مراجعة</small><b>'+esc(ANALYSIS.issues)+'</b></div>'
+      +     '<div class="kpi"><small>عدد الأعمدة</small><b>'+esc(ANALYSIS.headers.length)+'</b></div>'
+      +   '</div>'
+      +   '<div class="import-note" style="margin-bottom:16px">اكتشفنا الأعمدة التالية: '+ANALYSIS.headers.map(h=>'<span class="import-chip">'+esc(h)+'</span>').join(' ')+'</div>'
+      +   '<div class="import-note" style="margin-bottom:16px">سيتم تخطي السجلات الناقصة تلقائياً مع عرض سبب التجاوز في النتيجة النهائية.</div>'
+      +   '<div class="preview-table-wrap">'
+      +     '<table class="preview-table">'
+      +       '<thead><tr><th>#</th><th>ولي الأمر</th><th>الطالب</th><th>التواصل</th><th>الصف</th><th>ملاحظات</th><th>الحالة</th></tr></thead>'
+      +       '<tbody>'+rowsHtml+'</tbody>'
+      +     '</table>'
+      +   '</div>'
+      +   moreText
+      +   '<div class="import-actions no-print" style="margin-top:18px">'
+      +     '<button class="btn" style="background:#10b981;color:#fff" '+(ANALYSIS.ready ? '' : 'disabled')+' onclick="ImportStudents.importAll()">✅ استيراد السجلات الجاهزة ('+esc(ANALYSIS.ready)+')</button>'
+      +     '<button class="btn" type="button" onclick="window.print()">🖨️ طباعة المعاينة</button>'
+      +     '<button class="btn" style="background:#6b7280;color:#fff" type="button" onclick="ImportStudents.cancel()">❌ إلغاء</button>'
+      +   '</div>'
+      + '</div>';
+  }
+  async function init(){
     const c = client();
     const sessionRes = await c.auth.getSession();
-    if(!sessionRes.data.session) {
+    if(!sessionRes.data.session){
       location.href = 'index.html';
       return;
     }
-    
     const userRes = await c.from('users').select('*').eq('id', sessionRes.data.session.user.id).maybeSingle();
     if(!userRes.data) return;
     ME = userRes.data;
-    
-    if(!ME.is_super_admin && ME.role !== 'admin') {
+    if(!ME.is_super_admin && ME.role !== 'admin'){
       toast('ممنوع', 'هذه الصفحة للمدير فقط', 'red');
-      setTimeout(function(){ location.href = 'portal.html'; }, 2000);
+      setTimeout(()=>location.href='portal.html', 2000);
       return;
     }
-    
     $('#profileName').textContent = ME.name || 'مدير';
-    
-    $('#logoutBtn').onclick = async function() {
+    $('#profileRole').textContent = ME.role === 'admin' ? 'المدير' : 'الإدارة';
+    $('#logoutBtn').onclick = async function(){
       await c.auth.signOut();
       location.href = 'index.html';
     };
-    
-    // تحميل رابط الفورم المحفوظ
     const savedLink = localStorage.getItem('google_form_link');
     if(savedLink) $('#formLink').value = savedLink;
+    bindDropzone();
+    bindMobileMenu();
+    renderPreviewEmpty('لم يتم اختيار ملف بعد', 'ارفع ملف Excel أو CSV لعرض السجلات الجاهزة قبل الاستيراد.');
   }
-
-  function saveLink() {
-    const link = $('#formLink').value.trim();
-    if(!link) {
-      toast('تنبيه', 'أدخل رابط Google Form أولاً', 'red');
-      return;
-    }
-    localStorage.setItem('google_form_link', link);
-    toast('✅ تم الحفظ', 'تم حفظ رابط الفورم', 'green');
+  function bindMobileMenu(){
+    const btn = $('#mobileMenuBtn');
+    const sidebar = $('#sidebar');
+    if(!btn || !sidebar) return;
+    btn.addEventListener('click', ()=> sidebar.classList.toggle('open'));
   }
-
-  function copyLink() {
-    const link = $('#formLink').value.trim();
-    if(!link) {
-      toast('تنبيه', 'لا يوجد رابط', 'red');
-      return;
-    }
-    navigator.clipboard.writeText(link).then(function(){
-      toast('✅ تم النسخ', 'تم نسخ الرابط للحافظة', 'green');
+  function bindDropzone(){
+    const zone = $('#dropzone');
+    if(!zone) return;
+    ['dragenter','dragover'].forEach(type => zone.addEventListener(type, e => {
+      e.preventDefault();
+      zone.classList.add('is-dragover');
+    }));
+    ['dragleave','drop'].forEach(type => zone.addEventListener(type, e => {
+      e.preventDefault();
+      zone.classList.remove('is-dragover');
+    }));
+    zone.addEventListener('drop', e => {
+      const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+      if(file) handleChosenFile(file);
     });
   }
-
-  function shareWhatsApp() {
+  function saveLink(){
     const link = $('#formLink').value.trim();
-    if(!link) {
-      toast('تنبيه', 'احفظ الرابط أولاً', 'red');
-      return;
-    }
-    const msg = encodeURIComponent('السلام عليكم،\nيرجى تعبئة استمارة التسجيل لمدرسة أمين الرضا:\n\n' + link + '\n\nشكراً لكم');
+    if(!link){ toast('تنبيه', 'أدخل رابط Google Form أولاً', 'red'); return; }
+    localStorage.setItem('google_form_link', link);
+    toast('تم الحفظ', 'تم حفظ الرابط', 'green');
+  }
+  function copyLink(){
+    const link = $('#formLink').value.trim();
+    if(!link){ toast('تنبيه', 'لا يوجد رابط', 'red'); return; }
+    navigator.clipboard.writeText(link).then(() => toast('تم النسخ', 'تم نسخ الرابط للحافظة', 'green')).catch(() => toast('تعذر النسخ', 'جرّب النسخ يدوياً من الحقل', 'red'));
+  }
+  function shareWhatsApp(){
+    const link = $('#formLink').value.trim();
+    if(!link){ toast('تنبيه', 'احفظ الرابط أولاً', 'red'); return; }
+    const msg = encodeURIComponent('السلام عليكم،\nيرجى تعبئة استمارة التسجيل لمدارس أمين الرضا:\n\n' + link + '\n\nشكراً لكم');
     window.open('https://wa.me/?text=' + msg, '_blank');
   }
-
-  function handleFile(event) {
-    const file = event.target.files[0];
-    if(!file) return;
-    
-    $('#fileInfo').innerHTML = '<div style="padding:12px;background:#dbeafe;border-radius:8px;color:#0B6E4F;">📄 الملف: <b>'+esc(file.name)+'</b> ('+Math.round(file.size/1024)+' KB)<br>⏳ جاري قراءة الملف...</div>';
-    
+  function handleFile(event){
+    const file = event && event.target && event.target.files && event.target.files[0];
+    if(file) handleChosenFile(file);
+  }
+  function handleChosenFile(file){
+    RAW_ROWS = [];
+    ANALYSIS = null;
+    $('#resultsSection').style.display = 'none';
+    $('#resultsSection').innerHTML = '';
+    renderFileInfo(file, true);
+    $('#fileInfo').innerHTML += '<div class="file-box" style="margin-top:10px;background:#eef5ff;border-color:#d7e3f9;color:#29549e"><b>جاري قراءة الملف...</b><small>لحظات وسيتم تحليل السجلات</small></div>';
     const reader = new FileReader();
-    reader.onload = function(e) {
-      try {
+    reader.onload = function(e){
+      try{
         const data = new Uint8Array(e.target.result);
         const workbook = XLSX.read(data, {type:'array'});
         const firstSheet = workbook.SheetNames[0];
         const sheet = workbook.Sheets[firstSheet];
-        PARSED_DATA = XLSX.utils.sheet_to_json(sheet);
-        
-        if(!PARSED_DATA.length) {
+        RAW_ROWS = XLSX.utils.sheet_to_json(sheet, {defval:''});
+        if(!RAW_ROWS.length){
+          ANALYSIS = null;
+          renderFileInfo(file, false);
+          renderPreviewEmpty('الملف فارغ', 'لم نجد أي صفوف قابلة للقراءة داخل الملف.');
           toast('خطأ', 'الملف فارغ', 'red');
           return;
         }
-        
-        $('#fileInfo').innerHTML = '<div style="padding:12px;background:#d1fae5;border-radius:8px;color:#065f46;">✅ تم قراءة الملف بنجاح: <b>'+PARSED_DATA.length+' سجل</b></div>';
+        ANALYSIS = analyzeRows(RAW_ROWS);
+        $('#fileInfo').innerHTML = '<div class="file-box" style="background:#eefcf3;border-color:#c7ebd4;color:#0b6e4f"><b>تم تحليل الملف</b><small>'+esc(file.name)+' — '+esc(ANALYSIS.total)+' سجل</small></div>';
         renderPreview();
-        
-      } catch(err) {
-        toast('خطأ في القراءة', err.message, 'red');
-        $('#fileInfo').innerHTML = '<div style="padding:12px;background:#fee2e2;border-radius:8px;color:#991b1b;">❌ '+esc(err.message)+'</div>';
+        toast('تم تحليل الملف', 'تمت قراءة '+ANALYSIS.total+' سجل بنجاح', 'green');
+      }catch(err){
+        console.error(err);
+        ANALYSIS = null;
+        renderFileInfo(file, false);
+        renderPreviewEmpty('تعذر قراءة الملف', err.message || 'تأكد من أن الملف Excel أو CSV صالح للقراءة.');
+        toast('خطأ في القراءة', err.message || 'تعذر تحليل الملف', 'red');
       }
     };
     reader.readAsArrayBuffer(file);
   }
-
-  function renderPreview() {
-    const section = $('#previewSection');
-    section.style.display = 'block';
-    
-    // الكشف عن الأعمدة المتوفرة
-    const headers = Object.keys(PARSED_DATA[0]);
-    
-    let html = '<div class="card" style="margin-bottom:24px;"><div class="card-head"><h3>👁️ معاينة البيانات ('+PARSED_DATA.length+' سجل)</h3></div><div class="card-body">';
-    
-    // تنبيه
-    html += '<div style="background:#fef3c7;border:1px solid #f59e0b;padding:12px;border-radius:8px;margin-bottom:16px;color:#78350f;">';
-    html += '<b>⚠️ تنبيه:</b> راجع البيانات بعناية قبل الاستيراد. الأعمدة المكتشفة:<br>';
-    html += '<small>' + headers.map(function(h){ return '<code style="background:white;padding:2px 6px;border-radius:4px;margin:2px;display:inline-block;">'+esc(h)+'</code>'; }).join(' ') + '</small>';
-    html += '</div>';
-    
-    // عرض جدول
-    html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;">';
-    html += '<thead><tr>';
-    html += '<th style="background:#0B6E4F;color:white;padding:10px;">#</th>';
-    headers.slice(0, 6).forEach(function(h) {
-      html += '<th style="background:#0B6E4F;color:white;padding:10px;">'+esc(h)+'</th>';
-    });
-    html += '<th style="background:#0B6E4F;color:white;padding:10px;">الحالة</th>';
-    html += '</tr></thead><tbody>';
-    
-    PARSED_DATA.slice(0, 10).forEach(function(row, i) {
-      html += '<tr>';
-      html += '<td style="padding:8px;border-bottom:1px solid #e5e7eb;">'+(i+1)+'</td>';
-      headers.slice(0, 6).forEach(function(h) {
-        html += '<td style="padding:8px;border-bottom:1px solid #e5e7eb;">'+esc(row[h] || '—')+'</td>';
-      });
-      html += '<td style="padding:8px;border-bottom:1px solid #e5e7eb;"><span style="background:#dbeafe;color:#0B6E4F;padding:2px 8px;border-radius:4px;font-size:12px;">⏳ جاهز</span></td>';
-      html += '</tr>';
-    });
-    
-    html += '</tbody></table></div>';
-    
-    if(PARSED_DATA.length > 10) {
-      html += '<p style="text-align:center;margin-top:12px;color:#64748b;">... وعرض '+(PARSED_DATA.length - 10)+' سجل إضافي</p>';
+  async function importAll(){
+    if(!ANALYSIS || !ANALYSIS.rows || !ANALYSIS.ready){
+      toast('تنبيه', 'لا توجد سجلات جاهزة للاستيراد', 'red');
+      return;
     }
-    
-    // أزرار الاستيراد
-    html += '<div style="margin-top:20px;display:flex;gap:12px;flex-wrap:wrap;">';
-    html += '<button class="btn" style="background:#10b981;color:white;padding:14px 32px;font-size:16px;font-weight:bold;" onclick="ImportStudents.importAll()">✅ استيراد كل البيانات ('+PARSED_DATA.length+')</button>';
-    html += '<button class="btn" style="background:#dc2626;color:white;padding:14px 32px;" onclick="ImportStudents.cancel()">❌ إلغاء</button>';
-    html += '</div>';
-    
-    html += '</div></div>';
-    
-    section.innerHTML = html;
-  }
+    const readyRows = ANALYSIS.rows.filter(r => r.status === 'ready');
+    const skippedRows = ANALYSIS.rows.filter(r => r.status !== 'ready');
+    if(!confirm('سيتم استيراد '+readyRows.length+' سجل جاهز، وتخطي '+skippedRows.length+' سجل يحتاج مراجعة.\n\nهل تريد المتابعة؟')) return;
 
-  async function importAll() {
-    if(!confirm('هل أنت متأكد من استيراد '+PARSED_DATA.length+' سجل؟\n\nسيتم إنشاء حسابات لأولياء الأمور والطلاب تلقائياً.')) return;
-    
     const section = $('#resultsSection');
     section.style.display = 'block';
-    section.innerHTML = '<div class="card"><div class="card-body"><h3>⏳ جاري الاستيراد...</h3><div id="progress" style="margin-top:16px;"></div></div></div>';
-    
+    section.innerHTML = '<div class="import-card"><h3>⏳ جاري الاستيراد...</h3><div id="progress" class="file-box" style="margin-top:16px">بدء العملية...</div></div>';
     const progress = $('#progress');
     let success = 0;
     let failed = 0;
     const errors = [];
     const c = client();
-    
-    for(let i = 0; i < PARSED_DATA.length; i++) {
-      const row = PARSED_DATA[i];
-      progress.innerHTML = '<div style="background:#dbeafe;padding:12px;border-radius:8px;">⏳ معالجة '+(i+1)+' من '+PARSED_DATA.length+'...<br><small>'+esc(row['اسم الطالب الكامل'] || row['اسم ولي الأمر الكامل'] || 'سجل '+(i+1))+'</small></div>';
-      
-      try {
-        // محاولة استخراج البيانات بأسماء أعمدة متعددة محتملة
-        const parentName = row['اسم ولي الأمر الكامل'] || row['اسم ولي الأمر'] || row['ولي الأمر'] || '';
-        const parentPhone = row['رقم الهاتف'] || row['هاتف'] || '';
-        const parentEmail = row['البريد الإلكتروني'] || row['Email Address'] || row['email'] || '';
-        const studentName = row['اسم الطالب الكامل'] || row['اسم الطالب'] || row['الطالب'] || '';
-        const studentBirth = row['تاريخ الميلاد'] || '';
-        const studentGrade = row['الصف المطلوب'] || row['الصف'] || '';
-        const studentGender = row['الجنس'] || '';
-        
-        if(!parentName || !studentName) {
-          throw new Error('بيانات ناقصة (اسم ولي الأمر أو الطالب مفقود)');
-        }
-        
-        // 1. إنشاء حساب ولي الأمر (إذا لم يكن موجوداً)
-        // ملاحظة: هذا يحتاج صلاحيات service_role أو يستدعي API خاص
-        // للأمان، نضيف فقط في جدول users (يتم إنشاء auth user يدوياً لاحقاً)
-        
-        // تحقق من وجود ولي الأمر
-        let parentId = null;
-        if(parentEmail) {
-          const existingParent = await c.from('users').select('id').eq('email', parentEmail).maybeSingle();
-          if(existingParent.data) {
-            parentId = existingParent.data.id;
-          }
-        }
-        
-        // 2. إنشاء سجل في جدول registrations للمراجعة اللاحقة
+
+    for(let i = 0; i < readyRows.length; i++){
+      const row = readyRows[i];
+      progress.innerHTML = '<b>معالجة '+(i+1)+' من '+readyRows.length+'</b><br><small>'+esc(row.studentName || row.parentName || ('سجل '+row.index))+'</small>';
+      try{
         const regPayload = {
-          parent_name: parentName,
-          parent_phone: parentPhone,
-          parent_email: parentEmail,
-          student_name: studentName,
-          student_birth_date: parseDate(studentBirth),
-          student_grade: studentGrade,
-          student_gender: studentGender === 'ذكر' ? 'male' : studentGender === 'أنثى' ? 'female' : null,
-          notes: JSON.stringify(row),
+          parent_name: row.parentName,
+          parent_phone: row.parentPhone,
+          parent_email: row.parentEmail,
+          student_name: row.studentName,
+          student_birth_date: parseDate(row.studentBirth),
+          student_grade: row.studentGrade,
+          student_gender: normalizeGender(row.studentGender),
+          notes: JSON.stringify(row.raw || {}),
           status: 'pending',
           created_at: new Date().toISOString(),
           imported_from: 'google_forms'
         };
-        
-        // محاولة إدراج في registrations (قد لا يكون الجدول موجوداً)
         const regRes = await c.from('registrations').insert(regPayload);
-        
-        if(regRes.error) {
-          // إذا فشل، حاول حفظ في جدول مؤقت أو ملاحظات
-          console.error('Registration insert error:', regRes.error);
-          // نتجاوز ونعد نجاح لأن البيانات يمكن مراجعتها من Google Sheet
-          success++;
-        } else {
-          success++;
+        if(regRes.error){
+          throw regRes.error;
         }
-        
-      } catch(e) {
+        success++;
+      }catch(err){
         failed++;
-        errors.push({row: i+1, name: row['اسم الطالب الكامل'] || 'سجل '+(i+1), error: e.message});
+        errors.push({row:row.index,name:row.studentName || row.parentName || ('سجل '+row.index),error:err.message || String(err)});
       }
     }
-    
-    // عرض النتائج
-    let resultHtml = '<div class="card"><div class="card-body">';
-    resultHtml += '<h2 style="color:#10b981;margin-bottom:16px;">✅ اكتمل الاستيراد!</h2>';
-    
-    resultHtml += '<div class="kpis" style="margin-bottom:20px;">';
-    resultHtml += '<div class="kpi green"><small>نجح</small><b>'+success+'</b></div>';
-    resultHtml += '<div class="kpi red"><small>فشل</small><b>'+failed+'</b></div>';
-    resultHtml += '<div class="kpi blue"><small>الإجمالي</small><b>'+PARSED_DATA.length+'</b></div>';
-    resultHtml += '</div>';
-    
-    if(errors.length > 0) {
-      resultHtml += '<h3 style="color:#dc2626;margin-bottom:12px;">⚠️ سجلات بها أخطاء:</h3>';
-      resultHtml += '<div style="background:#fee2e2;padding:12px;border-radius:8px;max-height:300px;overflow-y:auto;">';
-      errors.forEach(function(e) {
-        resultHtml += '<div style="margin-bottom:8px;padding:8px;background:white;border-radius:4px;"><b>السجل '+e.row+':</b> '+esc(e.name)+'<br><small style="color:#991b1b;">'+esc(e.error)+'</small></div>';
-      });
-      resultHtml += '</div>';
-    }
-    
-    resultHtml += '<div style="margin-top:20px;display:flex;gap:8px;flex-wrap:wrap;">';
-    resultHtml += '<button class="btn" style="background:#3A3565;color:white;padding:10px 20px;" onclick="location.href=\'registrations-admin.html\'">📋 مراجعة التسجيلات</button>';
-    resultHtml += '<button class="btn" style="background:#10b981;color:white;padding:10px 20px;" onclick="location.href=\'super-admin.html\'">🏠 لوحة المدير</button>';
-    resultHtml += '<button class="btn" style="background:#6b7280;color:white;padding:10px 20px;" onclick="location.reload()">🔄 استيراد ملف آخر</button>';
-    resultHtml += '</div>';
-    
-    resultHtml += '</div></div>';
-    
-    section.innerHTML = resultHtml;
-    toast('✅ اكتمل', 'تم استيراد '+success+' سجل بنجاح', 'green');
-  }
 
-  function parseDate(str) {
-    if(!str) return null;
-    // محاولة تحليل تنسيقات تاريخ مختلفة
-    try {
-      // إذا كان رقم تسلسلي من Excel
-      if(typeof str === 'number') {
-        const d = new Date((str - 25569) * 86400 * 1000);
-        return d.toISOString().slice(0,10);
-      }
-      const d = new Date(str);
-      if(!isNaN(d.getTime())) {
-        return d.toISOString().slice(0,10);
-      }
-    } catch(e) {}
-    return null;
-  }
+    const skippedHtml = skippedRows.length ? skippedRows.map(row => '<div class="error-item"><b>السجل '+esc(row.index)+':</b> '+esc(row.studentName || row.parentName || 'سجل غير مكتمل')+'<br><small style="color:#946200">'+esc(row.issues.join('، '))+'</small></div>').join('') : '';
+    const failedHtml = errors.length ? errors.map(item => '<div class="error-item"><b>السجل '+esc(item.row)+':</b> '+esc(item.name)+'<br><small style="color:#b42318">'+esc(item.error)+'</small></div>').join('') : '';
 
-  function cancel() {
-    if(confirm('هل تريد إلغاء العملية؟')) {
-      PARSED_DATA = [];
-      $('#previewSection').style.display = 'none';
-      $('#previewSection').innerHTML = '';
-      $('#fileInfo').innerHTML = '';
-      $('#fileInput').value = '';
-    }
+    section.innerHTML = ''
+      + '<div class="import-card">'
+      +   '<h2 style="color:#10b981;margin-bottom:16px">✅ اكتمل الاستيراد</h2>'
+      +   '<div class="kpis" style="margin-bottom:20px">'
+      +     '<div class="kpi green"><small>نجح</small><b>'+esc(success)+'</b></div>'
+      +     '<div class="kpi red"><small>فشل أثناء الحفظ</small><b>'+esc(failed)+'</b></div>'
+      +     '<div class="kpi gold"><small>تم تجاوزه</small><b>'+esc(skippedRows.length)+'</b></div>'
+      +     '<div class="kpi blue"><small>الإجمالي</small><b>'+esc(ANALYSIS.total)+'</b></div>'
+      +   '</div>'
+      +   (failedHtml ? '<h3>سجلات فشل حفظها</h3><div class="error-list" style="margin-bottom:18px">'+failedHtml+'</div>' : '')
+      +   (skippedHtml ? '<h3>سجلات بحاجة مراجعة</h3><div class="error-list" style="margin-bottom:18px">'+skippedHtml+'</div>' : '')
+      +   '<div class="import-actions no-print">'
+      +     '<button class="btn" style="background:#3A3565;color:#fff" onclick="location.href=\'registrations-admin.html\'">📋 مراجعة التسجيلات</button>'
+      +     '<button class="btn" style="background:#10b981;color:#fff" onclick="location.href=\'super-admin.html\'">🏠 لوحة المدير</button>'
+      +     '<button class="btn" style="background:#6b7280;color:#fff" onclick="ImportStudents.resetPage()">🔄 استيراد ملف آخر</button>'
+      +   '</div>'
+      + '</div>';
+    toast('اكتمل', 'تم استيراد '+success+' سجل بنجاح', success ? 'green' : '');
+  }
+  function cancel(){
+    if(!confirm('هل تريد إلغاء العملية الحالية ومسح المعاينة؟')) return;
+    resetPage();
+  }
+  function resetPage(){
+    RAW_ROWS = [];
+    ANALYSIS = null;
+    if($('#fileInput')) $('#fileInput').value = '';
+    $('#fileInfo').innerHTML = '';
+    $('#resultsSection').style.display = 'none';
+    $('#resultsSection').innerHTML = '';
+    renderPreviewEmpty('لم يتم اختيار ملف بعد', 'ارفع ملف Excel أو CSV لعرض السجلات الجاهزة قبل الاستيراد.');
   }
 
   window.addEventListener('load', init);
-  
   window.ImportStudents = {
-    handleFile: handleFile,
-    saveLink: saveLink,
-    copyLink: copyLink,
-    shareWhatsApp: shareWhatsApp,
-    importAll: importAll,
-    cancel: cancel
+    handleFile,
+    saveLink,
+    copyLink,
+    shareWhatsApp,
+    importAll,
+    cancel,
+    resetPage
   };
 })();
 </script>
-
 <script src="assets/amin-theme-injector.js"></script>
 <script src="assets/i18n.js"></script>
 <script src="assets/amin-icons.js?v=20260706-3" defer></script>

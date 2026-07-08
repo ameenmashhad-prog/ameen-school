@@ -1,10 +1,12 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>طلبات التسجيل — مدارس أمين الرضا</title>
-  <link rel="stylesheet" href="assets/amin.css?v=20260706-5">
-<link rel="icon" href="/favicon.ico" sizes="any"><link rel="stylesheet" href="assets/registration.css">
+<link rel="stylesheet" href="assets/amin.css?v=20260706-5">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="stylesheet" href="assets/registration.css?v=20260709-1">
 <link rel="stylesheet" href="assets/i18n.css">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="assets/amin-logo-small.png">
@@ -14,26 +16,357 @@
 </head>
 <body>
 <a class="skip-link" href="#mainContent">تخطي إلى المحتوى</a>
-<main class="reg-shell" id="mainContent" tabindex="-1"><div class="reg-container">
-<header class="reg-header"><div class="reg-brand"><div class="reg-logo">ع</div><div><h1>طلبات التسجيل</h1><small>مراجعة طلبات أولياء الأمور والطلاب والمعلمين للعام 2026-2027</small></div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn" href="portal.html">البوابة الموحدة</a><button class="btn blue" onclick="loadAll()">تحديث</button></div></header>
-<section class="reg-hero"><div class="reg-title"><h2>مركز مراجعة طلبات التسجيل</h2><p>هذه الصفحة تقرأ طلبات التسجيل الجديدة وتسمح بمراجعتها ثم نقلها إلى حالة <b>تمت المراجعة</b> أو <b>معتمد</b> أو <b>مرفوض</b>. كما يمكنك الضغط على زر <b>تفعيل الحساب</b> لإنشاء حسابات المستخدمين في نظام الدخول وجداول users/students تلقائياً وتفعيل الدخول مباشرة.</p></div><aside class="reg-side"><div class="steps"><div class="step"><b>1</b><span>استلام الطلب</span></div><div class="step"><b>2</b><span>مراجعة البيانات والصور</span></div><div class="step"><b>3</b><span>اعتماد وتفعيل الحساب</span></div></div></aside></section>
-<section class="reg-card"><div class="card-head"><h3>طلبات الأسر والطلاب</h3></div><div class="card-body" id="familiesBox"><div class="empty">جاري التحميل...</div></div></section>
-<section class="reg-card"><div class="card-head"><h3>طلبات المعلمين</h3></div><div class="card-body" id="teachersBox"><div class="finance-empty"><b>جاري تحميل طلبات المعلمين...</b><small>سيتم عرض طلبات المعلمين هنا فور اكتمال القراءة.</small></div></div></section>
-</div></main><div id="toast" class="toast"></div>
-<script src="libs/supabase.min.js"></script><script src="assets/config.js"></script><script src="assets/platform-modules.js"></script><script src="assets/i18n.js"></script>
+<main class="reg-shell" id="mainContent" tabindex="-1">
+  <div class="reg-container">
+    <header class="reg-header no-print">
+      <div class="reg-brand">
+        <div class="reg-logo">📋</div>
+        <div>
+          <h1>طلبات التسجيل</h1>
+          <small>مراجعة طلبات أولياء الأمور والطلاب والمعلمين للعام 2026-2027</small>
+        </div>
+      </div>
+      <div class="reg-actions">
+        <a class="btn" href="portal.html">البوابة الموحدة</a>
+        <a class="btn" href="family-registration.html">تسجيل أسرة</a>
+        <a class="btn" href="teacher-registration.html">تسجيل معلم</a>
+        <button class="btn" type="button" onclick="window.print()">طباعة الصفحة</button>
+        <button class="btn blue" type="button" onclick="loadAll()">تحديث البيانات</button>
+      </div>
+    </header>
+
+    <section class="reg-hero no-print">
+      <div class="reg-title">
+        <h2>مركز مراجعة طلبات التسجيل</h2>
+        <p>من هنا تتابع الطلبات الجديدة، تراجع البيانات والصور، ثم تنقل الطلب إلى <b>تمت المراجعة</b> أو <b>معتمد</b> أو <b>مرفوض</b>. وبعدها يمكنك الضغط على <b>تفعيل الحساب</b> لإنشاء حسابات الدخول وتفعيل المستخدم مباشرة.</p>
+      </div>
+      <aside class="reg-side">
+        <div class="steps">
+          <div class="step"><b>1</b><span>استلام الطلب</span></div>
+          <div class="step"><b>2</b><span>مراجعة البيانات والصور</span></div>
+          <div class="step"><b>3</b><span>اعتماد وتفعيل الحساب</span></div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="reg-callout no-print">
+      <div>
+        <b>فلترة أسرع ومراجعة أوضح</b>
+        <p>استخدم البحث بالحقل الموحد للوصول السريع إلى ولي الأمر أو الطالب أو المعلم، ثم غيّر الحالة أو فعّل الحساب من نفس البطاقة دون الرجوع لصفحات أخرى.</p>
+      </div>
+      <span class="badge blue">طلبات قيد المتابعة</span>
+    </section>
+
+    <section class="reg-card no-print">
+      <div class="section-head">
+        <div>
+          <h3>تصفية الطلبات</h3>
+          <p>ابحث باسم ولي الأمر أو الطالب أو المعلم أو الهاتف، ثم صفِّ النتائج حسب الحالة أو النوع.</p>
+        </div>
+      </div>
+      <div class="filters-bar">
+        <input id="searchInput" class="input" placeholder="ابحث باسم ولي الأمر أو الطالب أو المعلم أو الهاتف">
+        <select id="statusFilter" class="select">
+          <option value="all">كل الحالات</option>
+          <option value="pending">قيد المراجعة</option>
+          <option value="reviewed">تمت المراجعة</option>
+          <option value="approved">معتمد</option>
+          <option value="rejected">مرفوض</option>
+        </select>
+        <select id="scopeFilter" class="select">
+          <option value="all">كل الأنواع</option>
+          <option value="families">أسر وطلاب</option>
+          <option value="teachers">معلمون</option>
+        </select>
+      </div>
+    </section>
+
+    <section class="reg-kpis no-print" id="statsGrid">
+      <div class="reg-kpi is-primary"><small>طلبات الأسر</small><b>—</b><p>أسر بانتظار المراجعة أو الاعتماد</p></div>
+      <div class="reg-kpi is-success"><small>الطلاب داخل الطلبات</small><b>—</b><p>عدد الأبناء المرتبطين بطلبات الأسر</p></div>
+      <div class="reg-kpi is-warning"><small>طلبات المعلمين</small><b>—</b><p>طلبات تسجيل المعلمين الحالية</p></div>
+      <div class="reg-kpi is-danger"><small>بانتظار الإجراء</small><b>—</b><p>طلبات ما تزال قيد المراجعة</p></div>
+    </section>
+
+    <section class="reg-card">
+      <div class="section-head">
+        <div>
+          <h3>طلبات الأسر والطلاب</h3>
+          <p id="familiesMeta">جاري تحميل طلبات الأسر والطلاب...</p>
+        </div>
+      </div>
+      <div id="familiesBox">
+        <div class="reg-empty"><b>جاري تحميل طلبات الأسر والطلاب...</b><p>سيتم عرض البطاقات هنا فور اكتمال القراءة.</p></div>
+      </div>
+    </section>
+
+    <section class="reg-card">
+      <div class="section-head">
+        <div>
+          <h3>طلبات المعلمين</h3>
+          <p id="teachersMeta">جاري تحميل طلبات المعلمين...</p>
+        </div>
+      </div>
+      <div id="teachersBox">
+        <div class="reg-empty"><b>جاري تحميل طلبات المعلمين...</b><p>سيتم عرض طلبات المعلمين هنا فور اكتمال القراءة.</p></div>
+      </div>
+    </section>
+  </div>
+</main>
+<div id="toast" class="toast"></div>
+
+<script src="libs/supabase.min.js"></script>
+<script src="assets/config.js"></script>
+<script src="assets/platform-modules.js"></script>
+<script src="assets/i18n.js"></script>
 <script>
 'use strict';
-const sb=supabase.createClient(AMIN_CONFIG.supabaseUrl,AMIN_CONFIG.supabaseAnonKey,{auth:{persistSession:true,autoRefreshToken:true,storageKey:(AMIN_CONFIG.authStorageKey||'amin-ovcjzsrqqgjsbqswtkro-auth-v2')}});
-const $=s=>document.querySelector(s);function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}function toast(t,m){const el=$('#toast');el.innerHTML='<b>'+esc(t)+'</b><br><span class="muted">'+esc(m||'')+'</span>';el.className='toast show';clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),3500)}
-async function ensure(){const {data:{session}}=await sb.auth.getSession();if(!session){location.href='index.html';return false}const {data:u}=await sb.from('users').select('role,is_super_admin').eq('id',session.user.id).maybeSingle();if(!u||!(u.is_super_admin||['admin','academic','academic_admin'].includes(u.role))){$('#familiesBox').innerHTML='<div class="empty">ليست لديك صلاحية مراجعة الطلبات</div>';return false}return true}
-function table(headers,rows){return rows.length?'<div class="table-wrap"><table><thead><tr>'+headers.map(h=>'<th>'+esc(h)+'</th>').join('')+'</tr></thead><tbody>'+rows.join('')+'</tbody></table></div>':'<div class="empty">لا توجد طلبات</div>'}
-async function setStatus(table,id,status){const {error}=await sb.from(table).update({status}).eq('id',id);if(error)toast('خطأ',error.message);else{toast('تم التحديث',status);loadAll()}}
-async function activateAccount(type,id){toast('جاري تفعيل الحساب...','يرجى الانتظار');const {data,error}=await sb.rpc('activate_registered_user',{p_reg_type:type,p_reg_id:id});if(error)toast('خطأ في التفعيل',error.message);else if(data&&!data.ok)toast('فشل التفعيل',data.error||'حدث خطأ غير معروف');else{toast('تم التفعيل بنجاح',data.message||'تم إنشاء الحساب في Auth و users');loadAll()}}
-async function loadFamilies(){const {data,error}=await sb.from('v_registration_family_students').select('*').order('created_at',{ascending:false});if(error){$('#familiesBox').innerHTML='<div class="empty">'+esc(error.message)+'</div>';return}const rows=(data||[]).map(r=>'<tr><td>'+esc(r.guardian_name)+'</td><td>'+esc(r.phone_primary||'—')+'</td><td>'+esc(r.student_name||'—')+'</td><td>'+esc(r.class_name||'—')+'</td><td>'+esc(r.section||'—')+'</td><td><span class="badge gold">'+esc(r.family_status)+'</span></td><td><button class="btn blue" onclick="activateAccount(\'family\',\''+r.family_id+'\')">تفعيل الحساب</button> <button class="btn green" onclick="setStatus(\'registration_families\',\''+r.family_id+'\',\'approved\')">اعتماد</button> <button class="btn red" onclick="setStatus(\'registration_families\',\''+r.family_id+'\',\'rejected\')">رفض</button></td></tr>');$('#familiesBox').innerHTML=table(['ولي الأمر','الهاتف','الطالب','الصف','الشعبة','الحالة','إجراء'],rows)}
-async function loadTeachers(){const {data,error}=await sb.from('registration_teachers').select('*').order('created_at',{ascending:false});if(error){$('#teachersBox').innerHTML='<div class="empty">'+esc(error.message)+'</div>';return}const rows=(data||[]).map(r=>'<tr><td>'+esc(r.full_name)+'</td><td>'+esc(r.qualification||'—')+'</td><td>'+esc(r.specialization||'—')+'</td><td>'+esc(r.phone||'—')+'</td><td>'+esc(r.email||'—')+'</td><td><span class="badge gold">'+esc(r.status)+'</span></td><td><button class="btn blue" onclick="activateAccount(\'teacher\',\''+r.id+'\')">تفعيل الحساب</button> <button class="btn green" onclick="setStatus(\'registration_teachers\',\''+r.id+'\',\'approved\')">اعتماد</button> <button class="btn red" onclick="setStatus(\'registration_teachers\',\''+r.id+'\',\'rejected\')">رفض</button></td></tr>');$('#teachersBox').innerHTML=table(['المعلم','المؤهل','التخصص','الهاتف','البريد','الحالة','إجراء'],rows)}
-async function loadAll(){if(!await ensure())return;await Promise.all([loadFamilies(),loadTeachers()])}
-window.addEventListener('load',loadAll);
-</script><script src="assets/ux-enhancements.js?v=20260706-3"></script>
+
+const sb = supabase.createClient(
+  AMIN_CONFIG.supabaseUrl,
+  AMIN_CONFIG.supabaseAnonKey,
+  {auth:{persistSession:true,autoRefreshToken:true,storageKey:(AMIN_CONFIG.authStorageKey||'amin-ovcjzsrqqgjsbqswtkro-auth-v2')}}
+);
+const $ = (s,r=document)=>r.querySelector(s);
+function esc(v){return String(v ?? '').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function toast(title,msg){
+  const el = $('#toast');
+  if(!el) return;
+  el.innerHTML = '<b>'+esc(title)+'</b><br><span class="muted">'+esc(msg||'')+'</span>';
+  el.className = 'toast show';
+  clearTimeout(el._t);
+  el._t = setTimeout(()=>el.classList.remove('show'),3500);
+}
+
+const state = { query:'', status:'all', scope:'all' };
+let familiesRaw = [];
+let familyGroups = [];
+let teachersRaw = [];
+let accessReady = false;
+
+function normalizeStatus(value){
+  const v = String(value || '').toLowerCase();
+  if(v === 'approved') return 'approved';
+  if(v === 'rejected') return 'rejected';
+  if(v === 'reviewed') return 'reviewed';
+  return 'pending';
+}
+function statusLabel(status){
+  return ({pending:'قيد المراجعة',reviewed:'تمت المراجعة',approved:'معتمد',rejected:'مرفوض'})[normalizeStatus(status)] || 'قيد المراجعة';
+}
+function statusBadge(status){
+  const key = normalizeStatus(status);
+  return '<span class="status-badge '+key+'">'+esc(statusLabel(key))+'</span>';
+}
+function formatDate(value){
+  if(!value) return '—';
+  const d = new Date(value);
+  if(Number.isNaN(d.getTime())) return '—';
+  return new Intl.DateTimeFormat('ar', {year:'numeric',month:'short',day:'numeric'}).format(d);
+}
+function groupFamilies(rows){
+  const bucket = new Map();
+  (rows || []).forEach(row => {
+    const id = row.family_id || row.id || ('family-'+Math.random());
+    if(!bucket.has(id)){
+      bucket.set(id, {
+        family_id: id,
+        guardian_name: row.guardian_name || 'ولي أمر غير محدد',
+        phone_primary: row.phone_primary || '',
+        family_status: normalizeStatus(row.family_status),
+        created_at: row.created_at || row.family_created_at || null,
+        students: []
+      });
+    }
+    const entry = bucket.get(id);
+    entry.family_status = normalizeStatus(row.family_status || entry.family_status);
+    entry.created_at = entry.created_at || row.created_at || row.family_created_at || null;
+    entry.students.push({
+      student_name: row.student_name || '—',
+      class_name: row.class_name || '—',
+      section: row.section || '—'
+    });
+  });
+  return Array.from(bucket.values()).sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));
+}
+function buildSearchTextFamily(item){
+  return [
+    item.guardian_name,
+    item.phone_primary,
+    item.students.map(s=>s.student_name).join(' '),
+    item.students.map(s=>s.class_name).join(' '),
+    item.students.map(s=>s.section).join(' ')
+  ].join(' ').toLowerCase();
+}
+function buildSearchTextTeacher(item){
+  return [item.full_name,item.phone,item.email,item.qualification,item.specialization].join(' ').toLowerCase();
+}
+function getFilteredFamilies(){
+  if(state.scope === 'teachers') return [];
+  const q = state.query.trim().toLowerCase();
+  return familyGroups.filter(item => {
+    if(state.status !== 'all' && normalizeStatus(item.family_status) !== state.status) return false;
+    if(q && !buildSearchTextFamily(item).includes(q)) return false;
+    return true;
+  });
+}
+function getFilteredTeachers(){
+  if(state.scope === 'families') return [];
+  const q = state.query.trim().toLowerCase();
+  return teachersRaw.filter(item => {
+    if(state.status !== 'all' && normalizeStatus(item.status) !== state.status) return false;
+    if(q && !buildSearchTextTeacher(item).includes(q)) return false;
+    return true;
+  });
+}
+function renderStats(){
+  const pendingFamilies = familyGroups.filter(x=>normalizeStatus(x.family_status)==='pending').length;
+  const pendingTeachers = teachersRaw.filter(x=>normalizeStatus(x.status)==='pending').length;
+  const html = [
+    {cls:'is-primary',label:'طلبات الأسر',value:familyGroups.length,desc:'عدد الأسر المسجلة بانتظار المراجعة أو الاعتماد'},
+    {cls:'is-success',label:'الطلاب داخل الطلبات',value:familiesRaw.length,desc:'عدد الأبناء المرتبطين بطلبات الأسر الحالية'},
+    {cls:'is-warning',label:'طلبات المعلمين',value:teachersRaw.length,desc:'طلبات تسجيل المعلمين الحالية'},
+    {cls:'is-danger',label:'بانتظار الإجراء',value:(pendingFamilies+pendingTeachers),desc:'طلبات ما تزال قيد المراجعة ولم تُحسم بعد'}
+  ].map(item => '<div class="reg-kpi '+item.cls+'"><small>'+esc(item.label)+'</small><b>'+esc(item.value)+'</b><p>'+esc(item.desc)+'</p></div>').join('');
+  $('#statsGrid').innerHTML = html;
+}
+function renderFamilies(){
+  const list = getFilteredFamilies();
+  $('#familiesMeta').textContent = list.length ? ('عرض '+list.length+' طلب أسرة') : 'لا توجد طلبات أسر مطابقة للبحث الحالي.';
+  if(!list.length){
+    $('#familiesBox').innerHTML = '<div class="reg-empty"><b>لا توجد طلبات مطابقة</b><p>جرّب تغيير البحث أو الفلتر أو حدّث الصفحة.</p></div>';
+    return;
+  }
+  $('#familiesBox').innerHTML = '<div class="request-grid">'+list.map(item => {
+    const students = item.students.map(st => '<li><b>'+esc(st.student_name)+'</b> — '+esc(st.class_name)+' / '+esc(st.section || '—')+'</li>').join('');
+    return '<article class="request-card">'
+      + '<div class="request-card-head">'
+      +   '<div>'
+      +     '<h4>'+esc(item.guardian_name)+'</h4>'
+      +     '<div class="request-meta"><span>الهاتف: '+esc(item.phone_primary || '—')+'</span><span>عدد الطلاب: '+esc(item.students.length)+'</span><span>تاريخ الطلب: '+esc(formatDate(item.created_at))+'</span></div>'
+      +   '</div>'
+      +   statusBadge(item.family_status)
+      + '</div>'
+      + '<div class="reg-note">طلاب الأسرة: '+esc(item.students.length)+' — راجع الصف والشعبة قبل الاعتماد النهائي أو تفعيل الحساب.</div>'
+      + '<ul class="request-list">'+students+'</ul>'
+      + '<div class="request-actions">'
+      +   '<button class="btn blue" type="button" onclick="activateAccount(\'family\',\''+esc(item.family_id)+'\')">تفعيل الحساب</button>'
+      +   '<button class="btn" type="button" onclick="setStatus(\'registration_families\',\''+esc(item.family_id)+'\',\'reviewed\')">تمت المراجعة</button>'
+      +   '<button class="btn green" type="button" onclick="setStatus(\'registration_families\',\''+esc(item.family_id)+'\',\'approved\')">اعتماد</button>'
+      +   '<button class="btn red" type="button" onclick="setStatus(\'registration_families\',\''+esc(item.family_id)+'\',\'rejected\')">رفض</button>'
+      + '</div>'
+      + '</article>';
+  }).join('')+'</div>';
+}
+function renderTeachers(){
+  const list = getFilteredTeachers();
+  $('#teachersMeta').textContent = list.length ? ('عرض '+list.length+' طلب معلم') : 'لا توجد طلبات معلمين مطابقة للبحث الحالي.';
+  if(!list.length){
+    $('#teachersBox').innerHTML = '<div class="reg-empty"><b>لا توجد طلبات مطابقة</b><p>جرّب تغيير البحث أو الفلتر أو حدّث الصفحة.</p></div>';
+    return;
+  }
+  $('#teachersBox').innerHTML = '<div class="request-grid">'+list.map(item => {
+    return '<article class="request-card">'
+      + '<div class="request-card-head">'
+      +   '<div>'
+      +     '<h4>'+esc(item.full_name || 'معلم غير محدد')+'</h4>'
+      +     '<div class="request-meta"><span>الهاتف: '+esc(item.phone || '—')+'</span><span>البريد: '+esc(item.email || '—')+'</span><span>تاريخ الطلب: '+esc(formatDate(item.created_at))+'</span></div>'
+      +   '</div>'
+      +   statusBadge(item.status)
+      + '</div>'
+      + '<div class="request-meta-line"><b>المؤهل:</b> <span>'+esc(item.qualification || '—')+'</span></div>'
+      + '<div class="request-meta-line"><b>التخصص:</b> <span>'+esc(item.specialization || '—')+'</span></div>'
+      + '<div class="request-meta-line"><b>سنوات الخبرة:</b> <span>'+esc(item.years_experience ?? '—')+'</span></div>'
+      + '<div class="request-actions">'
+      +   '<button class="btn blue" type="button" onclick="activateAccount(\'teacher\',\''+esc(item.id)+'\')">تفعيل الحساب</button>'
+      +   '<button class="btn" type="button" onclick="setStatus(\'registration_teachers\',\''+esc(item.id)+'\',\'reviewed\')">تمت المراجعة</button>'
+      +   '<button class="btn green" type="button" onclick="setStatus(\'registration_teachers\',\''+esc(item.id)+'\',\'approved\')">اعتماد</button>'
+      +   '<button class="btn red" type="button" onclick="setStatus(\'registration_teachers\',\''+esc(item.id)+'\',\'rejected\')">رفض</button>'
+      + '</div>'
+      + '</article>';
+  }).join('')+'</div>';
+}
+function renderAll(){
+  renderStats();
+  renderFamilies();
+  renderTeachers();
+}
+async function ensure(){
+  const {data:{session}} = await sb.auth.getSession();
+  if(!session){
+    location.href = 'index.html';
+    return false;
+  }
+  const {data:user} = await sb.from('users').select('role,is_super_admin').eq('id',session.user.id).maybeSingle();
+  if(!user || !(user.is_super_admin || ['admin','academic','academic_admin'].includes(user.role))){
+    $('#familiesBox').innerHTML = '<div class="reg-empty"><b>ليست لديك صلاحية مراجعة الطلبات</b><p>يمكنك الرجوع إلى البوابة أو طلب الصلاحية من الإدارة.</p></div>';
+    $('#teachersBox').innerHTML = '<div class="reg-empty"><b>ليست لديك صلاحية مراجعة الطلبات</b><p>هذه الواجهة مخصصة للإدارة والمراجعة.</p></div>';
+    return false;
+  }
+  return true;
+}
+async function setStatus(table,id,status){
+  const {error} = await sb.from(table).update({status}).eq('id',id);
+  if(error){
+    toast('خطأ', error.message);
+    return;
+  }
+  toast('تم التحديث', statusLabel(status));
+  await loadAll();
+}
+async function activateAccount(type,id){
+  toast('جاري تفعيل الحساب...', 'يرجى الانتظار');
+  const {data,error} = await sb.rpc('activate_registered_user',{p_reg_type:type,p_reg_id:id});
+  if(error){
+    toast('خطأ في التفعيل', error.message);
+    return;
+  }
+  if(data && !data.ok){
+    toast('فشل التفعيل', data.error || 'حدث خطأ غير معروف');
+    return;
+  }
+  toast('تم التفعيل بنجاح', (data && data.message) || 'تم إنشاء الحساب في Auth و users');
+  await loadAll();
+}
+async function loadAll(){
+  if(!accessReady){
+    accessReady = await ensure();
+    if(!accessReady) return;
+  }
+  $('#familiesBox').innerHTML = '<div class="reg-empty"><b>جاري تحميل طلبات الأسر والطلاب...</b><p>لحظات وسيتم تحديث القائمة.</p></div>';
+  $('#teachersBox').innerHTML = '<div class="reg-empty"><b>جاري تحميل طلبات المعلمين...</b><p>لحظات وسيتم تحديث القائمة.</p></div>';
+  const [familiesRes, teachersRes] = await Promise.all([
+    sb.from('v_registration_family_students').select('*').order('created_at',{ascending:false}),
+    sb.from('registration_teachers').select('*').order('created_at',{ascending:false})
+  ]);
+  if(familiesRes.error){
+    familiesRaw = [];
+    familyGroups = [];
+    $('#familiesBox').innerHTML = '<div class="reg-empty"><b>تعذر تحميل طلبات الأسر</b><p>'+esc(familiesRes.error.message)+'</p></div>';
+  } else {
+    familiesRaw = familiesRes.data || [];
+    familyGroups = groupFamilies(familiesRaw);
+  }
+  if(teachersRes.error){
+    teachersRaw = [];
+    $('#teachersBox').innerHTML = '<div class="reg-empty"><b>تعذر تحميل طلبات المعلمين</b><p>'+esc(teachersRes.error.message)+'</p></div>';
+  } else {
+    teachersRaw = teachersRes.data || [];
+  }
+  renderAll();
+}
+function bindFilters(){
+  $('#searchInput').addEventListener('input',e=>{state.query = e.target.value || ''; renderAll();});
+  $('#statusFilter').addEventListener('change',e=>{state.status = e.target.value; renderAll();});
+  $('#scopeFilter').addEventListener('change',e=>{state.scope = e.target.value; renderAll();});
+}
+window.addEventListener('load',()=>{bindFilters(); loadAll();});
+window.setStatus = setStatus;
+window.activateAccount = activateAccount;
+window.loadAll = loadAll;
+</script>
+<script src="assets/ux-enhancements.js?v=20260706-3"></script>
 <script src="assets/amin-theme-injector.js"></script>
 <script src="assets/amin-icons.js?v=20260706-3" defer></script>
-</body></html>
+</body>
+</html>
