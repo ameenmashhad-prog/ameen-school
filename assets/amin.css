@@ -442,6 +442,7 @@ tbody tr:hover{background:var(--primary-tint)}
 .finance-empty b{color:var(--text-primary)}
 .finance-empty small{max-width:420px;line-height:1.8}
 .finance-empty .empty-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.finance-quick-links{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
 .table-wrap{overflow:auto;-webkit-overflow-scrolling:touch}
 @media print{.sidebar,.topbar,.no-print,.toast,.modal-backdrop,.mobile-menu,.btn.mobile-menu{display:none!important}.shell{display:block;padding:0}.main{padding:0}.table-wrap{overflow:visible}.table-wrap table{font-size:11px}th,td{padding:6px 8px!important}}
 
