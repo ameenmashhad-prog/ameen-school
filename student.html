@@ -59,7 +59,7 @@
     <header class="topbar">
       <button class="btn mobile-menu" id="mobileMenuBtn">☰</button>
       <h2>بوابة الطالب</h2>
-      <div class="top-actions"></div>
+      <div class="top-actions"><button id="printBtn" class="btn">طباعة</button></div>
     </header>
 
     <section id="view-overview" class="view active"></section>
@@ -92,7 +92,11 @@
   function $(s, r){r=r||document;return r.querySelector(s)}
   function esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;')}
   function num(v){var n=Number(v);return Number.isFinite(n)?n:0}
+  const RT = function(){ return window.FinanceRuntime || {}; };
   function money(v){return num(v).toLocaleString('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0})}
+  function dualDate(v){return RT().dualDate ? RT().dualDate(String(v||'').slice(0,10)) : String(v||'').slice(0,10)}
+  function emptyState(title, hint, actions){ return '<div class="finance-empty"><b>'+esc(title)+'</b><small>'+esc(hint||'')+'</small>'+(actions?'<div class="empty-actions">'+actions+'</div>':'')+'</div>'; }
+  function quickLinksBar(){ return '<div class="finance-quick-links no-print"><button class="btn blue" onclick="StudentPortal.showView(\'homeworks\')">واجباتي</button><button class="btn" onclick="StudentPortal.showView(\'grades\')">درجاتي</button><button class="btn" onclick="location.href=\'student-homeworks.html\'">تسليم واجب</button><button class="btn gold" onclick="location.href=\'smart-calendar.html\'">التقويم</button></div>'; }
   
   let sb = null;
   let ME = null;
@@ -460,7 +464,7 @@
     html += '<div class="kpis" style="margin-bottom:20px;"><div class="kpi green"><small>أيام الحضور</small><b>'+present+'</b></div><div class="kpi red"><small>أيام الغياب</small><b>'+absent+'</b></div><div class="kpi gold"><small>أيام التأخير</small><b>'+late+'</b></div><div class="kpi blue"><small>الإجمالي</small><b>'+DATA.attendance.length+'</b></div></div>';
     
     if(!DATA.attendance.length) {
-      html += '<div class="empty" style="text-align:center;padding:60px;">لا توجد سجلات حضور.</div>';
+      html += emptyState('لا توجد سجلات حضور','سيظهر حضورك اليومي هنا بعد تسجيله من المدرسة.');
     } else {
       html += '<div class="table-wrap"><table><thead><tr><th>التاريخ</th><th>الحالة</th><th>ملاحظة</th></tr></thead><tbody>';
       DATA.attendance.slice(0, 60).forEach(function(a) {
@@ -513,7 +517,7 @@
     let html = '<div class="page-head"><div><h1>📝 اختباراتي</h1></div></div>';
     
     if(!DATA.exams.length) {
-      html += '<div class="empty" style="text-align:center;padding:60px;">لا توجد اختبارات قادمة.</div>';
+      html += emptyState('لا توجد اختبارات قادمة','إذا تم نشر اختبار جديد فسيظهر هنا مع موعده.','<button class="btn blue" onclick="location.href=\'online-exams.html\'">فتح الاختبارات الإلكترونية</button>');
     } else {
       html += '<div class="list">';
       DATA.exams.forEach(function(e) {
@@ -535,7 +539,7 @@
     let html = '<div class="page-head"><div><h1>🌟 سلوكي</h1></div></div>';
     
     if(!DATA.behavior.length) {
-      html += '<div class="empty" style="text-align:center;padding:60px;">لا توجد ملاحظات سلوكية. استمر! 👍</div>';
+      html += emptyState('لا توجد ملاحظات سلوكية','أداؤك السلوكي مستقر حتى الآن. استمر 👍');
     } else {
       const totalPoints = DATA.behavior.reduce(function(s,b){ return s + num(b.points || 0); }, 0);
       const positive = DATA.behavior.filter(function(b){ return num(b.points) > 0; }).length;
@@ -566,7 +570,7 @@
     let html = '<div class="page-head"><div><h1>🏆 إنجازاتي وشاراتي</h1></div></div>';
     
     if(!DATA.achievements.length) {
-      html += '<div class="empty" style="text-align:center;padding:60px;"><span class="amin-3d-ico-auto" data-size="64" data-emoji="🎯" style="display:inline-flex;align-items:center;justify-content:center;width:64px;height:64px;">🎯</span><h3 style="margin-top:16px;">ابدأ رحلتك نحو الإنجاز!</h3><p style="color:#999;margin-top:8px;">حافظ على حضورك وأنجز واجباتك لتحصل على شارات تحفيزية.</p></div>';
+      html += emptyState('ابدأ رحلتك نحو الإنجاز!','حافظ على حضورك وأنجز واجباتك لتحصل على شارات تحفيزية.','<button class="btn gold" onclick="StudentPortal.showView(\'homeworks\')">فتح الواجبات</button>');
     } else {
       const totalPoints = DATA.achievements.reduce(function(s,a){ return s + num(a.points_awarded || 0); }, 0);
       
@@ -692,6 +696,7 @@
   }
 
   window.addEventListener('load', init);
+  window.addEventListener('load', function(){ var p=$('#printBtn'); if(p) p.onclick=function(){ StudentPortal.printReport('grades'); }; });
   
   window.StudentPortal = {
     init: init,

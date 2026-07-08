@@ -58,6 +58,7 @@
       <h2>بوابة ولي الأمر</h2>
       <div class="top-actions">
         <select id="childSelector" class="select" style="display:none; min-width: 200px; padding:8px; border-radius:8px;"></select>
+        <button id="printBtn" class="btn">طباعة</button>
       </div>
     </header>
 
@@ -72,9 +73,11 @@
 <div id="toast" class="toast"></div>
 
 <script src="libs/supabase.min.js"></script>
+<script src="libs/calendar-lib.js"></script>
 <script src="assets/config.js"></script>
 <script src="assets/platform-modules.js"></script>
 <script src="assets/i18n.js"></script>
+<script src="assets/finance-runtime.js?v=20260707-1"></script>
 
 <script>
 (function(){
@@ -87,7 +90,11 @@
   function $(s, r){r=r||document;return r.querySelector(s)}
   function esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;')}
   function num(v){var n=Number(v);return Number.isFinite(n)?n:0}
+  const RT = function(){ return window.FinanceRuntime || {}; };
   function money(v){return num(v).toLocaleString('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0})}
+  function dualDate(v){return RT().dualDate ? RT().dualDate(String(v||'').slice(0,10)) : String(v||'').slice(0,10)}
+  function emptyState(title, hint, actions){ return '<div class="finance-empty"><b>'+esc(title)+'</b><small>'+esc(hint||'')+'</small>'+(actions?'<div class="empty-actions">'+actions+'</div>':'')+'</div>'; }
+  function quickLinksBar(){ return '<div class="finance-quick-links no-print"><button class="btn blue" onclick="ParentPortal.showView(\'grades\')">درجات الأبناء</button><button class="btn" onclick="ParentPortal.showView(\'finance\')">الأقساط</button><button class="btn" onclick="location.href=\'student-homeworks.html\'">الواجبات</button><button class="btn gold" onclick="location.href=\'smart-calendar.html\'">التقويم</button></div>'; }
   
   let currentChildId = null;
   let sb = null;
@@ -182,7 +189,7 @@
         await Promise.all(CHILDREN.map(function(c){ return loadChildData(c.id); }));
         renderOverview();
       } else {
-        $('#view-overview').innerHTML = '<div class="empty" style="text-align:center;padding:60px 20px;"><div style="font-size:64px;margin-bottom:20px;">⚠️</div><h3>لا يوجد طلاب مسجلين تحت هذا الحساب</h3><p style="color:#999;margin-top:10px;">يرجى مراجعة الإدارة لربط الطلاب بحسابك.</p></div>';
+        $('#view-overview').innerHTML = emptyState('لا يوجد طلاب مسجلون تحت هذا الحساب','يرجى مراجعة الإدارة لربط الطلاب بحساب ولي الأمر هذا.','<button class="btn blue" onclick="location.href=\'portal.html\'">العودة إلى البوابة</button>');
       }
 
     } catch(e) {
@@ -323,6 +330,7 @@
     let html = '<div class="page-head"><div><h1>أهلاً بك، '+esc(ME.name)+' 👋</h1><p>متابعة شاملة لأبنائك · عدد الأبناء: <b>'+CHILDREN.length+'</b>'+(unreadNotifs > 0 ? ' · <span class="badge red">'+unreadNotifs+' إشعار جديد</span>' : '')+'</p></div></div>';
 
     html += '<h3 style="margin-bottom:12px;">📞 تواصل سريع مع المدرسة</h3>';
+    html += quickLinksBar();
     html += '<div class="cards" style="margin-bottom:24px;">';
     html += '<a href="tel:'+SCHOOL_PHONE+'" style="text-decoration:none;color:inherit;"><div class="card" style="cursor:pointer;text-align:center;padding:20px"><span class="amin-3d-ico-auto" data-size="36" data-emoji="📞" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;">📞</span><div style="font-weight:bold;margin-top:8px;font-size:15px;">اتصال بالمدرسة</div><small style="opacity:0.9;">للتواصل المباشر</small></div></a>';
     html += '<a href="https://wa.me/'+phoneClean+'?text='+whatsappMsg+'" target="_blank" style="text-decoration:none;color:inherit;"><div class="card" style="cursor:pointer;text-align:center;padding:20px"><span class="amin-3d-ico-auto" data-size="36" data-emoji="💬" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;">💬</span><div style="font-weight:bold;margin-top:8px;font-size:15px;">واتساب الإدارة</div><small style="opacity:0.9;">رد سريع</small></div></a>';
@@ -378,7 +386,7 @@
       html += '<h3 style="margin:24px 0 12px;">🔔 آخر الإشعارات</h3><div class="list">';
       NOTIFICATIONS.slice(0, 5).forEach(function(n) {
         const isUnread = !n.read_at;
-        html += '<div class="item" style="'+(isUnread ? 'background:#FBF1DC;border-right:3px solid #B8860B;' : '')+'"><div><b>'+esc(n.title || 'إشعار')+'</b><small>'+esc(n.body || n.message || '')+' · '+esc(String(n.created_at || '').slice(0,10))+'</small></div><span class="badge '+(isUnread ? 'gold' : 'blue')+'">'+(isUnread ? 'جديد' : 'مقروء')+'</span></div>';
+        html += '<div class="item" style="'+(isUnread ? 'background:#FBF1DC;border-right:3px solid #B8860B;' : '')+'"><div><b>'+esc(n.title || 'إشعار')+'</b><small>'+esc(n.body || n.message || '')+' · '+esc(dualDate(n.created_at || ''))+'</small></div><span class="badge '+(isUnread ? 'gold' : 'blue')+'">'+(isUnread ? 'جديد' : 'مقروء')+'</span></div>';
       });
       html += '</div>';
     }
@@ -427,7 +435,7 @@
     html += '<div class="kpis" style="margin-bottom:20px;"><div class="kpi green"><small>أيام الحضور</small><b>'+present+'</b></div><div class="kpi red"><small>أيام الغياب</small><b>'+absent+'</b></div><div class="kpi gold"><small>أيام التأخير</small><b>'+late+'</b></div><div class="kpi blue"><small>الإجمالي</small><b>'+data.attendance.length+'</b></div></div>';
     
     if(!data.attendance.length) {
-      html += '<div class="empty" style="text-align:center;padding:60px;">لا توجد سجلات حضور.</div>';
+      html += emptyState('لا توجد سجلات حضور','لم تُسجل بيانات حضور لهذا الطالب بعد.');
     } else {
       html += '<div class="table-wrap"><table><thead><tr><th>التاريخ</th><th>الحالة</th><th>ملاحظة</th></tr></thead><tbody>';
       data.attendance.slice(0, 50).forEach(function(a) {
@@ -453,7 +461,7 @@
     html += '</div>';
     
     if(!data.fees.length) {
-      html += '<div class="empty" style="text-align:center;padding:60px;">لا توجد بيانات مالية.</div>';
+      html += emptyState('لا توجد بيانات مالية','لم يتم إنشاء ملف مالي لهذا الطالب بعد.');
     } else {
       const totalAll = data.fees.reduce(function(s,f){ return s + num(f.net_amount || f.base_amount); }, 0);
       const paidAll = data.fees.reduce(function(s,f){ return s + num(f.total_paid); }, 0);
@@ -484,7 +492,7 @@
     let html = '<div class="page-head"><div><h1>🌟 سلوك '+esc(childName)+'</h1></div></div>';
     
     if(!data.behavior.length) {
-      html += '<div class="empty" style="text-align:center;padding:60px;">لا توجد ملاحظات سلوكية.</div>';
+      html += emptyState('لا توجد ملاحظات سلوكية','لا توجد سجلات سلوكية لهذا الطالب حتى الآن.');
     } else {
       const totalPoints = data.behavior.reduce(function(s,b){ return s + num(b.points || 0); }, 0);
       const color = totalPoints >= 0 ? 'green' : 'red';
@@ -619,7 +627,6 @@
       '<div>📞 '+SCHOOL_PHONE+' | '+SCHOOL_NAME+'</div>'+
       '<div>تم إنشاء هذا التقرير من النظام الإلكتروني للمدرسة</div>'+
       '</div>'+
-<script src="assets/avatar.js"></script>
       '<script src="assets/amin-theme-injector.js"><\/script></body></html>';
   }
   
@@ -802,6 +809,7 @@
   }
 
   window.addEventListener('load', init);
+  window.addEventListener('load', function(){ var p=$('#printBtn'); if(p) p.onclick=function(){ ParentPortal.printChildReport('full'); }; });
   
   window.ParentPortal = {
     init: init,
@@ -822,4 +830,6 @@
 <script src="assets/amin-theme-injector.js"></script>
 <script src="assets/amin-icons.js?v=20260706-3" defer></script>
 </body>
+</html>
+dy>
 </html>
