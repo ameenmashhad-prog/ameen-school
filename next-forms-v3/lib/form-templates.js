@@ -172,13 +172,27 @@ const templatesMap = {
     visibility: 'finance_admin',
     printOrientation: 'landscape',
     title: { ar: 'استمارة استئذان مالي', fa: 'فرم مجوز مالی', en: 'Financial Permission Form' },
-    sections: [],
+    sections: [
+      { key: 'requestor', title: { ar: 'بيانات الجهة الطالبة', fa: 'اطلاعات درخواست‌کننده', en: 'Requestor Information' } },
+      { key: 'finance', title: { ar: 'تفاصيل الطلب المالي', fa: 'جزئیات درخواست مالی', en: 'Financial Request Details' } },
+      { key: 'attachments', title: { ar: 'المرفقات الداعمة', fa: 'پیوست‌های پشتیبان', en: 'Supporting Attachments' } },
+      { key: 'approval', title: { ar: 'الاعتماد والتوقيع', fa: 'تایید و امضا', en: 'Approval & Signature' } }
+    ],
     fields: [
-      field({ type: 'text', ar: 'اسم الجهة الطالبة', fa: 'نام درخواست‌کننده', en: 'Requesting Unit', required: true }),
-      field({ type: 'number', ar: 'المبلغ المطلوب', fa: 'مبلغ درخواستی', en: 'Requested Amount', required: true, width: 'half' }),
-      field({ type: 'date', ar: 'تاريخ الطلب', fa: 'تاریخ درخواست', en: 'Request Date', required: true, width: 'half' }),
-      field({ type: 'text', ar: 'سبب الطلب', fa: 'دلیل درخواست', en: 'Reason', required: true }),
-      field({ type: 'signature', ar: 'اعتماد المالية', fa: 'تایید مالی', en: 'Finance Approval', required: true })
+      field({ id:'requesting_unit', type:'text', ar:'اسم الجهة الطالبة', fa:'نام درخواست‌کننده', en:'Requesting Unit', required:true, width:'half', section:'requestor' }),
+      field({ id:'requester_name', type:'text', ar:'اسم مقدم الطلب', fa:'نام ثبت‌کننده', en:'Requester Name', required:true, width:'half', section:'requestor' }),
+      field({ id:'requester_role', type:'text', ar:'الصفة / المنصب', fa:'سمت / عنوان', en:'Role / Title', width:'half', section:'requestor' }),
+      field({ id:'request_date', type:'date', ar:'تاريخ الطلب', fa:'تاریخ درخواست', en:'Request Date', required:true, width:'half', section:'requestor' }),
+      field({ id:'requested_amount', type:'number', ar:'المبلغ المطلوب', fa:'مبلغ درخواستی', en:'Requested Amount', required:true, width:'half', section:'finance', placeholder:{ar:'بالرقم',fa:'به‌صورت عددی',en:'Numeric amount'} }),
+      field({ id:'currency', type:'select', ar:'العملة', fa:'واحد پول', en:'Currency', required:true, width:'half', section:'finance', options:[option('IQD','دينار عراقي','دینار عراق','Iraqi Dinar'), option('USD','دولار','دلار','US Dollar')] }),
+      field({ id:'cost_center', type:'text', ar:'مركز الكلفة', fa:'مرکز هزینه', en:'Cost Center', width:'half', section:'finance' }),
+      field({ id:'budget_line', type:'text', ar:'البند / الحساب', fa:'ردیف / حساب', en:'Budget Line / Account', width:'half', section:'finance' }),
+      field({ id:'needed_by_date', type:'date', ar:'مطلوب قبل تاريخ', fa:'نیاز تا تاریخ', en:'Needed By Date', width:'half', section:'finance' }),
+      field({ id:'urgency', type:'select', ar:'الأولوية', fa:'اولویت', en:'Urgency', width:'half', section:'finance', options:[option('normal','عادي','عادی','Normal'), option('high','عاجل','فوری','Urgent')] }),
+      field({ id:'reason', type:'text', ar:'سبب الطلب', fa:'دلیل درخواست', en:'Reason', required:true, section:'finance' }),
+      field({ id:'supporting_document', type:'file', ar:'المستند الداعم', fa:'سند پشتیبان', en:'Supporting Document', section:'attachments', accept:'.pdf,.jpg,.png,.jpeg,.xlsx' }),
+      field({ id:'requester_signature', type:'signature', ar:'توقيع مقدم الطلب', fa:'امضای ثبت‌کننده', en:'Requester Signature', required:true, section:'approval' }),
+      field({ id:'finance_approval_signature', type:'signature', ar:'اعتماد المالية', fa:'تایید مالی', en:'Finance Approval', section:'approval' })
     ]
   }
 };
