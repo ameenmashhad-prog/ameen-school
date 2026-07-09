@@ -187,7 +187,10 @@
     "filters": {
       "formSlug": "فلتر حسب slug النموذج",
       "allVisibilities": "كل التصنيفات",
-      "allStatuses": "كل الحالات"
+      "allStatuses": "كل الحالات",
+      "search": "بحث باسم مقدم الطلب / المرجع / ولي الأمر",
+      "fromDate": "من تاريخ",
+      "toDate": "إلى تاريخ"
     },
     "statuses": {
       "received": "مستلم",
@@ -208,8 +211,13 @@
       "markRejected": "رفض",
       "print": "طباعة",
       "statusSaved": "تم تحديث الحالة بنجاح",
-      "statusError": "تعذر تحديث الحالة"
-    }
+      "statusError": "تعذر تحديث الحالة",
+      "exportCsv": "تصدير CSV",
+      "resetFilters": "تصفير الفلاتر",
+      "refresh": "تحديث"
+    },
+    "reviewNote": "ملاحظة المراجعة",
+    "reviewNotePlaceholder": "اكتب ملاحظتك الداخلية حول هذا الطلب قبل تغيير حالته."
   },
   "leaveRequest": {
     "pageTitle": "استمارة طلب الإجازة — نسخة إنتاجية أولية",

@@ -187,7 +187,10 @@
     "filters": {
       "formSlug": "Filter by form slug",
       "allVisibilities": "All visibilities",
-      "allStatuses": "All statuses"
+      "allStatuses": "All statuses",
+      "search": "Search by applicant / reference / guardian",
+      "fromDate": "From date",
+      "toDate": "To date"
     },
     "statuses": {
       "received": "Received",
@@ -208,8 +211,13 @@
       "markRejected": "Reject",
       "print": "Print",
       "statusSaved": "Status updated successfully",
-      "statusError": "Could not update status"
-    }
+      "statusError": "Could not update status",
+      "exportCsv": "Export CSV",
+      "resetFilters": "Reset Filters",
+      "refresh": "Refresh"
+    },
+    "reviewNote": "Review Note",
+    "reviewNotePlaceholder": "Write your internal note about this submission before changing its status."
   },
   "leaveRequest": {
     "pageTitle": "Leave Request Form — Initial Production Version",

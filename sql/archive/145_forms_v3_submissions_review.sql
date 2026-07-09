@@ -10,6 +10,8 @@ create or replace function public.forms_list_submissions_v3(
   p_form_slug text default null,
   p_visibility text default null,
   p_status text default null,
+  p_created_from date default null,
+  p_created_to date default null,
   p_limit int default 100
 )
 returns jsonb
@@ -41,6 +43,8 @@ begin
         where (p_form_slug is null or form_slug = trim(p_form_slug))
           and (p_visibility is null or visibility = trim(p_visibility))
           and (p_status is null or status = trim(p_status))
+          and (p_created_from is null or created_at::date >= p_created_from)
+          and (p_created_to is null or created_at::date <= p_created_to)
         order by created_at desc
         limit v_limit
       ) s
@@ -49,7 +53,7 @@ begin
 end;
 $$;
 
-grant execute on function public.forms_list_submissions_v3(text,text,text,int) to authenticated, anon;
+grant execute on function public.forms_list_submissions_v3(text,text,text,date,date,int) to authenticated, anon;
 
 create or replace function public.forms_get_submission_v3(
   p_submission_id uuid

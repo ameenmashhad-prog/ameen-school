@@ -25,6 +25,24 @@ function statusLabel(status, labels) {
   return labels.statuses?.[status] || status || '—';
 }
 
+function csvCell(value) {
+  const text = String(value ?? '').replace(/"/g, '""');
+  return /[",\n]/.test(text) ? `"${text}"` : text;
+}
+
+function downloadCsv(filename, headers, rows) {
+  const csv = '\ufeff' + [headers.map(csvCell).join(','), ...rows.map((row) => headers.map((header) => csvCell(row[header])).join(','))].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
 function SubmissionItem({ item, labels, locale, selected, onSelect }) {
   return (
     <button
@@ -54,19 +72,10 @@ function buildSections(detail, locale, labels) {
     title: section.title?.[locale] || section.key,
     rows: fields.filter((field) => field.section === section.key).map((field) => {
       let value = values[field.id];
-      if (field.type === 'select') {
-        value = (field.options || []).find((option) => option.value === value)?.label?.[locale] || value;
-      }
-      if (field.type === 'date' && value) {
-        value = formatDateForLocale(locale, value);
-      }
-      if (field.type === 'file' && value?.name) {
-        value = value.name;
-      }
-      return {
-        label: field.label?.[locale] || field.id,
-        value: value || labels.emptyValue
-      };
+      if (field.type === 'select') value = (field.options || []).find((option) => option.value === value)?.label?.[locale] || value;
+      if (field.type === 'date' && value) value = formatDateForLocale(locale, value);
+      if (field.type === 'file' && value?.name) value = value.name;
+      return { label: field.label?.[locale] || field.id, value: value || labels.emptyValue };
     })
   })).filter((section) => section.rows.length);
 }
@@ -81,7 +90,8 @@ export default function FormsSubmissionsShell({ locale, dictionary }) {
   const [loading, setLoading] = useState(true);
   const [detailLoading, setDetailLoading] = useState(false);
   const [actionState, setActionState] = useState('idle');
-  const [filters, setFilters] = useState({ formSlug: '', visibility: 'all', status: 'all' });
+  const [reviewNote, setReviewNote] = useState('');
+  const [filters, setFilters] = useState({ formSlug: '', visibility: 'all', status: 'all', search: '', from: '', to: '' });
   const meta = localeMeta[activeLocale] || localeMeta.ar;
 
   useEffect(() => {
@@ -96,6 +106,8 @@ export default function FormsSubmissionsShell({ locale, dictionary }) {
         p_form_slug: filters.formSlug || null,
         p_visibility: filters.visibility === 'all' ? null : filters.visibility,
         p_status: filters.status === 'all' ? null : filters.status,
+        p_created_from: filters.from || null,
+        p_created_to: filters.to || null,
         p_limit: 100
       });
       const nextItems = result?.data?.items || result?.items || [];
@@ -110,11 +122,14 @@ export default function FormsSubmissionsShell({ locale, dictionary }) {
     }
   }
 
-  useEffect(() => { loadSubmissions(); }, [filters]);
+  useEffect(() => {
+    loadSubmissions();
+  }, [filters.formSlug, filters.visibility, filters.status, filters.from, filters.to]);
 
   useEffect(() => {
     if (!selectedId) {
       setDetail(null);
+      setReviewNote('');
       return;
     }
     let cancelled = false;
@@ -122,26 +137,39 @@ export default function FormsSubmissionsShell({ locale, dictionary }) {
     getSubmissionRpc({ p_submission_id: selectedId })
       .then((result) => {
         if (cancelled) return;
-        setDetail(result?.data?.item || result?.item || null);
+        const item = result?.data?.item || result?.item || null;
+        setDetail(item);
+        setReviewNote(item?.review_note || '');
       })
       .catch((error) => {
         console.error(error);
-        if (!cancelled) setDetail(null);
+        if (!cancelled) {
+          setDetail(null);
+          setReviewNote('');
+        }
       })
       .finally(() => {
         if (!cancelled) setDetailLoading(false);
       });
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [selectedId]);
 
   async function updateStatus(nextStatus) {
     if (!selectedId) return;
     setActionState('saving');
     try {
-      await updateSubmissionStatusRpc({ p_submission_id: selectedId, p_status: nextStatus, p_review_note: '' });
+      await updateSubmissionStatusRpc({
+        p_submission_id: selectedId,
+        p_status: nextStatus,
+        p_review_note: reviewNote || null
+      });
       await loadSubmissions();
       const refreshed = await getSubmissionRpc({ p_submission_id: selectedId });
-      setDetail(refreshed?.data?.item || refreshed?.item || null);
+      const item = refreshed?.data?.item || refreshed?.item || null;
+      setDetail(item);
+      setReviewNote(item?.review_note || '');
       setActionState('saved');
     } catch (error) {
       console.error(error);
@@ -149,12 +177,41 @@ export default function FormsSubmissionsShell({ locale, dictionary }) {
     }
   }
 
+  const filteredItems = useMemo(() => {
+    const query = String(filters.search || '').trim().toLowerCase();
+    if (!query) return items;
+    return items.filter((item) => [item.applicant_name, item.guardian_name, item.submission_ref, item.form_slug].join(' ').toLowerCase().includes(query));
+  }, [items, filters.search]);
+
   const kpis = useMemo(() => {
-    const by = (key) => items.filter((item) => item.status === key).length;
-    return { total: items.length, received: by('received'), reviewed: by('reviewed'), issued: by('issued') };
-  }, [items]);
+    const by = (key) => filteredItems.filter((item) => item.status === key).length;
+    return {
+      total: filteredItems.length,
+      received: by('received'),
+      reviewed: by('reviewed'),
+      issued: by('issued')
+    };
+  }, [filteredItems]);
 
   const sections = useMemo(() => buildSections(detail, activeLocale, labels), [detail, activeLocale, labels]);
+
+  function exportCurrentCsv() {
+    if (!filteredItems.length) return;
+    const rows = filteredItems.map((item) => ({
+      submission_ref: item.submission_ref,
+      form_slug: item.form_slug,
+      visibility: item.visibility,
+      status: item.status,
+      applicant_name: item.applicant_name,
+      guardian_name: item.guardian_name,
+      created_at: item.created_at
+    }));
+    downloadCsv('forms-v3-submissions.csv', ['submission_ref','form_slug','visibility','status','applicant_name','guardian_name','created_at'], rows);
+  }
+
+  function printDetail() {
+    window.print();
+  }
 
   return (
     <main className={`mx-auto min-h-screen max-w-[1500px] px-4 py-6 ${localeFontClass(activeLocale)}`} dir={meta.dir}>
@@ -172,6 +229,7 @@ export default function FormsSubmissionsShell({ locale, dictionary }) {
           <div className="flex flex-wrap items-center gap-2">
             <LanguageSwitcher locale={activeLocale} onChange={setActiveLocale} labels={forms.languageSwitcher} />
             <Link href={`/${activeLocale}/forms/student-registration`} className="rounded-2xl border border-slate-200 px-4 py-2 font-bold text-slate-700">{labels.openStudentForm}</Link>
+            <button onClick={exportCurrentCsv} className="rounded-2xl border border-slate-200 px-4 py-2 font-bold text-slate-700">{labels.actions.exportCsv}</button>
           </div>
         </div>
 
@@ -182,9 +240,10 @@ export default function FormsSubmissionsShell({ locale, dictionary }) {
           <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4"><div className="text-xs text-slate-500">{labels.kpis.issued}</div><div className="mt-2 font-black text-slate-900">{kpis.issued}</div></div>
         </div>
 
-        <div className="mt-5 grid gap-4 xl:grid-cols-[360px_minmax(0,1fr)]">
+        <div className="mt-5 grid gap-4 xl:grid-cols-[380px_minmax(0,1fr)]">
           <aside className="space-y-4 rounded-[24px] border border-slate-200 bg-slate-50 p-4">
-            <div className="grid gap-3">
+            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-1">
+              <input className="rounded-2xl border border-slate-200 bg-white px-3 py-3 text-sm" placeholder={labels.filters.search} value={filters.search} onChange={(e) => setFilters((c) => ({ ...c, search: e.target.value }))} />
               <input className="rounded-2xl border border-slate-200 bg-white px-3 py-3 text-sm" placeholder={labels.filters.formSlug} value={filters.formSlug} onChange={(e) => setFilters((c) => ({ ...c, formSlug: e.target.value }))} />
               <select className="rounded-2xl border border-slate-200 bg-white px-3 py-3 text-sm" value={filters.visibility} onChange={(e) => setFilters((c) => ({ ...c, visibility: e.target.value }))}>
                 <option value="all">{labels.filters.allVisibilities}</option>
@@ -200,12 +259,19 @@ export default function FormsSubmissionsShell({ locale, dictionary }) {
                 <option value="rejected">{labels.statuses.rejected}</option>
                 <option value="archived">{labels.statuses.archived}</option>
               </select>
+              <input type="date" className="rounded-2xl border border-slate-200 bg-white px-3 py-3 text-sm" value={filters.from} onChange={(e) => setFilters((c) => ({ ...c, from: e.target.value }))} />
+              <input type="date" className="rounded-2xl border border-slate-200 bg-white px-3 py-3 text-sm" value={filters.to} onChange={(e) => setFilters((c) => ({ ...c, to: e.target.value }))} />
+            </div>
+
+            <div className="flex flex-wrap gap-2 no-print">
+              <button onClick={() => setFilters({ formSlug:'', visibility:'all', status:'all', search:'', from:'', to:'' })} className="rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700">{labels.actions.resetFilters}</button>
+              <button onClick={loadSubmissions} className="rounded-2xl border border-brand-200 bg-brand-50 px-4 py-2 text-sm font-bold text-brand-800">{labels.actions.refresh}</button>
             </div>
 
             <div className="space-y-3">
               {loading ? <div className="rounded-2xl border border-slate-200 bg-white px-4 py-6 text-sm text-slate-500">{labels.loading}</div> : null}
-              {!loading && !items.length ? <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-4 py-6 text-sm text-slate-500">{labels.empty}</div> : null}
-              {!loading && items.map((item) => (
+              {!loading && !filteredItems.length ? <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-4 py-6 text-sm text-slate-500">{labels.empty}</div> : null}
+              {!loading && filteredItems.map((item) => (
                 <SubmissionItem key={item.id} item={item} labels={labels} locale={activeLocale} selected={item.id === selectedId} onSelect={setSelectedId} />
               ))}
             </div>
@@ -232,11 +298,15 @@ export default function FormsSubmissionsShell({ locale, dictionary }) {
                     <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4"><div className="text-xs text-slate-500">{labels.detail.guardian}</div><div className="mt-2 font-black text-slate-900">{detail.guardian_name || labels.emptyValue}</div></div>
                     <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4"><div className="text-xs text-slate-500">{labels.detail.attachment}</div><div className="mt-2 break-all font-black text-slate-900">{detail.uploaded_attachment?.object_path || labels.emptyValue}</div></div>
                   </div>
+                  <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-4 no-print">
+                    <label className="mb-2 block text-sm font-bold text-slate-800">{labels.reviewNote}</label>
+                    <textarea value={reviewNote} onChange={(e) => setReviewNote(e.target.value)} className="min-h-24 w-full rounded-2xl border border-slate-200 bg-white px-3 py-3 text-sm text-slate-900" placeholder={labels.reviewNotePlaceholder}></textarea>
+                  </div>
                   <div className="mt-5 flex flex-wrap gap-2 no-print">
                     <button onClick={() => updateStatus('reviewed')} className="rounded-2xl border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-bold text-blue-800">{labels.actions.markReviewed}</button>
                     <button onClick={() => updateStatus('issued')} className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-bold text-emerald-800">{labels.actions.markIssued}</button>
                     <button onClick={() => updateStatus('rejected')} className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-2 text-sm font-bold text-rose-800">{labels.actions.markRejected}</button>
-                    <button onClick={() => window.print()} className="rounded-2xl border border-slate-200 px-4 py-2 text-sm font-bold text-slate-700">{labels.actions.print}</button>
+                    <button onClick={printDetail} className="rounded-2xl border border-slate-200 px-4 py-2 text-sm font-bold text-slate-700">{labels.actions.print}</button>
                     {actionState === 'saved' ? <span className="self-center text-sm font-bold text-emerald-700">{labels.actions.statusSaved}</span> : null}
                     {actionState === 'error' ? <span className="self-center text-sm font-bold text-rose-700">{labels.actions.statusError}</span> : null}
                   </div>

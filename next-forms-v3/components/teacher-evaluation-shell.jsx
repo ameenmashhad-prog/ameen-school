@@ -8,25 +8,117 @@ import PreviewSheet from '@/components/preview-sheet';
 import { buildTemplateByKey } from '@/lib/form-templates';
 import { formatDateForLocale, localeDateLabel, localeFontClass, localeMeta } from '@/lib/locale-config';
 import { nextVersionStamp } from '@/lib/utils';
-import { listVersionsRpc, requestUploadTicketRpc, saveDraftRpc, submitTeacherEvaluationRpc, uploadAttachmentTransport } from '@/lib/rpc/forms-rpc';
+import {
+  listVersionsRpc,
+  requestUploadTicketRpc,
+  saveDraftRpc,
+  submitTeacherEvaluationRpc,
+  uploadAttachmentTransport
+} from '@/lib/rpc/forms-rpc';
 
-const LOCAL_LANGUAGE_KEY='amin_forms_v3_locale';
-const LOCAL_FORM_STATE_KEY='amin_forms_v3_teacher_evaluation_state';
-const MAX_FILE_SIZE=10*1024*1024;
+const LOCAL_LANGUAGE_KEY = 'amin_forms_v3_locale';
+const LOCAL_FORM_STATE_KEY = 'amin_forms_v3_teacher_evaluation_state';
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
-function makeInitialValues(template){return template.fields.reduce((acc,field)=>{acc[field.id]=field.type==='file'?null:'';return acc;},{});}
-function SectionCard({ title, subtitle, children }) {return <section className="rounded-[24px] border border-slate-200 bg-white p-5 shadow-soft"><div className="mb-4 border-b border-slate-100 pb-3"><h2 className="text-xl font-black text-slate-950">{title}</h2>{subtitle ? <p className="mt-1 text-sm leading-7 text-slate-500">{subtitle}</p> : null}</div><div className="grid gap-4 md:grid-cols-2">{children}</div></section>;}
-function StatusPill({ tone='slate', children }) {const tones={slate:'bg-slate-100 text-slate-700',brand:'bg-brand-50 text-brand-700',success:'bg-emerald-50 text-emerald-700',warning:'bg-amber-50 text-amber-700',danger:'bg-rose-50 text-rose-700'};return <span className={`rounded-full px-3 py-1 text-sm font-bold ${tones[tone]||tones.slate}`}>{children}</span>;}
-function InputField({ field, locale, value, error, onChange, labelMap }) {const label=field.label?.[locale]||field.id;const placeholder=field.placeholder?.[locale]||'';const helpText=field.helpText?.[locale];const wrapperClass=field.width==='full'?'md:col-span-2':'';const baseInputClass=`w-full rounded-2xl border px-3 py-3 text-sm ${error ? 'border-rose-300 bg-rose-50 text-rose-900' : 'border-slate-200 bg-slate-50 text-slate-900'}`;const meta=<>{helpText ? <small className="mt-2 block text-xs leading-6 text-slate-500">{helpText}</small> : null}{error ? <small className="mt-2 block text-xs font-bold leading-6 text-rose-600">{error}</small> : null}</>;if(field.type==='select'){return <label className={`block ${wrapperClass}`}><span className="mb-2 block text-sm font-bold text-slate-800">{label}{field.required?' *':''}</span><select value={value||''} onChange={(e)=>onChange(field.id,e.target.value)} className={baseInputClass}><option value="">{labelMap.selectPlaceholder}</option>{(field.options||[]).map((option)=><option key={option.id} value={option.value}>{option.label?.[locale]||option.value}</option>)}</select>{meta}</label>;}if(field.type==='file'){return <label className={`block ${wrapperClass}`}><span className="mb-2 block text-sm font-bold text-slate-800">{label}{field.required?' *':''}</span><input type="file" accept={field.accept||'*'} onChange={(e)=>{const file=e.target.files?.[0]||null;onChange(field.id,file?{rawFile:file}:null);}} className={`${baseInputClass} border-dashed`} /><small className="mt-2 block text-xs leading-6 text-slate-500">{value?.name||labelMap.fileHint}</small>{error ? <small className="mt-2 block text-xs font-bold leading-6 text-rose-600">{error}</small> : null}</label>;}if(field.type==='signature'){return <label className={`block ${wrapperClass}`}><span className="mb-2 block text-sm font-bold text-slate-800">{label}{field.required?' *':''}</span><input value={value||''} onChange={(e)=>onChange(field.id,e.target.value)} className={baseInputClass} placeholder={placeholder} /><small className="mt-2 block text-xs leading-6 text-slate-500">{labelMap.signatureHint}</small>{error ? <small className="mt-2 block text-xs font-bold leading-6 text-rose-600">{error}</small> : null}</label>;}if(field.type==='date'){return <label className={`block ${wrapperClass}`}><span className="mb-2 block text-sm font-bold text-slate-800">{label}{field.required?' *':''}</span><input type="date" value={value||''} onChange={(e)=>onChange(field.id,e.target.value)} className={baseInputClass} /><small className="mt-2 block text-xs leading-6 text-slate-500">{value ? formatDateForLocale(locale,value) : labelMap.dateHint}</small>{error ? <small className="mt-2 block text-xs font-bold leading-6 text-rose-600">{error}</small> : null}</label>;}const inputType=field.id==='evaluator_email'?'email':field.id==='score'?'number':'text';return <label className={`block ${wrapperClass}`}><span className="mb-2 block text-sm font-bold text-slate-800">{label}{field.required?' *':''}</span><input value={value||''} type={inputType} onChange={(e)=>onChange(field.id,e.target.value)} className={baseInputClass} placeholder={placeholder} />{meta}</label>;}
-function UploadStatusPanel({ labels, uploadTicket, uploadedAttachment, uploadState }) {const tone=uploadState==='uploaded'?'success':uploadState==='uploading'?'warning':uploadState==='ready'?'brand':uploadState==='error'?'danger':'slate';const statusText=uploadState==='uploaded'?labels.uploadDone:uploadState==='uploading'?labels.uploadingFile:uploadState==='ready'?labels.uploadPrepared:uploadState==='error'?labels.uploadTicketError:labels.uploadTicketPending;return <section className="rounded-[24px] border border-slate-200 bg-white p-5 shadow-soft"><div className="mb-3 flex items-center justify-between gap-3"><h3 className="text-lg font-black text-slate-950">{labels.uploadTicketTitle}</h3><StatusPill tone={tone}>{statusText}</StatusPill></div><div className="space-y-3 text-sm text-slate-700"><div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3"><div className="text-xs text-slate-500">{labels.uploadTicketId}</div><div className="mt-1 font-bold text-slate-900">{uploadTicket?.ticketId||'—'}</div></div><div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3"><div className="text-xs text-slate-500">{labels.uploadTicketExpiry}</div><div className="mt-1 font-bold text-slate-900">{uploadTicket?.expiresAtLabel||'—'}</div></div><div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3"><div className="text-xs text-slate-500">{labels.uploadObjectPath}</div><div className="mt-1 break-all font-bold text-slate-900">{uploadedAttachment?.object_path||'—'}</div></div></div><p className="mt-3 text-sm leading-7 text-slate-500">{labels.uploadGuide}</p></section>;}
-function SuccessPanel({ labels, receipt }) {if(!receipt)return null;return <section className="rounded-[24px] border border-emerald-200 bg-emerald-50 p-5 shadow-soft"><div className="flex flex-wrap items-start justify-between gap-3"><div><h3 className="text-xl font-black text-emerald-800">{labels.submitSuccessTitle}</h3><p className="mt-1 text-sm leading-7 text-emerald-700">{labels.submitSuccess}</p></div><StatusPill tone="success">{receipt.reportId}</StatusPill></div><div className="mt-4 grid gap-3 md:grid-cols-2"><div className="rounded-2xl border border-emerald-200 bg-white px-4 py-3"><div className="text-xs text-slate-500">{labels.submissionReference}</div><div className="mt-1 font-bold text-slate-900">{receipt.reportId}</div></div><div className="rounded-2xl border border-emerald-200 bg-white px-4 py-3"><div className="text-xs text-slate-500">{labels.submittedAt}</div><div className="mt-1 font-bold text-slate-900">{receipt.submittedAtLabel}</div></div></div></section>;}
-function PreviewCard({ title, rows }) {return <section className="rounded-[24px] border border-slate-200 bg-white p-5 shadow-soft"><h3 className="mb-4 text-lg font-black text-slate-950">{title}</h3><div className="space-y-3">{rows.map((row)=><div key={row.label} className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3"><div className="text-xs text-slate-500">{row.label}</div><div className="mt-1 font-bold text-slate-900">{row.value||'—'}</div></div>)}</div></section>;}
-function validateValues(template, values, labels, options={}) {const errors={};const requirePreparedUpload=options.requirePreparedUpload;template.fields.forEach((field)=>{const value=values[field.id];if(field.required){if(field.type==='file'&&!value?.name){errors[field.id]=labels.requiredField;return;}if(field.type!=='file'&&!String(value||'').trim()){errors[field.id]=labels.requiredField;return;}}if(field.id==='evaluator_email'&&value){const emailOk=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value));if(!emailOk)errors[field.id]=labels.invalidEmail;}if(field.id==='score'&&String(value||'').trim()){const n=Number(value);if(!Number.isFinite(n)||n<0||n>100)errors[field.id]=labels.invalidScore;}if(field.type==='file'&&value){if(value.size>MAX_FILE_SIZE)errors[field.id]=labels.fileTooLarge;if(field.accept&&value.name){const accepted=field.accept.split(',').map((item)=>item.trim().toLowerCase());const lowerName=value.name.toLowerCase();const matches=accepted.some((item)=>lowerName.endsWith(item.replace('*','')));if(!matches)errors[field.id]=labels.invalidFileType;}if(requirePreparedUpload&&field.id==='evidence_attachment'){errors[field.id]=labels.uploadTicketRequired;}}if(field.type==='signature'&&value&&String(value).trim().length<3){errors[field.id]=labels.signatureTooShort;}});return errors;}
-function PrintSheetPreview({ locale, template, values }) {const fieldsBySection=template.sections.map((section)=>({...section,fields:template.fields.filter((field)=>field.section===section.key)}));return <section className="rounded-[22px] border border-slate-200 bg-white p-5 shadow-sm"><div className="border-b border-slate-100 pb-3 text-center"><div className="text-xs text-slate-500">Amin Forms Studio v3</div><h4 className="mt-2 text-lg font-black text-slate-950">{template.title[locale]}</h4></div><div className="mt-4 space-y-4">{fieldsBySection.map((section)=><div key={section.key} className="rounded-2xl border border-slate-100 p-3"><div className="mb-2 text-sm font-bold text-slate-900">{section.title[locale]}</div><div className="grid gap-2 md:grid-cols-2">{section.fields.map((field)=>{const rawValue=values[field.id];let rendered=rawValue;if(field.type==='date'&&rawValue)rendered=formatDateForLocale(locale,rawValue);if(field.type==='file'&&rawValue?.name)rendered=rawValue.name;if(field.type==='select')rendered=(field.options||[]).find((option)=>option.value===rawValue)?.label?.[locale]||'';return <div key={field.id} className={`rounded-xl bg-slate-50 px-3 py-3 ${field.width==='full'?'md:col-span-2':''}`}><div className="text-[11px] text-slate-500">{field.label?.[locale]}</div><div className="mt-1 font-bold text-slate-900">{rendered||'—'}</div></div>;})}</div></div>)}</div></section>;}
+function makeInitialValues(template) {
+  return template.fields.reduce((acc, field) => {
+    acc[field.id] = field.type === 'file' ? null : '';
+    return acc;
+  }, {});
+}
+
+function SectionCard({ title, subtitle, children }) {
+  return (
+    <section className="rounded-[24px] border border-slate-200 bg-white p-5 shadow-soft">
+      <div className="mb-4 border-b border-slate-100 pb-3">
+        <h2 className="text-xl font-black text-slate-950">{title}</h2>
+        {subtitle ? <p className="mt-1 text-sm leading-7 text-slate-500">{subtitle}</p> : null}
+      </div>
+      <div className="grid gap-4 md:grid-cols-2">{children}</div>
+    </section>
+  );
+}
+
+function StatusPill({ tone='slate', children }) {
+  const tones={slate:'bg-slate-100 text-slate-700',brand:'bg-brand-50 text-brand-700',success:'bg-emerald-50 text-emerald-700',warning:'bg-amber-50 text-amber-700',danger:'bg-rose-50 text-rose-700'};
+  return <span className={`rounded-full px-3 py-1 text-sm font-bold ${tones[tone]||tones.slate}`}>{children}</span>;
+}
+
+function InputField({ field, locale, value, error, onChange, labelMap }) {
+  const label=field.label?.[locale]||field.id;
+  const placeholder=field.placeholder?.[locale]||'';
+  const helpText=field.helpText?.[locale];
+  const wrapperClass=field.width==='full'?'md:col-span-2':'';
+  const baseInputClass=`w-full rounded-2xl border px-3 py-3 text-sm ${error ? 'border-rose-300 bg-rose-50 text-rose-900' : 'border-slate-200 bg-slate-50 text-slate-900'}`;
+  const meta=<>{helpText ? <small className="mt-2 block text-xs leading-6 text-slate-500">{helpText}</small> : null}{error ? <small className="mt-2 block text-xs font-bold leading-6 text-rose-600">{error}</small> : null}</>;
+
+  if(field.type==='select') return <label className={`block ${wrapperClass}`}><span className="mb-2 block text-sm font-bold text-slate-800">{label}{field.required?' *':''}</span><select value={value||''} onChange={(e)=>onChange(field.id,e.target.value)} className={baseInputClass}><option value="">{labelMap.selectPlaceholder}</option>{(field.options||[]).map((option)=><option key={option.id} value={option.value}>{option.label?.[locale]||option.value}</option>)}</select>{meta}</label>;
+  if(field.type==='file') return <label className={`block ${wrapperClass}`}><span className="mb-2 block text-sm font-bold text-slate-800">{label}{field.required?' *':''}</span><input type="file" accept={field.accept||'*'} onChange={(e)=>{const file=e.target.files?.[0]||null;onChange(field.id,file?{rawFile:file}:null);}} className={`${baseInputClass} border-dashed`} /><small className="mt-2 block text-xs leading-6 text-slate-500">{value?.name||labelMap.fileHint}</small>{error ? <small className="mt-2 block text-xs font-bold leading-6 text-rose-600">{error}</small> : null}</label>;
+  if(field.type==='signature') return <label className={`block ${wrapperClass}`}><span className="mb-2 block text-sm font-bold text-slate-800">{label}{field.required?' *':''}</span><input value={value||''} onChange={(e)=>onChange(field.id,e.target.value)} className={baseInputClass} placeholder={placeholder} /><small className="mt-2 block text-xs leading-6 text-slate-500">{labelMap.signatureHint}</small>{error ? <small className="mt-2 block text-xs font-bold leading-6 text-rose-600">{error}</small> : null}</label>;
+  if(field.type==='date') return <label className={`block ${wrapperClass}`}><span className="mb-2 block text-sm font-bold text-slate-800">{label}{field.required?' *':''}</span><input type="date" value={value||''} onChange={(e)=>onChange(field.id,e.target.value)} className={baseInputClass} /><small className="mt-2 block text-xs leading-6 text-slate-500">{value ? formatDateForLocale(locale,value) : labelMap.dateHint}</small>{error ? <small className="mt-2 block text-xs font-bold leading-6 text-rose-600">{error}</small> : null}</label>;
+  const inputType=field.id==='evaluator_email'?'email':field.id==='score'?'number':'text';
+  return <label className={`block ${wrapperClass}`}><span className="mb-2 block text-sm font-bold text-slate-800">{label}{field.required?' *':''}</span><input value={value||''} type={inputType} onChange={(e)=>onChange(field.id,e.target.value)} className={baseInputClass} placeholder={placeholder} />{meta}</label>;
+}
+
+function UploadStatusPanel({ labels, uploadTicket, uploadedAttachment, uploadState }) {
+  const tone=uploadState==='uploaded'?'success':uploadState==='uploading'?'warning':uploadState==='ready'?'brand':uploadState==='error'?'danger':'slate';
+  const statusText=uploadState==='uploaded'?labels.uploadDone:uploadState==='uploading'?labels.uploadingFile:uploadState==='ready'?labels.uploadPrepared:uploadState==='error'?labels.uploadTicketError:labels.uploadTicketPending;
+  return <section className="rounded-[24px] border border-slate-200 bg-white p-5 shadow-soft"><div className="mb-3 flex items-center justify-between gap-3"><h3 className="text-lg font-black text-slate-950">{labels.uploadTicketTitle}</h3><StatusPill tone={tone}>{statusText}</StatusPill></div><div className="space-y-3 text-sm text-slate-700"><div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3"><div className="text-xs text-slate-500">{labels.uploadTicketId}</div><div className="mt-1 font-bold text-slate-900">{uploadTicket?.ticketId||'—'}</div></div><div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3"><div className="text-xs text-slate-500">{labels.uploadTicketExpiry}</div><div className="mt-1 font-bold text-slate-900">{uploadTicket?.expiresAtLabel||'—'}</div></div><div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3"><div className="text-xs text-slate-500">{labels.uploadObjectPath}</div><div className="mt-1 break-all font-bold text-slate-900">{uploadedAttachment?.object_path||'—'}</div></div></div><p className="mt-3 text-sm leading-7 text-slate-500">{labels.uploadGuide}</p></section>;
+}
+
+function SuccessPanel({ labels, receipt }) {
+  if(!receipt)return null;
+  return <section className="rounded-[24px] border border-emerald-200 bg-emerald-50 p-5 shadow-soft"><div className="flex flex-wrap items-start justify-between gap-3"><div><h3 className="text-xl font-black text-emerald-800">{labels.submitSuccessTitle}</h3><p className="mt-1 text-sm leading-7 text-emerald-700">{labels.submitSuccess}</p></div><StatusPill tone="success">{receipt.reportId}</StatusPill></div><div className="mt-4 grid gap-3 md:grid-cols-2"><div className="rounded-2xl border border-emerald-200 bg-white px-4 py-3"><div className="text-xs text-slate-500">{labels.submissionReference}</div><div className="mt-1 font-bold text-slate-900">{receipt.reportId}</div></div><div className="rounded-2xl border border-emerald-200 bg-white px-4 py-3"><div className="text-xs text-slate-500">{labels.submittedAt}</div><div className="mt-1 font-bold text-slate-900">{receipt.submittedAtLabel}</div></div></div></section>;
+}
+
+function PreviewCard({ title, rows }) {
+  return <section className="rounded-[24px] border border-slate-200 bg-white p-5 shadow-soft"><h3 className="mb-4 text-lg font-black text-slate-950">{title}</h3><div className="space-y-3">{rows.map((row)=><div key={row.label} className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3"><div className="text-xs text-slate-500">{row.label}</div><div className="mt-1 font-bold text-slate-900">{row.value||'—'}</div></div>)}</div></section>;
+}
+
+function validateValues(template, values, labels, options={}) {
+  const errors={};
+  const requirePreparedUpload=options.requirePreparedUpload;
+  template.fields.forEach((field)=>{
+    const value=values[field.id];
+    if(field.required){
+      if(field.type==='file'&&!value?.name){errors[field.id]=labels.requiredField;return;}
+      if(field.type!=='file'&&!String(value||'').trim()){errors[field.id]=labels.requiredField;return;}
+    }
+    if(field.id==='evaluator_email'&&value){const emailOk=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value));if(!emailOk)errors[field.id]=labels.invalidEmail;}
+    if(field.id==='score'&&String(value||'').trim()){const n=Number(value);if(!Number.isFinite(n)||n<0||n>100)errors[field.id]=labels.invalidScore;}
+    if(field.type==='file'&&value){
+      if(value.size>MAX_FILE_SIZE)errors[field.id]=labels.fileTooLarge;
+      if(field.accept&&value.name){const accepted=field.accept.split(',').map((item)=>item.trim().toLowerCase());const lowerName=value.name.toLowerCase();const matches=accepted.some((item)=>lowerName.endsWith(item.replace('*','')));if(!matches)errors[field.id]=labels.invalidFileType;}
+      if(requirePreparedUpload&&field.id==='evidence_attachment'){errors[field.id]=labels.uploadTicketRequired;}
+    }
+    if(field.type==='signature'&&value&&String(value).trim().length<3){errors[field.id]=labels.signatureTooShort;}
+  });
+  return errors;
+}
+
+function PrintSheetPreview({ locale, template, values }) {
+  const fieldsBySection=template.sections.map((section)=>({...section,fields:template.fields.filter((field)=>field.section===section.key)}));
+  return <section className="rounded-[22px] border border-slate-200 bg-white p-5 shadow-sm"><div className="border-b border-slate-100 pb-3 text-center"><div className="text-xs text-slate-500">Amin Forms Studio v3</div><h4 className="mt-2 text-lg font-black text-slate-950">{template.title[locale]}</h4></div><div className="mt-4 space-y-4">{fieldsBySection.map((section)=><div key={section.key} className="rounded-2xl border border-slate-100 p-3"><div className="mb-2 text-sm font-bold text-slate-900">{section.title[locale]}</div><div className="grid gap-2 md:grid-cols-2">{section.fields.map((field)=>{const rawValue=values[field.id];let rendered=rawValue;if(field.type==='date'&&rawValue)rendered=formatDateForLocale(locale,rawValue);if(field.type==='file'&&rawValue?.name)rendered=rawValue.name;if(field.type==='select')rendered=(field.options||[]).find((option)=>option.value===rawValue)?.label?.[locale]||'';return <div key={field.id} className={`rounded-xl bg-slate-50 px-3 py-3 ${field.width==='full'?'md:col-span-2':''}`}><div className="text-[11px] text-slate-500">{field.label?.[locale]}</div><div className="mt-1 font-bold text-slate-900">{rendered||'—'}</div></div>;})}</div></div>)}</div></section>;
+}
 
 export default function TeacherEvaluationShell({ locale, dictionary }) {
   const router=useRouter();
-  const forms=dictionary.forms;const labels=forms.teacherEvaluation;const template=useMemo(()=>buildTemplateByKey('teacher_evaluation'),[]);const [activeLocale,setActiveLocale]=useState(locale);const [values,setValues]=useState(()=>makeInitialValues(template));const [errors,setErrors]=useState({});const [saveState,setSaveState]=useState('idle');const [submitState,setSubmitState]=useState('idle');const [versions,setVersions]=useState([]);const [receipt,setReceipt]=useState(null);const [uploadTicket,setUploadTicket]=useState(null);const [uploadedAttachment,setUploadedAttachment]=useState(null);const [uploadState,setUploadState]=useState('idle');const [fileObjects,setFileObjects]=useState({});const meta=localeMeta[activeLocale]||localeMeta.ar;
+  const forms=dictionary.forms;
+  const labels=forms.teacherEvaluation;
+  const template=useMemo(()=>buildTemplateByKey('teacher_evaluation'),[]);
+  const [activeLocale,setActiveLocale]=useState(locale);
+  const [values,setValues]=useState(()=>makeInitialValues(template));
+  const [errors,setErrors]=useState({});
+  const [saveState,setSaveState]=useState('idle');
+  const [submitState,setSubmitState]=useState('idle');
+  const [versions,setVersions]=useState([]);
+  const [receipt,setReceipt]=useState(null);
+  const [uploadTicket,setUploadTicket]=useState(null);
+  const [uploadedAttachment,setUploadedAttachment]=useState(null);
+  const [uploadState,setUploadState]=useState('idle');
+  const [fileObjects,setFileObjects]=useState({});
+  const meta=localeMeta[activeLocale]||localeMeta.ar;
+
   useEffect(()=>{const remembered=window.localStorage.getItem(LOCAL_LANGUAGE_KEY);if(remembered&&localeMeta[remembered])setActiveLocale(remembered);const raw=window.localStorage.getItem('amin_forms_v3_teacher_evaluation_state');if(raw){try{const parsed=JSON.parse(raw);if(parsed?.values)setValues(parsed.values);if(parsed?.receipt)setReceipt(parsed.receipt);if(parsed?.uploadTicket)setUploadTicket(parsed.uploadTicket);if(parsed?.uploadedAttachment)setUploadedAttachment(parsed.uploadedAttachment);}catch(error){console.error(error);}}},[]);
   useEffect(()=>{window.localStorage.setItem(LOCAL_LANGUAGE_KEY,activeLocale);document.documentElement.lang=activeLocale;document.documentElement.dir=meta.dir;},[activeLocale,meta.dir]);
   useEffect(()=>{let cancelled=false;async function loadVersions(){try{const result=await listVersionsRpc({form_slug:template.slug});if(cancelled)return;setVersions(result?.data?.versions||result?.versions||[]);}catch(error){console.error(error);}}loadVersions();return()=>{cancelled=true;};},[template.slug]);

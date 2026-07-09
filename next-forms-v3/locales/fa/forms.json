@@ -187,7 +187,10 @@
     "filters": {
       "formSlug": "فیلتر بر اساس slug فرم",
       "allVisibilities": "همه دسته‌ها",
-      "allStatuses": "همه وضعیت‌ها"
+      "allStatuses": "همه وضعیت‌ها",
+      "search": "جست‌وجو با نام متقاضی / مرجع / ولی",
+      "fromDate": "از تاریخ",
+      "toDate": "تا تاریخ"
     },
     "statuses": {
       "received": "دریافت‌شده",
@@ -208,8 +211,13 @@
       "markRejected": "رد",
       "print": "چاپ",
       "statusSaved": "وضعیت با موفقیت به‌روزرسانی شد",
-      "statusError": "به‌روزرسانی وضعیت ناموفق بود"
-    }
+      "statusError": "به‌روزرسانی وضعیت ناموفق بود",
+      "exportCsv": "خروجی CSV",
+      "resetFilters": "بازنشانی فیلترها",
+      "refresh": "به‌روزرسانی"
+    },
+    "reviewNote": "یادداشت بررسی",
+    "reviewNotePlaceholder": "پیش از تغییر وضعیت، یادداشت داخلی خود را درباره این درخواست بنویسید."
   },
   "leaveRequest": {
     "pageTitle": "فرم درخواست مرخصی — نسخه اولیه تولیدی",
