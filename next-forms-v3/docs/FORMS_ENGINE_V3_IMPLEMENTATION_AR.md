@@ -14,7 +14,7 @@
 - البدء ببنية Next.js + Tailwind + RPC-only + i18n modular
 - تجهيز قاعدة صلبة للتوسعة لاحقًا إلى التقارير الأكاديمية والمالية
 
-## ما تم إنشاؤه
+## ما تم إنشاؤه أولياً
 ### بنية التطبيق
 - `app/`
 - `components/`
@@ -22,15 +22,26 @@
 - `locales/{ar,fa,en}/`
 - `app/api/forms/rpc/*`
 
-### قدرات النسخة الحالية
-- مبدل لغة ثلاثي
-- قوالب جاهزة
+### ما تم تعميقه الآن داخل المحرك نفسه
+- مبدل لغة ثلاثي مع حفظ آخر لغة محليًا
+- قوالب جاهزة قابلة للتبديل
 - مكتبة حقول أساسية
 - Canvas لبناء النموذج
-- لوحة إعدادات للحقل المحدد
-- معاينة قبل الطباعة
+- **إعادة ترتيب الحقول بالسحب والإفلات وبأزرار ↑ ↓**
+- **استنساخ الحقل Duplicate**
+- لوحة إعدادات أعمق للحقل المحدد
+- تحرير:
+  - التسمية
+  - placeholder
+  - helper text
+  - required
+  - width (full / half)
+- **تحرير خيارات حقول select**
+- معاينة قبل الطباعة أكثر واقعية حسب نوع الحقل
 - حفظ تلقائي كل 15 ثانية
-- Versions أولية قابلة للاستعادة
+- حفظ محلي fallback
+- استعادة آخر مسودة
+- سجل نسخ أولي داخل الواجهة
 - طبقة RPC-only للكتابة
 - قاموس مالي مقترح أولي ثلاثي اللغة
 
@@ -38,15 +49,28 @@
 - `forms_save_draft_v3`
 - `forms_restore_version_v3`
 - `forms_publish_v3`
+- `forms_list_versions_v3`
+
+## الملفات المضافة/المعمقة المهمة
+- `components/forms-studio-shell.jsx`
+- `components/form-canvas.jsx`
+- `components/preview-sheet.jsx`
+- `lib/form-templates.js`
+- `lib/utils.js`
+- `locales/ar/forms.json`
+- `locales/fa/forms.json`
+- `locales/en/forms.json`
+- `docs/FORMS_ENGINE_RPC_CONTRACT_AR.md`
+- `docs/STUDENT_REGISTRATION_TEMPLATE_SCHEMA.json`
 
 ## ملاحظة تشغيلية مهمة
-هذا التنفيذ هو **scaffold معماري فعلي** داخل مجلد مستقل، ويحتاج لاحقًا:
+هذا التنفيذ هو **scaffold معماري فعلي ومتعمق** داخل مجلد مستقل، ويحتاج لاحقًا:
 1. تثبيت dependencies داخل `next-forms-v3`
-2. توفير خطوط محلية داخل `public/fonts`
+2. توفير الخطوط المحلية داخل `public/fonts`
 3. ربط RPCات الفعلية في Supabase
-4. تحديد أول Report / Form Production-ready بعد هذا المحرك
+4. تحديد أول Form Production-ready وربطه فعليًا بقاعدة البيانات
 
 ## الخطوة التالية المقترحة
-بعد هذا المحرك، أنسب مسار هو أحد:
-- تعميق Form Builder نفسه (Drag & Drop كامل + حقول أكثر + نسخة publish/read mode)
-- أو الانتقال إلى **أول استمارة إنتاجية** من القوالب الجاهزة وتوصيلها فعليًا مع RPCات Supabase
+بعد تعميق المحرك نفسه، أنسب مسار هو:
+- تحويل **استمارة تسجيل الطالب** إلى نسخة إنتاجية كاملة
+- ثم ربطها فعليًا بـ RPCات Supabase بدل الاكتفاء بالـ scaffold

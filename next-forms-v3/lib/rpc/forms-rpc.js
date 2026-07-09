@@ -19,3 +19,7 @@ export function restoreVersionRpc(payload) {
 export function publishFormRpc(payload) {
   return call('/api/forms/rpc/publish-form', payload);
 }
+
+export function listVersionsRpc(payload) {
+  return call('/api/forms/rpc/list-versions', payload);
+}
