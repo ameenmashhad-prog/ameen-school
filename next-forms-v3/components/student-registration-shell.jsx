@@ -582,14 +582,14 @@ export default function StudentRegistrationShell({ locale, dictionary }) {
         visibility: template.visibility,
         submission_ref: reportId,
         schema: template,
-        values,
         upload_ticket_id: uploadTicket?.ticketId || null,
         uploaded_attachment: attachmentPayload ? {
           bucket: attachmentPayload.bucket,
           object_path: attachmentPayload.object_path,
           file_name: attachmentPayload.file_name,
           byte_size: attachmentPayload.byte_size
-        } : null
+        } : null,
+        values
       };
 
       const result = await submitStudentRegistrationRpc(payload);
@@ -619,7 +619,7 @@ export default function StudentRegistrationShell({ locale, dictionary }) {
     } catch (error) {
       console.error(error);
       setSubmitState('submit_error');
-      setUploadState((current) => current === 'uploading' ? 'error' : current);
+      setUploadState((current) => (current === 'uploading' ? 'error' : current));
     }
   }
 
@@ -755,3 +755,26 @@ export default function StudentRegistrationShell({ locale, dictionary }) {
     </main>
   );
 }
+EOF
+python3 - <<'PY'
+print('component cleaned again')
+PY
+cd /home/user/ameen-school && git diff --stat -- next-forms-v3/components/student-registration-shell.jsx | sed -n '1,40p' && git status --short next-forms-v3/components/student-registration-shell.jsx
+node --check /home/user/ameen-school/next-forms-v3/lib/rpc/forms-rpc.js
+node --check /home/user/ameen-school/next-forms-v3/app/api/forms/upload-file/route.js
+node --check /home/user/ameen-school/next-forms-v3/app/api/forms/rpc/request-upload-ticket/route.js
+python3 - <<'PY'
+import json
+from pathlib import Path
+for locale in ['ar','fa','en']:
+    json.loads(Path(f'/home/user/ameen-school/next-forms-v3/locales/{locale}/forms.json').read_text())
+print('json ok')
+PY
+python3 - <<'PY'
+from pathlib import Path
+text=Path('/home/user/ameen-school/next-forms-v3/components/student-registration-shell.jsx').read_text()
+for needle in ['uploadAttachmentTransport','UploadStatusPanel','fileNeedsReselect','router.push','prepareUploadTicket']:
+    print(needle, needle in text)
+PY
+
+","timeout":30} look weird; let's just run proper command separate
