@@ -5,7 +5,7 @@
 - `family-registration.html`
 
 إلى الفورم الجديد بعد النشر:
-- `/<locale>/forms/student-registration-packet`
+- `/<locale>/forms/family-registration-v3`
 
 مع أقل مخاطرة، وإمكانية rollback سريعة إذا احتجنا.
 
@@ -20,7 +20,7 @@
 ### الصفحة الجديدة
 - موجودة داخل: `next-forms-v3`
 - المسار المستهدف المقترح:
-  - `/ar/forms/student-registration-packet`
+  - `/ar/forms/family-registration-v3`
 - backend وRPC وSQL أصبحت مفعلة حتى `150`
 
 ### المانع الحالي فقط
@@ -55,7 +55,7 @@
 ## الربط الأساسي
 ```text
 family-registration.html
-→ <NEXT_FORMS_V3_URL>/ar/forms/student-registration-packet
+→ <NEXT_FORMS_V3_URL>/ar/forms/family-registration-v3
 ```
 
 ## مثال بعد النشر
@@ -66,7 +66,7 @@ https://next-forms-v3.vercel.app
 
 فالتحويل يكون إلى:
 ```text
-https://next-forms-v3.vercel.app/ar/forms/student-registration-packet
+https://next-forms-v3.vercel.app/ar/forms/family-registration-v3
 ```
 
 ---
@@ -85,7 +85,7 @@ https://next-forms-v3.vercel.app/ar/forms/student-registration-packet
 ### روابط فحص بعد النشر
 - `/ar`
 - `/ar/forms/student-registration`
-- `/ar/forms/student-registration-packet`
+- `/ar/forms/family-registration-v3`
 - `/ar/forms/submissions`
 
 ---
@@ -121,16 +121,18 @@ NEXT_FORMS_V3_URL=https://next-forms-v3.vercel.app
 - `family-registration.html`
 
 إلى:
-- `student-registration-packet`
+- `family-registration-v3`
 
 ### لماذا هذا المسار تحديدًا؟
-لأن المستخدم طلب فورم:
-- يجمع البيانات والجانب المالي
-- يمكن تعديله
-- ثم طباعته لحفظه في ملفات الطلاب
+لأن المطلوب النهائي أصبح نسخة عائلية مطبّعة على الفورم القديم:
+- بيانات ولي الأمر تُكتب مرة واحدة
+- بيانات الأم تُكتب مرة واحدة
+- اسم الأب والعائلة لا يتكرران مع كل طالب
+- كل طالب يُضاف كبطاقة مستقلة داخل نفس الطلب
+- مع طباعة عائلية وملحق لكل طالب
 
 وهذا هو بالضبط ما يحققه:
-- `student-registration-packet`
+- `family-registration-v3`
 
 ---
 

@@ -75,3 +75,7 @@ export function submitFinancialPermissionRpc(payload) {
 export function submitStudentRegistrationPacketRpc(payload) {
   return call('/api/forms/rpc/submit-student-registration-packet', payload);
 }
+
+export function submitFamilyRegistrationV3Rpc(payload) {
+  return call('/api/forms/rpc/submit-family-registration-v3', payload);
+}

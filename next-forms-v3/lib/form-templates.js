@@ -11,6 +11,15 @@ export const formTemplates = [
     }
   },
   {
+    key: 'family_registration_v3',
+    title: { ar: 'تسجيل الأسرة والطلاب', fa: 'ثبت‌نام خانواده و دانش‌آموزان', en: 'Family & Students Registration' },
+    description: {
+      ar: 'نسخة عائلية حديثة مبنية على بيانات الاستمارة القديمة مع منع تكرار بيانات الأب والعائلة',
+      fa: 'نسخه خانوادگی جدید بر پایه فرم قدیمی با حذف تکرار اطلاعات پدر و نام خانوادگی',
+      en: 'A normalized family registration flow based on the legacy form without repeating father and family data'
+    }
+  },
+  {
     key: 'student_registration_packet',
     title: { ar: 'استمارة التسجيل المطبوعة', fa: 'فرم چاپی ثبت‌نام', en: 'Printable Registration Packet' },
     description: {
@@ -71,6 +80,83 @@ function field({ id, type, required = false, ar, fa, en, width = 'full', section
   };
 }
 
+
+const nationalityOptions = [
+  option('iraqi', 'عراقي', 'عراقی', 'Iraqi'),
+  option('syrian', 'سوري', 'سوری', 'Syrian'),
+  option('lebanese', 'لبناني', 'لبنانی', 'Lebanese'),
+  option('bahraini', 'بحريني', 'بحرینی', 'Bahraini'),
+  option('kuwaiti', 'كويتي', 'کویتی', 'Kuwaiti'),
+  option('yemeni', 'يمني', 'یمنی', 'Yemeni'),
+  option('afghan', 'أفغاني', 'افغانی', 'Afghan'),
+  option('iranian', 'إيراني', 'ایرانی', 'Iranian'),
+  option('other', 'أخرى', 'سایر', 'Other')
+];
+
+const educationOptions = [
+  option('primary', 'ابتدائي', 'ابتدایی', 'Primary'),
+  option('middle', 'متوسط', 'متوسطه', 'Middle School'),
+  option('secondary', 'إعدادي', 'دبیرستان', 'Secondary'),
+  option('bachelor', 'بكالوريوس', 'کارشناسی', 'Bachelor'),
+  option('master', 'ماجستير', 'کارشناسی ارشد', 'Master'),
+  option('doctorate', 'دكتوراه', 'دکتری', 'Doctorate')
+];
+
+const guardianWorkOptions = [
+  option('merchant', 'كاسب', 'کاسب', 'Merchant'),
+  option('employee', 'موظف', 'کارمند', 'Employee'),
+  option('masters_student', 'طالب ماجستير', 'دانشجوی ارشد', 'Master Student'),
+  option('doctorate_student', 'طالب دكتوراه', 'دانشجوی دکتری', 'Doctorate Student'),
+  option('doctor', 'طبيب', 'پزشک', 'Doctor'),
+  option('engineer', 'مهندس', 'مهندس', 'Engineer'),
+  option('other', 'أخرى', 'سایر', 'Other')
+];
+
+const motherWorkOptions = [
+  option('homemaker', 'ربة منزل', 'خانه‌دار', 'Homemaker'),
+  option('student', 'طالبة', 'دانشجو', 'Student'),
+  option('employee', 'موظفة', 'کارمند', 'Employee'),
+  option('teacher', 'معلمة', 'معلم', 'Teacher'),
+  option('doctor', 'طبيبة', 'پزشک', 'Doctor'),
+  option('engineer', 'مهندسة', 'مهندس', 'Engineer'),
+  option('masters_student', 'طالبة ماجستير', 'دانشجوی ارشد', 'Master Student'),
+  option('doctorate_student', 'طالبة دكتوراه', 'دانشجوی دکتری', 'Doctorate Student'),
+  option('business_owner', 'صاحبة عمل', 'صاحب کسب‌وکار', 'Business Owner'),
+  option('other', 'أخرى', 'سایر', 'Other')
+];
+
+const residenceOptions = [
+  option('annual', 'سنوي', 'سالانه', 'Annual'),
+  option('visit', 'زيارة', 'زیارتی', 'Visit')
+];
+
+const studentGenderOptions = [
+  option('male', 'ذكر', 'پسر', 'Male'),
+  option('female', 'أنثى', 'دختر', 'Female')
+];
+
+const studentSectionOptions = [
+  option('section_a', 'أ', 'الف', 'A'),
+  option('section_b', 'ب', 'ب', 'B'),
+  option('section_c', 'ج', 'ج', 'C'),
+  option('section_d', 'د', 'د', 'D')
+];
+
+const studentGradeOptions = [
+  option('grade_1_primary', 'الأول الابتدائي', 'اول ابتدایی', 'Grade 1 Primary'),
+  option('grade_2_primary', 'الثاني الابتدائي', 'دوم ابتدایی', 'Grade 2 Primary'),
+  option('grade_3_primary', 'الثالث الابتدائي', 'سوم ابتدایی', 'Grade 3 Primary'),
+  option('grade_4_primary', 'الرابع الابتدائي', 'چهارم ابتدایی', 'Grade 4 Primary'),
+  option('grade_5_primary', 'الخامس الابتدائي', 'پنجم ابتدایی', 'Grade 5 Primary'),
+  option('grade_6_primary', 'السادس الابتدائي', 'ششم ابتدایی', 'Grade 6 Primary'),
+  option('grade_1_middle', 'الأول المتوسط', 'اول متوسطه', 'Grade 1 Middle'),
+  option('grade_2_middle', 'الثاني المتوسط', 'دوم متوسطه', 'Grade 2 Middle'),
+  option('grade_3_middle', 'الثالث المتوسط', 'سوم متوسطه', 'Grade 3 Middle'),
+  option('grade_4_secondary', 'الرابع الإعدادي', 'چهارم دبیرستان', 'Grade 4 Secondary'),
+  option('grade_5_secondary', 'الخامس الإعدادي', 'پنجم دبیرستان', 'Grade 5 Secondary'),
+  option('grade_6_secondary', 'السادس الإعدادي', 'ششم دبیرستان', 'Grade 6 Secondary')
+];
+
 const templatesMap = {
   student_registration: {
     slug: 'student-registration-v3',
@@ -109,6 +195,82 @@ const templatesMap = {
       field({ id: 'student_notes', type: 'text', ar: 'ملاحظات إضافية', fa: 'توضیحات تکمیلی', en: 'Additional Notes', section: 'student' }),
       field({ id: 'student_documents', type: 'file', ar: 'الوثائق', fa: 'مدارک', en: 'Documents', section: 'attachments', accept: '.pdf,.jpg,.png,.jpeg' }),
       field({ id: 'guardian_signature', type: 'signature', ar: 'التوقيع الإلكتروني', fa: 'امضای الکترونیکی', en: 'Electronic Signature', required: true, section: 'approval' })
+    ]
+  },
+  family_registration_v3: {
+    slug: 'family-registration-v3',
+    visibility: 'public',
+    printOrientation: 'portrait',
+    title: {
+      ar: 'تسجيل الأسرة والطلاب',
+      fa: 'ثبت‌نام خانواده و دانش‌آموزان',
+      en: 'Family & Students Registration'
+    },
+    sections: [
+      { key: 'guardian', title: { ar: 'بيانات ولي الأمر', fa: 'اطلاعات ولی', en: 'Guardian Information' } },
+      { key: 'mother', title: { ar: 'بيانات الأم', fa: 'اطلاعات مادر', en: 'Mother Information' } },
+      { key: 'students', title: { ar: 'بطاقات الطلاب', fa: 'کارت‌های دانش‌آموزان', en: 'Student Cards' } },
+      { key: 'family_context', title: { ar: 'السياق العائلي والصحي', fa: 'وضعیت خانوادگی و سلامت', en: 'Family & Health Context' } },
+      { key: 'finance', title: { ar: 'الرسوم والأمور المالية', fa: 'شهریه و امور مالی', en: 'Tuition & Finance' } },
+      { key: 'documents', title: { ar: 'الوثائق والمرفقات', fa: 'مدارک و پیوست‌ها', en: 'Documents & Attachments' } },
+      { key: 'approval', title: { ar: 'الاعتماد والطباعة', fa: 'تأیید و چاپ', en: 'Approval & Print' } }
+    ],
+    fields: [
+      field({ id:'guardian_given_name', type:'text', ar:'اسم ولي الأمر', fa:'نام ولی', en:'Guardian Name', required:true, width:'half', section:'guardian' }),
+      field({ id:'guardian_father_name', type:'text', ar:'اسم الأب لولي الأمر', fa:'نام پدر ولی', en:'Guardian Father Name', required:true, width:'half', section:'guardian' }),
+      field({ id:'family_name', type:'text', ar:'اسم العائلة', fa:'نام خانوادگی', en:'Family Name', required:true, width:'half', section:'guardian' }),
+      field({ id:'guardian_username', type:'text', ar:'اسم المستخدم المقترح', fa:'نام کاربری پیشنهادی', en:'Suggested Username', width:'half', section:'guardian' }),
+      field({ id:'guardian_birth_date', type:'date', ar:'تاريخ الميلاد', fa:'تاریخ تولد', en:'Date of Birth', required:true, width:'half', section:'guardian' }),
+      field({ id:'guardian_nationality', type:'select', ar:'الجنسية', fa:'ملیت', en:'Nationality', required:true, width:'half', section:'guardian', options:nationalityOptions }),
+      field({ id:'guardian_passport_number', type:'text', ar:'رقم جواز السفر', fa:'شماره گذرنامه', en:'Passport Number', width:'half', section:'guardian' }),
+      field({ id:'guardian_phone_primary', type:'text', ar:'الهاتف الأساسي', fa:'تلفن اصلی', en:'Primary Phone', required:true, width:'half', section:'guardian', placeholder:{ ar:'مثال: +964...', fa:'مثال: +98...', en:'Example: +964...' } }),
+      field({ id:'guardian_phone_whatsapp', type:'text', ar:'واتساب', fa:'واتساپ', en:'WhatsApp', width:'half', section:'guardian' }),
+      field({ id:'guardian_phone_emergency', type:'text', ar:'هاتف الطوارئ', fa:'تلفن اضطراری', en:'Emergency Phone', width:'half', section:'guardian' }),
+      field({ id:'guardian_education_level', type:'select', ar:'التحصيل الدراسي', fa:'تحصیلات', en:'Education Level', width:'half', section:'guardian', options:educationOptions }),
+      field({ id:'guardian_education_notes', type:'text', ar:'توضيحات التحصيل الدراسي', fa:'توضیحات تحصیلی', en:'Education Notes', width:'full', section:'guardian' }),
+      field({ id:'guardian_work_type', type:'select', ar:'العمل', fa:'شغل', en:'Work Type', width:'half', section:'guardian', options:guardianWorkOptions }),
+      field({ id:'guardian_work_notes', type:'text', ar:'توضيح العمل', fa:'توضیح شغل', en:'Work Notes', width:'half', section:'guardian' }),
+      field({ id:'residence_type', type:'select', ar:'نوع الإقامة', fa:'نوع اقامت', en:'Residence Type', width:'half', section:'guardian', options:residenceOptions }),
+      field({ id:'mother_given_name', type:'text', ar:'اسم الأم', fa:'نام مادر', en:'Mother Name', width:'half', section:'mother' }),
+      field({ id:'mother_father_name', type:'text', ar:'اسم الأب للأم', fa:'نام پدر مادر', en:'Mother Father Name', width:'half', section:'mother' }),
+      field({ id:'mother_family_name', type:'text', ar:'اسم العائلة للأم', fa:'نام خانوادگی مادر', en:'Mother Family Name', width:'half', section:'mother' }),
+      field({ id:'mother_birth_date', type:'date', ar:'تاريخ ميلاد الأم', fa:'تاریخ تولد مادر', en:'Mother Date of Birth', width:'half', section:'mother' }),
+      field({ id:'mother_nationality', type:'select', ar:'الجنسية', fa:'ملیت', en:'Nationality', width:'half', section:'mother', options:nationalityOptions }),
+      field({ id:'mother_passport_number', type:'text', ar:'رقم جواز السفر', fa:'شماره گذرنامه', en:'Passport Number', width:'half', section:'mother' }),
+      field({ id:'mother_phone', type:'text', ar:'رقم الهاتف', fa:'شماره تلفن', en:'Phone Number', width:'half', section:'mother' }),
+      field({ id:'mother_whatsapp', type:'text', ar:'واتساب', fa:'واتساپ', en:'WhatsApp', width:'half', section:'mother' }),
+      field({ id:'mother_education_level', type:'select', ar:'التحصيل الدراسي', fa:'تحصیلات', en:'Education Level', width:'half', section:'mother', options:educationOptions }),
+      field({ id:'mother_education_notes', type:'text', ar:'توضيحات التحصيل الدراسي', fa:'توضیحات تحصیلی', en:'Education Notes', width:'full', section:'mother' }),
+      field({ id:'mother_work_type', type:'select', ar:'العمل', fa:'شغل', en:'Work Type', width:'half', section:'mother', options:motherWorkOptions }),
+      field({ id:'mother_work_notes', type:'text', ar:'توضيح العمل', fa:'توضیح شغل', en:'Work Notes', width:'half', section:'mother' }),
+      field({ id:'living_with_in_iran', type:'text', ar:'مع من يعيش الطالب / الطلاب في إيران', fa:'دانش‌آموزان در ایران با چه کسی زندگی می‌کنند', en:'Who the Students Live with in Iran', width:'half', section:'family_context' }),
+      field({ id:'general_family_health_notes', type:'textarea', ar:'ملاحظات صحية / عائلية عامة', fa:'یادداشت‌های سلامت / خانوادگی', en:'General Health / Family Notes', width:'full', section:'family_context' }),
+      field({ id:'family_attachment', type:'file', ar:'مرفق عائلي أو صحي', fa:'پیوست خانوادگی یا سلامت', en:'Family or Health Attachment', section:'documents', accept:'.pdf,.jpg,.png,.jpeg' }),
+      field({ id:'document_copy_received', type:'checkbox', ar:'استلام استنساخ الوثيقة', fa:'دریافت کپی مدرک', en:'Copy of Document Received', width:'half', section:'documents' }),
+      field({ id:'document_original_received', type:'checkbox', ar:'استلام النسخة الأصلية', fa:'دریافت نسخه اصلی', en:'Original Document Received', width:'half', section:'documents' }),
+      field({ id:'document_notes', type:'textarea', ar:'ملاحظات الوثائق', fa:'یادداشت‌های مدارک', en:'Document Notes', width:'full', section:'documents' }),
+      field({ id:'accept_terms', type:'checkbox', ar:'أوافق على اعتماد البيانات العائلية وطباعة الطلب', fa:'با ثبت اطلاعات خانوادگی و چاپ فرم موافقم', en:'I accept the family data and print approval', required:true, width:'full', section:'approval' }),
+      field({ id:'guardian_signature', type:'signature', ar:'توقيع ولي الأمر', fa:'امضای ولی', en:'Guardian Signature', required:true, width:'half', section:'approval' })
+    ],
+    studentCardFields: [
+      field({ id:'student_given_name', type:'text', ar:'اسم الطالب', fa:'نام دانش‌آموز', en:'Student Name', required:true, width:'half', section:'students' }),
+      field({ id:'student_father_name', type:'text', ar:'اسم الأب', fa:'نام پدر', en:'Father Name', required:true, width:'half', section:'students' }),
+      field({ id:'student_family_name', type:'text', ar:'اسم العائلة', fa:'نام خانوادگی', en:'Family Name', required:true, width:'half', section:'students' }),
+      field({ id:'student_full_name', type:'text', ar:'الاسم الكامل المحسوب', fa:'نام کامل محاسبه‌شده', en:'Computed Full Name', required:true, width:'full', section:'students' }),
+      field({ id:'student_birth_date', type:'date', ar:'تاريخ الميلاد', fa:'تاریخ تولد', en:'Date of Birth', required:true, width:'half', section:'students' }),
+      field({ id:'student_gender', type:'select', ar:'الجنس', fa:'جنسیت', en:'Gender', required:true, width:'half', section:'students', options:studentGenderOptions }),
+      field({ id:'student_grade', type:'select', ar:'الصف', fa:'پایه', en:'Grade', required:true, width:'half', section:'students', options:studentGradeOptions }),
+      field({ id:'student_section', type:'select', ar:'الشعبة', fa:'کلاس / بخش', en:'Section', width:'half', section:'students', options:studentSectionOptions }),
+      field({ id:'student_birth_place', type:'text', ar:'مكان الولادة', fa:'محل تولد', en:'Birth Place', width:'half', section:'students' }),
+      field({ id:'student_passport_number', type:'text', ar:'رقم الجواز', fa:'شماره گذرنامه', en:'Passport Number', width:'half', section:'students' }),
+      field({ id:'student_passport_expiry_date', type:'date', ar:'تاريخ انتهاء الجواز', fa:'تاریخ پایان گذرنامه', en:'Passport Expiry Date', width:'half', section:'students' }),
+      field({ id:'student_previous_school', type:'text', ar:'المدرسة السابقة', fa:'مدرسه قبلی', en:'Previous School', width:'half', section:'students' }),
+      field({ id:'student_address_mashhad', type:'textarea', ar:'عنوان السكن: مشهد', fa:'نشانی سکونت: مشهد', en:'Address in Mashhad', width:'full', section:'students' }),
+      field({ id:'student_address_iraq', type:'textarea', ar:'عنوان السكن: العراق', fa:'نشانی سکونت: عراق', en:'Address in Iraq', width:'full', section:'students' }),
+      field({ id:'student_health_notes', type:'textarea', ar:'ملاحظات صحية خاصة بالطالب', fa:'یادداشت سلامت دانش‌آموز', en:'Student Health Notes', width:'full', section:'students' }),
+      field({ id:'student_photo', type:'file', ar:'صورة الطالب', fa:'عکس دانش‌آموز', en:'Student Photo', width:'half', section:'students', accept:'.jpg,.png,.jpeg,.webp' }),
+      field({ id:'student_username', type:'text', ar:'اسم المستخدم المقترح', fa:'نام کاربری پیشنهادی', en:'Suggested Username', width:'half', section:'students' }),
+      field({ id:'student_initial_password', type:'text', ar:'كلمة المرور الأولية', fa:'رمز عبور اولیه', en:'Initial Password', width:'half', section:'students' })
     ]
   },
   student_registration_packet: {
