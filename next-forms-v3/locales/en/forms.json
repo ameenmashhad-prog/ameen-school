@@ -122,6 +122,25 @@
       "student_grade": "Grade",
       "student_gender": "Gender",
       "student_notes": "Additional Notes"
+    },
+    "saveNow": "Save Draft Now",
+    "errorCount": "Validation Alerts",
+    "requiredField": "This field is required.",
+    "invalidPhone": "The phone number is incomplete or invalid.",
+    "invalidEmail": "The email format is invalid.",
+    "fileTooLarge": "The file exceeds the 10MB limit.",
+    "invalidFileType": "This file type is not supported at this stage.",
+    "signatureTooShort": "Signature is too short. Enter at least 3 characters.",
+    "submitSuccessTitle": "Submission received successfully",
+    "submissionReference": "Tracking Reference",
+    "submittedAt": "Submitted At",
+    "copyTrackingId": "Copy Tracking ID",
+    "printReceipt": "Print Receipt",
+    "sectionHints": {
+      "guardian": "Enter the guardian contact details exactly as they should appear in the report and printed copy.",
+      "student": "Enter the student core profile details according to the currently active language.",
+      "attachments": "At this stage only file metadata is stored; real binary upload will later connect through signed upload.",
+      "approval": "The electronic signature is currently rendered as a typed local fallback until the final signature layer is connected."
     }
   }
 }
