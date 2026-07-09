@@ -86,14 +86,7 @@ const templatesMap = {
       field({ id: 'student_name', type: 'text', ar: 'اسم الطالب', fa: 'نام دانش‌آموز', en: 'Student Name', required: true, width: 'half', section: 'student' }),
       field({ id: 'student_birth_date', type: 'date', ar: 'تاريخ الميلاد', fa: 'تاریخ تولد', en: 'Date of Birth', required: true, width: 'half', section: 'student' }),
       field({
-        id: 'student_grade',
-        type: 'select',
-        ar: 'الصف',
-        fa: 'پایه',
-        en: 'Grade',
-        required: true,
-        width: 'half',
-        section: 'student',
+        id: 'student_grade', type: 'select', ar: 'الصف', fa: 'پایه', en: 'Grade', required: true, width: 'half', section: 'student',
         options: [
           option('grade_1', 'الأول الابتدائي', 'اول ابتدایی', 'Grade 1'),
           option('grade_2', 'الثاني الابتدائي', 'دوم ابتدایی', 'Grade 2'),
@@ -101,18 +94,8 @@ const templatesMap = {
         ]
       }),
       field({
-        id: 'student_gender',
-        type: 'select',
-        ar: 'الجنس',
-        fa: 'جنسیت',
-        en: 'Gender',
-        required: true,
-        width: 'half',
-        section: 'student',
-        options: [
-          option('male', 'ذكر', 'پسر', 'Male'),
-          option('female', 'أنثى', 'دختر', 'Female')
-        ]
+        id: 'student_gender', type: 'select', ar: 'الجنس', fa: 'جنسیت', en: 'Gender', required: true, width: 'half', section: 'student',
+        options: [option('male', 'ذكر', 'پسر', 'Male'), option('female', 'أنثى', 'دختر', 'Female')]
       }),
       field({ id: 'student_notes', type: 'text', ar: 'ملاحظات إضافية', fa: 'توضیحات تکمیلی', en: 'Additional Notes', section: 'student' }),
       field({ id: 'student_documents', type: 'file', ar: 'الوثائق', fa: 'مدارک', en: 'Documents', section: 'attachments', accept: '.pdf,.jpg,.png,.jpeg' }),
@@ -123,14 +106,38 @@ const templatesMap = {
     slug: 'leave-request-v3',
     visibility: 'administrative',
     printOrientation: 'portrait',
-    title: { ar: 'نموذج طلب إجازة', fa: 'فرم درخواست مرخصی', en: 'Leave Request Form' },
-    sections: [],
+    title: {
+      ar: 'نموذج طلب إجازة',
+      fa: 'فرم درخواست مرخصی',
+      en: 'Leave Request Form'
+    },
+    sections: [
+      { key: 'staff', title: { ar: 'بيانات الموظف', fa: 'اطلاعات کارمند', en: 'Staff Information' } },
+      { key: 'leave', title: { ar: 'تفاصيل الإجازة', fa: 'جزئیات مرخصی', en: 'Leave Details' } },
+      { key: 'attachments', title: { ar: 'المرفقات الداعمة', fa: 'پیوست‌های پشتیبان', en: 'Supporting Attachments' } },
+      { key: 'approval', title: { ar: 'الاعتماد الإداري', fa: 'تایید اداری', en: 'Administrative Approval' } }
+    ],
     fields: [
-      field({ type: 'text', ar: 'اسم الموظف', fa: 'نام کارمند', en: 'Staff Name', required: true }),
-      field({ type: 'date', ar: 'تاريخ البداية', fa: 'تاریخ شروع', en: 'Start Date', required: true, width: 'half' }),
-      field({ type: 'date', ar: 'تاريخ النهاية', fa: 'تاریخ پایان', en: 'End Date', required: true, width: 'half' }),
-      field({ type: 'text', ar: 'سبب الإجازة', fa: 'علت مرخصی', en: 'Leave Reason', required: true }),
-      field({ type: 'signature', ar: 'اعتماد المدير', fa: 'تایید مدیر', en: 'Principal Signature', required: true })
+      field({ id:'staff_name', type:'text', ar:'اسم الموظف', fa:'نام کارمند', en:'Staff Name', required:true, width:'half', section:'staff' }),
+      field({ id:'staff_department', type:'text', ar:'القسم / الوحدة', fa:'بخش / واحد', en:'Department / Unit', required:true, width:'half', section:'staff' }),
+      field({ id:'staff_role', type:'text', ar:'المسمى الوظيفي', fa:'عنوان شغلی', en:'Job Title', width:'half', section:'staff' }),
+      field({ id:'staff_email', type:'text', ar:'البريد الإلكتروني', fa:'ایمیل', en:'Email', width:'half', section:'staff' }),
+      field({
+        id:'leave_type', type:'select', ar:'نوع الإجازة', fa:'نوع مرخصی', en:'Leave Type', required:true, width:'half', section:'leave',
+        options:[
+          option('annual','إجازة اعتيادية','مرخصی عادی','Annual Leave'),
+          option('medical','إجازة مرضية','مرخصی درمانی','Medical Leave'),
+          option('emergency','إجازة طارئة','مرخصی اضطراری','Emergency Leave'),
+          option('unpaid','إجازة بدون راتب','مرخصی بدون حقوق','Unpaid Leave')
+        ]
+      }),
+      field({ id:'leave_start_date', type:'date', ar:'تاريخ البداية', fa:'تاریخ شروع', en:'Start Date', required:true, width:'half', section:'leave' }),
+      field({ id:'leave_end_date', type:'date', ar:'تاريخ النهاية', fa:'تاریخ پایان', en:'End Date', required:true, width:'half', section:'leave' }),
+      field({ id:'return_date', type:'date', ar:'تاريخ العودة المتوقع', fa:'تاریخ بازگشت مورد انتظار', en:'Expected Return Date', width:'half', section:'leave' }),
+      field({ id:'leave_reason', type:'text', ar:'سبب الإجازة', fa:'علت مرخصی', en:'Leave Reason', required:true, section:'leave' }),
+      field({ id:'handover_notes', type:'text', ar:'خطة التسليم / البديل', fa:'برنامه تحویل / جانشین', en:'Handover / Delegate Plan', section:'leave' }),
+      field({ id:'supporting_document', type:'file', ar:'المستند الداعم', fa:'سند پشتیبان', en:'Supporting Document', section:'attachments', accept:'.pdf,.jpg,.png,.jpeg' }),
+      field({ id:'principal_signature', type:'signature', ar:'اعتماد المدير', fa:'تایید مدیر', en:'Principal Signature', required:true, section:'approval' })
     ]
   },
   teacher_evaluation: {
