@@ -13,5 +13,5 @@ export default async function StudentRegistrationSuccessPage({ params, searchPar
     applicant: searchParams?.applicant || '—'
   };
 
-  return <StudentRegistrationSuccessShell locale={locale} labels={labels} forms={forms} payload={payload} />;
+  return <StudentRegistrationSuccessShell locale={locale} labels={labels} forms={forms} payload={payload} formPath={`/${locale}/forms/student-registration`} builderPath={`/${locale}/forms/builder`} />;
 }

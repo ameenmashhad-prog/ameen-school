@@ -71,3 +71,7 @@ export function submitTeacherEvaluationRpc(payload) {
 export function submitFinancialPermissionRpc(payload) {
   return call('/api/forms/rpc/submit-financial-permission', payload);
 }
+
+export function submitStudentRegistrationPacketRpc(payload) {
+  return call('/api/forms/rpc/submit-student-registration-packet', payload);
+}

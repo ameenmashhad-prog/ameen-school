@@ -13,5 +13,5 @@ export default async function LeaveRequestSuccessPage({ params, searchParams }) 
     applicant: searchParams?.applicant || '—'
   };
 
-  return <StudentRegistrationSuccessShell locale={locale} labels={labels} forms={forms} payload={payload} />;
+  return <StudentRegistrationSuccessShell locale={locale} labels={labels} forms={forms} payload={payload} formPath={`/${locale}/forms/leave-request`} builderPath={`/${locale}/forms/builder`} />;
 }

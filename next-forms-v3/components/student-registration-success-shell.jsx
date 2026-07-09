@@ -4,8 +4,10 @@ import Link from 'next/link';
 import LanguageSwitcher from '@/components/language-switcher';
 import { localeFontClass, localeMeta } from '@/lib/locale-config';
 
-export default function StudentRegistrationSuccessShell({ locale, labels, forms, payload }) {
+export default function StudentRegistrationSuccessShell({ locale, labels, forms, payload, formPath, builderPath }) {
   const meta = localeMeta[locale] || localeMeta.ar;
+  const resolvedFormPath = formPath || `/${locale}/forms/student-registration`;
+  const resolvedBuilderPath = builderPath || `/${locale}/forms/builder`;
 
   return (
     <main className={`mx-auto min-h-screen max-w-4xl px-6 py-10 ${localeFontClass(locale)}`} dir={meta.dir}>
@@ -35,8 +37,8 @@ export default function StudentRegistrationSuccessShell({ locale, labels, forms,
         </div>
 
         <div className="mt-8 flex flex-wrap gap-3 no-print">
-          <Link href={`/${locale}/forms/student-registration`} className="rounded-2xl bg-brand-500 px-4 py-2 font-bold text-white">{labels.openNewRegistration}</Link>
-          <Link href={`/${locale}/forms/builder`} className="rounded-2xl border border-slate-200 px-4 py-2 font-bold text-slate-700">{labels.returnToBuilder}</Link>
+          <Link href={resolvedFormPath} className="rounded-2xl bg-brand-500 px-4 py-2 font-bold text-white">{labels.openNewRegistration}</Link>
+          <Link href={resolvedBuilderPath} className="rounded-2xl border border-slate-200 px-4 py-2 font-bold text-slate-700">{labels.returnToBuilder}</Link>
           <button onClick={() => window.print()} className="rounded-2xl border border-slate-200 px-4 py-2 font-bold text-slate-700">{labels.printReceipt}</button>
         </div>
       </section>

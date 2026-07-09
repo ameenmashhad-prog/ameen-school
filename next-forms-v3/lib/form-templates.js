@@ -11,6 +11,15 @@ export const formTemplates = [
     }
   },
   {
+    key: 'student_registration_packet',
+    title: { ar: 'استمارة التسجيل المطبوعة', fa: 'فرم چاپی ثبت‌نام', en: 'Printable Registration Packet' },
+    description: {
+      ar: 'إعادة بناء فورم التسجيل الورقي بصيغة قابلة للتعديل والطباعة مع القسم المالي',
+      fa: 'بازسازی فرم کاغذی ثبت‌نام به‌صورت قابل ویرایش و چاپ همراه با بخش مالی',
+      en: 'Editable and printable rebuild of the paper registration packet with finance fields'
+    }
+  },
+  {
     key: 'leave_request',
     title: { ar: 'طلب إجازة', fa: 'درخواست مرخصی', en: 'Leave Request' },
     description: {
@@ -100,6 +109,64 @@ const templatesMap = {
       field({ id: 'student_notes', type: 'text', ar: 'ملاحظات إضافية', fa: 'توضیحات تکمیلی', en: 'Additional Notes', section: 'student' }),
       field({ id: 'student_documents', type: 'file', ar: 'الوثائق', fa: 'مدارک', en: 'Documents', section: 'attachments', accept: '.pdf,.jpg,.png,.jpeg' }),
       field({ id: 'guardian_signature', type: 'signature', ar: 'التوقيع الإلكتروني', fa: 'امضای الکترونیکی', en: 'Electronic Signature', required: true, section: 'approval' })
+    ]
+  },
+  student_registration_packet: {
+    slug: 'student-registration-packet-v3',
+    visibility: 'public',
+    printOrientation: 'portrait',
+    title: {
+      ar: 'استمارة التسجيل المطبوعة',
+      fa: 'فرم چاپی ثبت‌نام',
+      en: 'Printable Registration Packet'
+    },
+    sections: [
+      { key: 'request', title: { ar: 'بيانات الطلب', fa: 'اطلاعات درخواست', en: 'Request Details' } },
+      { key: 'student', title: { ar: 'معلومات الطالب', fa: 'اطلاعات دانش‌آموز', en: 'Student Information' } },
+      { key: 'father', title: { ar: 'معلومات الأب', fa: 'اطلاعات پدر', en: 'Father Information' } },
+      { key: 'mother', title: { ar: 'معلومات الأم', fa: 'اطلاعات مادر', en: 'Mother Information' } },
+      { key: 'family', title: { ar: 'الوضع العائلي والصحي', fa: 'وضعیت خانوادگی و سلامتی', en: 'Family & Health Context' } },
+      { key: 'finance', title: { ar: 'الرسوم والأمور المالية', fa: 'شهریه و امور مالی', en: 'Tuition & Finance' } },
+      { key: 'attachments', title: { ar: 'المرفقات الداعمة', fa: 'پیوست‌های پشتیبان', en: 'Supporting Attachments' } },
+      { key: 'document_status', title: { ar: 'وضع الوثيقة الدراسية', fa: 'وضعیت مدرک تحصیلی', en: 'School Document Status' } },
+      { key: 'undertaking', title: { ar: 'التعهد والالتزام', fa: 'تعهد و التزام', en: 'Undertaking & Terms' } },
+      { key: 'administration', title: { ar: 'اعتماد الإدارة', fa: 'تأیید مدیریت', en: 'Administrative Approval' } }
+    ],
+    fields: [
+      field({ id:'registration_date', type:'date', ar:'تاريخ التسجيل', fa:'تاریخ ثبت‌نام', en:'Registration Date', required:true, width:'half', section:'request' }),
+      field({ id:'guardian_full_name', type:'text', ar:'اسم ولي الأمر', fa:'نام ولی', en:'Guardian Full Name', required:true, width:'half', section:'request' }),
+      field({ id:'registration_for', type:'select', ar:'التسجيل لـ', fa:'ثبت‌نام برای', en:'Registering For', required:true, width:'half', section:'request', options:[option('boy','ابني','پسرم','My Son'), option('girl','ابنتي','دخترم','My Daughter')] }),
+      field({ id:'target_grade', type:'text', ar:'الصف المطلوب', fa:'پایه مورد درخواست', en:'Target Grade', required:true, width:'half', section:'request' }),
+      field({ id:'student_full_name', type:'text', ar:'الاسم الثلاثي', fa:'نام کامل', en:'Student Full Name', required:true, width:'half', section:'student' }),
+      field({ id:'student_passport_number', type:'text', ar:'رقم الجواز', fa:'شماره گذرنامه', en:'Passport Number', width:'half', section:'student' }),
+      field({ id:'student_birth_date', type:'date', ar:'تاريخ الولادة', fa:'تاریخ تولد', en:'Date of Birth', required:true, width:'half', section:'student' }),
+      field({ id:'student_online_study_phone', type:'text', ar:'الهاتف للدروس الإلكترونية', fa:'تلفن برای درس‌های آنلاین', en:'Phone for Online Lessons', width:'half', section:'student' }),
+      field({ id:'previous_school', type:'text', ar:'المدرسة السابقة', fa:'مدرسه قبلی', en:'Previous School', width:'half', section:'student' }),
+      field({ id:'student_address_mashhad', type:'textarea', ar:'عنوان السكن: مشهد', fa:'نشانی محل سکونت: مشهد', en:'Address in Mashhad', width:'full', section:'student' }),
+      field({ id:'student_address_iraq', type:'textarea', ar:'عنوان السكن: العراق', fa:'نشانی محل سکونت: عراق', en:'Address in Iraq', width:'full', section:'student' }),
+      field({ id:'father_full_name', type:'text', ar:'الاسم الثلاثي', fa:'نام کامل', en:'Father Full Name', required:true, width:'half', section:'father' }),
+      field({ id:'father_guardian_phone', type:'text', ar:'هاتف الولي الخاص', fa:'تلفن ولی', en:'Guardian Phone', required:true, width:'half', section:'father' }),
+      field({ id:'father_education', type:'text', ar:'التحصيل الدراسي', fa:'تحصیلات', en:'Education Level', width:'half', section:'father' }),
+      field({ id:'father_job_address', type:'textarea', ar:'العمل وعنوان العمل', fa:'شغل و نشانی محل کار', en:'Job & Work Address', width:'full', section:'father' }),
+      field({ id:'mother_full_name', type:'text', ar:'الاسم الثلاثي', fa:'نام کامل', en:'Mother Full Name', width:'half', section:'mother' }),
+      field({ id:'mother_phone', type:'text', ar:'هاتف الأم', fa:'تلفن مادر', en:'Mother Phone', width:'half', section:'mother' }),
+      field({ id:'mother_education', type:'text', ar:'التحصيل الدراسي', fa:'تحصیلات', en:'Education Level', width:'half', section:'mother' }),
+      field({ id:'mother_job_address', type:'textarea', ar:'العمل وعنوان العمل', fa:'شغل و نشانی محل کار', en:'Job & Work Address', width:'full', section:'mother' }),
+      field({ id:'medical_condition_notes', type:'textarea', ar:'الحالة الصحية / مشاكل النطق أو السمع أو الحالات المزمنة', fa:'وضعیت سلامتی / مشکلات گفتار، شنوایی یا بیماری‌های مزمن', en:'Health Notes / Speech, Hearing, or Chronic Conditions', width:'full', section:'family' }),
+      field({ id:'living_with_in_iran', type:'text', ar:'مع من يعيش الطالب في إيران', fa:'دانش‌آموز در ایران با چه کسی زندگی می‌کند', en:'Who the Student Lives with in Iran', width:'half', section:'family' }),
+      field({ id:'student_status', type:'textarea', ar:'وضع الطالب نفسياً وجسمياً', fa:'وضعیت روانی و جسمی دانش‌آموز', en:'Student Psychological & Physical Status', width:'full', section:'family' }),
+      field({ id:'health_attachment', type:'file', ar:'ملف صحي / مستند داعم', fa:'پرونده سلامت / سند پشتیبان', en:'Health File / Supporting Attachment', section:'attachments', accept:'.pdf,.jpg,.png,.jpeg' }),
+      field({ id:'document_copy_received', type:'checkbox', ar:'استلام استنساخ الوثيقة', fa:'دریافت کپی مدرک', en:'Copy of Document Received', width:'half', section:'document_status' }),
+      field({ id:'document_original_received', type:'checkbox', ar:'استلام النسخة الأصلية', fa:'دریافت نسخه اصلی', en:'Original Document Received', width:'half', section:'document_status' }),
+      field({ id:'document_notes', type:'textarea', ar:'توضيحات', fa:'توضیحات', en:'Notes', width:'full', section:'document_status' }),
+      field({ id:'accept_terms', type:'checkbox', ar:'أوافق على التعهد والشروط', fa:'تعهد و شرایط را می‌پذیرم', en:'I accept the undertaking and terms', required:true, width:'full', section:'undertaking' }),
+      field({ id:'parent_signature', type:'signature', ar:'توقيع ولي الأمر', fa:'امضای ولی', en:'Guardian Signature', required:true, width:'half', section:'undertaking' }),
+      field({ id:'terms_guardian_phone', type:'text', ar:'رقم الهاتف في صفحة التعهد', fa:'شماره تلفن در صفحه تعهد', en:'Phone Number on Undertaking Page', width:'half', section:'undertaking' }),
+      field({ id:'registered_by', type:'text', ar:'تم تسجيل الطالب من قبل', fa:'دانش‌آموز توسط چه کسی ثبت شد', en:'Registered By', width:'half', section:'administration' }),
+      field({ id:'registered_on', type:'date', ar:'بتاريخ', fa:'در تاریخ', en:'Registered On', width:'half', section:'administration' }),
+      field({ id:'registration_officer_signature', type:'signature', ar:'توقيع مسؤول التسجيل', fa:'امضای مسئول ثبت‌نام', en:'Registration Officer Signature', width:'half', section:'administration' }),
+      field({ id:'finance_officer_signature', type:'signature', ar:'توقيع المسؤول المالي', fa:'امضای مسئول مالی', en:'Finance Officer Signature', width:'half', section:'administration' }),
+      field({ id:'director_signature', type:'signature', ar:'توقيع مدير المجمع', fa:'امضای مدیر مجتمع', en:'Director Signature', width:'full', section:'administration' })
     ]
   },
   leave_request: {
