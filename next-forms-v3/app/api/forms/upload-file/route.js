@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { NextResponse } from 'next/server';
 
 const bucketName = process.env.FORMS_UPLOAD_BUCKET || 'forms-v3-uploads';
 
@@ -24,20 +24,45 @@ export async function POST(request) {
     return NextResponse.json({ ok: false, error: 'missing_ticket_id' }, { status: 400 });
   }
 
-  const ext = file.name.includes('.') ? file.name.split('.').pop() : 'bin';
-  const safeName = file.name.replace(/[^a-zA-Z0-9._-]+/g, '_');
-  const objectPath = `${formSlug || 'form'}/${fieldId || 'file'}/${ticketId}_${safeName}`;
-  const buffer = Buffer.from(await file.arrayBuffer());
-
   try {
     const supabase = serverClient();
-    const { error } = await supabase.storage.from(bucketName).upload(objectPath, buffer, {
+
+    const resolve = await supabase.rpc('forms_resolve_upload_ticket_v3', {
+      p_ticket_id: ticketId,
+      p_form_slug: String(formSlug || ''),
+      p_field_id: String(fieldId || ''),
+      p_file_name: file.name
+    });
+
+    if (resolve.error || !resolve.data?.ok) {
+      return NextResponse.json(
+        { ok: false, error: resolve.error?.message || resolve.data?.error || 'upload_ticket_invalid' },
+        { status: 400 }
+      );
+    }
+
+    const objectPath = resolve.data.object_path;
+    const buffer = Buffer.from(await file.arrayBuffer());
+
+    const upload = await supabase.storage.from(bucketName).upload(objectPath, buffer, {
       contentType: file.type || 'application/octet-stream',
       upsert: true
     });
 
-    if (error) {
-      return NextResponse.json({ ok: false, error: error.message, bucket: bucketName }, { status: 500 });
+    if (upload.error) {
+      return NextResponse.json({ ok: false, error: upload.error.message, bucket: bucketName }, { status: 500 });
+    }
+
+    const finalize = await supabase.rpc('forms_finalize_upload_ticket_v3', {
+      p_ticket_id: ticketId,
+      p_object_path: objectPath
+    });
+
+    if (finalize.error || !finalize.data?.ok) {
+      return NextResponse.json(
+        { ok: false, error: finalize.error?.message || finalize.data?.error || 'upload_ticket_finalize_failed' },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({
@@ -46,7 +71,8 @@ export async function POST(request) {
       object_path: objectPath,
       file_name: file.name,
       content_type: file.type || 'application/octet-stream',
-      byte_size: file.size || 0
+      byte_size: file.size || 0,
+      ticket_id: ticketId
     });
   } catch (error) {
     return NextResponse.json({ ok: false, error: error.message || 'upload_failed' }, { status: 500 });
