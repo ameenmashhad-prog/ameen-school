@@ -77,6 +77,10 @@
     "printModes": {
       "portrait": "A4 عمودی",
       "landscape": "A4 افقی"
-    }
+    },
+    "exportJson": "خروجی JSON",
+    "resetTemplate": "بازنشانی قالب",
+    "liveSummaryTitle": "خلاصه زنده فرم",
+    "requiredFields": "فیلدهای الزامی"
   }
 }

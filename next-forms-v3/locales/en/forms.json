@@ -77,6 +77,10 @@
     "printModes": {
       "portrait": "A4 Portrait",
       "landscape": "A4 Landscape"
-    }
+    },
+    "exportJson": "Export JSON",
+    "resetTemplate": "Reset Template",
+    "liveSummaryTitle": "Live Form Summary",
+    "requiredFields": "Required Fields"
   }
 }

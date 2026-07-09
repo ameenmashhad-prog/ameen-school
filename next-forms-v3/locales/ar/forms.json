@@ -77,6 +77,10 @@
     "printModes": {
       "portrait": "A4 عمودي",
       "landscape": "A4 أفقي"
-    }
+    },
+    "exportJson": "تصدير JSON",
+    "resetTemplate": "إعادة ضبط القالب",
+    "liveSummaryTitle": "ملخص حي للنموذج",
+    "requiredFields": "الحقول الإلزامية"
   }
 }

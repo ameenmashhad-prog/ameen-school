@@ -8,7 +8,7 @@ import PreviewSheet from '@/components/preview-sheet';
 import TemplatePicker from '@/components/template-picker';
 import { buildTemplateByKey, formTemplates } from '@/lib/form-templates';
 import { localeMeta, localeNumber, localeDateLabel, localeFontClass } from '@/lib/locale-config';
-import { saveDraftRpc, restoreVersionRpc, publishFormRpc } from '@/lib/rpc/forms-rpc';
+import { saveDraftRpc, restoreVersionRpc, publishFormRpc, listVersionsRpc } from '@/lib/rpc/forms-rpc';
 import { cloneForm, generateId, makeField, nextVersionStamp, reorderList } from '@/lib/utils';
 
 const LOCAL_LANGUAGE_KEY = 'amin_forms_v3_locale';
@@ -38,7 +38,39 @@ export default function FormsStudioShell({ locale, dictionary }) {
 
   useEffect(() => {
     window.localStorage.setItem(LOCAL_LANGUAGE_KEY, activeLocale);
-  }, [activeLocale]);
+    document.documentElement.lang = activeLocale;
+    document.documentElement.dir = meta.dir;
+  }, [activeLocale, meta.dir]);
+
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadRemoteVersions() {
+      try {
+        const result = await listVersionsRpc({ form_slug: schema.slug });
+        const remoteVersions = result?.data?.versions || result?.versions || [];
+        if (cancelled) return;
+        setVersions((current) => {
+          const merged = [...remoteVersions.map((version) => ({
+            id: version.version_id || version.id || version.version_label,
+            label: version.version_label || version.label || version.saved_at || 'version',
+            source: 'rpc'
+          })), ...current];
+          const map = new Map();
+          merged.forEach((item) => {
+            if (!map.has(item.id)) map.set(item.id, item);
+          });
+          return [...map.values()].slice(0, 10);
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    loadRemoteVersions();
+    return () => { cancelled = true; };
+  }, [schema.slug]);
 
   useEffect(() => {
     const raw = window.localStorage.getItem(localDraftKey(schema.slug));
@@ -173,6 +205,25 @@ export default function FormsStudioShell({ locale, dictionary }) {
     updateField(selectedField.id, { options });
   }
 
+
+  function resetCurrentTemplate() {
+    const fallback = buildTemplateByKey('student_registration');
+    setSchema(fallback);
+    setSelectedFieldId(fallback.fields[0]?.id || null);
+  }
+
+  function exportSchemaJson() {
+    const blob = new Blob([JSON.stringify(schema, null, 2)], { type: 'application/json;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${schema.slug}.json`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
   async function manualSave() {
     setSaveState('saving');
     try {
@@ -248,6 +299,7 @@ export default function FormsStudioShell({ locale, dictionary }) {
             <LanguageSwitcher locale={activeLocale} onChange={setActiveLocale} labels={forms.languageSwitcher} />
             <button onClick={manualSave} className="rounded-2xl border border-slate-200 px-4 py-2 font-bold text-slate-700">{forms.builder.saveDraft}</button>
             <button onClick={restoreLatest} className="rounded-2xl border border-slate-200 px-4 py-2 font-bold text-slate-700">{forms.builder.restoreLatest}</button>
+            <button onClick={exportSchemaJson} className="rounded-2xl border border-slate-200 px-4 py-2 font-bold text-slate-700">{forms.builder.exportJson}</button>
             <button onClick={publishCurrent} className="rounded-2xl bg-brand-500 px-4 py-2 font-bold text-white">{forms.builder.publish}</button>
           </div>
         </div>
@@ -304,6 +356,9 @@ export default function FormsStudioShell({ locale, dictionary }) {
                     <option value="landscape">{forms.builder.printModes.landscape}</option>
                   </select>
                 </label>
+                <div className="flex items-end gap-2">
+                  <button onClick={resetCurrentTemplate} className="w-full rounded-2xl border border-amber-200 bg-amber-50 px-4 py-2 font-bold text-amber-800">{forms.builder.resetTemplate}</button>
+                </div>
               </div>
             </div>
 
@@ -413,6 +468,24 @@ export default function FormsStudioShell({ locale, dictionary }) {
                 <button onClick={() => window.print()} className="rounded-2xl border border-slate-200 px-3 py-2 text-sm font-bold text-slate-700">{dictionary.reports.preview.print}</button>
               </div>
               <PreviewSheet locale={activeLocale} schema={schema} labels={dictionary} />
+            </div>
+
+            <div className="rounded-[24px] border border-slate-200 bg-white p-4">
+              <h3 className="text-lg font-black text-slate-950">{forms.builder.liveSummaryTitle}</h3>
+              <div className="mt-3 grid gap-3 text-sm text-slate-700">
+                <div className="rounded-2xl border border-slate-200 px-3 py-3">
+                  <div className="font-bold text-slate-950">{forms.builder.fieldCount}: {schema.fields.length}</div>
+                  <div className="mt-1 text-slate-500">{forms.builder.requiredFields}: {schema.fields.filter((field) => field.required).length}</div>
+                </div>
+                <div className="rounded-2xl border border-slate-200 px-3 py-3">
+                  <div className="font-bold text-slate-950">{forms.builder.orientationLabel}</div>
+                  <div className="mt-1 text-slate-500">{schema.printOrientation === 'landscape' ? forms.builder.printModes.landscape : forms.builder.printModes.portrait}</div>
+                </div>
+                <div className="rounded-2xl border border-slate-200 px-3 py-3">
+                  <div className="font-bold text-slate-950">RBAC</div>
+                  <div className="mt-1 text-slate-500">{forms.visibility[schema.visibility]}</div>
+                </div>
+              </div>
             </div>
 
             <div className="rounded-[24px] border border-slate-200 bg-white p-4">
