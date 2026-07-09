@@ -1,0 +1,168 @@
+{
+  "form_key": "family_registration_v3",
+  "slug": "family-registration-v3",
+  "visibility": "public",
+  "print_orientation": "portrait",
+  "source_reference": "family-registration.html",
+  "mode": "family_header_with_student_cards",
+  "sections": [
+    {
+      "key": "guardian",
+      "title": {
+        "ar": "بيانات ولي الأمر",
+        "fa": "اطلاعات ولی",
+        "en": "Guardian Information"
+      }
+    },
+    {
+      "key": "mother",
+      "title": {
+        "ar": "بيانات الأم",
+        "fa": "اطلاعات مادر",
+        "en": "Mother Information"
+      }
+    },
+    {
+      "key": "students",
+      "title": {
+        "ar": "بطاقات الطلاب",
+        "fa": "کارت‌های دانش‌آموزان",
+        "en": "Student Cards"
+      }
+    },
+    {
+      "key": "family_context",
+      "title": {
+        "ar": "السياق العائلي والصحي",
+        "fa": "وضعیت خانوادگی و سلامت",
+        "en": "Family & Health Context"
+      }
+    },
+    {
+      "key": "finance",
+      "title": {
+        "ar": "الرسوم والأمور المالية",
+        "fa": "شهریه و امور مالی",
+        "en": "Tuition & Finance"
+      }
+    },
+    {
+      "key": "documents",
+      "title": {
+        "ar": "الوثائق والمرفقات",
+        "fa": "مدارک و پیوست‌ها",
+        "en": "Documents & Attachments"
+      }
+    },
+    {
+      "key": "approval",
+      "title": {
+        "ar": "الاعتماد والطباعة",
+        "fa": "تأیید و چاپ",
+        "en": "Approval & Print"
+      }
+    }
+  ],
+  "guardian_fields": [
+    "guardian_given_name",
+    "guardian_father_name",
+    "family_name",
+    "guardian_username",
+    "guardian_birth_date",
+    "guardian_nationality",
+    "guardian_passport_number",
+    "guardian_phone_primary",
+    "guardian_phone_whatsapp",
+    "guardian_phone_emergency",
+    "guardian_education_level",
+    "guardian_education_notes",
+    "guardian_work_type",
+    "guardian_work_notes",
+    "residence_type"
+  ],
+  "mother_fields": [
+    "mother_given_name",
+    "mother_father_name",
+    "mother_family_name",
+    "mother_birth_date",
+    "mother_nationality",
+    "mother_passport_number",
+    "mother_phone",
+    "mother_whatsapp",
+    "mother_education_level",
+    "mother_education_notes",
+    "mother_work_type",
+    "mother_work_notes"
+  ],
+  "student_card_model": {
+    "fields": [
+      "student_given_name",
+      "student_father_name",
+      "student_family_name",
+      "student_full_name",
+      "student_birth_date",
+      "student_gender",
+      "student_class_id",
+      "student_section",
+      "student_birth_place",
+      "student_passport_number",
+      "student_passport_expiry_date",
+      "student_previous_school",
+      "student_address_mashhad",
+      "student_address_iraq",
+      "student_photo",
+      "student_username",
+      "student_initial_password"
+    ],
+    "inheritance_rules": {
+      "student_father_name": {
+        "default_from": "guardian_given_name",
+        "editable": true
+      },
+      "student_family_name": {
+        "default_from": "family_name",
+        "editable": true
+      },
+      "student_full_name": {
+        "computed_from": [
+          "student_given_name",
+          "student_father_name",
+          "student_family_name"
+        ],
+        "editable_override": true
+      }
+    }
+  },
+  "family_context": [
+    "living_with_in_iran",
+    "general_family_health_notes",
+    "document_notes"
+  ],
+  "finance": {
+    "fee_catalog_mode": "shared_family",
+    "payment_rows": [
+      "student_ref",
+      "card_number",
+      "tracking_number",
+      "reference",
+      "payment_date",
+      "amount",
+      "notes"
+    ],
+    "supports_shared_or_per_student": true
+  },
+  "documents": {
+    "family_level": [
+      "document_copy_received",
+      "document_original_received"
+    ],
+    "attachments": [
+      "health_attachment",
+      "supporting_document"
+    ]
+  },
+  "print_outputs": [
+    "family_master_sheet",
+    "student_appendix_per_student"
+  ]
+}
