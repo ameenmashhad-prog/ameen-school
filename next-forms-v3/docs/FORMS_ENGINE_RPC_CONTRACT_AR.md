@@ -166,3 +166,29 @@
 ```
 
 > هذا المسار ليس كتابة مباشرة من الواجهة إلى الجداول، بل نقل ثنائي للخادم بعد إصدار تذكرة RPC، بينما يبقى حفظ بيانات النموذج نفسه عبر RPC فقط.
+
+---
+
+## 8) forms_submit_teacher_evaluation_v3
+### المدخلات
+```json
+{
+  "form_slug": "teacher-evaluation-v3",
+  "locale": "ar",
+  "visibility": "administrative",
+  "submission_ref": "TE-1720000000000",
+  "upload_ticket_id": "uuid-or-token",
+  "schema": { "...": "validated schema snapshot" },
+  "values": { "...": "submitted values" }
+}
+```
+
+### المخرجات
+```json
+{
+  "ok": true,
+  "submission_id": "uuid",
+  "submission_ref": "TE-1720000000000",
+  "status": "received"
+}
+```

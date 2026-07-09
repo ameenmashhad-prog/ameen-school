@@ -145,13 +145,26 @@ const templatesMap = {
     visibility: 'administrative',
     printOrientation: 'portrait',
     title: { ar: 'نموذج تقييم معلم', fa: 'فرم ارزیابی معلم', en: 'Teacher Evaluation Form' },
-    sections: [],
+    sections: [
+      { key: 'teacher', title: { ar: 'بيانات المعلم', fa: 'اطلاعات معلم', en: 'Teacher Information' } },
+      { key: 'evaluation', title: { ar: 'تفاصيل التقييم', fa: 'جزئیات ارزیابی', en: 'Evaluation Details' } },
+      { key: 'evidence', title: { ar: 'الشواهد والمرفقات', fa: 'شواهد و پیوست‌ها', en: 'Evidence & Attachments' } },
+      { key: 'approval', title: { ar: 'اعتماد المقيم', fa: 'تایید ارزیاب', en: 'Reviewer Approval' } }
+    ],
     fields: [
-      field({ type: 'text', ar: 'اسم المعلم', fa: 'نام معلم', en: 'Teacher Name', required: true }),
-      field({ type: 'select', ar: 'المعيار', fa: 'شاخص', en: 'Criteria', required: true, width: 'half', options: [option('criteria_pedagogy', 'الأداء التدريسي', 'عملکرد آموزشی', 'Teaching Performance'), option('criteria_punctuality', 'الانضباط الزمني', 'نظم زمانی', 'Punctuality'), option('criteria_communication', 'التواصل', 'ارتباط', 'Communication')] }),
-      field({ type: 'number', ar: 'الدرجة', fa: 'امتیاز', en: 'Score', required: true, width: 'half' }),
-      field({ type: 'text', ar: 'ملاحظة', fa: 'یادداشت', en: 'Note' }),
-      field({ type: 'signature', ar: 'اعتماد المقيم', fa: 'تایید ارزیاب', en: 'Reviewer Signature', required: true })
+      field({ id:'teacher_name', type: 'text', ar: 'اسم المعلم', fa: 'نام معلم', en: 'Teacher Name', required: true, width:'half', section:'teacher' }),
+      field({ id:'subject_area', type: 'text', ar: 'المادة / التخصص', fa: 'درس / تخصص', en: 'Subject / Specialization', required: true, width:'half', section:'teacher' }),
+      field({ id:'evaluator_name', type: 'text', ar: 'اسم المقيم', fa: 'نام ارزیاب', en: 'Evaluator Name', required: true, width:'half', section:'teacher' }),
+      field({ id:'evaluation_date', type: 'date', ar: 'تاريخ التقييم', fa: 'تاریخ ارزیابی', en: 'Evaluation Date', required: true, width:'half', section:'teacher' }),
+      field({ id:'class_context', type: 'text', ar: 'الصف / السياق', fa: 'پایه / زمینه', en: 'Class / Context', width:'half', section:'teacher' }),
+      field({ id:'semester', type: 'select', ar: 'الفصل الدراسي', fa: 'نیمسال', en: 'Semester', width:'half', section:'teacher', options:[option('semester_1','الفصل الأول','نیمسال اول','Semester 1'), option('semester_2','الفصل الثاني','نیمسال دوم','Semester 2')] }),
+      field({ id:'criteria', type: 'select', ar: 'المعيار', fa: 'شاخص', en: 'Criteria', required: true, width:'half', section:'evaluation', options: [option('criteria_pedagogy', 'الأداء التدريسي', 'عملکرد آموزشی', 'Teaching Performance'), option('criteria_punctuality', 'الانضباط الزمني', 'نظم زمانی', 'Punctuality'), option('criteria_communication', 'التواصل', 'ارتباط', 'Communication'), option('criteria_preparation', 'التحضير والتنظيم', 'آماده‌سازی و نظم', 'Preparation & Organization')] }),
+      field({ id:'score', type: 'number', ar: 'الدرجة', fa: 'امتیاز', en: 'Score', required: true, width:'half', section:'evaluation', placeholder:{ar:'من 100',fa:'از 100',en:'Out of 100'} }),
+      field({ id:'strengths', type: 'text', ar: 'نقاط القوة', fa: 'نقاط قوت', en: 'Strengths', section:'evaluation' }),
+      field({ id:'improvement_points', type: 'text', ar: 'مجالات التحسين', fa: 'زمینه‌های بهبود', en: 'Improvement Areas', section:'evaluation' }),
+      field({ id:'recommendation', type: 'text', ar: 'التوصية النهائية', fa: 'توصیه نهایی', en: 'Final Recommendation', section:'evaluation' }),
+      field({ id:'evidence_attachment', type:'file', ar:'مرفق داعم', fa:'پیوست پشتیبان', en:'Supporting Attachment', section:'evidence', accept:'.pdf,.jpg,.png,.jpeg' }),
+      field({ id:'reviewer_signature', type: 'signature', ar: 'اعتماد المقيم', fa: 'تایید ارزیاب', en: 'Reviewer Signature', required: true, section:'approval' })
     ]
   },
   financial_permission: {

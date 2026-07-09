@@ -22,7 +22,7 @@ export default async function LocaleHome({ params }) {
           </div>
         </div>
 
-        <div className="mt-8 grid gap-4 md:grid-cols-6">
+        <div className="mt-8 grid gap-4 md:grid-cols-7">
           <Link className="rounded-3xl border border-slate-200 bg-slate-50 p-5 font-bold text-slate-900 transition hover:border-brand-300 hover:bg-white" href={`/${locale}/forms/builder`}>
             {dict.home.startBuilder}
           </Link>
@@ -31,6 +31,9 @@ export default async function LocaleHome({ params }) {
           </Link>
           <Link className="rounded-3xl border border-slate-200 bg-slate-50 p-5 font-bold text-slate-900 transition hover:border-brand-300 hover:bg-white" href={`/${locale}/forms/leave-request`}>
             {dict.home.startLeaveRequest}
+          </Link>
+          <Link className="rounded-3xl border border-slate-200 bg-slate-50 p-5 font-bold text-slate-900 transition hover:border-brand-300 hover:bg-white" href={`/${locale}/forms/teacher-evaluation`}>
+            {dict.home.startTeacherEvaluation}
           </Link>
           <Link className="rounded-3xl border border-slate-200 bg-slate-50 p-5 font-bold text-slate-900 transition hover:border-brand-300 hover:bg-white" href={`/${locale}/forms/submissions`}>
             {dict.home.startSubmissionsReview}

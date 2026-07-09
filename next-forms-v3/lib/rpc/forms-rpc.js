@@ -63,3 +63,7 @@ export function updateSubmissionStatusRpc(payload) {
 export function submitLeaveRequestRpc(payload) {
   return call('/api/forms/rpc/submit-leave-request', payload);
 }
+
+export function submitTeacherEvaluationRpc(payload) {
+  return call('/api/forms/rpc/submit-teacher-evaluation', payload);
+}
