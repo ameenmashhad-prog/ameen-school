@@ -5,7 +5,8 @@
     "startBuilder": "ابدأ محرر الاستمارات",
     "localAssetsOnly": "كل الأصول محلية دون CDN.",
     "rpcOnly": "كل عمليات الكتابة تمر عبر RPC فقط.",
-    "startStudentRegistration": "ابدأ استمارة تسجيل الطالب"
+    "startStudentRegistration": "ابدأ استمارة تسجيل الطالب",
+    "startSubmissionsReview": "افتح لوحة الطلبات المرسلة"
   },
   "languageSwitcher": {
     "ar": "عربي",
@@ -163,5 +164,49 @@
     "uploadDone": "تم رفع الملف بنجاح",
     "uploadObjectPath": "مسار الملف المرفوع",
     "fileNeedsReselect": "أعد اختيار الملف لأن الجلسة الحالية لا تحتوي على النسخة الثنائية للرفع."
+  },
+  "submissions": {
+    "pageTitle": "لوحة الطلبات المرسلة",
+    "pageSubtitle": "مراجعة الاستمارات الواردة عبر محرك الاستمارات الجديد، مع تصفية حسب النموذج والحالة والتصنيف.",
+    "openStudentForm": "فتح استمارة تسجيل الطالب",
+    "loading": "جارٍ تحميل الطلبات...",
+    "empty": "لا توجد طلبات مطابقة للفلاتر الحالية.",
+    "noSelection": "اختر طلباً من القائمة لعرض التفاصيل.",
+    "loadingDetail": "جارٍ تحميل تفاصيل الطلب...",
+    "loadError": "تعذر تحميل تفاصيل الطلب المحدد.",
+    "emptyValue": "—",
+    "noGuardian": "ولي الأمر غير مذكور",
+    "kpis": {
+      "total": "إجمالي الطلبات",
+      "received": "مستلمة",
+      "reviewed": "تمت مراجعتها",
+      "issued": "مُصدرة"
+    },
+    "filters": {
+      "formSlug": "فلتر حسب slug النموذج",
+      "allVisibilities": "كل التصنيفات",
+      "allStatuses": "كل الحالات"
+    },
+    "statuses": {
+      "received": "مستلم",
+      "reviewed": "تمت مراجعته",
+      "issued": "مُصدر",
+      "rejected": "مرفوض",
+      "archived": "مؤرشف"
+    },
+    "detail": {
+      "submissionRef": "المرجع",
+      "visibility": "التصنيف",
+      "guardian": "ولي الأمر",
+      "attachment": "المرفق"
+    },
+    "actions": {
+      "markReviewed": "تمييز كمراجع",
+      "markIssued": "تمييز كمصدر",
+      "markRejected": "رفض",
+      "print": "طباعة",
+      "statusSaved": "تم تحديث الحالة بنجاح",
+      "statusError": "تعذر تحديث الحالة"
+    }
   }
 }

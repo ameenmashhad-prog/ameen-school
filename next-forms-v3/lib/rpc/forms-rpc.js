@@ -47,3 +47,15 @@ export async function uploadAttachmentTransport({ ticketId, formSlug, fieldId, f
   if (!response.ok) throw new Error(`Upload failed: ${response.status}`);
   return response.json();
 }
+
+export function listSubmissionsRpc(payload) {
+  return call('/api/forms/rpc/list-submissions', payload);
+}
+
+export function getSubmissionRpc(payload) {
+  return call('/api/forms/rpc/get-submission', payload);
+}
+
+export function updateSubmissionStatusRpc(payload) {
+  return call('/api/forms/rpc/update-submission-status', payload);
+}

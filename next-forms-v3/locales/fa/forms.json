@@ -5,7 +5,8 @@
     "startBuilder": "شروع ویرایشگر فرم‌ها",
     "localAssetsOnly": "همه دارایی‌ها محلی و بدون CDN هستند.",
     "rpcOnly": "همه نوشتن‌ها فقط از مسیر RPC انجام می‌شود.",
-    "startStudentRegistration": "شروع فرم ثبت‌نام دانش‌آموز"
+    "startStudentRegistration": "شروع فرم ثبت‌نام دانش‌آموز",
+    "startSubmissionsReview": "باز کردن پنل درخواست‌های ارسالی"
   },
   "languageSwitcher": {
     "ar": "عربي",
@@ -163,5 +164,49 @@
     "uploadDone": "فایل با موفقیت بارگذاری شد",
     "uploadObjectPath": "مسیر فایل بارگذاری‌شده",
     "fileNeedsReselect": "فایل را دوباره انتخاب کنید؛ نسخه باینری آن در این نشست موجود نیست."
+  },
+  "submissions": {
+    "pageTitle": "داشبورد درخواست‌های ارسالی",
+    "pageSubtitle": "مرور فرم‌های دریافتی از موتور جدید فرم‌ها، همراه با فیلتر بر اساس فرم، وضعیت و دسته‌بندی.",
+    "openStudentForm": "باز کردن فرم ثبت‌نام دانش‌آموز",
+    "loading": "در حال بارگذاری درخواست‌ها...",
+    "empty": "درخواستی مطابق فیلترهای فعلی پیدا نشد.",
+    "noSelection": "برای مشاهده جزئیات، یک درخواست را از فهرست انتخاب کنید.",
+    "loadingDetail": "در حال بارگذاری جزئیات درخواست...",
+    "loadError": "بارگذاری جزئیات درخواست انتخابی ناموفق بود.",
+    "emptyValue": "—",
+    "noGuardian": "نام ولی ثبت نشده است",
+    "kpis": {
+      "total": "کل درخواست‌ها",
+      "received": "دریافت‌شده",
+      "reviewed": "بررسی‌شده",
+      "issued": "صادرشده"
+    },
+    "filters": {
+      "formSlug": "فیلتر بر اساس slug فرم",
+      "allVisibilities": "همه دسته‌ها",
+      "allStatuses": "همه وضعیت‌ها"
+    },
+    "statuses": {
+      "received": "دریافت‌شده",
+      "reviewed": "بررسی‌شده",
+      "issued": "صادرشده",
+      "rejected": "ردشده",
+      "archived": "بایگانی‌شده"
+    },
+    "detail": {
+      "submissionRef": "مرجع",
+      "visibility": "دسته‌بندی",
+      "guardian": "ولی",
+      "attachment": "پیوست"
+    },
+    "actions": {
+      "markReviewed": "علامت‌گذاری به‌عنوان بررسی‌شده",
+      "markIssued": "علامت‌گذاری به‌عنوان صادرشده",
+      "markRejected": "رد",
+      "print": "چاپ",
+      "statusSaved": "وضعیت با موفقیت به‌روزرسانی شد",
+      "statusError": "به‌روزرسانی وضعیت ناموفق بود"
+    }
   }
 }

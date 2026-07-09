@@ -5,7 +5,8 @@
     "startBuilder": "Open Forms Builder",
     "localAssetsOnly": "All assets are local with no CDN usage.",
     "rpcOnly": "All write operations go through RPC only.",
-    "startStudentRegistration": "Open Student Registration Form"
+    "startStudentRegistration": "Open Student Registration Form",
+    "startSubmissionsReview": "Open submissions review panel"
   },
   "languageSwitcher": {
     "ar": "AR",
@@ -163,5 +164,49 @@
     "uploadDone": "File uploaded successfully",
     "uploadObjectPath": "Uploaded object path",
     "fileNeedsReselect": "Please re-select the file; its binary content is not available in this session."
+  },
+  "submissions": {
+    "pageTitle": "Submitted Forms Review Board",
+    "pageSubtitle": "Review forms received through the new forms engine, with filters by form slug, status, and visibility.",
+    "openStudentForm": "Open Student Registration Form",
+    "loading": "Loading submissions...",
+    "empty": "No submissions match the current filters.",
+    "noSelection": "Choose a submission from the list to inspect its details.",
+    "loadingDetail": "Loading submission details...",
+    "loadError": "Could not load the selected submission details.",
+    "emptyValue": "—",
+    "noGuardian": "Guardian not provided",
+    "kpis": {
+      "total": "Total Submissions",
+      "received": "Received",
+      "reviewed": "Reviewed",
+      "issued": "Issued"
+    },
+    "filters": {
+      "formSlug": "Filter by form slug",
+      "allVisibilities": "All visibilities",
+      "allStatuses": "All statuses"
+    },
+    "statuses": {
+      "received": "Received",
+      "reviewed": "Reviewed",
+      "issued": "Issued",
+      "rejected": "Rejected",
+      "archived": "Archived"
+    },
+    "detail": {
+      "submissionRef": "Reference",
+      "visibility": "Visibility",
+      "guardian": "Guardian",
+      "attachment": "Attachment"
+    },
+    "actions": {
+      "markReviewed": "Mark Reviewed",
+      "markIssued": "Mark Issued",
+      "markRejected": "Reject",
+      "print": "Print",
+      "statusSaved": "Status updated successfully",
+      "statusError": "Could not update status"
+    }
   }
 }
