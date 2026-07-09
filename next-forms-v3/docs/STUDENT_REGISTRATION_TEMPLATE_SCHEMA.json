@@ -1,0 +1,107 @@
+{
+  "template_key": "student_registration",
+  "form_slug": "student-registration-v3",
+  "visibility": "public",
+  "title": {
+    "ar": "استمارة تسجيل طالب",
+    "fa": "فرم ثبت‌نام دانش‌آموز",
+    "en": "Student Registration Form"
+  },
+  "fields": [
+    {
+      "id": "guardian_name",
+      "type": "text",
+      "required": true,
+      "label": {
+        "ar": "اسم ولي الأمر",
+        "fa": "نام ولی",
+        "en": "Guardian Name"
+      },
+      "placeholder": {
+        "ar": "أدخل اسم ولي الأمر",
+        "fa": "نام ولی را وارد کنید",
+        "en": "Enter guardian name"
+      },
+      "translationKeys": [
+        "forms.student_registration.guardian_name.label",
+        "forms.student_registration.guardian_name.placeholder"
+      ]
+    },
+    {
+      "id": "student_name",
+      "type": "text",
+      "required": true,
+      "label": {
+        "ar": "اسم الطالب",
+        "fa": "نام دانش‌آموز",
+        "en": "Student Name"
+      },
+      "placeholder": {
+        "ar": "أدخل اسم الطالب",
+        "fa": "نام دانش‌آموز را وارد کنید",
+        "en": "Enter student name"
+      },
+      "translationKeys": [
+        "forms.student_registration.student_name.label",
+        "forms.student_registration.student_name.placeholder"
+      ]
+    },
+    {
+      "id": "birth_date",
+      "type": "date",
+      "required": true,
+      "calendarMode": {
+        "ar": "gregorian_primary",
+        "fa": "jalali_primary",
+        "en": "gregorian_only"
+      },
+      "label": {
+        "ar": "تاريخ الميلاد",
+        "fa": "تاریخ تولد",
+        "en": "Date of Birth"
+      },
+      "translationKeys": [
+        "forms.student_registration.birth_date.label"
+      ]
+    },
+    {
+      "id": "grade",
+      "type": "select",
+      "required": true,
+      "label": {
+        "ar": "الصف",
+        "fa": "پایه",
+        "en": "Grade"
+      },
+      "translationKeys": [
+        "forms.student_registration.grade.label"
+      ]
+    },
+    {
+      "id": "documents",
+      "type": "file",
+      "required": false,
+      "label": {
+        "ar": "الوثائق",
+        "fa": "مدارک",
+        "en": "Documents"
+      },
+      "translationKeys": [
+        "forms.student_registration.documents.label"
+      ]
+    },
+    {
+      "id": "guardian_signature",
+      "type": "signature",
+      "required": false,
+      "label": {
+        "ar": "التوقيع الإلكتروني",
+        "fa": "امضای الکترونیکی",
+        "en": "Electronic Signature"
+      },
+      "translationKeys": [
+        "forms.student_registration.guardian_signature.label"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "home": {
+    "title": "Professional Forms Engine",
+    "subtitle": "A new multilingual forms layer for Arabic, Persian, and English with autosave, print preview, and ready-to-use templates.",
+    "startBuilder": "Open Forms Builder",
+    "localAssetsOnly": "All assets are local with no CDN usage.",
+    "rpcOnly": "All write operations go through RPC only."
+  },
+  "languageSwitcher": {
+    "ar": "AR",
+    "fa": "FA",
+    "en": "EN"
+  },
+  "visibility": {
+    "public": "Public",
+    "administrative": "Administrative",
+    "finance_admin": "Finance Restricted"
+  },
+  "templates": {
+    "title": "Ready Templates"
+  },
+  "fieldLabels": {
+    "text": "Text",
+    "number": "Number",
+    "date": "Date",
+    "select": "Select",
+    "file": "File",
+    "signature": "E-Signature"
+  },
+  "builder": {
+    "badge": "Forms Engine v3",
+    "title": "Trilingual Forms Builder",
+    "subtitle": "Supports instant switching between Arabic, Persian, and English while preserving current input and applying the correct font, direction, numbers, and calendar rules per language.",
+    "restoreLatest": "Restore Latest",
+    "publish": "Publish Template",
+    "autosaveStatusTitle": "Autosave Status",
+    "autosaveEvery15": "Autosaves every 15 seconds and keeps a recoverable version history.",
+    "currentSaveState": {
+      "idle": "No autosave yet",
+      "saving": "Saving draft...",
+      "saved": "Latest version saved successfully",
+      "error": "Save failed — review RPC or network"
+    },
+    "visibilityLabel": "Visibility",
+    "fieldCount": "Field Count",
+    "fieldSettings": "Field Settings",
+    "fieldLabel": "Field Label",
+    "placeholder": "Placeholder",
+    "requiredToggle": "Required field",
+    "selectFieldHint": "Select a field from the canvas or add a new field to start editing.",
+    "previewTitle": "Print Preview",
+    "paletteTitle": "Field Library",
+    "emptyCanvasTitle": "Start dragging fields into the canvas",
+    "emptyCanvasHint": "Or choose a ready-made template from the side panel.",
+    "placeholderPreview": "Field preview appears here",
+    "numberMode": "Number Mode",
+    "printModes": {
+      "portrait": "A4 Portrait",
+      "landscape": "A4 Landscape"
+    }
+  }
+}

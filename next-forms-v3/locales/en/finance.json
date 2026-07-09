@@ -1,0 +1,13 @@
+{
+  "glossary": {
+    "title": "Proposed Finance Glossary",
+    "items": [
+      { "key": "debit", "label": "Debit", "description": "An accounting entry posted on the debit side of a movement." },
+      { "key": "credit", "label": "Credit", "description": "An accounting entry on the credit side or a positive balance in favor of the customer/student." },
+      { "key": "balance", "label": "Balance", "description": "The final remaining amount after all debit and credit movements are applied." },
+      { "key": "installment", "label": "Installment", "description": "A scheduled part of total fees within a payment plan." },
+      { "key": "overdue", "label": "Overdues", "description": "Amounts that remain unpaid after the due date has passed." },
+      { "key": "reconciliation_entry", "label": "Reconciliation Entry", "description": "A separate adjustment document used after issue instead of editing an already issued financial report." }
+    ]
+  }
+}

@@ -1,0 +1,92 @@
+# عقد RPC المقترح — محرك الاستمارات v3
+
+## المبدأ
+لا توجد أي كتابة مباشرة من الواجهة إلى الجداول.
+كل عمليات الإنشاء/التحديث/الاستعادة/النشر تمر عبر RPC فقط.
+
+---
+
+## 1) forms_save_draft_v3
+### المدخلات
+```json
+{
+  "form_slug": "student-registration-v3",
+  "locale": "ar",
+  "version_label": "2026-07-09T10:00:00.000Z",
+  "visibility": "public",
+  "autosave": true,
+  "schema": { "...": "full form schema" }
+}
+```
+
+### المخرجات
+```json
+{
+  "ok": true,
+  "form_id": "uuid",
+  "version_id": "uuid",
+  "saved_at": "timestamp"
+}
+```
+
+---
+
+## 2) forms_restore_version_v3
+### المدخلات
+```json
+{
+  "version_id": "uuid"
+}
+```
+
+### المخرجات
+```json
+{
+  "ok": true,
+  "schema": { "...": "restored form schema" },
+  "restored_from": "uuid"
+}
+```
+
+---
+
+## 3) forms_publish_v3
+### المدخلات
+```json
+{
+  "form_slug": "student-registration-v3",
+  "locale": "ar",
+  "visibility": "public",
+  "schema": { "...": "validated final schema" }
+}
+```
+
+### المخرجات
+```json
+{
+  "ok": true,
+  "published_form_id": "uuid",
+  "issued_at": "timestamp",
+  "status": "issued"
+}
+```
+
+---
+
+## 4) forms_list_versions_v3 (مقترح لاحق)
+### المدخلات
+```json
+{
+  "form_slug": "student-registration-v3"
+}
+```
+
+### المخرجات
+```json
+{
+  "ok": true,
+  "versions": [
+    { "version_id": "uuid", "version_label": "...", "saved_at": "..." }
+  ]
+}
+```
