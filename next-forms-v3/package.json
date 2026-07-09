@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "forms:health": "node scripts/forms-v3-health-check.mjs",
+    "forms:smoke": "node scripts/forms-v3-rpc-smoke.mjs"
   },
   "dependencies": {
     "next": "15.0.0",
