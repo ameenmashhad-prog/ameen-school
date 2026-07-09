@@ -1,4 +1,4 @@
-# التحقق الحي بعد تطبيق SQL 144 → 149
+# التحقق الحي بعد تطبيق SQL 144 → 150
 
 ## الحالة
 تم تنفيذ فحص حي على قاعدة البيانات بعد إبلاغ تشغيل الملفات:
@@ -8,6 +8,7 @@
 - `147_forms_v3_teacher_evaluation_submit.sql`
 - `148_forms_v3_financial_permission_submit.sql`
 - `149_forms_v3_student_registration_packet_submit.sql`
+- `150_forms_v3_submission_name_fallbacks.sql`
 
 ## النتيجة العامة
 ### ناجح
@@ -50,35 +51,29 @@
 - جلب التفاصيل عبر get submission
 - أرشفتها عبر update submission status
 
-## ملاحظة مكتشفة أثناء التحقق
-لوحة الطلبات المرسلة تعتمد في اسم مقدم الطلب على fallback محدود داخل SQL 145، لذلك:
-- `financial-permission-v3` قد يظهر بدون اسم مقدم طلب واضح
-- `student-registration-packet-v3` قد لا يُظهر اسم الطالب/ولي الأمر بشكل مناسب
+## التحقق من Patch 150
+بعد تشغيل `150_forms_v3_submission_name_fallbacks.sql` تم إجراء فحص حي إضافي على نموذجين كانا يحتاجان fallback أفضل:
+- `financial-permission-v3`
+- `student-registration-packet-v3`
 
-## الحل المقترح
-تم إنشاء patch جديد:
-- `sql/archive/150_forms_v3_submission_name_fallbacks.sql`
+### النتيجة
+- في `financial-permission-v3` أصبح `applicant_name` يظهر من الحقل `requester_name`
+- في `student-registration-packet-v3` أصبح:
+  - `applicant_name` يظهر من الحقل `student_full_name`
+  - `guardian_name` يظهر من الحقل `guardian_full_name`
 
-هذا الملف يحسن fallback للأسماء في:
-- `forms_list_submissions_v3`
-- `forms_get_submission_v3`
-
-بحيث يدعم حقولًا مثل:
-- `student_full_name`
-- `guardian_full_name`
-- `requester_name`
-- `requesting_unit`
+وهذا يعني أن لوحة الطلبات المرسلة ستعرض الأسماء بشكل أوضح دون تعديل إضافي في الواجهة.
 
 ## التوصية التالية
 الخطوة التالية المنطقية الآن:
-1. تطبيق `150_forms_v3_submission_name_fallbacks.sql`
-2. إعادة فتح لوحة الطلبات المرسلة
-3. تنفيذ UAT بصري على:
+1. إعادة فتح لوحة الطلبات المرسلة ومراجعة عرض الأسماء بصريًا
+2. تنفيذ UAT بصري على:
    - تسجيل الطالب
    - فورم التسجيل المطبوع
    - طلب الإجازة
    - تقييم المعلم
    - الاستئذان المالي
+3. بعدها الانتقال إلى نشر `next-forms-v3` أو ربطه ببيئة Vercel النهائية
 
 ## تنبيه مهم
 التحقق الحالي أكد أن backend صار يعمل، لكنه لا يغني عن مراجعة RBAC الفعلية قبل الإطلاق العام الكامل، خصوصًا لمسارات review الإدارية.
