@@ -4,7 +4,8 @@
     "subtitle": "A new multilingual forms layer for Arabic, Persian, and English with autosave, print preview, and ready-to-use templates.",
     "startBuilder": "Open Forms Builder",
     "localAssetsOnly": "All assets are local with no CDN usage.",
-    "rpcOnly": "All write operations go through RPC only."
+    "rpcOnly": "All write operations go through RPC only.",
+    "startStudentRegistration": "Open Student Registration Form"
   },
   "languageSwitcher": {
     "ar": "AR",
@@ -82,5 +83,45 @@
     "resetTemplate": "Reset Template",
     "liveSummaryTitle": "Live Form Summary",
     "requiredFields": "Required Fields"
+  },
+  "studentRegistration": {
+    "pageTitle": "Student Registration Form — Initial Production Version",
+    "pageSubtitle": "A real form built on top of the new template, with autosave, print preview, and RPC-only submission.",
+    "visibilityLabel": "Visibility",
+    "openBuilder": "Open Builder",
+    "printPreview": "Print Preview",
+    "submit": "Submit Form",
+    "reset": "Reset Data",
+    "saving": "Saving draft...",
+    "saved": "Draft saved",
+    "saveError": "Could not save draft",
+    "notSavedYet": "Not saved yet",
+    "statusDraft": "Draft Status",
+    "requiredCoverage": "Required Field Coverage",
+    "versionCount": "Version Count",
+    "validationError": "Complete all required fields before submission.",
+    "submitSuccess": "The form was submitted successfully through RPC.",
+    "submitError": "Submission failed — review RPC.",
+    "submitting": "Submitting...",
+    "guardianPreviewTitle": "Guardian Preview",
+    "studentPreviewTitle": "Student Preview",
+    "printPreviewTitle": "Real Print Preview",
+    "versionListTitle": "Form Versions",
+    "noVersions": "No versions available yet.",
+    "selectPlaceholder": "Select from the list",
+    "fileHint": "The selected file name will appear here.",
+    "signatureHint": "At this stage, a typed signature is used as a local fallback.",
+    "dateHint": "The date will later be displayed according to the active locale rule.",
+    "fields": {
+      "guardian_name": "Guardian Name",
+      "guardian_phone": "Phone Number",
+      "guardian_email": "Email",
+      "guardian_address": "Address",
+      "student_name": "Student Name",
+      "student_birth_date": "Date of Birth",
+      "student_grade": "Grade",
+      "student_gender": "Gender",
+      "student_notes": "Additional Notes"
+    }
   }
 }

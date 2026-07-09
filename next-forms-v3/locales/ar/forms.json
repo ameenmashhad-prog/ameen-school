@@ -4,7 +4,8 @@
     "subtitle": "طبقة جديدة مخصصة للاستـمارات متعددة اللغات، مبنية لتدعم العربية والفارسية والإنكليزية، مع حفظ تلقائي، معاينة قبل الطباعة، وقوالب جاهزة.",
     "startBuilder": "ابدأ محرر الاستمارات",
     "localAssetsOnly": "كل الأصول محلية دون CDN.",
-    "rpcOnly": "كل عمليات الكتابة تمر عبر RPC فقط."
+    "rpcOnly": "كل عمليات الكتابة تمر عبر RPC فقط.",
+    "startStudentRegistration": "ابدأ استمارة تسجيل الطالب"
   },
   "languageSwitcher": {
     "ar": "عربي",
@@ -82,5 +83,45 @@
     "resetTemplate": "إعادة ضبط القالب",
     "liveSummaryTitle": "ملخص حي للنموذج",
     "requiredFields": "الحقول الإلزامية"
+  },
+  "studentRegistration": {
+    "pageTitle": "استمارة تسجيل الطالب — نسخة إنتاجية أولية",
+    "pageSubtitle": "نموذج فعلي مبني على القالب الجديد، مع حفظ تلقائي، نسخة طباعة، وإرسال عبر RPC فقط.",
+    "visibilityLabel": "التصنيف",
+    "openBuilder": "فتح المحرر",
+    "printPreview": "طباعة المعاينة",
+    "submit": "إرسال الاستمارة",
+    "reset": "مسح البيانات",
+    "saving": "جارٍ حفظ المسودة...",
+    "saved": "تم حفظ المسودة",
+    "saveError": "تعذر حفظ المسودة",
+    "notSavedYet": "لم تحفظ بعد",
+    "statusDraft": "حالة المسودة",
+    "requiredCoverage": "تغطية الحقول الإلزامية",
+    "versionCount": "عدد النسخ",
+    "validationError": "أكمِل الحقول الإلزامية قبل الإرسال.",
+    "submitSuccess": "تم إرسال الاستمارة بنجاح عبر RPC.",
+    "submitError": "تعذر إرسال الاستمارة — راجع RPC.",
+    "submitting": "جارٍ الإرسال...",
+    "guardianPreviewTitle": "معاينة بيانات ولي الأمر",
+    "studentPreviewTitle": "معاينة بيانات الطالب",
+    "printPreviewTitle": "معاينة الطباعة الفعلية",
+    "versionListTitle": "نسخ هذا النموذج",
+    "noVersions": "لا توجد نسخ متاحة بعد.",
+    "selectPlaceholder": "اختر من القائمة",
+    "fileHint": "سيظهر اسم الملف هنا بعد اختياره.",
+    "signatureHint": "في هذه المرحلة نستخدم توقيعًا كتابيًا كـ fallback محلي.",
+    "dateHint": "سيُعرض التاريخ لاحقًا حسب قاعدة اللغة النشطة.",
+    "fields": {
+      "guardian_name": "اسم ولي الأمر",
+      "guardian_phone": "رقم الهاتف",
+      "guardian_email": "البريد الإلكتروني",
+      "guardian_address": "العنوان",
+      "student_name": "اسم الطالب",
+      "student_birth_date": "تاريخ الميلاد",
+      "student_grade": "الصف",
+      "student_gender": "الجنس",
+      "student_notes": "ملاحظات إضافية"
+    }
   }
 }

@@ -4,7 +4,8 @@
     "subtitle": "لایه‌ای جدید برای فرم‌های چندزبانه با پشتیبانی کامل از عربی، فارسی و انگلیسی، همراه با ذخیره خودکار، پیش‌نمایش چاپ و قالب‌های آماده.",
     "startBuilder": "شروع ویرایشگر فرم‌ها",
     "localAssetsOnly": "همه دارایی‌ها محلی و بدون CDN هستند.",
-    "rpcOnly": "همه نوشتن‌ها فقط از مسیر RPC انجام می‌شود."
+    "rpcOnly": "همه نوشتن‌ها فقط از مسیر RPC انجام می‌شود.",
+    "startStudentRegistration": "شروع فرم ثبت‌نام دانش‌آموز"
   },
   "languageSwitcher": {
     "ar": "عربي",
@@ -82,5 +83,45 @@
     "resetTemplate": "بازنشانی قالب",
     "liveSummaryTitle": "خلاصه زنده فرم",
     "requiredFields": "فیلدهای الزامی"
+  },
+  "studentRegistration": {
+    "pageTitle": "فرم ثبت‌نام دانش‌آموز — نسخه اولیه تولیدی",
+    "pageSubtitle": "یک فرم واقعی بر پایه قالب جدید، همراه با ذخیره خودکار، پیش‌نمایش چاپ و ارسال فقط از مسیر RPC.",
+    "visibilityLabel": "دسته‌بندی",
+    "openBuilder": "باز کردن ویرایشگر",
+    "printPreview": "چاپ پیش‌نمایش",
+    "submit": "ارسال فرم",
+    "reset": "پاک‌سازی داده‌ها",
+    "saving": "در حال ذخیره پیش‌نویس...",
+    "saved": "پیش‌نویس ذخیره شد",
+    "saveError": "ذخیره پیش‌نویس ناموفق بود",
+    "notSavedYet": "هنوز ذخیره نشده",
+    "statusDraft": "وضعیت پیش‌نویس",
+    "requiredCoverage": "پوشش فیلدهای الزامی",
+    "versionCount": "تعداد نسخه‌ها",
+    "validationError": "پیش از ارسال، فیلدهای الزامی را کامل کنید.",
+    "submitSuccess": "فرم با موفقیت از مسیر RPC ارسال شد.",
+    "submitError": "ارسال فرم ناموفق بود — RPC را بررسی کنید.",
+    "submitting": "در حال ارسال...",
+    "guardianPreviewTitle": "پیش‌نمایش اطلاعات ولی",
+    "studentPreviewTitle": "پیش‌نمایش اطلاعات دانش‌آموز",
+    "printPreviewTitle": "پیش‌نمایش چاپ واقعی",
+    "versionListTitle": "نسخه‌های این فرم",
+    "noVersions": "هنوز نسخه‌ای در دسترس نیست.",
+    "selectPlaceholder": "از فهرست انتخاب کنید",
+    "fileHint": "پس از انتخاب فایل، نام آن اینجا نمایش داده می‌شود.",
+    "signatureHint": "در این مرحله از امضای نوشتاری به‌عنوان fallback محلی استفاده می‌شود.",
+    "dateHint": "تاریخ بعداً بر اساس قاعده زبان فعال نمایش داده می‌شود.",
+    "fields": {
+      "guardian_name": "نام ولی",
+      "guardian_phone": "شماره تلفن",
+      "guardian_email": "ایمیل",
+      "guardian_address": "نشانی",
+      "student_name": "نام دانش‌آموز",
+      "student_birth_date": "تاریخ تولد",
+      "student_grade": "پایه",
+      "student_gender": "جنسیت",
+      "student_notes": "توضیحات تکمیلی"
+    }
   }
 }

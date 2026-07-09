@@ -23,3 +23,7 @@ export function publishFormRpc(payload) {
 export function listVersionsRpc(payload) {
   return call('/api/forms/rpc/list-versions', payload);
 }
+
+export function submitStudentRegistrationRpc(payload) {
+  return call('/api/forms/rpc/submit-student-registration', payload);
+}
