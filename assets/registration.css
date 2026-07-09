@@ -257,6 +257,26 @@
 }
 .subject-chip button{border:0;background:transparent;color:inherit;font-weight:900}
 .reg-footer-note{margin-top:14px;color:var(--muted);font-size:13px}
+.reg-progress-panel{margin-bottom:18px}
+.reg-progress-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:16px}
+.reg-progress-card{padding:18px;border-radius:26px;background:linear-gradient(145deg,#fff,rgba(158,188,236,.08));border:1px solid rgba(158,188,236,.22);box-shadow:var(--e1)}
+.reg-progress-card h4{margin:0 0 8px;font-size:18px}
+.reg-progress-card p{margin:0;color:var(--muted);font-size:14px;line-height:1.7}
+.reg-progress-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.reg-progress-meter{height:10px;border-radius:999px;background:#edf2fb;overflow:hidden;margin:14px 0 10px}
+.reg-progress-meter span{display:block;height:100%;background:linear-gradient(90deg,#0B6E4F,#49c38a);border-radius:999px;transition:width .2s ease}
+.reg-check-list{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.reg-check-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:18px;background:rgba(158,188,236,.08);border:1px solid rgba(158,188,236,.18)}
+.reg-check-item b{font-size:14px}
+.reg-check-item small{display:block;color:var(--muted);line-height:1.6}
+.reg-check-item.ok{background:#effdf6;border-color:#b9efcf}
+.reg-check-item.warn{background:#fff8e8;border-color:#f3ddb0}
+.reg-check-item.error{background:#fff0f0;border-color:#f5c1c1}
+.reg-check-icon{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:900;flex:0 0 auto;background:#dbe7fb;color:#28518f}
+.reg-check-item.ok .reg-check-icon{background:#d1fae5;color:#0b6e4f}
+.reg-check-item.warn .reg-check-icon{background:#fef3c7;color:#8a5a10}
+.reg-check-item.error .reg-check-icon{background:#fee2e2;color:#b42318}
+.reg-inline-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
 .filters-bar{
   display:grid;
   grid-template-columns:minmax(260px,1.8fr) repeat(2,minmax(170px,.7fr));
@@ -415,7 +435,8 @@
   .reg-upload-grid,
   .request-grid,
   .reg-kpis,
-  .reg-mini-grid{grid-template-columns:1fr}
+  .reg-mini-grid,
+  .reg-progress-grid{grid-template-columns:1fr}
   .form-grid{grid-template-columns:repeat(8,1fr)}
   .col-8,.col-6,.col-4,.col-3{grid-column:span 4}
   .filters-bar{grid-template-columns:1fr 1fr}
