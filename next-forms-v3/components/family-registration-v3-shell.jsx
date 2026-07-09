@@ -326,6 +326,29 @@ function countErrors(fieldErrors, studentErrors, globalErrors) {
   return familyErrorsCount + studentErrorsCount + globalErrors.length;
 }
 
+function countReadyStudents(template, students) {
+  const requiredStudentFields = (template.studentCardFields || []).filter((field) => field.required).map((field) => field.id);
+  return (students || []).filter((student) => requiredStudentFields.every((fieldId) => String(student[fieldId] || '').trim())).length;
+}
+
+function countStudentManualOverrides(students) {
+  return (students || []).reduce((sum, student) => {
+    return sum
+      + Number(Boolean(student._meta?.fatherManual))
+      + Number(Boolean(student._meta?.familyManual))
+      + Number(Boolean(student._meta?.fullNameManual))
+      + Number(Boolean(student._meta?.usernameManual));
+  }, 0);
+}
+
+function countStudentInheritedLinks(students) {
+  return (students || []).reduce((sum, student) => {
+    return sum
+      + Number(!student._meta?.fatherManual)
+      + Number(!student._meta?.familyManual);
+  }, 0);
+}
+
 function validateValues(template, values, labels, options = {}) {
   const fieldErrors = {};
   const studentErrors = {};
@@ -408,9 +431,9 @@ function validateValues(template, values, labels, options = {}) {
   return { fieldErrors, studentErrors, globalErrors };
 }
 
-function SectionCard({ title, subtitle, children }) {
+function SectionCard({ title, subtitle, children, anchorId }) {
   return (
-    <section className="rounded-[24px] border border-slate-200 bg-white p-5 shadow-soft">
+    <section id={anchorId} className="rounded-[24px] border border-slate-200 bg-white p-5 shadow-soft">
       <div className="mb-4 border-b border-slate-100 pb-3">
         <h2 className="text-xl font-black text-slate-950">{title}</h2>
         {subtitle ? <p className="mt-1 text-sm leading-7 text-slate-500">{subtitle}</p> : null}
@@ -638,7 +661,7 @@ function PaymentsEditor({ locale, labels, rows, students, onChange, totalAmount 
   );
 }
 
-function StudentCard({ locale, labels, student, index, fieldById, studentErrors, onFieldChange, onRestoreInheritance, onRemove, canRemove }) {
+function StudentCard({ locale, labels, student, index, fieldById, studentErrors, onFieldChange, onRestoreInheritance, onRemove, onDuplicate, canRemove }) {
   const inheritedFather = !student._meta?.fatherManual;
   const inheritedFamily = !student._meta?.familyManual;
   const autoFullName = !student._meta?.fullNameManual;
@@ -666,7 +689,17 @@ function StudentCard({ locale, labels, student, index, fieldById, studentErrors,
         </div>
         <div className="flex flex-wrap gap-2">
           <button type="button" onClick={() => onRestoreInheritance(student.id)} className="rounded-2xl border border-brand-200 bg-brand-50 px-3 py-2 text-xs font-bold text-brand-800">{labels.restoreInheritance}</button>
+          <button type="button" onClick={() => onDuplicate(student.id)} className="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700">{labels.duplicateStudent}</button>
           {canRemove ? <button type="button" onClick={() => onRemove(student.id)} className="rounded-2xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-bold text-rose-700">{labels.removeStudent}</button> : null}
+        </div>
+      </div>
+
+      <div className="mb-4 rounded-2xl border border-slate-200 bg-white px-4 py-4">
+        <div className="mb-2 text-xs font-bold text-slate-500">{labels.cardPreviewTitle}</div>
+        <div className="flex flex-wrap gap-2">
+          <StatusPill tone={autoFullName ? 'brand' : 'warning'}>{labels.cardComputedName}: {student.student_full_name || labels.emptyValue}</StatusPill>
+          <StatusPill tone="slate">{labels.cardUsername}: {student.student_username || labels.emptyValue}</StatusPill>
+          <StatusPill tone="slate">{labels.cardPassword}: {student.student_initial_password || labels.emptyValue}</StatusPill>
         </div>
       </div>
 
@@ -875,6 +908,7 @@ export default function FamilyRegistrationV3Shell({ locale, dictionary }) {
   const [uploadedAttachment, setUploadedAttachment] = useState(null);
   const [uploadState, setUploadState] = useState('idle');
   const [fileObjects, setFileObjects] = useState({ family_attachment: null });
+  const [actionFlash, setActionFlash] = useState('');
 
   const meta = localeMeta[activeLocale] || localeMeta.ar;
 
@@ -951,6 +985,12 @@ export default function FamilyRegistrationV3Shell({ locale, dictionary }) {
   const guardianFullName = useMemo(() => computeGuardianFullName(values), [values]);
   const motherFullName = useMemo(() => computeMotherFullName(values), [values]);
   const errorCount = countErrors(fieldErrors, studentErrors, globalErrors);
+  const guardianCoreFields = ['guardian_given_name', 'guardian_father_name', 'family_name', 'guardian_phone_primary', 'guardian_birth_date'];
+  const guardianCoreDone = guardianCoreFields.filter((fieldId) => String(values[fieldId] || '').trim()).length;
+  const studentReadyCount = useMemo(() => countReadyStudents(template, values.students), [template, values.students]);
+  const duplicateNames = useMemo(() => duplicateStudentNames(values.students), [values.students]);
+  const studentManualOverrides = useMemo(() => countStudentManualOverrides(values.students), [values.students]);
+  const studentInheritedLinks = useMemo(() => countStudentInheritedLinks(values.students), [values.students]);
 
   function persistLocal(nextValues, nextReceipt = receipt, nextUploadTicket = uploadTicket, nextAttachment = uploadedAttachment) {
     window.localStorage.setItem(LOCAL_FORM_STATE_KEY, JSON.stringify({
@@ -959,6 +999,89 @@ export default function FamilyRegistrationV3Shell({ locale, dictionary }) {
       uploadTicket: nextUploadTicket,
       uploadedAttachment: nextAttachment
     }));
+  }
+
+
+  function flashAction(message) {
+    setActionFlash(message);
+    window.setTimeout(() => setActionFlash(''), 2200);
+  }
+
+  function copyPrimaryPhoneToWhatsapp() {
+    if (!String(values.guardian_phone_primary || '').trim()) return;
+    setValues((current) => {
+      const next = { ...current, guardian_phone_whatsapp: current.guardian_phone_primary };
+      persistLocal(next);
+      return next;
+    });
+    flashAction(labels.quickActionDonePrimaryWhatsapp);
+  }
+
+  function syncMotherFamilyName() {
+    setValues((current) => {
+      const next = {
+        ...current,
+        mother_family_name: current.family_name || '',
+        _meta: {
+          ...current._meta,
+          motherFamilyManual: false
+        }
+      };
+      const normalized = normalizeFamilyValues(template, next);
+      persistLocal(normalized);
+      return normalized;
+    });
+    flashAction(labels.quickActionDoneMotherFamily);
+  }
+
+  function applyFamilyInheritanceToStudents() {
+    setValues((current) => {
+      const next = {
+        ...current,
+        students: current.students.map((student) => ({
+          ...student,
+          _meta: {
+            ...student._meta,
+            fatherManual: false,
+            familyManual: false,
+            fullNameManual: false
+          }
+        }))
+      };
+      const normalized = normalizeFamilyValues(template, next);
+      persistLocal(normalized);
+      return normalized;
+    });
+    flashAction(labels.quickActionDoneStudentsInheritance);
+  }
+
+  function duplicateStudentCard(studentId) {
+    setValues((current) => {
+      const source = current.students.find((student) => student.id === studentId);
+      if (!source) return current;
+      const duplicate = {
+        ...source,
+        id: generateId('student_card'),
+        student_given_name: '',
+        student_full_name: '',
+        student_birth_date: '',
+        student_passport_number: '',
+        student_passport_expiry_date: '',
+        student_photo: null,
+        student_username: '',
+        student_initial_password: '',
+        _meta: {
+          ...source._meta,
+          fullNameManual: false,
+          usernameManual: false
+        }
+      };
+      const next = { ...current, students: [...current.students, duplicate] };
+      const normalized = normalizeFamilyValues(template, next);
+      persistLocal(normalized);
+      return normalized;
+    });
+    flashAction(labels.quickActionDoneDuplicateStudent);
   }
 
   function setFieldValue(fieldId, value) {
@@ -1411,21 +1534,61 @@ export default function FamilyRegistrationV3Shell({ locale, dictionary }) {
               </div>
             </div>
 
+            <div className="rounded-[24px] border border-brand-100 bg-brand-50 px-5 py-4 text-brand-900">
+              <div className="text-base font-black">{labels.normalizedFlowTitle}</div>
+              <p className="mt-2 text-sm leading-7 text-brand-800">{labels.normalizedFlowDescription}</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {labels.normalizedFlowPoints.map((item) => <StatusPill key={item} tone="brand">{item}</StatusPill>)}
+              </div>
+            </div>
+
+            <div className="rounded-[24px] border border-slate-200 bg-white p-4 shadow-soft">
+              <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <div className="text-sm font-black text-slate-900">{labels.quickJumpTitle}</div>
+                  <div className="text-xs leading-6 text-slate-500">{labels.quickJumpDescription}</div>
+                </div>
+                <div className="text-xs font-bold text-slate-500">{guardianCoreDone} / {guardianCoreFields.length}</div>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <a href="#family-v3-guardian" className="rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-bold text-slate-700">{labels.navGuardian}</a>
+                <a href="#family-v3-mother" className="rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-bold text-slate-700">{labels.navMother}</a>
+                <a href="#family-v3-students" className="rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-bold text-slate-700">{labels.navStudents}</a>
+                <a href="#family-v3-family-context" className="rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-bold text-slate-700">{labels.navFamilyContext}</a>
+                <a href="#family-v3-finance" className="rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-bold text-slate-700">{labels.navFinance}</a>
+                <a href="#family-v3-documents" className="rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-bold text-slate-700">{labels.navDocuments}</a>
+                <a href="#family-v3-approval" className="rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-bold text-slate-700">{labels.navApproval}</a>
+              </div>
+            </div>
+
+            {actionFlash ? (
+              <div className="rounded-[20px] border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-bold text-emerald-800">{actionFlash}</div>
+            ) : null}
+
             {globalErrors.length ? (
               <div className="rounded-[24px] border border-rose-200 bg-rose-50 px-4 py-4 text-sm text-rose-700">
                 {globalErrors.map((message) => <div key={message}>• {message}</div>)}
               </div>
             ) : null}
 
-            <SectionCard title={template.sections.find((section) => section.key === 'guardian')?.title?.[activeLocale]} subtitle={labels.sectionHints.guardian}>
+            <SectionCard anchorId="family-v3-guardian" title={template.sections.find((section) => section.key === 'guardian')?.title?.[activeLocale]} subtitle={labels.sectionHints.guardian}>
               <div className="grid gap-4 md:grid-cols-2">
                 {familyFieldIds.guardian.map((fieldId) => (
                   <InputField key={fieldId} field={fieldById.get(fieldId)} locale={activeLocale} value={values[fieldId]} error={fieldErrors[fieldId]} onChange={setFieldValue} labels={labels} />
                 ))}
               </div>
+              <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <div className="mb-2 text-sm font-black text-slate-900">{labels.quickActionsTitle}</div>
+                <div className="mb-3 text-xs leading-6 text-slate-500">{labels.quickActionsDescription}</div>
+                <div className="flex flex-wrap gap-2">
+                  <button type="button" onClick={copyPrimaryPhoneToWhatsapp} className="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700">{labels.copyPrimaryToWhatsapp}</button>
+                  <button type="button" onClick={syncMotherFamilyName} className="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700">{labels.syncMotherFamilyName}</button>
+                  <button type="button" onClick={applyFamilyInheritanceToStudents} className="rounded-2xl border border-brand-200 bg-brand-50 px-3 py-2 text-xs font-bold text-brand-800">{labels.applyInheritanceToAllStudents}</button>
+                </div>
+              </div>
             </SectionCard>
 
-            <SectionCard title={template.sections.find((section) => section.key === 'mother')?.title?.[activeLocale]} subtitle={labels.sectionHints.mother}>
+            <SectionCard anchorId="family-v3-mother" title={template.sections.find((section) => section.key === 'mother')?.title?.[activeLocale]} subtitle={labels.sectionHints.mother}>
               <div className="grid gap-4 md:grid-cols-2">
                 {familyFieldIds.mother.map((fieldId) => (
                   <InputField key={fieldId} field={fieldById.get(fieldId)} locale={activeLocale} value={values[fieldId]} error={fieldErrors[fieldId]} onChange={setFieldValue} labels={labels} />
@@ -1433,7 +1596,26 @@ export default function FamilyRegistrationV3Shell({ locale, dictionary }) {
               </div>
             </SectionCard>
 
-            <SectionCard title={template.sections.find((section) => section.key === 'students')?.title?.[activeLocale]} subtitle={labels.sectionHints.students}>
+            <SectionCard anchorId="family-v3-students" title={template.sections.find((section) => section.key === 'students')?.title?.[activeLocale]} subtitle={labels.sectionHints.students}>
+              <div className="mb-4 grid gap-3 md:grid-cols-4">
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm">
+                  <div className="text-slate-500">{labels.studentReadyLabel}</div>
+                  <div className="mt-1 font-black text-slate-900">{localeNumber(activeLocale, studentReadyCount)} / {localeNumber(activeLocale, values.students.length)}</div>
+                </div>
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm">
+                  <div className="text-slate-500">{labels.duplicateWarningLabel}</div>
+                  <div className="mt-1 font-black text-slate-900">{duplicateNames.length ? labels.duplicateWarningDetected : labels.duplicateWarningClear}</div>
+                </div>
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm">
+                  <div className="text-slate-500">{labels.manualOverridesLabel}</div>
+                  <div className="mt-1 font-black text-slate-900">{localeNumber(activeLocale, studentManualOverrides)}</div>
+                </div>
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm">
+                  <div className="text-slate-500">{labels.inheritedLinksLabel}</div>
+                  <div className="mt-1 font-black text-slate-900">{localeNumber(activeLocale, studentInheritedLinks)}</div>
+                </div>
+              </div>
+
               <div className="space-y-4">
                 {values.students.map((student, index) => (
                   <StudentCard
@@ -1447,6 +1629,7 @@ export default function FamilyRegistrationV3Shell({ locale, dictionary }) {
                     onFieldChange={setStudentValue}
                     onRestoreInheritance={restoreStudentInheritance}
                     onRemove={removeStudent}
+                    onDuplicate={duplicateStudentCard}
                     canRemove={values.students.length > 1}
                   />
                 ))}
@@ -1454,7 +1637,7 @@ export default function FamilyRegistrationV3Shell({ locale, dictionary }) {
               </div>
             </SectionCard>
 
-            <SectionCard title={template.sections.find((section) => section.key === 'family_context')?.title?.[activeLocale]} subtitle={labels.sectionHints.family_context}>
+            <SectionCard anchorId="family-v3-family-context" title={template.sections.find((section) => section.key === 'family_context')?.title?.[activeLocale]} subtitle={labels.sectionHints.family_context}>
               <div className="grid gap-4 md:grid-cols-2">
                 {familyFieldIds.family_context.map((fieldId) => (
                   <InputField key={fieldId} field={fieldById.get(fieldId)} locale={activeLocale} value={values[fieldId]} error={fieldErrors[fieldId]} onChange={setFieldValue} labels={labels} />
@@ -1462,7 +1645,7 @@ export default function FamilyRegistrationV3Shell({ locale, dictionary }) {
               </div>
             </SectionCard>
 
-            <SectionCard title={template.sections.find((section) => section.key === 'finance')?.title?.[activeLocale]} subtitle={labels.sectionHints.finance}>
+            <SectionCard anchorId="family-v3-finance" title={template.sections.find((section) => section.key === 'finance')?.title?.[activeLocale]} subtitle={labels.sectionHints.finance}>
               <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
                 <div className="mb-3 text-sm font-black text-slate-900">{labels.feeBandsTitle}</div>
                 <div className="space-y-2 text-sm text-slate-700">
@@ -1479,7 +1662,7 @@ export default function FamilyRegistrationV3Shell({ locale, dictionary }) {
               </div>
             </SectionCard>
 
-            <SectionCard title={template.sections.find((section) => section.key === 'documents')?.title?.[activeLocale]} subtitle={labels.sectionHints.documents}>
+            <SectionCard anchorId="family-v3-documents" title={template.sections.find((section) => section.key === 'documents')?.title?.[activeLocale]} subtitle={labels.sectionHints.documents}>
               <div className="grid gap-4 md:grid-cols-2">
                 {familyFieldIds.documents.map((fieldId) => (
                   <InputField key={fieldId} field={fieldById.get(fieldId)} locale={activeLocale} value={values[fieldId]} error={fieldErrors[fieldId]} onChange={setFieldValue} labels={labels} />
@@ -1487,7 +1670,7 @@ export default function FamilyRegistrationV3Shell({ locale, dictionary }) {
               </div>
             </SectionCard>
 
-            <SectionCard title={template.sections.find((section) => section.key === 'approval')?.title?.[activeLocale]} subtitle={labels.sectionHints.approval}>
+            <SectionCard anchorId="family-v3-approval" title={template.sections.find((section) => section.key === 'approval')?.title?.[activeLocale]} subtitle={labels.sectionHints.approval}>
               <div className="mb-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">{labels.termsAcceptanceText}</div>
               <div className="grid gap-4 md:grid-cols-2">
                 {familyFieldIds.approval.map((fieldId) => (
