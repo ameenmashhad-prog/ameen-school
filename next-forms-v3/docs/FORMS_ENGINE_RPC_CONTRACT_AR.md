@@ -90,3 +90,54 @@
   ]
 }
 ```
+
+---
+
+## 5) forms_request_upload_ticket_v3
+### المدخلات
+```json
+{
+  "form_slug": "student-registration-v3",
+  "locale": "ar",
+  "field_id": "student_documents",
+  "file_name": "passport.pdf",
+  "content_type": "application/pdf",
+  "byte_size": 524288
+}
+```
+
+### المخرجات
+```json
+{
+  "ok": true,
+  "ticket_id": "uuid-or-token",
+  "expires_at": "timestamp",
+  "upload_strategy": "signed_upload"
+}
+```
+
+---
+
+## 6) forms_submit_student_registration_v3
+### المدخلات
+```json
+{
+  "form_slug": "student-registration-v3",
+  "locale": "ar",
+  "visibility": "public",
+  "submission_ref": "SR-1720000000000",
+  "upload_ticket_id": "uuid-or-token",
+  "schema": { "...": "validated schema snapshot" },
+  "values": { "...": "submitted values" }
+}
+```
+
+### المخرجات
+```json
+{
+  "ok": true,
+  "submission_id": "uuid",
+  "submission_ref": "SR-1720000000000",
+  "status": "received"
+}
+```

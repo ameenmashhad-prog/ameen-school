@@ -27,3 +27,7 @@ export function listVersionsRpc(payload) {
 export function submitStudentRegistrationRpc(payload) {
   return call('/api/forms/rpc/submit-student-registration', payload);
 }
+
+export function requestUploadTicketRpc(payload) {
+  return call('/api/forms/rpc/request-upload-ticket', payload);
+}

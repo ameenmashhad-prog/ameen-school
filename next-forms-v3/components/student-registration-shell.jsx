@@ -2,11 +2,12 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import LanguageSwitcher from '@/components/language-switcher';
 import { buildTemplateByKey } from '@/lib/form-templates';
 import { formatDateForLocale, localeDateLabel, localeFontClass, localeMeta } from '@/lib/locale-config';
 import { nextVersionStamp } from '@/lib/utils';
-import { saveDraftRpc, listVersionsRpc, submitStudentRegistrationRpc } from '@/lib/rpc/forms-rpc';
+import { listVersionsRpc, requestUploadTicketRpc, saveDraftRpc, submitStudentRegistrationRpc } from '@/lib/rpc/forms-rpc';
 
 const LOCAL_LANGUAGE_KEY = 'amin_forms_v3_locale';
 const LOCAL_FORM_STATE_KEY = 'amin_forms_v3_student_registration_state';
@@ -39,6 +40,7 @@ function StatusPill({ tone = 'slate', children }) {
     warning: 'bg-amber-50 text-amber-700',
     danger: 'bg-rose-50 text-rose-700'
   };
+
   return <span className={`rounded-full px-3 py-1 text-sm font-bold ${tones[tone] || tones.slate}`}>{children}</span>;
 }
 
@@ -144,43 +146,30 @@ function PreviewCard({ title, rows }) {
   );
 }
 
-function SuccessPanel({ labels, receipt, locale }) {
-  if (!receipt) return null;
+function UploadTicketPanel({ labels, ticket, uploadState }) {
+  const tone = uploadState === 'ready' ? 'success' : uploadState === 'error' ? 'danger' : uploadState === 'loading' ? 'warning' : 'slate';
+  const stateText = uploadState === 'ready' ? labels.uploadPrepared : uploadState === 'loading' ? labels.uploadPreparing : uploadState === 'error' ? labels.uploadTicketError : labels.uploadTicketPending;
 
   return (
-    <section className="rounded-[24px] border border-emerald-200 bg-emerald-50 p-5 shadow-soft">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h3 className="text-xl font-black text-emerald-800">{labels.submitSuccessTitle}</h3>
-          <p className="mt-1 text-sm leading-7 text-emerald-700">{labels.submitSuccess}</p>
-        </div>
-        <StatusPill tone="success">{receipt.reportId}</StatusPill>
+    <section className="rounded-[24px] border border-slate-200 bg-white p-5 shadow-soft no-print">
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <h3 className="text-lg font-black text-slate-950">{labels.uploadTicketTitle}</h3>
+        <StatusPill tone={tone}>{stateText}</StatusPill>
       </div>
-      <div className="mt-4 grid gap-3 md:grid-cols-2">
-        <div className="rounded-2xl border border-emerald-200 bg-white px-4 py-3">
-          <div className="text-xs text-slate-500">{labels.submissionReference}</div>
-          <div className="mt-1 font-bold text-slate-900">{receipt.reportId}</div>
+      {ticket ? (
+        <div className="space-y-3 text-sm text-slate-700">
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+            <div className="text-xs text-slate-500">{labels.uploadTicketId}</div>
+            <div className="mt-1 font-bold text-slate-900">{ticket.ticketId || ticket.upload_token || '—'}</div>
+          </div>
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+            <div className="text-xs text-slate-500">{labels.uploadTicketExpiry}</div>
+            <div className="mt-1 font-bold text-slate-900">{ticket.expiresAtLabel || ticket.expires_at || '—'}</div>
+          </div>
         </div>
-        <div className="rounded-2xl border border-emerald-200 bg-white px-4 py-3">
-          <div className="text-xs text-slate-500">{labels.submittedAt}</div>
-          <div className="mt-1 font-bold text-slate-900">{receipt.submittedAtLabel}</div>
-        </div>
-      </div>
-      <div className="mt-4 flex flex-wrap gap-3 no-print">
-        <button
-          onClick={async () => {
-            try {
-              await navigator.clipboard.writeText(receipt.reportId);
-            } catch (error) {
-              console.error(error);
-            }
-          }}
-          className="rounded-2xl border border-emerald-200 bg-white px-4 py-2 text-sm font-bold text-emerald-800"
-        >
-          {labels.copyTrackingId}
-        </button>
-        <button onClick={() => window.print()} className="rounded-2xl bg-emerald-700 px-4 py-2 text-sm font-bold text-white">{labels.printReceipt}</button>
-      </div>
+      ) : (
+        <p className="text-sm leading-7 text-slate-500">{labels.uploadGuide}</p>
+      )}
     </section>
   );
 }
@@ -189,7 +178,7 @@ function normalizePhone(value) {
   return String(value || '').replace(/[^0-9+]/g, '');
 }
 
-function validateValues(template, values, labels, locale) {
+function validateValues(template, values, labels, requirePreparedUpload) {
   const errors = {};
 
   template.fields.forEach((field) => {
@@ -224,6 +213,9 @@ function validateValues(template, values, labels, locale) {
         const matches = accepted.some((item) => lowerName.endsWith(item.replace('*', '')));
         if (!matches) errors[field.id] = labels.invalidFileType;
       }
+      if (requirePreparedUpload && field.id === 'student_documents') {
+        errors[field.id] = labels.uploadTicketRequired;
+      }
     }
 
     if (field.type === 'signature' && value && String(value).trim().length < 3) {
@@ -235,6 +227,7 @@ function validateValues(template, values, labels, locale) {
 }
 
 export default function StudentRegistrationShell({ locale, dictionary }) {
+  const router = useRouter();
   const forms = dictionary.forms;
   const labelMap = forms.studentRegistration;
   const template = useMemo(() => buildTemplateByKey('student_registration'), []);
@@ -245,6 +238,8 @@ export default function StudentRegistrationShell({ locale, dictionary }) {
   const [submitState, setSubmitState] = useState('idle');
   const [versions, setVersions] = useState([]);
   const [receipt, setReceipt] = useState(null);
+  const [uploadTicket, setUploadTicket] = useState(null);
+  const [uploadState, setUploadState] = useState('idle');
   const meta = localeMeta[activeLocale] || localeMeta.ar;
 
   useEffect(() => {
@@ -257,6 +252,7 @@ export default function StudentRegistrationShell({ locale, dictionary }) {
         const parsed = JSON.parse(raw);
         if (parsed?.values) setValues(parsed.values);
         if (parsed?.receipt) setReceipt(parsed.receipt);
+        if (parsed?.uploadTicket) setUploadTicket(parsed.uploadTicket);
       } catch (error) {
         console.error(error);
       }
@@ -271,6 +267,7 @@ export default function StudentRegistrationShell({ locale, dictionary }) {
 
   useEffect(() => {
     let cancelled = false;
+
     async function loadVersions() {
       try {
         const result = await listVersionsRpc({ form_slug: template.slug });
@@ -281,13 +278,16 @@ export default function StudentRegistrationShell({ locale, dictionary }) {
         console.error(error);
       }
     }
+
     loadVersions();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [template.slug]);
 
   useEffect(() => {
     const timer = setInterval(async () => {
-      window.localStorage.setItem(LOCAL_FORM_STATE_KEY, JSON.stringify({ values, receipt }));
+      window.localStorage.setItem(LOCAL_FORM_STATE_KEY, JSON.stringify({ values, receipt, uploadTicket }));
       setSaveState('saving');
       try {
         await saveDraftRpc({
@@ -305,8 +305,9 @@ export default function StudentRegistrationShell({ locale, dictionary }) {
         setSaveState('error');
       }
     }, 15000);
+
     return () => clearInterval(timer);
-  }, [values, receipt, template, activeLocale]);
+  }, [values, receipt, uploadTicket, template, activeLocale]);
 
   const fieldsBySection = useMemo(() => {
     return template.sections.map((section) => ({
@@ -315,22 +316,25 @@ export default function StudentRegistrationShell({ locale, dictionary }) {
     }));
   }, [template]);
 
-  const validation = useMemo(() => validateValues(template, values, labelMap, activeLocale), [template, values, labelMap, activeLocale]);
   const requiredFields = useMemo(() => template.fields.filter((field) => field.required), [template]);
   const requiredDone = requiredFields.filter((field) => {
     const value = values[field.id];
     if (field.type === 'file') return !!value?.name;
     return String(value || '').trim().length > 0;
   }).length;
+  const validation = useMemo(() => validateValues(template, values, labelMap, Boolean(values.student_documents?.name && !uploadTicket)), [template, values, labelMap, uploadTicket]);
 
-  function persistLocal(nextValues, nextReceipt = receipt) {
-    window.localStorage.setItem(LOCAL_FORM_STATE_KEY, JSON.stringify({ values: nextValues, receipt: nextReceipt }));
+  function persistLocal(nextValues, nextReceipt = receipt, nextUploadTicket = uploadTicket) {
+    window.localStorage.setItem(LOCAL_FORM_STATE_KEY, JSON.stringify({ values: nextValues, receipt: nextReceipt, uploadTicket: nextUploadTicket }));
   }
 
   function setFieldValue(fieldId, value) {
     setValues((current) => {
       const next = { ...current, [fieldId]: fieldId === 'guardian_phone' ? normalizePhone(value) : value };
-      persistLocal(next);
+      const nextUploadTicket = fieldId === 'student_documents' ? null : uploadTicket;
+      if (fieldId === 'student_documents') setUploadTicket(null);
+      if (fieldId === 'student_documents') setUploadState('idle');
+      persistLocal(next, receipt, nextUploadTicket);
       return next;
     });
     setErrors((current) => ({ ...current, [fieldId]: undefined }));
@@ -342,7 +346,9 @@ export default function StudentRegistrationShell({ locale, dictionary }) {
     setValues(next);
     setErrors({});
     setReceipt(null);
-    persistLocal(next, null);
+    setUploadTicket(null);
+    setUploadState('idle');
+    persistLocal(next, null, null);
     setSubmitState('idle');
   }
 
@@ -358,6 +364,7 @@ export default function StudentRegistrationShell({ locale, dictionary }) {
         form_values: values,
         autosave: false
       });
+      persistLocal(values);
       setSaveState('saved');
     } catch (error) {
       console.error(error);
@@ -365,8 +372,43 @@ export default function StudentRegistrationShell({ locale, dictionary }) {
     }
   }
 
+  async function prepareUploadTicket() {
+    if (!values.student_documents?.name) {
+      setErrors((current) => ({ ...current, student_documents: labelMap.requiredField }));
+      return;
+    }
+
+    setUploadState('loading');
+    try {
+      const result = await requestUploadTicketRpc({
+        form_slug: template.slug,
+        locale: activeLocale,
+        field_id: 'student_documents',
+        file_name: values.student_documents.name,
+        content_type: values.student_documents.type || 'application/octet-stream',
+        byte_size: values.student_documents.size || 0
+      });
+      if (result?.ok === false) throw new Error(result.error || 'upload_ticket_failed');
+      const ticketPayload = result?.data || result;
+      const nextTicket = {
+        ...ticketPayload,
+        ticketId: ticketPayload?.ticket_id || ticketPayload?.upload_token || `UP-${Date.now()}`,
+        expiresAtLabel: ticketPayload?.expires_at ? formatDateForLocale(activeLocale, String(ticketPayload.expires_at).slice(0, 10)) : labelMap.uploadTicketPending
+      };
+      setUploadTicket(nextTicket);
+      persistLocal(values, receipt, nextTicket);
+      setUploadState('ready');
+      setErrors((current) => ({ ...current, student_documents: undefined }));
+    } catch (error) {
+      console.error(error);
+      setUploadState('error');
+      setErrors((current) => ({ ...current, student_documents: labelMap.uploadTicketError }));
+    }
+  }
+
   async function submitForm() {
-    const nextErrors = validateValues(template, values, labelMap, activeLocale);
+    const needUploadTicket = Boolean(values.student_documents?.name && !uploadTicket);
+    const nextErrors = validateValues(template, values, labelMap, needUploadTicket);
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length) {
       setSubmitState('validation_error');
@@ -375,6 +417,7 @@ export default function StudentRegistrationShell({ locale, dictionary }) {
 
     setSubmitState('submitting');
     const reportId = `SR-${Date.now()}`;
+
     try {
       const payload = {
         form_slug: template.slug,
@@ -382,21 +425,33 @@ export default function StudentRegistrationShell({ locale, dictionary }) {
         visibility: template.visibility,
         submission_ref: reportId,
         schema: template,
+        upload_ticket_id: uploadTicket?.ticketId || null,
         values
       };
       const result = await submitStudentRegistrationRpc(payload);
       if (result?.ok === false) {
         throw new Error(result.error || 'submit_failed');
       }
+
+      const submittedAtIso = new Date().toISOString();
       const nextReceipt = {
         reportId,
-        submittedAt: new Date().toISOString(),
-        submittedAtLabel: formatDateForLocale(activeLocale, new Date().toISOString().slice(0, 10)),
+        submittedAt: submittedAtIso,
+        submittedAtLabel: formatDateForLocale(activeLocale, submittedAtIso.slice(0, 10)),
         response: result
       };
+
       setReceipt(nextReceipt);
-      persistLocal(values, nextReceipt);
+      persistLocal(values, nextReceipt, uploadTicket);
       setSubmitState('submitted');
+
+      const params = new URLSearchParams({
+        ref: reportId,
+        submittedAt: submittedAtIso,
+        locale: activeLocale,
+        applicant: values.student_name || ''
+      });
+      router.push(`/${activeLocale}/forms/student-registration/success?${params.toString()}`);
     } catch (error) {
       console.error(error);
       setSubmitState('submit_error');
@@ -488,6 +543,7 @@ export default function StudentRegistrationShell({ locale, dictionary }) {
 
             <div className="no-print flex flex-wrap gap-3 rounded-[24px] border border-slate-200 bg-white p-4 shadow-soft">
               <button onClick={resetForm} className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-2 font-bold text-amber-800">{labelMap.reset}</button>
+              <button onClick={prepareUploadTicket} className="rounded-2xl border border-brand-200 bg-brand-50 px-4 py-2 font-bold text-brand-800">{labelMap.prepareUpload}</button>
               <button onClick={saveNow} className="rounded-2xl border border-slate-200 px-4 py-2 font-bold text-slate-700">{labelMap.saveNow}</button>
               <button onClick={submitForm} className="rounded-2xl bg-brand-500 px-4 py-2 font-bold text-white">{labelMap.submit}</button>
               {submitState === 'validation_error' ? <span className="self-center text-sm font-bold text-red-600">{labelMap.validationError}</span> : null}
@@ -498,11 +554,22 @@ export default function StudentRegistrationShell({ locale, dictionary }) {
           </section>
 
           <aside className="space-y-4">
+            <UploadTicketPanel labels={labelMap} ticket={uploadTicket} uploadState={uploadState} />
             <PreviewCard title={labelMap.guardianPreviewTitle} rows={previewGuardianRows} />
             <PreviewCard title={labelMap.studentPreviewTitle} rows={previewStudentRows} />
             <section className="rounded-[24px] border border-slate-200 bg-white p-5 shadow-soft">
               <h3 className="mb-3 text-lg font-black text-slate-950">{labelMap.printPreviewTitle}</h3>
-              <PreviewSheet locale={activeLocale} schema={template} labels={dictionary} />
+              <div className="mb-3 text-xs text-slate-500">{labelMap.printSheetHint}</div>
+              <div className="rounded-2xl border border-slate-100 bg-slate-50 p-3">
+                <div className="mb-3 flex items-center justify-between gap-3 text-xs text-slate-500">
+                  <span>{labelMap.printPaperLabel}</span>
+                  <StatusPill tone="slate">{template.printOrientation === 'landscape' ? forms.builder.printModes.landscape : forms.builder.printModes.portrait}</StatusPill>
+                </div>
+                <div className="scale-[0.97] origin-top">
+                  <PrintSheetPreview locale={activeLocale} template={template} values={values} labels={labelMap} />
+                </div>
+              </div>
+              <div className="print-only mt-3 rounded-2xl border border-brand-100 bg-brand-50 px-4 py-3 text-sm text-brand-800">{labelMap.printReceiptBanner}</div>
             </section>
             <section className="rounded-[24px] border border-slate-200 bg-white p-5 shadow-soft no-print">
               <h3 className="mb-3 text-lg font-black text-slate-950">{labelMap.versionListTitle}</h3>
@@ -519,5 +586,43 @@ export default function StudentRegistrationShell({ locale, dictionary }) {
         </div>
       </section>
     </main>
+  );
+}
+
+function PrintSheetPreview({ locale, template, values, labels }) {
+  const fieldsBySection = template.sections.map((section) => ({
+    ...section,
+    fields: template.fields.filter((field) => field.section === section.key)
+  }));
+
+  return (
+    <section className="rounded-[22px] border border-slate-200 bg-white p-5 shadow-sm">
+      <div className="border-b border-slate-100 pb-3 text-center">
+        <div className="text-xs text-slate-500">Amin Forms Studio v3</div>
+        <h4 className="mt-2 text-lg font-black text-slate-950">{labels.pageTitle}</h4>
+      </div>
+      <div className="mt-4 space-y-4">
+        {fieldsBySection.map((section) => (
+          <div key={section.key} className="rounded-2xl border border-slate-100 p-3">
+            <div className="mb-2 text-sm font-bold text-slate-900">{section.title[locale]}</div>
+            <div className="grid gap-2 md:grid-cols-2">
+              {section.fields.map((field) => {
+                const rawValue = values[field.id];
+                let rendered = rawValue;
+                if (field.type === 'date' && rawValue) rendered = formatDateForLocale(locale, rawValue);
+                if (field.type === 'file' && rawValue?.name) rendered = rawValue.name;
+                if (field.type === 'select') rendered = (field.options || []).find((option) => option.value === rawValue)?.label?.[locale] || '';
+                return (
+                  <div key={field.id} className={`rounded-xl bg-slate-50 px-3 py-3 ${field.width === 'full' ? 'md:col-span-2' : ''}`}>
+                    <div className="text-[11px] text-slate-500">{field.label?.[locale]}</div>
+                    <div className="mt-1 font-bold text-slate-900">{rendered || '—'}</div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }

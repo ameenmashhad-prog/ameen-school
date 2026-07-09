@@ -141,6 +141,23 @@
       "student": "Enter the student core profile details according to the currently active language.",
       "attachments": "At this stage only file metadata is stored; real binary upload will later connect through signed upload.",
       "approval": "The electronic signature is currently rendered as a typed local fallback until the final signature layer is connected."
-    }
+    },
+    "prepareUpload": "Prepare Attachment Upload",
+    "uploadPrepared": "Upload ticket is ready",
+    "uploadPreparing": "Preparing upload ticket...",
+    "uploadTicketError": "Could not prepare the upload ticket",
+    "uploadTicketPending": "No upload ticket has been prepared yet",
+    "uploadTicketTitle": "Attachment Status",
+    "uploadTicketId": "Ticket ID",
+    "uploadTicketExpiry": "Expiry",
+    "uploadGuide": "If a file is attached, prepare the upload ticket first so the form is ready for the real upload flow later.",
+    "uploadTicketRequired": "Prepare the file upload ticket before submitting the form.",
+    "printSheetHint": "This preview represents how the printed sheet will look with the current input values.",
+    "printPaperLabel": "Paper Mode",
+    "printReceiptBanner": "The current printout acts as a provisional receipt until the final PDF report is approved.",
+    "successPageSubtitle": "The request was registered successfully in the new interface. Keep the tracking reference to follow the status or share it with the administrative team.",
+    "successApplicant": "Student Name",
+    "openNewRegistration": "Open New Registration",
+    "returnToBuilder": "Return to Builder"
   }
 }
