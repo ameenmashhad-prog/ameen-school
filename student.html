@@ -96,6 +96,7 @@
   function money(v){return num(v).toLocaleString('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0})}
   function dualDate(v){return RT().dualDate ? RT().dualDate(String(v||'').slice(0,10)) : String(v||'').slice(0,10)}
   function emptyState(title, hint, actions){ return '<div class="finance-empty"><b>'+esc(title)+'</b><small>'+esc(hint||'')+'</small>'+(actions?'<div class="empty-actions">'+actions+'</div>':'')+'</div>'; }
+  function printEmptyMessage(title, hint){ return '<div style="text-align:center;padding:28px;border:1px dashed #cbd5e1;border-radius:14px;background:#f8fafc;color:#475569;"><b style="display:block;color:#0B6E4F;margin-bottom:8px;">'+esc(title)+'</b><span>'+esc(hint||'')+'</span></div>'; }
   function quickLinksBar(){ return '<div class="finance-quick-links no-print"><button class="btn blue" onclick="StudentPortal.showView(\'homeworks\')">واجباتي</button><button class="btn" onclick="StudentPortal.showView(\'grades\')">درجاتي</button><button class="btn" onclick="location.href=\'student-homeworks.html\'">تسليم واجب</button><button class="btn gold" onclick="location.href=\'smart-calendar.html\'">التقويم</button></div>'; }
   
   let sb = null;
@@ -425,7 +426,7 @@
     html += '</div>';
     
     if(!DATA.grades.length) {
-      html += '<div class="empty" style="text-align:center;padding:60px;">لا توجد درجات مسجلة بعد.</div>';
+      html += emptyState('لا توجد درجات مسجلة بعد','ستظهر درجاتك هنا بعد اعتمادها من المعلم أو الإدارة.');
     } else {
       const avg = Math.round(DATA.grades.reduce(function(s,g){ return s + num(g.score || g.grade || g.mark); }, 0) / DATA.grades.length);
       const excellent = DATA.grades.filter(function(g){ return num(g.score || g.grade || g.mark) >= 85; }).length;

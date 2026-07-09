@@ -94,6 +94,7 @@
   function money(v){return num(v).toLocaleString('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0})}
   function dualDate(v){return RT().dualDate ? RT().dualDate(String(v||'').slice(0,10)) : String(v||'').slice(0,10)}
   function emptyState(title, hint, actions){ return '<div class="finance-empty"><b>'+esc(title)+'</b><small>'+esc(hint||'')+'</small>'+(actions?'<div class="empty-actions">'+actions+'</div>':'')+'</div>'; }
+  function printEmptyMessage(title, hint){ return '<div style="text-align:center;padding:28px;border:1px dashed #cbd5e1;border-radius:14px;background:#f8fafc;color:#475569;"><b style="display:block;color:#0B6E4F;margin-bottom:8px;">'+esc(title)+'</b><span>'+esc(hint||'')+'</span></div>'; }
   function quickLinksBar(){ return '<div class="finance-quick-links no-print"><button class="btn blue" onclick="ParentPortal.showView(\'grades\')">درجات الأبناء</button><button class="btn" onclick="ParentPortal.showView(\'finance\')">الأقساط</button><button class="btn" onclick="location.href=\'student-homeworks.html\'">الواجبات</button><button class="btn gold" onclick="location.href=\'smart-calendar.html\'">التقويم</button></div>'; }
   
   let currentChildId = null;
@@ -722,7 +723,7 @@
       });
       html += '</tbody></table>';
     } else {
-      html += '<p style="text-align:center;padding:30px;color:#888;">لا توجد سجلات حضور.</p>';
+      html += printEmptyMessage('لا توجد سجلات حضور','ستظهر سجلات الحضور لهذا الطالب هنا بعد تسجيلها من المدرسة.');
     }
     
     return html;
@@ -753,7 +754,7 @@
       });
       html += '</tbody></table>';
     } else {
-      html += '<p style="text-align:center;padding:30px;color:#888;">لا توجد درجات مسجلة بعد.</p>';
+      html += printEmptyMessage('لا توجد درجات مسجلة بعد','ستظهر درجات هذا الطالب هنا بعد اعتمادها من المعلم أو الإدارة.');
     }
     
     return html;
@@ -785,7 +786,7 @@
       });
       html += '</tbody></table>';
     } else {
-      html += '<p style="text-align:center;padding:30px;color:#888;">لا توجد بيانات مالية.</p>';
+      html += printEmptyMessage('لا توجد بيانات مالية','لم يتم إنشاء ملف مالي لهذا الطالب بعد أو لم تُسجل عليه رسوم حالياً.');
     }
     
     return html;
