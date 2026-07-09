@@ -141,3 +141,28 @@
   "status": "received"
 }
 ```
+
+---
+
+## 7) مسار النقل الثنائي للملفات
+بعد إصدار تذكرة الرفع من `forms_request_upload_ticket_v3`، يتم نقل الملف الثنائي عبر مسار الخادم:
+- `POST /api/forms/upload-file`
+
+### المدخلات (multipart/form-data)
+- `ticket_id`
+- `form_slug`
+- `field_id`
+- `file`
+
+### المخرجات
+```json
+{
+  "ok": true,
+  "bucket": "forms-v3-uploads",
+  "object_path": "student-registration-v3/student_documents/...",
+  "file_name": "passport.pdf",
+  "byte_size": 524288
+}
+```
+
+> هذا المسار ليس كتابة مباشرة من الواجهة إلى الجداول، بل نقل ثنائي للخادم بعد إصدار تذكرة RPC، بينما يبقى حفظ بيانات النموذج نفسه عبر RPC فقط.

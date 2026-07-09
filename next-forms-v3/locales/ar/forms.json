@@ -158,6 +158,10 @@
     "successPageSubtitle": "تم تسجيل الطلب في الواجهة الجديدة بنجاح. احتفظ بالرقم المرجعي لمتابعة الحالة أو الربط مع الفريق الإداري.",
     "successApplicant": "اسم الطالب",
     "openNewRegistration": "فتح استمارة جديدة",
-    "returnToBuilder": "العودة إلى المحرر"
+    "returnToBuilder": "العودة إلى المحرر",
+    "uploadingFile": "جارٍ رفع الملف...",
+    "uploadDone": "تم رفع الملف بنجاح",
+    "uploadObjectPath": "مسار الملف المرفوع",
+    "fileNeedsReselect": "أعد اختيار الملف لأن الجلسة الحالية لا تحتوي على النسخة الثنائية للرفع."
   }
 }

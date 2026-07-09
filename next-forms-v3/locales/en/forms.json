@@ -158,6 +158,10 @@
     "successPageSubtitle": "The request was registered successfully in the new interface. Keep the tracking reference to follow the status or share it with the administrative team.",
     "successApplicant": "Student Name",
     "openNewRegistration": "Open New Registration",
-    "returnToBuilder": "Return to Builder"
+    "returnToBuilder": "Return to Builder",
+    "uploadingFile": "Uploading file...",
+    "uploadDone": "File uploaded successfully",
+    "uploadObjectPath": "Uploaded object path",
+    "fileNeedsReselect": "Please re-select the file; its binary content is not available in this session."
   }
 }

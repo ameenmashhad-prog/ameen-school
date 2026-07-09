@@ -34,6 +34,7 @@
 - `app/[locale]/forms/student-registration/success/page.jsx`
 - `app/api/forms/rpc/submit-student-registration/route.js`
 - `app/api/forms/rpc/request-upload-ticket/route.js`
+- `app/api/forms/upload-file/route.js`
 
 ## ملاحظة مهمة
 هذه الصفحة Production-ready من ناحية الواجهة وتدفق العمل، لكنها تحتاج لاحقًا:

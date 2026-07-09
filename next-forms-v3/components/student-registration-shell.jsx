@@ -4,10 +4,17 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import LanguageSwitcher from '@/components/language-switcher';
+import PreviewSheet from '@/components/preview-sheet';
 import { buildTemplateByKey } from '@/lib/form-templates';
 import { formatDateForLocale, localeDateLabel, localeFontClass, localeMeta } from '@/lib/locale-config';
 import { nextVersionStamp } from '@/lib/utils';
-import { listVersionsRpc, requestUploadTicketRpc, saveDraftRpc, submitStudentRegistrationRpc } from '@/lib/rpc/forms-rpc';
+import {
+  listVersionsRpc,
+  requestUploadTicketRpc,
+  saveDraftRpc,
+  submitStudentRegistrationRpc,
+  uploadAttachmentTransport
+} from '@/lib/rpc/forms-rpc';
 
 const LOCAL_LANGUAGE_KEY = 'amin_forms_v3_locale';
 const LOCAL_FORM_STATE_KEY = 'amin_forms_v3_student_registration_state';
@@ -82,12 +89,7 @@ function InputField({ field, locale, value, error, onChange, labelMap }) {
           accept={field.accept || '*'}
           onChange={(event) => {
             const file = event.target.files?.[0] || null;
-            onChange(field.id, file ? {
-              name: file.name,
-              size: file.size,
-              type: file.type,
-              lastModified: file.lastModified
-            } : null);
+            onChange(field.id, file ? { rawFile: file } : null);
           }}
           className={`${baseInputClass} border-dashed`}
         />
@@ -146,30 +148,80 @@ function PreviewCard({ title, rows }) {
   );
 }
 
-function UploadTicketPanel({ labels, ticket, uploadState }) {
-  const tone = uploadState === 'ready' ? 'success' : uploadState === 'error' ? 'danger' : uploadState === 'loading' ? 'warning' : 'slate';
-  const stateText = uploadState === 'ready' ? labels.uploadPrepared : uploadState === 'loading' ? labels.uploadPreparing : uploadState === 'error' ? labels.uploadTicketError : labels.uploadTicketPending;
+function UploadStatusPanel({ labels, uploadTicket, uploadedAttachment, uploadState }) {
+  const tone = uploadState === 'uploaded' ? 'success' : uploadState === 'uploading' ? 'warning' : uploadState === 'ready' ? 'brand' : uploadState === 'error' ? 'danger' : 'slate';
+  const statusText = uploadState === 'uploaded'
+    ? labels.uploadDone
+    : uploadState === 'uploading'
+      ? labels.uploadingFile
+      : uploadState === 'ready'
+        ? labels.uploadPrepared
+        : uploadState === 'error'
+          ? labels.uploadTicketError
+          : labels.uploadTicketPending;
 
   return (
-    <section className="rounded-[24px] border border-slate-200 bg-white p-5 shadow-soft no-print">
+    <section className="rounded-[24px] border border-slate-200 bg-white p-5 shadow-soft">
       <div className="mb-3 flex items-center justify-between gap-3">
         <h3 className="text-lg font-black text-slate-950">{labels.uploadTicketTitle}</h3>
-        <StatusPill tone={tone}>{stateText}</StatusPill>
+        <StatusPill tone={tone}>{statusText}</StatusPill>
       </div>
-      {ticket ? (
-        <div className="space-y-3 text-sm text-slate-700">
-          <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-            <div className="text-xs text-slate-500">{labels.uploadTicketId}</div>
-            <div className="mt-1 font-bold text-slate-900">{ticket.ticketId || ticket.upload_token || '—'}</div>
-          </div>
-          <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-            <div className="text-xs text-slate-500">{labels.uploadTicketExpiry}</div>
-            <div className="mt-1 font-bold text-slate-900">{ticket.expiresAtLabel || ticket.expires_at || '—'}</div>
-          </div>
+      <div className="space-y-3 text-sm text-slate-700">
+        <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+          <div className="text-xs text-slate-500">{labels.uploadTicketId}</div>
+          <div className="mt-1 font-bold text-slate-900">{uploadTicket?.ticketId || '—'}</div>
         </div>
-      ) : (
-        <p className="text-sm leading-7 text-slate-500">{labels.uploadGuide}</p>
-      )}
+        <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+          <div className="text-xs text-slate-500">{labels.uploadTicketExpiry}</div>
+          <div className="mt-1 font-bold text-slate-900">{uploadTicket?.expiresAtLabel || '—'}</div>
+        </div>
+        <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+          <div className="text-xs text-slate-500">{labels.uploadObjectPath}</div>
+          <div className="mt-1 break-all font-bold text-slate-900">{uploadedAttachment?.object_path || '—'}</div>
+        </div>
+      </div>
+      <p className="mt-3 text-sm leading-7 text-slate-500">{labels.uploadGuide}</p>
+    </section>
+  );
+}
+
+function SuccessPanel({ labels, receipt }) {
+  if (!receipt) return null;
+
+  return (
+    <section className="rounded-[24px] border border-emerald-200 bg-emerald-50 p-5 shadow-soft">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h3 className="text-xl font-black text-emerald-800">{labels.submitSuccessTitle}</h3>
+          <p className="mt-1 text-sm leading-7 text-emerald-700">{labels.submitSuccess}</p>
+        </div>
+        <StatusPill tone="success">{receipt.reportId}</StatusPill>
+      </div>
+      <div className="mt-4 grid gap-3 md:grid-cols-2">
+        <div className="rounded-2xl border border-emerald-200 bg-white px-4 py-3">
+          <div className="text-xs text-slate-500">{labels.submissionReference}</div>
+          <div className="mt-1 font-bold text-slate-900">{receipt.reportId}</div>
+        </div>
+        <div className="rounded-2xl border border-emerald-200 bg-white px-4 py-3">
+          <div className="text-xs text-slate-500">{labels.submittedAt}</div>
+          <div className="mt-1 font-bold text-slate-900">{receipt.submittedAtLabel}</div>
+        </div>
+      </div>
+      <div className="mt-4 flex flex-wrap gap-3 no-print">
+        <button
+          onClick={async () => {
+            try {
+              await navigator.clipboard.writeText(receipt.reportId);
+            } catch (error) {
+              console.error(error);
+            }
+          }}
+          className="rounded-2xl border border-emerald-200 bg-white px-4 py-2 text-sm font-bold text-emerald-800"
+        >
+          {labels.copyTrackingId}
+        </button>
+        <button onClick={() => window.print()} className="rounded-2xl bg-emerald-700 px-4 py-2 text-sm font-bold text-white">{labels.printReceipt}</button>
+      </div>
     </section>
   );
 }
@@ -178,8 +230,9 @@ function normalizePhone(value) {
   return String(value || '').replace(/[^0-9+]/g, '');
 }
 
-function validateValues(template, values, labels, requirePreparedUpload) {
+function validateValues(template, values, labels, options = {}) {
   const errors = {};
+  const requirePreparedUpload = options.requirePreparedUpload;
 
   template.fields.forEach((field) => {
     const value = values[field.id];
@@ -226,11 +279,50 @@ function validateValues(template, values, labels, requirePreparedUpload) {
   return errors;
 }
 
+function PrintSheetPreview({ locale, template, values, labels }) {
+  const fieldsBySection = template.sections.map((section) => ({
+    ...section,
+    fields: template.fields.filter((field) => field.section === section.key)
+  }));
+
+  return (
+    <section className="rounded-[22px] border border-slate-200 bg-white p-5 shadow-sm">
+      <div className="border-b border-slate-100 pb-3 text-center">
+        <div className="text-xs text-slate-500">Amin Forms Studio v3</div>
+        <h4 className="mt-2 text-lg font-black text-slate-950">{labels.pageTitle}</h4>
+      </div>
+      <div className="mt-4 space-y-4">
+        {fieldsBySection.map((section) => (
+          <div key={section.key} className="rounded-2xl border border-slate-100 p-3">
+            <div className="mb-2 text-sm font-bold text-slate-900">{section.title[locale]}</div>
+            <div className="grid gap-2 md:grid-cols-2">
+              {section.fields.map((field) => {
+                const rawValue = values[field.id];
+                let rendered = rawValue;
+                if (field.type === 'date' && rawValue) rendered = formatDateForLocale(locale, rawValue);
+                if (field.type === 'file' && rawValue?.name) rendered = rawValue.name;
+                if (field.type === 'select') rendered = (field.options || []).find((option) => option.value === rawValue)?.label?.[locale] || '';
+                return (
+                  <div key={field.id} className={`rounded-xl bg-slate-50 px-3 py-3 ${field.width === 'full' ? 'md:col-span-2' : ''}`}>
+                    <div className="text-[11px] text-slate-500">{field.label?.[locale]}</div>
+                    <div className="mt-1 font-bold text-slate-900">{rendered || '—'}</div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export default function StudentRegistrationShell({ locale, dictionary }) {
   const router = useRouter();
   const forms = dictionary.forms;
   const labelMap = forms.studentRegistration;
   const template = useMemo(() => buildTemplateByKey('student_registration'), []);
+
   const [activeLocale, setActiveLocale] = useState(locale);
   const [values, setValues] = useState(() => makeInitialValues(template));
   const [errors, setErrors] = useState({});
@@ -239,7 +331,10 @@ export default function StudentRegistrationShell({ locale, dictionary }) {
   const [versions, setVersions] = useState([]);
   const [receipt, setReceipt] = useState(null);
   const [uploadTicket, setUploadTicket] = useState(null);
+  const [uploadedAttachment, setUploadedAttachment] = useState(null);
   const [uploadState, setUploadState] = useState('idle');
+  const [fileObjects, setFileObjects] = useState({});
+
   const meta = localeMeta[activeLocale] || localeMeta.ar;
 
   useEffect(() => {
@@ -253,6 +348,7 @@ export default function StudentRegistrationShell({ locale, dictionary }) {
         if (parsed?.values) setValues(parsed.values);
         if (parsed?.receipt) setReceipt(parsed.receipt);
         if (parsed?.uploadTicket) setUploadTicket(parsed.uploadTicket);
+        if (parsed?.uploadedAttachment) setUploadedAttachment(parsed.uploadedAttachment);
       } catch (error) {
         console.error(error);
       }
@@ -287,7 +383,7 @@ export default function StudentRegistrationShell({ locale, dictionary }) {
 
   useEffect(() => {
     const timer = setInterval(async () => {
-      window.localStorage.setItem(LOCAL_FORM_STATE_KEY, JSON.stringify({ values, receipt, uploadTicket }));
+      window.localStorage.setItem(LOCAL_FORM_STATE_KEY, JSON.stringify({ values, receipt, uploadTicket, uploadedAttachment }));
       setSaveState('saving');
       try {
         await saveDraftRpc({
@@ -307,7 +403,7 @@ export default function StudentRegistrationShell({ locale, dictionary }) {
     }, 15000);
 
     return () => clearInterval(timer);
-  }, [values, receipt, uploadTicket, template, activeLocale]);
+  }, [values, receipt, uploadTicket, uploadedAttachment, template, activeLocale]);
 
   const fieldsBySection = useMemo(() => {
     return template.sections.map((section) => ({
@@ -322,21 +418,47 @@ export default function StudentRegistrationShell({ locale, dictionary }) {
     if (field.type === 'file') return !!value?.name;
     return String(value || '').trim().length > 0;
   }).length;
-  const validation = useMemo(() => validateValues(template, values, labelMap, Boolean(values.student_documents?.name && !uploadTicket)), [template, values, labelMap, uploadTicket]);
 
-  function persistLocal(nextValues, nextReceipt = receipt, nextUploadTicket = uploadTicket) {
-    window.localStorage.setItem(LOCAL_FORM_STATE_KEY, JSON.stringify({ values: nextValues, receipt: nextReceipt, uploadTicket: nextUploadTicket }));
+  const validation = useMemo(
+    () => validateValues(template, values, labelMap, { requirePreparedUpload: Boolean(values.student_documents?.name && !uploadTicket) }),
+    [template, values, labelMap, uploadTicket]
+  );
+
+  function persistLocal(nextValues, nextReceipt = receipt, nextUploadTicket = uploadTicket, nextAttachment = uploadedAttachment) {
+    window.localStorage.setItem(LOCAL_FORM_STATE_KEY, JSON.stringify({
+      values: nextValues,
+      receipt: nextReceipt,
+      uploadTicket: nextUploadTicket,
+      uploadedAttachment: nextAttachment
+    }));
   }
 
   function setFieldValue(fieldId, value) {
+    let normalizedValue = value;
+
+    if (fieldId === 'guardian_phone') {
+      normalizedValue = normalizePhone(value);
+    }
+
+    if (fieldId === 'student_documents') {
+      setFileObjects((current) => ({ ...current, student_documents: value?.rawFile || null }));
+      normalizedValue = value?.rawFile ? {
+        name: value.rawFile.name,
+        size: value.rawFile.size,
+        type: value.rawFile.type,
+        lastModified: value.rawFile.lastModified
+      } : null;
+      setUploadTicket(null);
+      setUploadedAttachment(null);
+      setUploadState('idle');
+    }
+
     setValues((current) => {
-      const next = { ...current, [fieldId]: fieldId === 'guardian_phone' ? normalizePhone(value) : value };
-      const nextUploadTicket = fieldId === 'student_documents' ? null : uploadTicket;
-      if (fieldId === 'student_documents') setUploadTicket(null);
-      if (fieldId === 'student_documents') setUploadState('idle');
-      persistLocal(next, receipt, nextUploadTicket);
+      const next = { ...current, [fieldId]: normalizedValue };
+      persistLocal(next, receipt, fieldId === 'student_documents' ? null : uploadTicket, fieldId === 'student_documents' ? null : uploadedAttachment);
       return next;
     });
+
     setErrors((current) => ({ ...current, [fieldId]: undefined }));
     if (submitState !== 'idle') setSubmitState('idle');
   }
@@ -347,8 +469,10 @@ export default function StudentRegistrationShell({ locale, dictionary }) {
     setErrors({});
     setReceipt(null);
     setUploadTicket(null);
+    setUploadedAttachment(null);
+    setFileObjects({});
     setUploadState('idle');
-    persistLocal(next, null, null);
+    persistLocal(next, null, null, null);
     setSubmitState('idle');
   }
 
@@ -389,14 +513,16 @@ export default function StudentRegistrationShell({ locale, dictionary }) {
         byte_size: values.student_documents.size || 0
       });
       if (result?.ok === false) throw new Error(result.error || 'upload_ticket_failed');
+
       const ticketPayload = result?.data || result;
       const nextTicket = {
         ...ticketPayload,
         ticketId: ticketPayload?.ticket_id || ticketPayload?.upload_token || `UP-${Date.now()}`,
         expiresAtLabel: ticketPayload?.expires_at ? formatDateForLocale(activeLocale, String(ticketPayload.expires_at).slice(0, 10)) : labelMap.uploadTicketPending
       };
+
       setUploadTicket(nextTicket);
-      persistLocal(values, receipt, nextTicket);
+      persistLocal(values, receipt, nextTicket, uploadedAttachment);
       setUploadState('ready');
       setErrors((current) => ({ ...current, student_documents: undefined }));
     } catch (error) {
@@ -408,7 +534,7 @@ export default function StudentRegistrationShell({ locale, dictionary }) {
 
   async function submitForm() {
     const needUploadTicket = Boolean(values.student_documents?.name && !uploadTicket);
-    const nextErrors = validateValues(template, values, labelMap, needUploadTicket);
+    const nextErrors = validateValues(template, values, labelMap, { requirePreparedUpload: needUploadTicket });
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length) {
       setSubmitState('validation_error');
@@ -419,15 +545,53 @@ export default function StudentRegistrationShell({ locale, dictionary }) {
     const reportId = `SR-${Date.now()}`;
 
     try {
+      let attachmentPayload = uploadedAttachment;
+
+      if (values.student_documents?.name) {
+        if (!uploadTicket?.ticketId) {
+          setErrors((current) => ({ ...current, student_documents: labelMap.uploadTicketRequired }));
+          setSubmitState('validation_error');
+          return;
+        }
+
+        if (!attachmentPayload) {
+          const rawFile = fileObjects.student_documents;
+          if (!rawFile) {
+            setErrors((current) => ({ ...current, student_documents: labelMap.fileNeedsReselect }));
+            setSubmitState('validation_error');
+            return;
+          }
+
+          setUploadState('uploading');
+          const uploadResult = await uploadAttachmentTransport({
+            ticketId: uploadTicket.ticketId,
+            formSlug: template.slug,
+            fieldId: 'student_documents',
+            file: rawFile
+          });
+          if (uploadResult?.ok === false) throw new Error(uploadResult.error || 'upload_failed');
+          attachmentPayload = uploadResult;
+          setUploadedAttachment(uploadResult);
+          setUploadState('uploaded');
+        }
+      }
+
       const payload = {
         form_slug: template.slug,
         locale: activeLocale,
         visibility: template.visibility,
         submission_ref: reportId,
         schema: template,
+        values,
         upload_ticket_id: uploadTicket?.ticketId || null,
-        values
+        uploaded_attachment: attachmentPayload ? {
+          bucket: attachmentPayload.bucket,
+          object_path: attachmentPayload.object_path,
+          file_name: attachmentPayload.file_name,
+          byte_size: attachmentPayload.byte_size
+        } : null
       };
+
       const result = await submitStudentRegistrationRpc(payload);
       if (result?.ok === false) {
         throw new Error(result.error || 'submit_failed');
@@ -442,7 +606,7 @@ export default function StudentRegistrationShell({ locale, dictionary }) {
       };
 
       setReceipt(nextReceipt);
-      persistLocal(values, nextReceipt, uploadTicket);
+      persistLocal(values, nextReceipt, uploadTicket, attachmentPayload || uploadedAttachment);
       setSubmitState('submitted');
 
       const params = new URLSearchParams({
@@ -455,6 +619,7 @@ export default function StudentRegistrationShell({ locale, dictionary }) {
     } catch (error) {
       console.error(error);
       setSubmitState('submit_error');
+      setUploadState((current) => current === 'uploading' ? 'error' : current);
     }
   }
 
@@ -464,6 +629,7 @@ export default function StudentRegistrationShell({ locale, dictionary }) {
     { label: labelMap.fields.guardian_email, value: values.guardian_email },
     { label: labelMap.fields.guardian_address, value: values.guardian_address }
   ];
+
   const previewStudentRows = [
     { label: labelMap.fields.student_name, value: values.student_name },
     { label: labelMap.fields.student_birth_date, value: values.student_birth_date ? formatDateForLocale(activeLocale, values.student_birth_date) : '' },
@@ -518,7 +684,7 @@ export default function StudentRegistrationShell({ locale, dictionary }) {
               </div>
             </div>
 
-            <SuccessPanel labels={labelMap} receipt={receipt} locale={activeLocale} />
+            <SuccessPanel labels={labelMap} receipt={receipt} />
 
             {fieldsBySection.map((section) => (
               <SectionCard key={section.key} title={section.title[activeLocale]} subtitle={labelMap.sectionHints?.[section.key]}>
@@ -550,11 +716,12 @@ export default function StudentRegistrationShell({ locale, dictionary }) {
               {submitState === 'submitted' ? <span className="self-center text-sm font-bold text-brand-700">{labelMap.submitSuccess}</span> : null}
               {submitState === 'submit_error' ? <span className="self-center text-sm font-bold text-red-600">{labelMap.submitError}</span> : null}
               {submitState === 'submitting' ? <span className="self-center text-sm font-bold text-slate-700">{labelMap.submitting}</span> : null}
+              {uploadState === 'uploading' ? <span className="self-center text-sm font-bold text-brand-700">{labelMap.uploadingFile}</span> : null}
             </div>
           </section>
 
           <aside className="space-y-4">
-            <UploadTicketPanel labels={labelMap} ticket={uploadTicket} uploadState={uploadState} />
+            <UploadStatusPanel labels={labelMap} uploadTicket={uploadTicket} uploadedAttachment={uploadedAttachment} uploadState={uploadState} />
             <PreviewCard title={labelMap.guardianPreviewTitle} rows={previewGuardianRows} />
             <PreviewCard title={labelMap.studentPreviewTitle} rows={previewStudentRows} />
             <section className="rounded-[24px] border border-slate-200 bg-white p-5 shadow-soft">
@@ -586,43 +753,5 @@ export default function StudentRegistrationShell({ locale, dictionary }) {
         </div>
       </section>
     </main>
-  );
-}
-
-function PrintSheetPreview({ locale, template, values, labels }) {
-  const fieldsBySection = template.sections.map((section) => ({
-    ...section,
-    fields: template.fields.filter((field) => field.section === section.key)
-  }));
-
-  return (
-    <section className="rounded-[22px] border border-slate-200 bg-white p-5 shadow-sm">
-      <div className="border-b border-slate-100 pb-3 text-center">
-        <div className="text-xs text-slate-500">Amin Forms Studio v3</div>
-        <h4 className="mt-2 text-lg font-black text-slate-950">{labels.pageTitle}</h4>
-      </div>
-      <div className="mt-4 space-y-4">
-        {fieldsBySection.map((section) => (
-          <div key={section.key} className="rounded-2xl border border-slate-100 p-3">
-            <div className="mb-2 text-sm font-bold text-slate-900">{section.title[locale]}</div>
-            <div className="grid gap-2 md:grid-cols-2">
-              {section.fields.map((field) => {
-                const rawValue = values[field.id];
-                let rendered = rawValue;
-                if (field.type === 'date' && rawValue) rendered = formatDateForLocale(locale, rawValue);
-                if (field.type === 'file' && rawValue?.name) rendered = rawValue.name;
-                if (field.type === 'select') rendered = (field.options || []).find((option) => option.value === rawValue)?.label?.[locale] || '';
-                return (
-                  <div key={field.id} className={`rounded-xl bg-slate-50 px-3 py-3 ${field.width === 'full' ? 'md:col-span-2' : ''}`}>
-                    <div className="text-[11px] text-slate-500">{field.label?.[locale]}</div>
-                    <div className="mt-1 font-bold text-slate-900">{rendered || '—'}</div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        ))}
-      </div>
-    </section>
   );
 }

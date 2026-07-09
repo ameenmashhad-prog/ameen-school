@@ -31,3 +31,19 @@ export function submitStudentRegistrationRpc(payload) {
 export function requestUploadTicketRpc(payload) {
   return call('/api/forms/rpc/request-upload-ticket', payload);
 }
+
+export async function uploadAttachmentTransport({ ticketId, formSlug, fieldId, file }) {
+  const formData = new FormData();
+  formData.append('ticket_id', ticketId);
+  formData.append('form_slug', formSlug);
+  formData.append('field_id', fieldId);
+  formData.append('file', file);
+
+  const response = await fetch('/api/forms/upload-file', {
+    method: 'POST',
+    body: formData
+  });
+
+  if (!response.ok) throw new Error(`Upload failed: ${response.status}`);
+  return response.json();
+}
