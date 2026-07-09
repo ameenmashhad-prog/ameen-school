@@ -79,7 +79,15 @@
           <option value="teachers">معلمون</option>
         </select>
       </div>
+      <div class="reg-inline-actions" style="margin-top:14px">
+        <button class="btn" type="button" onclick="applyQuickFilter('pending','all')">المعلّق فقط</button>
+        <button class="btn" type="button" onclick="applyQuickFilter('all','families')">الأسر فقط</button>
+        <button class="btn" type="button" onclick="applyQuickFilter('all','teachers')">المعلمون فقط</button>
+        <button class="btn" type="button" onclick="resetFilters()">تصفير الفلاتر</button>
+      </div>
     </section>
+
+    <section class="reg-card no-print" id="reviewOverviewPanel"></section>
 
     <section class="reg-kpis no-print" id="statsGrid">
       <div class="reg-kpi is-primary"><small>طلبات الأسر</small><b>—</b><p>أسر بانتظار المراجعة أو الاعتماد</p></div>
@@ -137,8 +145,11 @@ function toast(title,msg){
   clearTimeout(el._t);
   el._t = setTimeout(()=>el.classList.remove('show'),3500);
 }
+function progressItem(cls,icon,title,detail){
+  return '<li class="reg-check-item '+cls+'"><span class="reg-check-icon">'+esc(icon)+'</span><div><b>'+esc(title)+'</b><small>'+esc(detail)+'</small></div></li>';
+}
 
-const state = { query:'', status:'all', scope:'all' };
+const state = { query:'', status:'all', scope:'all', lastLoadedAt:null };
 let familiesRaw = [];
 let familyGroups = [];
 let teachersRaw = [];
@@ -286,7 +297,25 @@ function renderTeachers(){
       + '</article>';
   }).join('')+'</div>';
 }
+function renderOverview(){
+  const families = getFilteredFamilies();
+  const teachers = getFilteredTeachers();
+  const totalCurrent = families.length + teachers.length;
+  const pendingCurrent = families.filter(x=>normalizeStatus(x.family_status)==='pending').length + teachers.filter(x=>normalizeStatus(x.status)==='pending').length;
+  const approvedCurrent = families.filter(x=>normalizeStatus(x.family_status)==='approved').length + teachers.filter(x=>normalizeStatus(x.status)==='approved').length;
+  const reviewedCurrent = families.filter(x=>normalizeStatus(x.family_status)==='reviewed').length + teachers.filter(x=>normalizeStatus(x.status)==='reviewed').length;
+  const suggestion = pendingCurrent ? 'ابدأ بالطلبات المعلّقة أولاً، ثم فعّل الحسابات بعد المراجعة النهائية.' : totalCurrent ? 'لا توجد طلبات معلّقة ضمن الفلتر الحالي؛ يمكنك مراجعة المعتمدة أو تغيير الفلاتر.' : 'غيّر الفلتر أو أزل البحث لعرض طلبات أخرى.';
+  const lastLoaded = state.lastLoadedAt ? new Intl.DateTimeFormat('ar',{hour:'numeric',minute:'numeric',second:'numeric'}).format(state.lastLoadedAt) : '—';
+  $('#reviewOverviewPanel').innerHTML = '<div class="reg-progress-grid">'
+    + '<div class="reg-progress-card"><h4>ملخص الفلتر الحالي</h4><p>'+esc(suggestion)+'</p><div class="reg-progress-meta"><span class="reg-chip">إجمالي ظاهر: '+esc(totalCurrent)+'</span><span class="reg-chip">معلّق: '+esc(pendingCurrent)+'</span><span class="reg-chip">تمت مراجعته: '+esc(reviewedCurrent)+'</span><span class="reg-chip">معتمد: '+esc(approvedCurrent)+'</span></div><div class="reg-inline-actions"><button class="btn" type="button" onclick="applyQuickFilter(\'pending\',\'all\')">فتح المعلّق</button><button class="btn" type="button" onclick="window.print()">طباعة السجل الحالي</button></div></div>'
+    + '<div class="reg-progress-card"><h4>حالة التحميل</h4><ul class="reg-check-list">'
+    + progressItem(totalCurrent?'ok':'warn', totalCurrent?'✓':'!', 'النتائج الحالية', totalCurrent ? ('تم تحميل '+totalCurrent+' طلب/طلبات وفق الفلتر الحالي.') : 'لا توجد نتائج ضمن هذا الفلتر حالياً.')
+    + progressItem(state.query?'ok':'warn', state.query?'✓':'!', 'البحث النصي', state.query ? ('البحث الحالي: '+state.query) : 'لم يتم استخدام بحث نصي حتى الآن.')
+    + progressItem('ok','⏱','آخر تحديث', 'آخر جلب للبيانات: '+lastLoaded)
+    + '</ul></div></div>';
+}
 function renderAll(){
+  renderOverview();
   renderStats();
   renderFamilies();
   renderTeachers();
@@ -379,6 +408,23 @@ async function loadAll(){
   } else {
     teachersRaw = teachersRes.data || [];
   }
+  state.lastLoadedAt = new Date();
+  renderAll();
+}
+function resetFilters(){
+  state.query='';
+  state.status='all';
+  state.scope='all';
+  $('#searchInput').value='';
+  $('#statusFilter').value='all';
+  $('#scopeFilter').value='all';
+  renderAll();
+}
+function applyQuickFilter(status,scope){
+  state.status=status;
+  state.scope=scope;
+  $('#statusFilter').value=status;
+  $('#scopeFilter').value=scope;
   renderAll();
 }
 function bindFilters(){
@@ -390,6 +436,8 @@ window.addEventListener('load',()=>{bindFilters(); loadAll();});
 window.setStatus = setStatus;
 window.activateAccount = activateAccount;
 window.loadAll = loadAll;
+window.resetFilters = resetFilters;
+window.applyQuickFilter = applyQuickFilter;
 </script>
 <script src="assets/ux-enhancements.js?v=20260706-3"></script>
 <script src="assets/amin-theme-injector.js"></script>

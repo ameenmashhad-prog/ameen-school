@@ -40,6 +40,10 @@
   .error-item{padding:10px 12px;border-radius:16px;background:#fff;border:1px solid #f1d0d0}
   .small-muted{color:var(--muted);font-size:13px}
   .small-ok{color:#0b6e4f;font-size:13px}
+  .import-group-list{display:grid;gap:8px;margin-top:14px}
+  .import-group-item{padding:10px 12px;border-radius:16px;background:#f8fbff;border:1px solid #dbe6f7}
+  .import-group-item b{display:block;margin-bottom:4px}
+  .import-tool-note{margin-top:12px;color:var(--muted);font-size:13px;line-height:1.7}
   @media (max-width:900px){.import-hero{grid-template-columns:1fr}}
   @media (max-width:640px){.dropzone{padding:24px}.import-card{padding:18px}}
   @media print{
@@ -141,6 +145,19 @@
 
         <section class="import-card no-print">
           <div class="card-head" style="padding:0;border:0;background:transparent;margin-bottom:16px">
+            <h3>🧩 قوالب وأدوات سريعة</h3>
+          </div>
+          <p>إذا لم يكن لديك ملف جاهز بعد، استخدم هذه الأدوات لتجهيز قالب صحيح بسرعة قبل الرفع.</p>
+          <div class="import-actions">
+            <button class="btn" type="button" onclick="ImportStudents.downloadTemplate()">⬇️ تحميل قالب CSV</button>
+            <button class="btn" type="button" onclick="ImportStudents.downloadSample()">🧪 تحميل مثال صالح</button>
+            <button class="btn" type="button" onclick="ImportStudents.copyHeaders()">📋 نسخ أسماء الأعمدة</button>
+          </div>
+          <div class="import-tool-note">القالب يتضمن الأعمدة الأكثر اعتماداً في النظام: اسم ولي الأمر، الهاتف، البريد، اسم الطالب، تاريخ الميلاد، الصف، الجنس.</div>
+        </section>
+
+        <section class="import-card no-print">
+          <div class="card-head" style="padding:0;border:0;background:transparent;margin-bottom:16px">
             <h3>📥 رفع ملف Excel أو CSV</h3>
           </div>
           <div class="dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()">
@@ -190,6 +207,12 @@
     studentGrade:['الصف المطلوب','الصف','Class','Grade'],
     studentGender:['الجنس','Gender']
   };
+  const TEMPLATE_HEADERS = ['اسم ولي الأمر الكامل','رقم الهاتف','البريد الإلكتروني','اسم الطالب الكامل','تاريخ الميلاد','الصف المطلوب','الجنس'];
+  const SAMPLE_CSV_ROWS = [
+    ['ولي أمر مثال 1','07700000001','parent1@example.com','طالب مثال 1','2017-01-15','الأول الابتدائي','ذكر'],
+    ['ولي أمر مثال 1','07700000001','parent1@example.com','طالب مثال 2','2016-08-02','الثاني الابتدائي','أنثى'],
+    ['ولي أمر مثال 2','07700000002','parent2@example.com','طالب مثال 3','2015-10-21','الثالث الابتدائي','ذكر']
+  ];
 
   function $(s,r=document){return r.querySelector(s)}
   function esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;')}
@@ -225,6 +248,24 @@
       if(row && row[key] != null && String(row[key]).trim()) return String(row[key]).trim();
     }
     return '';
+  }
+  function csvEscape(v){
+    const text = String(v == null ? '' : v);
+    return /[",\n]/.test(text) ? '"' + text.replace(/"/g,'""') + '"' : text;
+  }
+  function makeCsv(rows){
+    return rows.map(row => row.map(csvEscape).join(',')).join('\n');
+  }
+  function triggerDownload(filename, content){
+    const blob = new Blob([content], {type:'text/csv;charset=utf-8;'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
   function normalizeArabic(v){
     return String(v || '')
@@ -438,6 +479,8 @@
     }).join('');
     const moreText = ANALYSIS.total > 12 ? '<p class="small-muted" style="margin-top:12px;text-align:center">تم عرض أول 12 سجل فقط من أصل '+esc(ANALYSIS.total)+' سجل.</p>' : '';
     const groupsCount = ANALYSIS.plan.groups.length;
+    const groupsHtml = ANALYSIS.plan.groups.slice(0,5).map(group => '<div class="import-group-item"><b>'+esc(group.displayName || 'أسرة غير مسماة')+'</b><small class="small-muted">'+esc(group.students.length)+' طالب/طلاب — '+esc(group.contact || 'بدون وسيلة تواصل')+'</small></div>').join('');
+    const groupsMore = groupsCount > 5 ? '<div class="small-muted">... وهناك '+esc(groupsCount - 5)+' أسر إضافية في نفس الدفعة.</div>' : '';
     $('#previewSection').innerHTML = ''
       + '<div class="import-card">'
       +   '<div class="card-head" style="padding:0;border:0;background:transparent;margin-bottom:16px">'
@@ -451,6 +494,7 @@
       +   '</div>'
       +   '<div class="import-note" style="margin-bottom:16px">اكتشفنا الأعمدة التالية: '+ANALYSIS.headers.map(h=>'<span class="import-chip">'+esc(h)+'</span>').join(' ')+'</div>'
       +   '<div class="import-note" style="margin-bottom:16px">سيتم تحويل الملف إلى <b>'+esc(groupsCount)+'</b> طلب أسرة و <b>'+esc(ANALYSIS.plan.readyRows.length)+'</b> سجل طالب جاهز، مع تجاوز السجلات الناقصة تماماً.</div>'
+      +   '<div class="import-card" style="padding:16px;margin-bottom:16px;background:#fbfdff;border-style:dashed"><h3 style="font-size:18px;margin-bottom:6px">تجميع الأسر قبل الحفظ</h3><p class="small-muted">هذا يوضح كيف سيتحول الملف إلى طلبات أسر منفصلة داخل النظام.</p><div class="import-group-list">'+groupsHtml+'</div>'+groupsMore+'</div>'
       +   '<div class="preview-table-wrap">'
       +     '<table class="preview-table">'
       +       '<thead><tr><th>#</th><th>ولي الأمر</th><th>الطالب</th><th>التواصل</th><th>الصف</th><th>ملاحظات</th><th>الحالة</th></tr></thead>'
@@ -664,6 +708,18 @@
     $('#resultsSection').innerHTML = '';
     renderPreviewEmpty('لم يتم اختيار ملف بعد', 'ارفع ملف Excel أو CSV لعرض السجلات الجاهزة قبل الاستيراد.');
   }
+  function downloadTemplate(){
+    triggerDownload('registration-template.csv', makeCsv([TEMPLATE_HEADERS]));
+    toast('تم التحضير', 'تم تنزيل قالب CSV فارغ', 'green');
+  }
+  function downloadSample(){
+    triggerDownload('registration-sample.csv', makeCsv([TEMPLATE_HEADERS].concat(SAMPLE_CSV_ROWS)));
+    toast('تم التحضير', 'تم تنزيل ملف مثال صالح', 'green');
+  }
+  function copyHeaders(){
+    const text = TEMPLATE_HEADERS.join(',');
+    navigator.clipboard.writeText(text).then(() => toast('تم النسخ', 'تم نسخ أسماء الأعمدة', 'green')).catch(() => toast('تعذر النسخ', 'انسخ أسماء الأعمدة يدوياً من الشاشة', 'red'));
+  }
 
   window.addEventListener('load', init);
   window.ImportStudents = {
@@ -673,7 +729,10 @@
     shareWhatsApp,
     importAll,
     cancel,
-    resetPage
+    resetPage,
+    downloadTemplate,
+    downloadSample,
+    copyHeaders
   };
 })();
 </script>
