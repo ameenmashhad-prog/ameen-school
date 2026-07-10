@@ -9,6 +9,8 @@
     analyticsEnabled: true,
     analyticsTable: 'ui_analytics_events',
     academicMonths: [9,10,11,12,1,2,3,4,5],
-    defaultAttendanceType: 'daily'
+    defaultAttendanceType: 'daily',
+    familyRegistrationV3Url: '',
+    familyRegistrationV3AutoRedirect: false
   };
 }());

@@ -28,6 +28,19 @@
       <aside class="reg-side"><div class="steps"><div class="step"><b>1</b><span>بيانات ولي الأمر والأم</span></div><div class="step"><b>2</b><span>بيانات الطلاب</span></div><div class="step"><b>3</b><span>الإرسال والطباعة</span></div></div></aside>
     </section>
 
+    <section class="reg-soft-launch no-print" id="familyV3SoftLaunch" hidden>
+      <div class="reg-soft-launch-copy">
+        <span class="reg-soft-pill">نسخة جديدة جاهزة</span>
+        <h3>تم تجهيز Family Registration v3</h3>
+        <p id="familyV3Status">هذه النسخة الأحدث تبقي منطق التسجيل العائلي وتقلل تكرار بيانات الأب والعائلة عند إضافة أكثر من طالب.</p>
+        <small class="reg-soft-countdown" aria-live="polite">تحويل تلقائي بعد <span id="familyV3Countdown">4</span> ثوانٍ عند تفعيل التحويل التلقائي.</small>
+      </div>
+      <div class="reg-soft-launch-actions">
+        <a class="btn blue" id="familyV3LaunchLink" href="#">افتح النسخة الجديدة</a>
+        <button class="btn" type="button" id="familyV3DismissBtn">الاستمرار في النسخة الحالية</button>
+      </div>
+    </section>
+
     <section class="reg-callout no-print">
       <div>
         <b>جهزي قبل البدء</b>
@@ -121,6 +134,7 @@
 <script src="libs/supabase.min.js"></script><script src="libs/calendar-lib.js"></script><script src="assets/config.js"></script><script src="assets/platform-modules.js"></script><script src="assets/i18n.js"></script><script src="assets/registration.js?v=20260709-3"></script>
 <script>window.addEventListener('load',()=>RegistrationForms.init('family'));</script>
 <script src="assets/ux-enhancements.js?v=20260706-3"></script>
+<script src="assets/family-registration-soft-launch.js?v=20260710-1"></script>
 <script src="assets/amin-theme-injector.js"></script>
 <script src="assets/amin-icons.js?v=20260706-3" defer></script>
 </body>

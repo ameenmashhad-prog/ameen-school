@@ -443,6 +443,37 @@
   .filters-bar > :first-child{grid-column:1/-1}
   .reg-title h2{font-size:34px}
 }
+.reg-soft-launch{
+  margin-bottom:18px;
+  padding:18px 22px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  border-radius:32px;
+  background:linear-gradient(145deg,#fff,#ecf8f5);
+  border:1px solid rgba(11,110,79,.14);
+  box-shadow:var(--e1);
+}
+.reg-soft-launch-copy h3{margin:6px 0 8px;font-size:24px}
+.reg-soft-launch-copy p{margin:0;color:var(--muted);line-height:1.8}
+.reg-soft-pill{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:8px 12px;
+  border-radius:999px;
+  background:#dff6ef;
+  color:#0b6e4f;
+  border:1px solid #b9efcf;
+  font-size:12px;
+  font-weight:900;
+}
+.reg-soft-launch-actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end}
+.reg-soft-countdown{display:block;margin-top:8px;color:#0b6e4f;font-weight:800}
+.btn.is-disabled,
+.btn[aria-disabled="true"]{pointer-events:none;opacity:.6}
+
 @media(max-width:620px){
   .reg-shell{padding:12px}
   .reg-header{
@@ -461,7 +492,8 @@
   .reg-card,
   .reg-callout,
   .reg-subnav,
-  .reg-upload-card{padding:18px;border-radius:24px}
+  .reg-upload-card,
+  .reg-soft-launch{padding:18px;border-radius:24px}
   .reg-title h2{font-size:28px}
   .reg-title p{font-size:16px}
   .form-grid{grid-template-columns:repeat(4,1fr)}
@@ -473,7 +505,8 @@
   .section-head,
   .request-card-head,
   .reg-subnav,
-  .reg-callout{align-items:flex-start;flex-direction:column}
+  .reg-callout,
+  .reg-soft-launch{align-items:flex-start;flex-direction:column}
   .filters-bar{grid-template-columns:1fr}
   .request-actions .btn{flex:1;min-width:0}
 }
