@@ -11,6 +11,7 @@ ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 TARGET_URL="${1%/}"
 TEMPLATE_FILE="$ROOT_DIR/family-registration-v3-hard-switch.template.html"
 LEGACY_FILE="$ROOT_DIR/family-registration.html"
+PUBLIC_LEGACY_FILE="$ROOT_DIR/family-registration-legacy.html"
 BACKUP_DIR="$ROOT_DIR/migration_backups"
 TIMESTAMP="$(date +%Y%m%d-%H%M%S)"
 BACKUP_FILE="$BACKUP_DIR/family-registration.${TIMESTAMP}.legacy.html"
@@ -27,6 +28,7 @@ fi
 
 mkdir -p "$BACKUP_DIR"
 cp "$LEGACY_FILE" "$BACKUP_FILE"
+cp "$LEGACY_FILE" "$PUBLIC_LEGACY_FILE"
 
 python3 - <<PY
 from pathlib import Path
@@ -38,4 +40,5 @@ PY
 
 echo "Hard switch applied successfully."
 echo "Legacy backup saved to: $BACKUP_FILE"
+echo "Public legacy copy saved to: $PUBLIC_LEGACY_FILE"
 echo "family-registration.html now redirects to: $TARGET_URL/ar/forms/family-registration-v3"

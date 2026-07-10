@@ -23,8 +23,9 @@
 
 هذا السكربت يقوم بـ:
 1. أخذ نسخة احتياطية من `family-registration.html`
-2. حقن رابط النشر الحقيقي داخل القالب
-3. استبدال `family-registration.html` تلقائيًا
+2. إنشاء نسخة منشورة مؤقتة من الفورم السابق باسم `family-registration-legacy.html`
+3. حقن رابط النشر الحقيقي داخل القالب
+4. استبدال `family-registration.html` تلقائيًا
 
 ---
 
@@ -50,12 +51,15 @@ bash scripts/apply-family-registration-hard-switch.sh https://next-forms-v3.verc
 باسم مثل:
 - `family-registration.20260710-123456.legacy.html`
 
+كما تُنشأ نسخة منشورة قابلة للفتح يدويًا باسم:
+- `family-registration-legacy.html`
+
 ### 2) الصفحة الحالية تُستبدل
 يصبح `family-registration.html` نفسه عبارة عن:
 - رسالة قصيرة
 - redirect تلقائي
 - زر فتح يدوي للنسخة الجديدة
-- زر عودة مؤقتة إلى النسخة السابقة
+- زر فتح مؤقت للنسخة السابقة عبر `family-registration-legacy.html`
 
 ---
 
