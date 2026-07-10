@@ -175,6 +175,12 @@ NEXT_FORMS_V3_URL=https://next-forms-v3.vercel.app
 
 # ملفات جاهزة مرتبطة بهذه الخطة
 - `docs/FAMILY_REGISTRATION_TO_FORMS_V3_MIGRATION_PLAN_AR.md`
+- `docs/FAMILY_REGISTRATION_V3_SOFT_LAUNCH_READY_AR.md`
+- `docs/FAMILY_REGISTRATION_V3_HARD_SWITCH_READY_AR.md`
 - `family-registration-v3-bridge.html`
+- `family-registration-v3-hard-switch.template.html`
+- `scripts/apply-family-registration-hard-switch.sh`
 
-الملف الثاني هو صفحة bridge جاهزة تقريبًا، يكفي وضع رابط النشر الحقيقي داخلها ثم استخدامها بدل الصفحة القديمة عندما تقررون التحويل النهائي.
+الملفات الآن تغطي المسارين:
+- Soft Launch داخل الصفحة القديمة
+- Hard Switch نهائي مع backup تلقائي وrollback واضح
