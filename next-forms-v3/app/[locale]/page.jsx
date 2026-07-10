@@ -1,10 +1,10 @@
 import Link from 'next/link';
-import { getDictionary } from '@/lib/i18n';
+import { getFormsHomeDictionary } from '@/lib/i18n';
 import { localeMeta } from '@/lib/locale-config';
 
 export default async function LocaleHome({ params }) {
   const locale = params.locale;
-  const dict = await getDictionary(locale, 'forms');
+  const dict = await getFormsHomeDictionary(locale);
   const meta = localeMeta[locale];
 
   return (

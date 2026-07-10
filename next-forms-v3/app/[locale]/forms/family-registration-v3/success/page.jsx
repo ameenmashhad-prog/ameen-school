@@ -1,11 +1,10 @@
 import StudentRegistrationSuccessShell from '@/components/student-registration-success-shell';
-import { getDictionary } from '@/lib/i18n';
+import { getFormsSuccessDictionary } from '@/lib/i18n';
 import { formatDateForLocale } from '@/lib/locale-config';
 
 export default async function FamilyRegistrationV3SuccessPage({ params, searchParams }) {
   const locale = params.locale;
-  const forms = await getDictionary(locale, 'forms');
-  const labels = forms.familyRegistrationV3;
+  const { forms, labels } = await getFormsSuccessDictionary(locale, 'familyRegistrationV3');
 
   const payload = {
     ref: searchParams?.ref || '—',
