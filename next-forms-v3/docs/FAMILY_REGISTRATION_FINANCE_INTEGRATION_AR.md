@@ -5,11 +5,12 @@
 تمت إضافة route قراءة جديدة:
 - `app/api/forms/data/family-registration-finance/route.js`
 
-هذه route تقرأ:
-- `classes`
-- `fee_structures`
+وأصبحت تعتمد على RPC عامة مخصصة:
+- `forms_get_family_registration_finance_catalog_v3`
 
-ثم تعيد لكل صف:
+بدل القراءة المباشرة من `fee_structures`، حتى لا تتأثر بصلاحيات الصفحة المالية أو غياب service role في بيئة النشر.
+
+هذه route تعيد لكل صف:
 - `class_id`
 - `class_name`
 - `fee_structure_id`
@@ -42,8 +43,11 @@
 ---
 
 ## ما الذي تم تجهيزه في قاعدة البيانات؟
-### ملف SQL جديد
+### ملفات SQL الجديدة
 - `sql/archive/152_forms_v3_family_registration_finance_bridge.sql`
+- `sql/archive/153_family_registration_activation_finance_sync.sql`
+- `sql/archive/154_family_registration_fee_catalog_public_rpc.sql`
+- `sql/archive/155_seed_missing_fee_structures_from_registration_defaults.sql`
 
 ### دوره
 - يوسّع `registration_families` و `registration_students`
@@ -88,8 +92,17 @@
 شغّل بالترتيب:
 1. `sql/archive/152_forms_v3_family_registration_finance_bridge.sql`
 2. `sql/archive/153_family_registration_activation_finance_sync.sql`
+3. `sql/archive/154_family_registration_fee_catalog_public_rpc.sql`
+4. `sql/archive/155_seed_missing_fee_structures_from_registration_defaults.sql`
+
+### دور 154
+يجعل قراءة كتالوج الرسوم متاحة للنموذج الجديد بشكل آمن وpublic عبر RPC، دون فتح الصفحة المالية أو تعطيل RLS.
+
+### دور 155
+يملأ الصفوف التي لا تملك سعرًا معتمدًا حاليًا داخل `fee_structures` بالأسعار المرجعية المستخدمة في استمارة التسجيل الحالية، لكن فقط إذا كانت قيمتها مفقودة أو صفرية.
 
 بعدها يصبح التكامل المالي كاملًا على مستوى:
 - سحب رسوم الصفوف من قاعدة البيانات
 - حفظ snapshot داخل التسجيل
 - تحويلها إلى ملفات مالية فعلية عند التفعيل
+- ظهور القسط/الخطة المالية مباشرة من نفس المنظومة القديمة
