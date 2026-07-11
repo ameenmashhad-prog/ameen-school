@@ -303,6 +303,7 @@ async function deleteExpense(id) {
   }
 }
 function printActive(){window.print()}function bind(){ $$('.nav button[data-view]').forEach(b=>b.addEventListener('click',()=>render(b.dataset.view)));$('#mobileMenuBtn')?.addEventListener('click',()=>$('#sidebar').classList.toggle('open'));$('#logoutBtn').addEventListener('click',async()=>{await client().auth.signOut({scope:'local'});location.href='index.html'});$('#refreshBtn').addEventListener('click',load)}
-async function init(){client();if(!await ensure())return;bind();await load();const focus=localStorage.getItem('finance_credit_focus_student');if(focus){localStorage.removeItem('finance_credit_focus_student');selectStudent(focus,'students')}}
+function consumeFinanceFocus(){const params=new URLSearchParams(location.search);const focus=params.get('studentId')||localStorage.getItem('finance_credit_focus_student');const mode=params.get('mode')||localStorage.getItem('finance_credit_focus_mode')||'students';if(!focus)return;localStorage.removeItem('finance_credit_focus_student');localStorage.removeItem('finance_credit_focus_mode');const target=['students','payment','plans','print'].includes(mode)?mode:'students';selectStudent(focus,target);render(target)}
+async function init(){client();if(!await ensure())return;bind();await load();consumeFinanceFocus()}
 window.FinancePro={init,render,filterStudents,selectStudent,updatePlanCalc,updatePlanType,savePlan,toggleTransfer,toggleReceiverName,toggleCurrency,savePayment,saveRate,printActive,setPaymentPlanMode,fillPaymentAmountFromSelection,updateCurrencyUI,updateUsdPreview,fetchTgjuRate,renderExpenses,calcExpIrr,saveExpense,deleteExpense};
 }());

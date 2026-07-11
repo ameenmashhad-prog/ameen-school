@@ -6,7 +6,7 @@
 <title>طلبات التسجيل — مدارس أمين الرضا</title>
 <link rel="stylesheet" href="assets/amin.css?v=20260706-5">
 <link rel="icon" href="/favicon.ico" sizes="any">
-<link rel="stylesheet" href="assets/registration.css?v=20260711-4">
+<link rel="stylesheet" href="assets/registration.css?v=20260711-5">
 <link rel="stylesheet" href="assets/i18n.css">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="assets/amin-logo-small.png">
@@ -124,7 +124,7 @@
 <div id="toast" class="toast"></div>
 
 <script src="libs/supabase.min.js"></script>
-<script src="assets/config.js"></script>
+<script src="assets/config.js?v=20260710-2"></script>
 <script src="assets/platform-modules.js"></script>
 <script src="assets/i18n.js"></script>
 <script>
@@ -137,6 +137,7 @@ const sb = supabase.createClient(
 );
 const $ = (s,r=document)=>r.querySelector(s);
 function esc(v){return String(v ?? '').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function jse(v){return JSON.stringify(String(v ?? ''))}
 function toast(title,msg){
   const el = $('#toast');
   if(!el) return;
@@ -210,7 +211,9 @@ function groupFamilies(familiesRows, studentsRows){
     }
     const entry = bucket.get(id);
     entry.students.push({
+      registration_student_id: row.id,
       student_name: row.student_name || '—',
+      class_id: row.class_id || '',
       class_name: row.student_class_label || '—',
       section: row.section || '—',
       annual_fee_snapshot: Number(row.annual_fee_snapshot || 0),
@@ -276,8 +279,18 @@ function renderFamilies(){
     const familyTotal = item.students.reduce((sum, st)=>sum + Number(st.annual_fee_snapshot||0), 0);
     const familyPayments = (item.finance_payment_entries||[]).reduce((sum, row)=>sum + Number(row.amount||0), 0);
     const familyRemaining = Math.max(familyTotal - familyPayments, 0);
-    const students = item.students.map(st => '<li><b>'+esc(st.student_name)+'</b> — '+esc(st.class_name)+' / '+esc(st.section || '—')
-      +'<br><small class="muted">الرسوم السنوية: '+esc(money(st.annual_fee_snapshot))+' · الخطة: '+esc(st.finance_plan_type || '—')+' · عدد الأقساط: '+esc(st.finance_installments_count || '—')+'</small></li>').join('');
+    const students = item.students.map(st => {
+      const financeActions = normalizeStatus(item.family_status)==='approved'
+        ? '<div class="reg-inline-actions" style="margin-top:8px">'
+          + '<button class="btn small blue" type="button" onclick="openFinanceForRegistrationStudent('+jse(st.registration_student_id)+', '+jse('students')+')">الملف المالي</button>'
+          + '<button class="btn small gold" type="button" onclick="openFinanceForRegistrationStudent('+jse(st.registration_student_id)+', '+jse('payment')+')">دفعة</button>'
+          + '<button class="btn small" type="button" onclick="openFinanceForRegistrationStudent('+jse(st.registration_student_id)+', '+jse('plans')+')">الخطة</button>'
+          + '</div>'
+        : '<small class="muted">فعّل الحساب أولاً لفتح الملف المالي لهذا الطالب.</small>';
+      return '<li><b>'+esc(st.student_name)+'</b> — '+esc(st.class_name)+' / '+esc(st.section || '—')
+      +'<br><small class="muted">الرسوم السنوية: '+esc(money(st.annual_fee_snapshot))+' · الخطة: '+esc(st.finance_plan_type || '—')+' · عدد الأقساط: '+esc(st.finance_installments_count || '—')+'</small>'
+      + financeActions + '</li>';
+    }).join('');
     return '<article class="request-card">'
       + '<div class="request-card-head">'
       +   '<div>'
@@ -414,6 +427,19 @@ async function activateAccount(type,id){
   toast('تم التفعيل بنجاح', (data && data.message) || 'تم إنشاء الحساب في Auth و users');
   await loadAll();
 }
+async function openFinanceForRegistrationStudent(registrationStudentId, mode){
+  const allStudents = familyGroups.flatMap(group => group.students || []);
+  const regStudent = allStudents.find(student => String(student.registration_student_id) === String(registrationStudentId));
+  if(!regStudent){ toast('تعذر فتح الملف المالي','لم يتم العثور على الطالب داخل بطاقة التسجيل الحالية.'); return; }
+  const match = await sb.from('students').select('id,student_name,class_id').eq('student_name', regStudent.student_name).eq('class_id', regStudent.class_id).order('created_at',{ascending:false}).limit(1);
+  if(match.error){ toast('تعذر فتح الملف المالي', match.error.message); return; }
+  const target = (match.data||[])[0];
+  if(!target){ toast('لا يوجد ملف مالي بعد','فعّل الحساب أولاً أو تحقق من اكتمال الربط المالي لهذا الطالب.'); return; }
+  localStorage.setItem('finance_credit_focus_student', target.id);
+  localStorage.setItem('finance_credit_focus_mode', mode || 'students');
+  location.href = 'finance-pro.html?lite=1&studentId=' + encodeURIComponent(target.id) + '&mode=' + encodeURIComponent(mode || 'students');
+}
+
 async function loadAll(){
   if(!accessReady){
     accessReady = await ensure();
@@ -471,6 +497,7 @@ window.activateAccount = activateAccount;
 window.loadAll = loadAll;
 window.resetFilters = resetFilters;
 window.applyQuickFilter = applyQuickFilter;
+window.openFinanceForRegistrationStudent = openFinanceForRegistrationStudent;
 </script>
 <script src="assets/ux-enhancements.js?v=20260706-3"></script>
 <script src="assets/amin-theme-injector.js"></script>
