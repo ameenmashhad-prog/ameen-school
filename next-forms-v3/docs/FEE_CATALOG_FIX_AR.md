@@ -1,46 +1,32 @@
 # إصلاح خطأ `created_at` في `fee_structures`
 
 ## المشكلة
-عند تشغيل:
-- `sql/archive/155_seed_missing_fee_structures_from_registration_defaults.sql`
-
-ظهر الخطأ:
+عند تشغيل ملفات seed/fee catalog ظهر الخطأ:
 ```text
 ERROR: 42703: column "created_at" of relation "fee_structures" does not exist
 ```
 
-## السبب
-البيئة الحية تحتوي جدول `fee_structures` لكن بدون العمود:
-- `created_at`
+## التفسير
+هذا يعني أن بيئة القاعدة عندك تحتوي جدول `fee_structures` لكن بصيغة أقدم من المتوقعة، ولا تحتوي الأعمدة الزمنية الحديثة.
 
-بينما ملف seed كان يفترض وجوده.
+## الحل الأبسط الآن
+**لا تشغّل 155 وحده.**
 
-## الحل المعتمد
-بدل تشغيل 155 وحده، شغّل هذا الملف الجديد:
-- `sql/archive/156_fix_fee_structures_created_at_and_seed_catalog.sql`
+شغّل هذا الملف مباشرة:
+- `sql/archive/157_fee_structures_safe_public_catalog_patch.sql`
 
-## ماذا يفعل 156؟
-1. يضيف الأعمدة الناقصة إن لم تكن موجودة:
-   - `created_at`
-   - `updated_at`
-   - `amount`
-   - `annual_fee`
-   - `monthly_fee`
-   - `currency`
-   - `academic_year`
-   - `is_active`
-2. يطبع القيم القديمة إلى الصيغة الموحدة
-3. يعيد تعريف RPC:
-   - `forms_get_family_registration_finance_catalog_v3`
-4. يزرع الرسوم المفقودة للصفوف بالقيم المرجعية الحالية
+## لماذا 157 أفضل؟
+لأنه:
+1. يضيف الأعمدة الناقصة إن لم تكن موجودة
+2. يطبع القيم القديمة إلى الصيغة الحديثة
+3. يعيد تعريف RPC كتالوج الرسوم العامة
+4. يزرع الرسوم المفقودة للصفوف
+5. **لا يعتمد على `created_at` داخل INSERT نفسها**، لذلك هو أكثر أمانًا في البيئات القديمة
 
-## بعد تشغيل 156
-أعد فحص:
-- `https://next-forms-v3.vercel.app/api/forms/data/family-registration-finance`
-
-ويفترض أن ترى:
-- `annual_fee > 0` للصفوف التي كانت فارغة
-- وربط الرسوم يبدأ بالظهور داخل `family-registration-v3`
-
-## ملاحظة
-إذا كنت قد شغّلت 154 سابقًا فلا مشكلة، لأن 156 يعيد تعريف RPC بشكل متوافق.
+## ما الذي بعده؟
+بعد تشغيل `157`:
+1. أعد فتح:
+   - `https://next-forms-v3.vercel.app/api/forms/data/family-registration-finance`
+2. يجب أن ترى صفوفًا فيها:
+   - `annual_fee > 0`
+3. بعدها أتحقق لك من التكامل المالي الحي بالكامل
