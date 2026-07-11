@@ -6,7 +6,7 @@
 <title>طلبات التسجيل — مدارس أمين الرضا</title>
 <link rel="stylesheet" href="assets/amin.css?v=20260706-5">
 <link rel="icon" href="/favicon.ico" sizes="any">
-<link rel="stylesheet" href="assets/registration.css?v=20260709-2">
+<link rel="stylesheet" href="assets/registration.css?v=20260711-4">
 <link rel="stylesheet" href="assets/i18n.css">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="assets/amin-logo-small.png">
@@ -175,27 +175,49 @@ function formatDate(value){
   if(Number.isNaN(d.getTime())) return '—';
   return new Intl.DateTimeFormat('ar', {year:'numeric',month:'short',day:'numeric'}).format(d);
 }
-function groupFamilies(rows){
+function money(v){return Number(v||0).toLocaleString('en-US',{style:'currency',currency:'USD',maximumFractionDigits:2})}
+function groupFamilies(familiesRows, studentsRows){
   const bucket = new Map();
-  (rows || []).forEach(row => {
-    const id = row.family_id || row.id || ('family-'+Math.random());
+  (familiesRows || []).forEach(row => {
+    bucket.set(row.id, {
+      family_id: row.id,
+      guardian_name: row.guardian_name || 'ولي أمر غير محدد',
+      phone_primary: row.phone_primary || '',
+      family_status: normalizeStatus(row.status),
+      created_at: row.created_at || null,
+      family_name: row.family_name || '',
+      finance_payment_entries: Array.isArray(row.finance_payment_entries) ? row.finance_payment_entries : [],
+      general_family_health_notes: row.general_family_health_notes || '',
+      document_notes: row.document_notes || '',
+      students: []
+    });
+  });
+  (studentsRows || []).forEach(row => {
+    const id = row.family_id;
     if(!bucket.has(id)){
       bucket.set(id, {
         family_id: id,
-        guardian_name: row.guardian_name || 'ولي أمر غير محدد',
-        phone_primary: row.phone_primary || '',
-        family_status: normalizeStatus(row.family_status),
-        created_at: row.created_at || row.family_created_at || null,
+        guardian_name: 'ولي أمر غير محدد',
+        phone_primary: '',
+        family_status: normalizeStatus(row.status),
+        created_at: row.created_at || null,
+        family_name: '',
+        finance_payment_entries: [],
+        general_family_health_notes: '',
+        document_notes: '',
         students: []
       });
     }
     const entry = bucket.get(id);
-    entry.family_status = normalizeStatus(row.family_status || entry.family_status);
-    entry.created_at = entry.created_at || row.created_at || row.family_created_at || null;
     entry.students.push({
       student_name: row.student_name || '—',
-      class_name: row.class_name || '—',
-      section: row.section || '—'
+      class_name: row.student_class_label || '—',
+      section: row.section || '—',
+      annual_fee_snapshot: Number(row.annual_fee_snapshot || 0),
+      monthly_fee_snapshot: Number(row.monthly_fee_snapshot || 0),
+      finance_plan_type: row.finance_plan_type || '—',
+      finance_installments_count: row.finance_installments_count || 0,
+      finance_plan_start_date: row.finance_plan_start_date || null
     });
   });
   return Array.from(bucket.values()).sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));
@@ -206,7 +228,9 @@ function buildSearchTextFamily(item){
     item.phone_primary,
     item.students.map(s=>s.student_name).join(' '),
     item.students.map(s=>s.class_name).join(' '),
-    item.students.map(s=>s.section).join(' ')
+    item.students.map(s=>s.section).join(' '),
+    item.family_name,
+    item.students.map(s=>s.finance_plan_type).join(' ')
   ].join(' ').toLowerCase();
 }
 function buildSearchTextTeacher(item){
@@ -249,7 +273,11 @@ function renderFamilies(){
     return;
   }
   $('#familiesBox').innerHTML = '<div class="request-grid">'+list.map(item => {
-    const students = item.students.map(st => '<li><b>'+esc(st.student_name)+'</b> — '+esc(st.class_name)+' / '+esc(st.section || '—')+'</li>').join('');
+    const familyTotal = item.students.reduce((sum, st)=>sum + Number(st.annual_fee_snapshot||0), 0);
+    const familyPayments = (item.finance_payment_entries||[]).reduce((sum, row)=>sum + Number(row.amount||0), 0);
+    const familyRemaining = Math.max(familyTotal - familyPayments, 0);
+    const students = item.students.map(st => '<li><b>'+esc(st.student_name)+'</b> — '+esc(st.class_name)+' / '+esc(st.section || '—')
+      +'<br><small class="muted">الرسوم السنوية: '+esc(money(st.annual_fee_snapshot))+' · الخطة: '+esc(st.finance_plan_type || '—')+' · عدد الأقساط: '+esc(st.finance_installments_count || '—')+'</small></li>').join('');
     return '<article class="request-card">'
       + '<div class="request-card-head">'
       +   '<div>'
@@ -258,7 +286,10 @@ function renderFamilies(){
       +   '</div>'
       +   statusBadge(item.family_status)
       + '</div>'
-      + '<div class="reg-note">طلاب الأسرة: '+esc(item.students.length)+' — راجع الصف والشعبة قبل الاعتماد النهائي أو تفعيل الحساب.</div>'
+      + '<div class="reg-note">الملخص المالي داخل نفس بطاقة التسجيل: إجمالي متوقع '+esc(money(familyTotal))+' · مدخل حالياً '+esc(money(familyPayments))+' · متبقي '+esc(money(familyRemaining))+'</div>'
+      + '<div class="request-meta-line"><b>اسم العائلة:</b> <span>'+esc(item.family_name || '—')+'</span></div>'
+      + '<div class="request-meta-line"><b>ملاحظات الأسرة:</b> <span>'+esc(item.general_family_health_notes || '—')+'</span></div>'
+      + '<div class="request-meta-line"><b>ملاحظات الوثائق:</b> <span>'+esc(item.document_notes || '—')+'</span></div>'
       + '<ul class="request-list">'+students+'</ul>'
       + '<div class="request-actions">'
       +   '<button class="btn blue" type="button" onclick="activateAccount(\'family\',\''+esc(item.family_id)+'\')">تفعيل الحساب</button>'
@@ -390,17 +421,19 @@ async function loadAll(){
   }
   $('#familiesBox').innerHTML = '<div class="reg-empty"><b>جاري تحميل طلبات الأسر والطلاب...</b><p>لحظات وسيتم تحديث القائمة.</p></div>';
   $('#teachersBox').innerHTML = '<div class="reg-empty"><b>جاري تحميل طلبات المعلمين...</b><p>لحظات وسيتم تحديث القائمة.</p></div>';
-  const [familiesRes, teachersRes] = await Promise.all([
-    sb.from('v_registration_family_students').select('*').order('created_at',{ascending:false}),
+  const [familiesRes, studentsRes, teachersRes] = await Promise.all([
+    sb.from('registration_families').select('id,guardian_name,phone_primary,status,created_at,family_name,finance_payment_entries,general_family_health_notes,document_notes').order('created_at',{ascending:false}),
+    sb.from('registration_students').select('id,family_id,student_name,section,status,created_at,student_class_label,annual_fee_snapshot,monthly_fee_snapshot,finance_plan_type,finance_installments_count,finance_plan_start_date').order('created_at',{ascending:false}),
     sb.from('registration_teachers').select('*').order('created_at',{ascending:false})
   ]);
-  if(familiesRes.error){
+  if(familiesRes.error || studentsRes.error){
     familiesRaw = [];
     familyGroups = [];
-    $('#familiesBox').innerHTML = '<div class="reg-empty"><b>تعذر تحميل طلبات الأسر</b><p>'+esc(familiesRes.error.message)+'</p></div>';
+    const message = (familiesRes.error && familiesRes.error.message) || (studentsRes.error && studentsRes.error.message) || 'خطأ غير معروف';
+    $('#familiesBox').innerHTML = '<div class="reg-empty"><b>تعذر تحميل طلبات الأسر</b><p>'+esc(message)+'</p></div>';
   } else {
-    familiesRaw = familiesRes.data || [];
-    familyGroups = groupFamilies(familiesRaw);
+    familiesRaw = studentsRes.data || [];
+    familyGroups = groupFamilies(familiesRes.data || [], studentsRes.data || []);
   }
   if(teachersRes.error){
     teachersRaw = [];
