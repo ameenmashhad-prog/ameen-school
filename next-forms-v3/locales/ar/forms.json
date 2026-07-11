@@ -812,6 +812,21 @@
     "cardComputedName": "الاسم الكامل",
     "cardUsername": "اسم المستخدم",
     "cardPassword": "كلمة المرور",
-    "emptyValue": "—"
+    "emptyValue": "—",
+    "financeIntegrationTitle": "ربط الرسوم والأقساط من النظام المالي",
+    "classFeeLabel": "رسوم الصف السنوية",
+    "classFeeMissing": "غير مربوط بعد",
+    "monthlyApproxLabel": "شهري تقريبي",
+    "classFeeFetchedFromFinance": "هذه القيمة مسحوبة من إعدادات رسوم الصفوف في النظام المالي القديم / قواعد المالية.",
+    "classFeeCatalogPending": "تعذر قراءة كتالوج الرسوم الآن أو ما زال قيد التحميل.",
+    "installmentPreviewTitle": "معاينة الأقساط المرتبطة بالصفحة المالية",
+    "installmentPreviewEmpty": "اختر الصف وخطة الأقساط وتاريخ البداية لعرض الجدول المتوقع.",
+    "installmentLabelPrefix": "قسط",
+    "planCountLabel": "عدد الأقساط",
+    "expectedFeesLabel": "الإجمالي المتوقع من رسوم الصفوف",
+    "projectedRemainingLabel": "المتبقي المتوقع بعد الدفعات المدخلة",
+    "financeCatalogReady": "تم تحميل رسوم الصفوف من قاعدة البيانات وربطها بالنموذج.",
+    "financeCatalogLoading": "جارٍ تحميل رسوم الصفوف من قاعدة البيانات المالية...",
+    "financeCatalogError": "تعذر تحميل رسوم الصفوف الآن. يمكنك المتابعة لكن دون ربط مالي كامل حتى تعود البيانات."
   }
 }

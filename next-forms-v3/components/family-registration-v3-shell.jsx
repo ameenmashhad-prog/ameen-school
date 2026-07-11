@@ -19,6 +19,8 @@ const LOCAL_LANGUAGE_KEY = 'amin_forms_v3_locale';
 const LOCAL_FORM_STATE_KEY = 'amin_forms_v3_family_registration_v3_state';
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const PAYMENT_ROWS = 5;
+const DEFAULT_PLAN_START_DATE = '2026-09-10';
+const PLAN_COUNTS = { two: 2, three: 3, four: 4, six: 6, monthly: 9, quarterly: 3, custom: null };
 
 function blankPaymentRows() {
   return Array.from({ length: PAYMENT_ROWS }, (_, index) => ({
@@ -61,6 +63,43 @@ function birthDatePasswordFromISO(iso) {
   const parts = iso.split('-');
   if (parts.length !== 3) return '';
   return `${parts[2]}${parts[1]}${parts[0]}`;
+}
+
+function planCountForType(planType, currentValue = 1) {
+  const mapped = PLAN_COUNTS[planType];
+  if (mapped == null) return Math.max(1, Number(currentValue) || 1);
+  return mapped;
+}
+
+function addMonthsToIso(isoDate, monthsToAdd) {
+  if (!isoDate) return '';
+  const date = new Date(`${isoDate}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return '';
+  const baseDay = date.getDate();
+  date.setMonth(date.getMonth() + monthsToAdd);
+  while (date.getDate() < baseDay) {
+    date.setDate(date.getDate() - 1);
+  }
+  return date.toISOString().slice(0, 10);
+}
+
+function buildFinanceSchedulePreview(annualFee, planType, installmentsCount, startDate) {
+  const safeCount = Math.max(1, Number(installmentsCount) || 1);
+  const total = Number(annualFee || 0);
+  const rows = [];
+  if (!total || !startDate) return rows;
+  const intervalMonths = planType === 'quarterly' ? 3 : 1;
+  let remaining = Math.round(total * 100) / 100;
+  for (let index = 1; index <= safeCount; index += 1) {
+    const dueAmount = index === safeCount ? Math.round(remaining * 100) / 100 : Math.round((total / safeCount) * 100) / 100;
+    remaining = Math.round((remaining - dueAmount) * 100) / 100;
+    rows.push({
+      installment_number: index,
+      due_date: addMonthsToIso(startDate, (index - 1) * intervalMonths),
+      amount_due: dueAmount
+    });
+  }
+  return rows;
 }
 
 function latinize(raw) {
@@ -135,6 +174,9 @@ function makeEmptyStudent(template, familyValues) {
   student.student_family_name = String(familyValues.family_name || '');
   student.student_full_name = computeStudentFullName(student);
   student.student_initial_password = '';
+  student.finance_plan_type = 'monthly';
+  student.finance_installments_count = '9';
+  student.finance_plan_start_date = DEFAULT_PLAN_START_DATE;
   return student;
 }
 
@@ -175,28 +217,44 @@ function sanitizeFileMeta(value) {
   };
 }
 
-function sanitizeStudentsForSubmit(students) {
-  return students.map((student) => ({
-    id: student.id,
-    student_given_name: student.student_given_name,
-    student_father_name: student.student_father_name,
-    student_family_name: student.student_family_name,
-    student_full_name: student.student_full_name,
-    student_birth_date: student.student_birth_date,
-    student_gender: student.student_gender,
-    student_grade: student.student_grade,
-    student_section: student.student_section,
-    student_birth_place: student.student_birth_place,
-    student_passport_number: student.student_passport_number,
-    student_passport_expiry_date: student.student_passport_expiry_date,
-    student_previous_school: student.student_previous_school,
-    student_address_mashhad: student.student_address_mashhad,
-    student_address_iraq: student.student_address_iraq,
-    student_health_notes: student.student_health_notes,
-    student_photo: sanitizeFileMeta(student.student_photo),
-    student_username: student.student_username,
-    student_initial_password: student.student_initial_password
-  }));
+function sanitizeStudentsForSubmit(students, financeCatalogMap = new Map()) {
+  return students.map((student) => {
+    const finance = financeCatalogMap.get(String(student.student_grade || '')) || null;
+    const installmentsCount = planCountForType(student.finance_plan_type, student.finance_installments_count || 1);
+    const annualFee = Number(finance?.annual_fee || 0);
+    return {
+      id: student.id,
+      student_given_name: student.student_given_name,
+      student_father_name: student.student_father_name,
+      student_family_name: student.student_family_name,
+      student_full_name: student.student_full_name,
+      student_birth_date: student.student_birth_date,
+      student_gender: student.student_gender,
+      student_grade: student.student_grade,
+      student_class_id: student.student_grade || null,
+      student_class_label: finance?.class_name || null,
+      student_section: student.student_section,
+      student_birth_place: student.student_birth_place,
+      student_passport_number: student.student_passport_number,
+      student_passport_expiry_date: student.student_passport_expiry_date,
+      student_previous_school: student.student_previous_school,
+      student_address_mashhad: student.student_address_mashhad,
+      student_address_iraq: student.student_address_iraq,
+      student_health_notes: student.student_health_notes,
+      student_photo: sanitizeFileMeta(student.student_photo),
+      student_username: student.student_username,
+      student_initial_password: student.student_initial_password,
+      finance_fee_structure_id: finance?.fee_structure_id || null,
+      finance_currency: finance?.currency || 'USD',
+      finance_academic_year: finance?.academic_year || '2026-2027',
+      annual_fee_snapshot: annualFee,
+      monthly_fee_snapshot: Number(finance?.monthly_fee || 0),
+      finance_plan_type: student.finance_plan_type || 'monthly',
+      finance_installments_count: installmentsCount,
+      finance_plan_start_date: student.finance_plan_start_date || DEFAULT_PLAN_START_DATE,
+      finance_installment_schedule: buildFinanceSchedulePreview(annualFee, student.finance_plan_type || 'monthly', installmentsCount, student.finance_plan_start_date || DEFAULT_PLAN_START_DATE)
+    };
+  });
 }
 
 function normalizeFamilyValues(template, values) {
@@ -258,6 +316,9 @@ function normalizeFamilyValues(template, values) {
       usedStudentUsernames.add(String(normalizedStudent.student_username).toLowerCase());
     }
 
+    normalizedStudent.finance_plan_type = normalizedStudent.finance_plan_type || 'monthly';
+    normalizedStudent.finance_installments_count = String(planCountForType(normalizedStudent.finance_plan_type, normalizedStudent.finance_installments_count || 1));
+    normalizedStudent.finance_plan_start_date = normalizedStudent.finance_plan_start_date || DEFAULT_PLAN_START_DATE;
     normalizedStudent.student_initial_password = birthDatePasswordFromISO(normalizedStudent.student_birth_date) || normalizedStudent.student_initial_password || '';
     return normalizedStudent;
   });
@@ -545,7 +606,7 @@ function InputField({ field, locale, value, error, onChange, labels }) {
     );
   }
 
-  const inputType = field.id.includes('phone') ? 'tel' : 'text';
+  const inputType = field.id.includes('phone') ? 'tel' : field.type === 'number' ? 'number' : 'text';
 
   return (
     <label className={`block ${wrapperClass}`}>
@@ -661,10 +722,13 @@ function PaymentsEditor({ locale, labels, rows, students, onChange, totalAmount 
   );
 }
 
-function StudentCard({ locale, labels, student, index, fieldById, studentErrors, onFieldChange, onRestoreInheritance, onRemove, onDuplicate, canRemove }) {
+function StudentCard({ locale, labels, student, index, fieldById, financeCatalogMap, studentErrors, onFieldChange, onRestoreInheritance, onRemove, onDuplicate, canRemove }) {
   const inheritedFather = !student._meta?.fatherManual;
   const inheritedFamily = !student._meta?.familyManual;
   const autoFullName = !student._meta?.fullNameManual;
+  const financeItem = financeCatalogMap.get(String(student.student_grade || '')) || null;
+  const financePlanCount = planCountForType(student.finance_plan_type || 'monthly', student.finance_installments_count || 1);
+  const financeSchedule = buildFinanceSchedulePreview(Number(financeItem?.annual_fee || 0), student.finance_plan_type || 'monthly', financePlanCount, student.finance_plan_start_date || DEFAULT_PLAN_START_DATE);
   const editableFields = [
     'student_birth_date',
     'student_gender',
@@ -677,7 +741,10 @@ function StudentCard({ locale, labels, student, index, fieldById, studentErrors,
     'student_address_mashhad',
     'student_address_iraq',
     'student_health_notes',
-    'student_photo'
+    'student_photo',
+    'finance_plan_type',
+    'finance_installments_count',
+    'finance_plan_start_date'
   ];
 
   return (
@@ -700,6 +767,18 @@ function StudentCard({ locale, labels, student, index, fieldById, studentErrors,
           <StatusPill tone={autoFullName ? 'brand' : 'warning'}>{labels.cardComputedName}: {student.student_full_name || labels.emptyValue}</StatusPill>
           <StatusPill tone="slate">{labels.cardUsername}: {student.student_username || labels.emptyValue}</StatusPill>
           <StatusPill tone="slate">{labels.cardPassword}: {student.student_initial_password || labels.emptyValue}</StatusPill>
+        </div>
+      </div>
+
+      <div className="mb-4 rounded-2xl border border-slate-200 bg-white px-4 py-4">
+        <div className="mb-2 text-xs font-bold text-slate-500">{labels.financeIntegrationTitle}</div>
+        <div className="flex flex-wrap gap-2">
+          <StatusPill tone={financeItem ? 'success' : 'warning'}>{labels.classFeeLabel}: {financeItem ? `${localeNumber(locale, Number(financeItem.annual_fee || 0))} ${financeItem.currency}` : labels.classFeeMissing}</StatusPill>
+          <StatusPill tone={financeItem ? 'brand' : 'slate'}>{labels.monthlyApproxLabel}: {financeItem ? `${localeNumber(locale, Number(financeItem.monthly_fee || 0))} ${financeItem.currency}` : labels.emptyValue}</StatusPill>
+          <StatusPill tone="slate">{labels.planCountLabel}: {localeNumber(locale, financePlanCount)}</StatusPill>
+        </div>
+        <div className="mt-3 text-xs leading-6 text-slate-500">
+          {financeItem ? labels.classFeeFetchedFromFinance : labels.classFeeCatalogPending}
         </div>
       </div>
 
@@ -733,7 +812,10 @@ function StudentCard({ locale, labels, student, index, fieldById, studentErrors,
         </div>
 
         {editableFields.map((fieldId) => {
-          const field = fieldById.get(fieldId);
+          const originalField = fieldById.get(fieldId);
+          const field = fieldId === 'student_grade'
+            ? { ...originalField, options: Array.from(financeCatalogMap.values()).map((item) => ({ id: item.class_id, value: item.class_id, label: { ar: item.class_name, fa: item.class_name, en: item.class_name } })) }
+            : originalField;
           return (
             <InputField
               key={`${student.id}-${fieldId}`}
@@ -750,11 +832,28 @@ function StudentCard({ locale, labels, student, index, fieldById, studentErrors,
         <InputField field={fieldById.get('student_username')} locale={locale} value={student.student_username} error={studentErrors?.student_username} onChange={(fieldId, value) => onFieldChange(student.id, fieldId, value)} labels={labels} />
         <InputField field={fieldById.get('student_initial_password')} locale={locale} value={student.student_initial_password} error={studentErrors?.student_initial_password} onChange={(fieldId, value) => onFieldChange(student.id, fieldId, value)} labels={labels} />
       </div>
+
+      <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-4">
+        <div className="mb-3 text-sm font-black text-slate-900">{labels.installmentPreviewTitle}</div>
+        {financeSchedule.length ? (
+          <div className="space-y-2">
+            {financeSchedule.map((item) => (
+              <div key={`${student.id}-${item.installment_number}`} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-xs">
+                <span>{labels.installmentLabelPrefix} {localeNumber(locale, item.installment_number)}</span>
+                <span>{item.due_date ? formatDateForLocale(locale, item.due_date) : labels.emptyValue}</span>
+                <b>{localeNumber(locale, item.amount_due)} {financeItem?.currency || 'USD'}</b>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-xs leading-6 text-slate-500">{labels.installmentPreviewEmpty}</div>
+        )}
+      </div>
     </div>
   );
 }
 
-function PrintableFamilyRegistration({ locale, labels, template, values, totalAmount }) {
+function PrintableFamilyRegistration({ locale, labels, template, values, totalAmount, financeCatalogMap }) {
   const guardianFullName = computeGuardianFullName(values);
   const motherFullName = computeMotherFullName(values);
 
@@ -801,7 +900,7 @@ function PrintableFamilyRegistration({ locale, labels, template, values, totalAm
                 <tr key={student.id}>
                   <td className="border border-black px-1 py-2 text-center">{localeNumber(locale, index + 1)}</td>
                   <td className="border border-black px-1 py-2">{student.student_full_name || ' '}</td>
-                  <td className="border border-black px-1 py-2">{(template.studentCardFields.find((field) => field.id === 'student_grade')?.options || []).find((option) => option.value === student.student_grade)?.label?.[locale] || ' '}</td>
+                  <td className="border border-black px-1 py-2">{financeCatalogMap.get(String(student.student_grade || ''))?.class_name || ' '}</td>
                   <td className="border border-black px-1 py-2">{(template.studentCardFields.find((field) => field.id === 'student_gender')?.options || []).find((option) => option.value === student.student_gender)?.label?.[locale] || ' '}</td>
                   <td className="border border-black px-1 py-2">{student.student_username || ' '}</td>
                 </tr>
@@ -863,7 +962,7 @@ function PrintableFamilyRegistration({ locale, labels, template, values, totalAm
           <div className="mt-4 grid gap-0 md:grid-cols-2">
             <PrintField label={template.studentCardFields.find((field) => field.id === 'student_full_name')?.label?.[locale]} value={student.student_full_name} />
             <PrintField label={template.studentCardFields.find((field) => field.id === 'student_birth_date')?.label?.[locale]} value={student.student_birth_date ? formatDateForLocale(locale, student.student_birth_date) : ''} />
-            <PrintField label={template.studentCardFields.find((field) => field.id === 'student_grade')?.label?.[locale]} value={(template.studentCardFields.find((field) => field.id === 'student_grade')?.options || []).find((option) => option.value === student.student_grade)?.label?.[locale] || student.student_grade} />
+            <PrintField label={template.studentCardFields.find((field) => field.id === 'student_grade')?.label?.[locale]} value={financeCatalogMap.get(String(student.student_grade || ''))?.class_name || student.student_grade} />
             <PrintField label={template.studentCardFields.find((field) => field.id === 'student_section')?.label?.[locale]} value={(template.studentCardFields.find((field) => field.id === 'student_section')?.options || []).find((option) => option.value === student.student_section)?.label?.[locale] || student.student_section} />
             <PrintField label={template.studentCardFields.find((field) => field.id === 'student_passport_number')?.label?.[locale]} value={student.student_passport_number} />
             <PrintField label={template.studentCardFields.find((field) => field.id === 'student_previous_school')?.label?.[locale]} value={student.student_previous_school} />
@@ -909,6 +1008,8 @@ export default function FamilyRegistrationV3Shell({ locale, dictionary }) {
   const [uploadState, setUploadState] = useState('idle');
   const [fileObjects, setFileObjects] = useState({ family_attachment: null });
   const [actionFlash, setActionFlash] = useState('');
+  const [financeCatalog, setFinanceCatalog] = useState([]);
+  const [financeCatalogState, setFinanceCatalogState] = useState('loading');
 
   const meta = localeMeta[activeLocale] || localeMeta.ar;
 
@@ -935,6 +1036,34 @@ export default function FamilyRegistrationV3Shell({ locale, dictionary }) {
     document.documentElement.lang = activeLocale;
     document.documentElement.dir = meta.dir;
   }, [activeLocale, meta.dir]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadFinanceCatalog() {
+      setFinanceCatalogState('loading');
+      try {
+        const response = await fetch('/api/forms/data/family-registration-finance', { cache: 'no-store' });
+        const result = await response.json();
+        if (cancelled) return;
+        if (!response.ok || result?.ok === false) {
+          throw new Error(result?.error || `finance_catalog_${response.status}`);
+        }
+        setFinanceCatalog(result.items || []);
+        setFinanceCatalogState('ready');
+      } catch (error) {
+        console.error(error);
+        if (cancelled) return;
+        setFinanceCatalog([]);
+        setFinanceCatalogState('error');
+      }
+    }
+
+    loadFinanceCatalog();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -982,9 +1111,12 @@ export default function FamilyRegistrationV3Shell({ locale, dictionary }) {
   const requiredDone = useMemo(() => countRequiredDone(template, values), [template, values]);
   const requiredTotal = useMemo(() => countRequiredTotal(template, values), [template, values]);
   const totalAmount = useMemo(() => totalPayments(values.payment_entries || []), [values.payment_entries]);
+  const expectedFamilyFeeTotal = useMemo(() => values.students.reduce((sum, student) => sum + Number(financeCatalogMap.get(String(student.student_grade || ''))?.annual_fee || 0), 0), [values.students, financeCatalogMap]);
+  const remainingProjected = Math.max(expectedFamilyFeeTotal - totalAmount, 0);
   const guardianFullName = useMemo(() => computeGuardianFullName(values), [values]);
   const motherFullName = useMemo(() => computeMotherFullName(values), [values]);
   const errorCount = countErrors(fieldErrors, studentErrors, globalErrors);
+  const financeCatalogMap = useMemo(() => new Map(financeCatalog.map((item) => [String(item.class_id), item])), [financeCatalog]);
   const guardianCoreFields = ['guardian_given_name', 'guardian_father_name', 'family_name', 'guardian_phone_primary', 'guardian_birth_date'];
   const guardianCoreDone = guardianCoreFields.filter((fieldId) => String(values[fieldId] || '').trim()).length;
   const studentReadyCount = useMemo(() => countReadyStudents(template, values.students), [template, values.students]);
@@ -1157,6 +1289,14 @@ export default function FamilyRegistrationV3Shell({ locale, dictionary }) {
 
           if (fieldId === 'student_username') {
             updated._meta.usernameManual = true;
+          }
+
+          if (fieldId === 'finance_plan_type') {
+            updated.finance_installments_count = String(planCountForType(String(normalizedValue || 'monthly'), updated.finance_installments_count || 1));
+          }
+
+          if (fieldId === 'finance_installments_count') {
+            normalizedValue = String(Math.max(1, Number(normalizedValue) || 1));
           }
 
           updated[fieldId] = normalizedValue;
@@ -1366,7 +1506,7 @@ export default function FamilyRegistrationV3Shell({ locale, dictionary }) {
         }
       }
 
-      const normalizedStudents = sanitizeStudentsForSubmit(values.students);
+      const normalizedStudents = sanitizeStudentsForSubmit(values.students, financeCatalogMap);
       const payloadValues = {
         guardian_name: guardianFullName,
         guardian_full_name: guardianFullName,
@@ -1477,7 +1617,7 @@ export default function FamilyRegistrationV3Shell({ locale, dictionary }) {
 
   const studentsRows = values.students.map((student, index) => ({
     label: `${labels.studentCardTitle} ${localeNumber(activeLocale, index + 1)}`,
-    value: `${student.student_full_name || '—'} — ${(fieldById.get('student_grade')?.options || []).find((option) => option.value === student.student_grade)?.label?.[activeLocale] || '—'}`
+    value: `${student.student_full_name || '—'} — ${financeCatalogMap.get(String(student.student_grade || ''))?.class_name || '—'}`
   }));
 
   const familyFieldIds = {
@@ -1625,6 +1765,7 @@ export default function FamilyRegistrationV3Shell({ locale, dictionary }) {
                     student={student}
                     index={index}
                     fieldById={fieldById}
+                    financeCatalogMap={financeCatalogMap}
                     studentErrors={studentErrors[student.id] || {}}
                     onFieldChange={setStudentValue}
                     onRestoreInheritance={restoreStudentInheritance}
@@ -1646,6 +1787,9 @@ export default function FamilyRegistrationV3Shell({ locale, dictionary }) {
             </SectionCard>
 
             <SectionCard anchorId="family-v3-finance" title={template.sections.find((section) => section.key === 'finance')?.title?.[activeLocale]} subtitle={labels.sectionHints.finance}>
+              <div className={`mb-4 rounded-2xl border px-4 py-3 text-sm ${financeCatalogState === 'ready' ? 'border-emerald-200 bg-emerald-50 text-emerald-800' : financeCatalogState === 'error' ? 'border-amber-200 bg-amber-50 text-amber-800' : 'border-slate-200 bg-slate-50 text-slate-700'}`}>
+                {financeCatalogState === 'ready' ? labels.financeCatalogReady : financeCatalogState === 'error' ? labels.financeCatalogError : labels.financeCatalogLoading}
+              </div>
               <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
                 <div className="mb-3 text-sm font-black text-slate-900">{labels.feeBandsTitle}</div>
                 <div className="space-y-2 text-sm text-slate-700">
@@ -1697,6 +1841,8 @@ export default function FamilyRegistrationV3Shell({ locale, dictionary }) {
             <SummaryCard title={labels.studentsSummaryTitle} rows={studentsRows.length ? studentsRows : [{ label: labels.studentCardTitle, value: labels.studentsEmpty }]} />
             <SummaryCard title={labels.financeSummaryTitle} rows={[
               { label: labels.paymentTotal, value: localeNumber(activeLocale, totalAmount) },
+              { label: labels.expectedFeesLabel, value: localeNumber(activeLocale, expectedFamilyFeeTotal) },
+              { label: labels.projectedRemainingLabel, value: localeNumber(activeLocale, remainingProjected) },
               { label: labels.documentsSummaryTitle, value: uploadedAttachment?.file_name || values.family_attachment?.name || '—' },
               { label: labels.versionCount, value: localeNumber(activeLocale, versions.length) },
               { label: labels.studentsSummaryTitle, value: `${localeNumber(activeLocale, values.students.length)} ${labels.studentsCountUnit}` }
@@ -1711,7 +1857,7 @@ export default function FamilyRegistrationV3Shell({ locale, dictionary }) {
                 </div>
                 <div className="max-h-[780px] overflow-auto">
                   <div className="origin-top scale-[0.5]">
-                    <PrintableFamilyRegistration locale={activeLocale} labels={labels} template={template} values={values} totalAmount={totalAmount} />
+                    <PrintableFamilyRegistration locale={activeLocale} labels={labels} template={template} values={values} totalAmount={totalAmount} financeCatalogMap={financeCatalogMap} />
                   </div>
                 </div>
               </div>
@@ -1732,7 +1878,7 @@ export default function FamilyRegistrationV3Shell({ locale, dictionary }) {
       </section>
 
       <section className="print-only py-6">
-        <PrintableFamilyRegistration locale={activeLocale} labels={labels} template={template} values={values} totalAmount={totalAmount} />
+        <PrintableFamilyRegistration locale={activeLocale} labels={labels} template={template} values={values} totalAmount={totalAmount} financeCatalogMap={financeCatalogMap} />
         <div className="mx-auto mt-4 w-full max-w-[794px] rounded-2xl border border-brand-100 bg-brand-50 px-4 py-3 text-sm text-brand-800">{labels.printReceiptBanner}</div>
       </section>
     </main>

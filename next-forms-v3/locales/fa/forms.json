@@ -812,6 +812,21 @@
     "cardComputedName": "نام کامل",
     "cardUsername": "نام کاربری",
     "cardPassword": "رمز عبور",
-    "emptyValue": "—"
+    "emptyValue": "—",
+    "financeIntegrationTitle": "اتصال شهریه و اقساط با سیستم مالی",
+    "classFeeLabel": "شهریه سالانه پایه",
+    "classFeeMissing": "هنوز متصل نیست",
+    "monthlyApproxLabel": "تقریب ماهانه",
+    "classFeeFetchedFromFinance": "این مبلغ از تنظیمات شهریه پایه‌ها در سیستم مالی خوانده می‌شود.",
+    "classFeeCatalogPending": "بارگذاری کاتالوگ شهریه انجام نشده یا موقتاً در دسترس نیست.",
+    "installmentPreviewTitle": "پیش‌نمایش اقساط مرتبط با صفحه مالی",
+    "installmentPreviewEmpty": "برای دیدن جدول اقساط، پایه، نوع طرح و تاریخ شروع را انتخاب کنید.",
+    "installmentLabelPrefix": "قسط",
+    "planCountLabel": "تعداد اقساط",
+    "expectedFeesLabel": "جمع مورد انتظار شهریه‌ها",
+    "projectedRemainingLabel": "مانده مورد انتظار پس از پرداخت‌های ثبت‌شده",
+    "financeCatalogReady": "شهریه پایه‌ها با موفقیت از پایگاه داده مالی بارگذاری شد.",
+    "financeCatalogLoading": "در حال بارگذاری شهریه پایه‌ها از پایگاه داده مالی...",
+    "financeCatalogError": "بارگذاری شهریه پایه‌ها ناموفق بود. می‌توانید ادامه دهید اما ارتباط مالی کامل موقتاً فعال نیست."
   }
 }

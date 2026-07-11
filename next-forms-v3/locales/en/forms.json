@@ -812,6 +812,21 @@
     "cardComputedName": "Full name",
     "cardUsername": "Username",
     "cardPassword": "Password",
-    "emptyValue": "—"
+    "emptyValue": "—",
+    "financeIntegrationTitle": "Fee and installment connection to the finance system",
+    "classFeeLabel": "Annual class fee",
+    "classFeeMissing": "Not linked yet",
+    "monthlyApproxLabel": "Approx. monthly",
+    "classFeeFetchedFromFinance": "This value is pulled from the legacy finance class-fee settings.",
+    "classFeeCatalogPending": "The fee catalog is still loading or temporarily unavailable.",
+    "installmentPreviewTitle": "Installment preview linked to the finance page",
+    "installmentPreviewEmpty": "Choose the class, installment plan, and start date to preview the expected schedule.",
+    "installmentLabelPrefix": "Installment",
+    "planCountLabel": "Installments count",
+    "expectedFeesLabel": "Expected total class fees",
+    "projectedRemainingLabel": "Projected remaining after entered payments",
+    "financeCatalogReady": "Class fees were loaded successfully from the finance database.",
+    "financeCatalogLoading": "Loading class fees from the finance database...",
+    "financeCatalogError": "Could not load class fees right now. You can continue, but the finance link is temporarily incomplete."
   }
 }

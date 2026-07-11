@@ -142,6 +142,16 @@ const studentSectionOptions = [
   option('section_d', 'د', 'د', 'D')
 ];
 
+const financePlanOptions = [
+  option('two', 'قسطان', 'دو قسط', 'Two Installments'),
+  option('three', '3 أقساط', 'سه قسط', '3 Installments'),
+  option('four', '4 أقساط', 'چهار قسط', '4 Installments'),
+  option('six', '6 أقساط', 'شش قسط', '6 Installments'),
+  option('monthly', 'أقساط شهرية', 'اقساط ماهانه', 'Monthly Installments'),
+  option('quarterly', 'ربع سنوية', 'سه‌ماهه', 'Quarterly'),
+  option('custom', 'خطة خاصة', 'طرح سفارشی', 'Custom Plan')
+];
+
 const studentGradeOptions = [
   option('grade_1_primary', 'الأول الابتدائي', 'اول ابتدایی', 'Grade 1 Primary'),
   option('grade_2_primary', 'الثاني الابتدائي', 'دوم ابتدایی', 'Grade 2 Primary'),
@@ -261,6 +271,9 @@ const templatesMap = {
       field({ id:'student_gender', type:'select', ar:'الجنس', fa:'جنسیت', en:'Gender', required:true, width:'half', section:'students', options:studentGenderOptions }),
       field({ id:'student_grade', type:'select', ar:'الصف', fa:'پایه', en:'Grade', required:true, width:'half', section:'students', options:studentGradeOptions }),
       field({ id:'student_section', type:'select', ar:'الشعبة', fa:'کلاس / بخش', en:'Section', width:'half', section:'students', options:studentSectionOptions }),
+      field({ id:'finance_plan_type', type:'select', ar:'خطة الأقساط', fa:'نوع اقساط', en:'Installment Plan', width:'half', section:'students', options:financePlanOptions }),
+      field({ id:'finance_installments_count', type:'number', ar:'عدد الأقساط', fa:'تعداد اقساط', en:'Installments Count', width:'half', section:'students' }),
+      field({ id:'finance_plan_start_date', type:'date', ar:'تاريخ بداية الخطة', fa:'تاریخ شروع طرح', en:'Plan Start Date', width:'half', section:'students' }),
       field({ id:'student_birth_place', type:'text', ar:'مكان الولادة', fa:'محل تولد', en:'Birth Place', width:'half', section:'students' }),
       field({ id:'student_passport_number', type:'text', ar:'رقم الجواز', fa:'شماره گذرنامه', en:'Passport Number', width:'half', section:'students' }),
       field({ id:'student_passport_expiry_date', type:'date', ar:'تاريخ انتهاء الجواز', fa:'تاریخ پایان گذرنامه', en:'Passport Expiry Date', width:'half', section:'students' }),
