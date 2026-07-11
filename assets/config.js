@@ -10,7 +10,7 @@
     analyticsTable: 'ui_analytics_events',
     academicMonths: [9,10,11,12,1,2,3,4,5],
     defaultAttendanceType: 'daily',
-    familyRegistrationV3Url: 'https://next-forms-v3-ameen-reza.vercel.app/ar/forms/family-registration-v3',
+    familyRegistrationV3Url: 'https://next-forms-v3.vercel.app/ar/forms/family-registration-v3',
     familyRegistrationV3AutoRedirect: false
   };
 }());

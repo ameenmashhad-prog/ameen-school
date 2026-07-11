@@ -6,9 +6,15 @@ export default function LocaleLayout({ children, params }) {
     return children;
   }
 
+  const dir = localeMeta[locale].dir;
+  const syncHtml = `document.documentElement.lang=${JSON.stringify(locale)};document.documentElement.dir=${JSON.stringify(dir)};document.documentElement.dataset.locale=${JSON.stringify(locale)};`;
+
   return (
-    <div lang={locale} dir={localeMeta[locale].dir} data-locale={locale}>
-      {children}
-    </div>
+    <>
+      <script dangerouslySetInnerHTML={{ __html: syncHtml }} />
+      <div lang={locale} dir={dir} data-locale={locale}>
+        {children}
+      </div>
+    </>
   );
 }
