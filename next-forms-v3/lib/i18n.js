@@ -23,13 +23,15 @@ export async function getFormsHomeDictionary(locale) {
 export async function getFormsPageDictionary(locale, pageKey) {
   const forms = await readLocaleUnit(locale, 'forms');
   return {
-    languageSwitcher: forms.languageSwitcher,
-    visibility: forms.visibility,
-    builder: {
-      badge: forms.builder?.badge,
-      printModes: forms.builder?.printModes
-    },
-    [pageKey]: forms[pageKey]
+    forms: {
+      languageSwitcher: forms.languageSwitcher,
+      visibility: forms.visibility,
+      builder: {
+        badge: forms.builder?.badge,
+        printModes: forms.builder?.printModes
+      },
+      [pageKey]: forms[pageKey]
+    }
   };
 }
 
