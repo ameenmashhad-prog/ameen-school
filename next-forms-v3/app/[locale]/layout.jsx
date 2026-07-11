@@ -1,7 +1,7 @@
 import { isValidLocale, localeMeta } from '@/lib/locale-config';
 
-export default function LocaleLayout({ children, params }) {
-  const locale = params.locale;
+export default async function LocaleLayout({ children, params }) {
+  const { locale } = await params;
   if (!isValidLocale(locale)) {
     return children;
   }

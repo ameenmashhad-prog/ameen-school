@@ -1111,12 +1111,12 @@ export default function FamilyRegistrationV3Shell({ locale, dictionary }) {
   const requiredDone = useMemo(() => countRequiredDone(template, values), [template, values]);
   const requiredTotal = useMemo(() => countRequiredTotal(template, values), [template, values]);
   const totalAmount = useMemo(() => totalPayments(values.payment_entries || []), [values.payment_entries]);
+  const financeCatalogMap = useMemo(() => new Map(financeCatalog.map((item) => [String(item.class_id), item])), [financeCatalog]);
   const expectedFamilyFeeTotal = useMemo(() => values.students.reduce((sum, student) => sum + Number(financeCatalogMap.get(String(student.student_grade || ''))?.annual_fee || 0), 0), [values.students, financeCatalogMap]);
   const remainingProjected = Math.max(expectedFamilyFeeTotal - totalAmount, 0);
   const guardianFullName = useMemo(() => computeGuardianFullName(values), [values]);
   const motherFullName = useMemo(() => computeMotherFullName(values), [values]);
   const errorCount = countErrors(fieldErrors, studentErrors, globalErrors);
-  const financeCatalogMap = useMemo(() => new Map(financeCatalog.map((item) => [String(item.class_id), item])), [financeCatalog]);
   const guardianCoreFields = ['guardian_given_name', 'guardian_father_name', 'family_name', 'guardian_phone_primary', 'guardian_birth_date'];
   const guardianCoreDone = guardianCoreFields.filter((fieldId) => String(values[fieldId] || '').trim()).length;
   const studentReadyCount = useMemo(() => countReadyStudents(template, values.students), [template, values.students]);

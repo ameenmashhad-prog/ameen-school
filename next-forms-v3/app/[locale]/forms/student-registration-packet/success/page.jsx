@@ -3,13 +3,15 @@ import { getFormsSuccessDictionary } from '@/lib/i18n';
 import { formatDateForLocale } from '@/lib/locale-config';
 
 export default async function StudentRegistrationPacketSuccessPage({ params, searchParams }) {
-  const locale = params.locale;
+  const { locale } = await params;
   const { forms, labels } = await getFormsSuccessDictionary(locale, 'registrationPacket');
 
+  const resolvedSearchParams = await searchParams;
+
   const payload = {
-    ref: searchParams?.ref || '—',
-    submittedAt: searchParams?.submittedAt ? formatDateForLocale(locale, String(searchParams.submittedAt).slice(0, 10)) : '—',
-    applicant: searchParams?.applicant || '—'
+    ref: resolvedSearchParams?.ref || '—',
+    submittedAt: resolvedSearchParams?.submittedAt ? formatDateForLocale(locale, String(resolvedSearchParams.submittedAt).slice(0, 10)) : '—',
+    applicant: resolvedSearchParams?.applicant || '—'
   };
 
   return (

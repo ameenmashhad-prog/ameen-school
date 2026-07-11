@@ -3,7 +3,7 @@ import { getFormsHomeDictionary } from '@/lib/i18n';
 import { localeMeta } from '@/lib/locale-config';
 
 export default async function LocaleHome({ params }) {
-  const locale = params.locale;
+  const { locale } = await params;
   const dict = await getFormsHomeDictionary(locale);
   const meta = localeMeta[locale];
 
