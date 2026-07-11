@@ -1,34 +1,27 @@
 # إصلاح خطأ `ON CONFLICT` في `forms_submit_family_registration_v3`
 
 ## المشكلة
-بعد تشغيل 152 و153 و157 ظهر خطأ عند submit:
+بعد تفعيل bridge المالي ظهر خطأ عند submit:
 ```text
 there is no unique or exclusion constraint matching the ON CONFLICT specification
 ```
 
 ## السبب
-الدالة `forms_submit_family_registration_v3` تستخدم:
+الدالة `forms_submit_family_registration_v3` كانت تعتمد على:
 ```sql
 on conflict (forms_v3_submission_ref)
 ```
-لكن بيئة القاعدة لا تحتوي unique index / constraint مطابق بالكامل لهذا العمود.
+لكن بعض البيئات لا تحتوي unique index / constraint مطابق بالشكل المطلوب.
 
-## الحل
-شغّل هذا الملف:
-- `sql/archive/158_fix_family_registration_submission_ref_unique.sql`
+## الحل الأسلم الآن
+بدل مطاردة الـ constraint، شغّل هذا الملف:
+- `sql/archive/159_family_registration_submit_no_conflict_dependency.sql`
 
-## ماذا يفعل 158؟
-1. يتأكد من وجود العمود:
-   - `forms_v3_submission_ref`
-2. ينظف أي تكرارات محتملة ويُبقي أحدث سجل
-3. ينشئ unique index صحيح على هذا العمود
-4. يعيد تعريف `forms_submit_family_registration_v3` بنفس منطق bridge لكن بشكل قابل للعمل مع `ON CONFLICT`
+## ماذا يفعل 159؟
+- لا يعتمد على `ON CONFLICT` أصلًا
+- إذا وجد family بنفس `forms_v3_submission_ref` يقوم بعمل `update`
+- إذا لم يجد، يقوم بعمل `insert`
+- ثم يُعيد إدراج `registration_students` التابعة للحالة الحالية
 
-## بعد تشغيل 158
-أستطيع التحقق لك من:
-- submit العائلي
-- حفظ snapshot المالي داخل `registration_families` و `registration_students`
-- تفعيل الأسرة
-- توليد `student_fees`
-- توليد `finance_payment_plans`
-- توليد `student_installments`
+## النتيجة
+بعد 159 يصبح submit العائلي مستقراً حتى لو كانت البيئة القديمة مختلفة في الـ indexes والقيود.
