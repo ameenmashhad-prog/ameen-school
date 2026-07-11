@@ -43,3 +43,12 @@
 ## ملاحظة تشغيلية
 لكي تعمل هذه الميزة فعليًا على الموقع، يجب تشغيل:
 - `sql/archive/165_finance_credit_transfer_between_siblings.sql`
+
+## دعم العملتين
+تم أيضًا تجهيز patch إضافية لدعم حفظ التحويلات مع:
+- الدولار USD
+- الريال الإيراني IRR
+- وسعر الصرف المستخدم
+
+الملف:
+- `sql/archive/166_finance_credit_transfer_currency_support.sql`
