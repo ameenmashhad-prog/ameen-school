@@ -156,6 +156,8 @@ let familyGroups = [];
 let teachersRaw = [];
 let financeContext = { publicStudents: [], studentFees: [], installments: [], transfers: [] };
 let accessReady = false;
+let currentOperator = null;
+let submissionsByRef = new Map();
 
 function normalizeStatus(value){
   const v = String(value || '').toLowerCase();
@@ -179,8 +181,22 @@ function formatDate(value){
 }
 function money(v){return Number(v||0).toLocaleString('en-US',{style:'currency',currency:'USD',maximumFractionDigits:2})}
 function amountRemaining(fee){return Math.max(Number(fee&&fee.net_amount||0)-Number(fee&&fee.total_paid||0),0)}
+function paymentUsdAmount(row){
+  const amount = Number(row && row.amount || 0);
+  if(!Number.isFinite(amount) || amount <= 0) return 0;
+  const currency = String(row && row.currency || 'USD').toUpperCase();
+  if(currency === 'IRR'){
+    const rate = Number(row && row.exchange_rate || 0);
+    if(!Number.isFinite(rate) || rate <= 0) return 0;
+    return amount / rate;
+  }
+  return amount;
+}
+function paymentReceiverSummary(rows){
+  return [...new Set((rows || []).map(row => String(row && row.receiver_name || '').trim()).filter(Boolean))].join('، ');
+}
 function financeStatusLabel(status){return ({paid:'مدفوع بالكامل',partial:'دفع جزئي',unpaid:'غير مدفوع'})[String(status||'').toLowerCase()]||'بدون ملف'}
-function groupFamilies(familiesRows, studentsRows, finance){
+function groupFamilies(familiesRows, studentsRows, finance, submissionsMap){
   const bucket = new Map();
   const publicStudentByKey = new Map();
   const feeByStudentId = new Map();
@@ -222,6 +238,9 @@ function groupFamilies(familiesRows, studentsRows, finance){
   });
 
   (familiesRows || []).forEach(row => {
+    const submission = (submissionsMap && submissionsMap.get(String(row.forms_v3_submission_ref || ''))) || null;
+    const approval = submission && submission.submission_values && submission.submission_values.approval ? submission.submission_values.approval : {};
+    const paymentEntries = Array.isArray(row.finance_payment_entries) ? row.finance_payment_entries : [];
     bucket.set(row.id, {
       family_id: row.id,
       guardian_name: row.guardian_name || 'ولي أمر غير محدد',
@@ -229,9 +248,21 @@ function groupFamilies(familiesRows, studentsRows, finance){
       family_status: normalizeStatus(row.status),
       created_at: row.created_at || null,
       family_name: row.family_name || '',
-      finance_payment_entries: Array.isArray(row.finance_payment_entries) ? row.finance_payment_entries : [],
+      forms_v3_submission_ref: row.forms_v3_submission_ref || '',
+      finance_payment_entries: paymentEntries,
       general_family_health_notes: row.general_family_health_notes || '',
       document_notes: row.document_notes || '',
+      applicant_relation: row.applicant_relation || approval.applicant_relation || '',
+      applicant_other_relation: row.applicant_other_relation || approval.applicant_other_relation || '',
+      applicant_name: row.applicant_name || approval.applicant_name || '',
+      accountant_receiver_name: row.accountant_receiver_name || approval.accountant_receiver_name || '',
+      admin_reviewer_name: row.admin_reviewer_name || '',
+      admin_reviewed_at: row.admin_reviewed_at || null,
+      finance_receiver_name: row.finance_receiver_name || '',
+      finance_received_at: row.finance_received_at || null,
+      payment_receivers_text: paymentReceiverSummary(paymentEntries),
+      forms_submission_status: submission ? String(submission.status || '') : '',
+      submission_students: Array.isArray(submission && submission.submission_values && submission.submission_values.students) ? submission.submission_values.students : [],
       students: []
     });
   });
@@ -255,6 +286,7 @@ function groupFamilies(familiesRows, studentsRows, finance){
     const entry = bucket.get(id);
     const studentKey = [String(row.student_name || '').trim().toLowerCase(), String(row.class_id || '')].join('__');
     const publicStudent = publicStudentByKey.get(studentKey) || null;
+    const submissionStudent = (entry.submission_students || []).find(st => [String(st.student_full_name || st.student_name || '').trim().toLowerCase(), String(st.student_class_id || st.student_grade || '')].join('__') === studentKey) || null;
     const fee = publicStudent ? feeByStudentId.get(String(publicStudent.id)) : null;
     const instAgg = fee ? (installmentAggByFeeId.get(String(fee.id)) || { open:0, overdue:0 }) : { open:0, overdue:0 };
     const transferCount = fee ? (transferAggByFeeId.get(String(fee.id)) || 0) : 0;
@@ -269,6 +301,8 @@ function groupFamilies(familiesRows, studentsRows, finance){
       finance_plan_type: row.finance_plan_type || '—',
       finance_installments_count: row.finance_installments_count || 0,
       finance_plan_start_date: row.finance_plan_start_date || null,
+      passport_attachment_name: (row.passport_attachment && row.passport_attachment.name) || (submissionStudent && submissionStudent.student_passport_attachment && submissionStudent.student_passport_attachment.name) || '',
+      academic_documents_name: (row.academic_documents_attachment && row.academic_documents_attachment.name) || (submissionStudent && submissionStudent.student_academic_documents && submissionStudent.student_academic_documents.name) || '',
       public_student_id: publicStudent ? publicStudent.id : null,
       finance_fee_id: fee ? fee.id : null,
       finance_status: fee ? String(fee.status || '') : '',
@@ -290,6 +324,12 @@ function buildSearchTextFamily(item){
     item.students.map(s=>s.class_name).join(' '),
     item.students.map(s=>s.section).join(' '),
     item.family_name,
+    item.applicant_name,
+    item.applicant_relation,
+    item.accountant_receiver_name,
+    item.admin_reviewer_name,
+    item.finance_receiver_name,
+    item.payment_receivers_text,
     item.students.map(s=>s.finance_plan_type).join(' '),
     item.students.map(s=>s.finance_status).join(' ')
   ].join(' ').toLowerCase();
@@ -335,8 +375,11 @@ function renderFamilies(){
   }
   $('#familiesBox').innerHTML = '<div class="request-grid">'+list.map(item => {
     const familyTotal = item.students.reduce((sum, st)=>sum + Number(st.annual_fee_snapshot||0), 0);
-    const familyPayments = (item.finance_payment_entries||[]).reduce((sum, row)=>sum + Number(row.amount||0), 0);
+    const familyPayments = (item.finance_payment_entries||[]).reduce((sum, row)=>sum + paymentUsdAmount(row), 0);
     const familyRemaining = Math.max(familyTotal - familyPayments, 0);
+    const applicantRelationText = item.applicant_relation === 'other' ? (item.applicant_other_relation || 'أخرى') : ({father:'الأب',mother:'الأم'})[String(item.applicant_relation||'').toLowerCase()] || item.applicant_relation || '—';
+    const adminReviewText = item.admin_reviewer_name ? (item.admin_reviewer_name + (item.admin_reviewed_at ? (' — ' + formatDate(item.admin_reviewed_at)) : '')) : '—';
+    const financeReceiverText = item.finance_receiver_name ? (item.finance_receiver_name + (item.finance_received_at ? (' — ' + formatDate(item.finance_received_at)) : '')) : (item.accountant_receiver_name || item.payment_receivers_text || '—');
     const students = item.students.map(st => {
       const financeBadges = st.finance_fee_id
         ? '<div class="reg-chip-row" style="margin-top:8px">'
@@ -360,6 +403,12 @@ function renderFamilies(){
             : '<small class="muted">فعّل الحساب أولاً لفتح الملف المالي لهذا الطالب.</small>');
       return '<li><b>'+esc(st.student_name)+'</b> — '+esc(st.class_name)+' / '+esc(st.section || '—')
       +'<br><small class="muted">الرسوم السنوية: '+esc(money(st.annual_fee_snapshot))+' · الخطة: '+esc(st.finance_plan_type || '—')+' · عدد الأقساط: '+esc(st.finance_installments_count || '—')+'</small>'
+      + ((st.passport_attachment_name || st.academic_documents_name)
+          ? '<div class="reg-chip-row" style="margin-top:8px">'
+            + (st.passport_attachment_name ? '<span class="reg-chip">جواز: '+esc(st.passport_attachment_name)+'</span>' : '')
+            + (st.academic_documents_name ? '<span class="reg-chip">سجل دراسي: '+esc(st.academic_documents_name)+'</span>' : '')
+            + '</div>'
+          : '')
       + financeBadges
       + financeActions + '</li>';
     }).join('');
@@ -373,9 +422,16 @@ function renderFamilies(){
       + '</div>'
       + '<div class="reg-note">الملخص المالي داخل نفس بطاقة التسجيل: إجمالي متوقع '+esc(money(familyTotal))+' · مدخل حالياً '+esc(money(familyPayments))+' · متبقي '+esc(money(familyRemaining))+'</div>'
       + '<div class="request-meta-line"><b>اسم العائلة:</b> <span>'+esc(item.family_name || '—')+'</span></div>'
+      + '<div class="request-meta-line"><b>مقدم طلب التسجيل:</b> <span>'+esc(item.applicant_name || '—')+' — '+esc(applicantRelationText)+'</span></div>'
+      + '<div class="request-meta-line"><b>مستلم الدفعات / المحاسب:</b> <span>'+esc(financeReceiverText)+'</span></div>'
+      + '<div class="request-meta-line"><b>المراجع الإداري:</b> <span>'+esc(adminReviewText)+'</span></div>'
       + '<div class="request-meta-line"><b>ملاحظات الأسرة:</b> <span>'+esc(item.general_family_health_notes || '—')+'</span></div>'
       + '<div class="request-meta-line"><b>ملاحظات الوثائق:</b> <span>'+esc(item.document_notes || '—')+'</span></div>'
       + '<ul class="request-list">'+students+'</ul>'
+      + '<div class="reg-inline-actions" style="margin-bottom:10px">'
+      +   '<button class="btn small" type="button" onclick="stampFamilyOperator('+jse(item.family_id)+', '+jse('review')+')">تثبيت اسمي كمراجع</button>'
+      +   '<button class="btn small gold" type="button" onclick="stampFamilyOperator('+jse(item.family_id)+', '+jse('finance')+')">تثبيت اسمي كمحاسب</button>'
+      + '</div>'
       + '<div class="request-actions">'
       +   '<button class="btn blue" type="button" onclick="activateAccount(\'family\',\''+esc(item.family_id)+'\')">تفعيل الحساب</button>'
       +   '<button class="btn" type="button" onclick="setStatus(\'registration_families\',\''+esc(item.family_id)+'\',\'reviewed\')">تمت المراجعة</button>'
@@ -442,21 +498,76 @@ async function ensure(){
     location.href = 'index.html';
     return false;
   }
-  const {data:user} = await sb.from('users').select('role,is_super_admin').eq('id',session.user.id).maybeSingle();
+  const {data:user} = await sb.from('users').select('name,email,role,is_super_admin').eq('id',session.user.id).maybeSingle();
   if(!user || !(user.is_super_admin || ['admin','academic','academic_admin'].includes(user.role))){
     $('#familiesBox').innerHTML = '<div class="reg-empty"><b>ليست لديك صلاحية مراجعة الطلبات</b><p>يمكنك الرجوع إلى البوابة أو طلب الصلاحية من الإدارة.</p></div>';
     $('#teachersBox').innerHTML = '<div class="reg-empty"><b>ليست لديك صلاحية مراجعة الطلبات</b><p>هذه الواجهة مخصصة للإدارة والمراجعة.</p></div>';
     return false;
   }
+  currentOperator = {
+    id: session.user.id,
+    name: user.name || user.email || 'مشرف النظام',
+    email: user.email || session.user.email || '',
+    role: user.role || ''
+  };
   return true;
 }
 async function setStatus(table,id,status){
-  const {error} = await sb.from(table).update({status}).eq('id',id);
-  if(error){
-    toast('خطأ', error.message);
+  let payload = {status};
+  if(table === 'registration_families' && currentOperator && ['reviewed','approved'].includes(status)){
+    payload.admin_reviewer_name = currentOperator.name;
+    payload.admin_reviewer_id = currentOperator.id;
+    payload.admin_reviewed_at = new Date().toISOString();
+  }
+  let response = await sb.from(table).update(payload).eq('id',id);
+  if(response.error && table === 'registration_families' && String(response.error.message||'').includes('admin_reviewer_name')){
+    response = await sb.from(table).update({status}).eq('id',id);
+    if(!response.error){
+      toast('تم التحديث', statusLabel(status) + ' — لتثبيت اسم المراجع شغّل ملف SQL: sql/archive/168_family_registration_admin_finance_context.sql');
+      await loadAll();
+      return;
+    }
+  }
+  if(response.error){
+    toast('خطأ', response.error.message);
     return;
   }
   toast('تم التحديث', statusLabel(status));
+  await loadAll();
+}
+async function stampFamilyOperator(familyId, mode){
+  const family = familyGroups.find(item => String(item.family_id) === String(familyId));
+  if(!family || !currentOperator){
+    toast('تعذر التحديث', 'لا يمكن تحديد البطاقة الحالية أو بيانات المشرف.');
+    return;
+  }
+  const payload = {};
+  if(mode === 'review'){
+    payload.admin_reviewer_name = currentOperator.name;
+    payload.admin_reviewer_id = currentOperator.id;
+    payload.admin_reviewed_at = new Date().toISOString();
+  } else {
+    payload.finance_receiver_name = currentOperator.name;
+    payload.finance_receiver_id = currentOperator.id;
+    payload.finance_received_at = new Date().toISOString();
+    payload.accountant_receiver_name = currentOperator.name;
+    payload.finance_payment_entries = (family.finance_payment_entries || []).map(row => {
+      const amount = Number(row && row.amount || 0);
+      if(amount > 0 && !String(row.receiver_name || '').trim()) return { ...row, receiver_name: currentOperator.name };
+      return row;
+    });
+  }
+  const {error} = await sb.from('registration_families').update(payload).eq('id', familyId);
+  if(error){
+    const msg = String(error.message || '');
+    if(msg.includes('finance_receiver_name') || msg.includes('admin_reviewer_name') || msg.includes('accountant_receiver_name')){
+      toast('يلزم تحديث SQL', 'شغّل الملف sql/archive/168_family_registration_admin_finance_context.sql ثم أعد المحاولة.');
+      return;
+    }
+    toast('خطأ', error.message);
+    return;
+  }
+  toast('تم الحفظ', mode === 'review' ? 'تم تثبيت اسم المراجع الإداري الحالي.' : 'تم تثبيت اسم مستلم الدفعات الحالي على البطاقة.');
   await loadAll();
 }
 async function activateAccount(type,id){
@@ -528,14 +639,15 @@ async function loadAll(){
   }
   $('#familiesBox').innerHTML = '<div class="reg-empty"><b>جاري تحميل طلبات الأسر والطلاب...</b><p>لحظات وسيتم تحديث القائمة.</p></div>';
   $('#teachersBox').innerHTML = '<div class="reg-empty"><b>جاري تحميل طلبات المعلمين...</b><p>لحظات وسيتم تحديث القائمة.</p></div>';
-  const [familiesRes, studentsRes, teachersRes, publicStudentsRes, feeRes, installmentRes, transferRes] = await Promise.all([
-    sb.from('registration_families').select('id,guardian_name,phone_primary,status,created_at,family_name,finance_payment_entries,general_family_health_notes,document_notes').order('created_at',{ascending:false}),
-    sb.from('registration_students').select('id,family_id,student_name,class_id,section,status,created_at,student_class_label,annual_fee_snapshot,monthly_fee_snapshot,finance_plan_type,finance_installments_count,finance_plan_start_date').order('created_at',{ascending:false}),
+  const [familiesRes, studentsRes, teachersRes, publicStudentsRes, feeRes, installmentRes, transferRes, submissionsRes] = await Promise.all([
+    sb.from('registration_families').select('*').order('created_at',{ascending:false}),
+    sb.from('registration_students').select('*').order('created_at',{ascending:false}),
     sb.from('registration_teachers').select('*').order('created_at',{ascending:false}),
     sb.from('students').select('id,student_name,class_id,parent_id,created_at').order('created_at',{ascending:false}),
     sb.from('student_fees').select('id,student_id,net_amount,total_paid,credit_balance,status,updated_at,created_at').order('updated_at',{ascending:false}),
     sb.from('student_installments').select('student_fee_id,amount_due,amount_paid,due_date,status'),
-    sb.from('finance_credit_transfers').select('id,from_student_fee_id,to_student_fee_id,created_at')
+    sb.from('finance_credit_transfers').select('id,from_student_fee_id,to_student_fee_id,created_at'),
+    sb.from('forms_v3_submissions').select('submission_ref,submission_values,status,review_note,updated_at').eq('form_slug','family-registration-v3').order('created_at',{ascending:false})
   ]);
   financeContext = {
     publicStudents: publicStudentsRes.error ? [] : (publicStudentsRes.data || []),
@@ -543,6 +655,7 @@ async function loadAll(){
     installments: installmentRes.error ? [] : (installmentRes.data || []),
     transfers: transferRes.error ? [] : (transferRes.data || [])
   };
+  submissionsByRef = new Map(((submissionsRes.error ? [] : (submissionsRes.data || [])) || []).map(row => [String(row.submission_ref || ''), row]));
   if(familiesRes.error || studentsRes.error){
     familiesRaw = [];
     familyGroups = [];
@@ -550,7 +663,7 @@ async function loadAll(){
     $('#familiesBox').innerHTML = '<div class="reg-empty"><b>تعذر تحميل طلبات الأسر</b><p>'+esc(message)+'</p></div>';
   } else {
     familiesRaw = studentsRes.data || [];
-    familyGroups = groupFamilies(familiesRes.data || [], studentsRes.data || [], financeContext);
+    familyGroups = groupFamilies(familiesRes.data || [], studentsRes.data || [], financeContext, submissionsByRef);
   }
   if(teachersRes.error){
     teachersRaw = [];
@@ -590,6 +703,7 @@ window.resetFilters = resetFilters;
 window.applyQuickFilter = applyQuickFilter;
 window.openFinanceForRegistrationStudent = openFinanceForRegistrationStudent;
 window.openCreditTransferForRegistrationStudent = openCreditTransferForRegistrationStudent;
+window.stampFamilyOperator = stampFamilyOperator;
 </script>
 <script src="assets/ux-enhancements.js?v=20260706-3"></script>
 <script src="assets/amin-theme-injector.js"></script>
