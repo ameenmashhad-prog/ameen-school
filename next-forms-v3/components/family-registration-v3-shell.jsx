@@ -1161,12 +1161,14 @@ function PrintField({ label, value, wide = false }) {
   );
 }
 
-export default function FamilyRegistrationV3Shell({ locale, dictionary }) {
+export default function FamilyRegistrationV3Shell({ locale, dictionary, initialStep = FORM_STEPS.registration }) {
   const router = useRouter();
   const forms = dictionary.forms;
   const labels = forms.familyRegistrationV3;
   const template = useMemo(() => buildTemplateByKey('family_registration_v3'), []);
   const fieldById = useMemo(() => fieldMapFromTemplate(template), [template]);
+  const registrationPath = `/${locale}/forms/family-registration-v3`;
+  const financePath = `/${locale}/forms/family-registration-v3/finance`;
 
   const [activeLocale, setActiveLocale] = useState(locale);
   const [values, setValues] = useState(() => makeInitialValues(template));
@@ -1184,7 +1186,7 @@ export default function FamilyRegistrationV3Shell({ locale, dictionary }) {
   const [actionFlash, setActionFlash] = useState('');
   const [financeCatalog, setFinanceCatalog] = useState([]);
   const [financeCatalogState, setFinanceCatalogState] = useState('loading');
-  const [currentStep, setCurrentStep] = useState(FORM_STEPS.registration);
+  const [currentStep, setCurrentStep] = useState(initialStep);
 
   const meta = localeMeta[activeLocale] || localeMeta.ar;
 
@@ -1205,9 +1207,8 @@ export default function FamilyRegistrationV3Shell({ locale, dictionary }) {
       }
     }
 
-    const stepParam = new URLSearchParams(window.location.search).get('step');
-    if (stepParam === FORM_STEPS.finance) setCurrentStep(FORM_STEPS.finance);
-  }, [template]);
+    setCurrentStep(initialStep);
+  }, [template, initialStep]);
 
   useEffect(() => {
     window.localStorage.setItem(LOCAL_LANGUAGE_KEY, activeLocale);
@@ -1303,9 +1304,13 @@ export default function FamilyRegistrationV3Shell({ locale, dictionary }) {
 
   function updateStep(nextStep) {
     setCurrentStep(nextStep);
-    const url = new URL(window.location.href);
-    url.searchParams.set('step', nextStep);
-    window.history.replaceState({}, '', url.toString());
+
+    const targetPath = nextStep === FORM_STEPS.finance ? financePath : registrationPath;
+    if (window.location.pathname !== targetPath) {
+      router.push(targetPath);
+      return;
+    }
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
