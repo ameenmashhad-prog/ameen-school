@@ -23,6 +23,60 @@ const DEFAULT_PLAN_START_DATE = '2026-09-10';
 const PLAN_COUNTS = { two: 2, three: 3, four: 4, six: 6, monthly: 9, quarterly: 3, custom: null };
 const FORM_STEPS = { registration: 'registration', finance: 'finance' };
 const SCHOOL_WATERMARK_SRC = '/branding/ameen-school-logo-watermark.png';
+const SCHOOL_YEAR_LABEL = '2026-2027';
+const PRINT_COPY = {
+  ar: {
+    schoolName: 'مجمع أمين الرضا التعليمي',
+    generatedFrom: 'نموذج احترافي منظم يختصر التكرار ويُبقي بيانات الطالب والماليات مفصولة بوضوح.',
+    familyQuickSummary: 'ملخص عائلي سريع',
+    studentsCountLabel: 'عدد الطلاب',
+    documentStatusTitle: 'حالة الوثائق والاعتماد',
+    sharedPaymentsTitle: 'دفعات عائلية عامة',
+    studentPaymentsTitle: 'دفعات مرتبطة بهذا الطالب',
+    noPayments: 'لا توجد دفعات مسجلة حالياً.',
+    generatedNotice: 'هذه الصفحات مولدة من التسجيل الجديد: بيانات الطالب مستقلة، والماليات تأتي خلفها في صفحة منفصلة.',
+    planScheduleTitle: 'جدول الأقساط المتوقع',
+    guardianSignatureLabel: 'توقيع ولي الأمر',
+    registrationOfficerLabel: 'اعتماد التسجيل',
+    financeOfficerLabel: 'اعتماد المالية',
+    pageProfileHint: 'صفحة بيانات الطالب',
+    pageFinanceHint: 'صفحة الماليات الخاصة بالطالب'
+  },
+  fa: {
+    schoolName: 'مجتمع آموزشی امین‌الرضا',
+    generatedFrom: 'فرم حرفه‌ای و منظم که تکرار را حذف می‌کند و اطلاعات دانش‌آموز و مالی را جدا نگه می‌دارد.',
+    familyQuickSummary: 'خلاصه سریع خانواده',
+    studentsCountLabel: 'تعداد دانش‌آموزان',
+    documentStatusTitle: 'وضعیت مدارک و تأیید',
+    sharedPaymentsTitle: 'پرداخت‌های عمومی خانواده',
+    studentPaymentsTitle: 'پرداخت‌های مرتبط با این دانش‌آموز',
+    noPayments: 'در حال حاضر پرداختی ثبت نشده است.',
+    generatedNotice: 'این صفحات از ثبت‌نام جدید ساخته می‌شوند: اطلاعات دانش‌آموز مستقل است و صفحه مالی جداگانه در پشت آن می‌آید.',
+    planScheduleTitle: 'جدول مورد انتظار اقساط',
+    guardianSignatureLabel: 'امضای ولی',
+    registrationOfficerLabel: 'تأیید ثبت‌نام',
+    financeOfficerLabel: 'تأیید مالی',
+    pageProfileHint: 'صفحه اطلاعات دانش‌آموز',
+    pageFinanceHint: 'صفحه مالی مخصوص دانش‌آموز'
+  },
+  en: {
+    schoolName: 'Amin Al-Ridha Educational Complex',
+    generatedFrom: 'A professional structured format that removes repetition and keeps student data clearly separated from finance.',
+    familyQuickSummary: 'Quick Family Summary',
+    studentsCountLabel: 'Students Count',
+    documentStatusTitle: 'Documents & Approval Status',
+    sharedPaymentsTitle: 'Shared Family Payments',
+    studentPaymentsTitle: 'Payments Linked to This Student',
+    noPayments: 'No payments are recorded yet.',
+    generatedNotice: 'These pages are generated from the new registration flow: the student profile is separate and the finance page follows behind it.',
+    planScheduleTitle: 'Expected Installment Schedule',
+    guardianSignatureLabel: 'Guardian Signature',
+    registrationOfficerLabel: 'Registration Approval',
+    financeOfficerLabel: 'Finance Approval',
+    pageProfileHint: 'Student profile page',
+    pageFinanceHint: 'Student finance page'
+  }
+};
 
 function blankPaymentRows() {
   return Array.from({ length: PAYMENT_ROWS }, (_, index) => ({
@@ -424,6 +478,14 @@ function nonEmptyPaymentRows(rows) {
 
 function directPaymentRowsForStudent(rows, studentId) {
   return nonEmptyPaymentRows(rows).filter((row) => row.student_ref === studentId);
+}
+
+function sharedFamilyPaymentRows(rows) {
+  return nonEmptyPaymentRows(rows).filter((row) => !String(row.student_ref || '').trim());
+}
+
+function sumPaymentRows(rows) {
+  return (rows || []).reduce((sum, row) => sum + (Number(row.amount || 0) || 0), 0);
 }
 
 function validateValues(template, values, labels, options = {}) {
@@ -916,7 +978,9 @@ function FinanceStudentCard({ locale, labels, student, index, fieldById, finance
   );
 }
 
-function PrintPageShell({ title, subtitle, children, pageBreak = true }) {
+function PrintPageShell({ locale, title, subtitle, hint, children, pageBreak = true }) {
+  const copy = PRINT_COPY[locale] || PRINT_COPY.ar;
+
   return (
     <section
       style={pageBreak ? { breakAfter: 'page', pageBreakAfter: 'always' } : undefined}
@@ -933,9 +997,23 @@ function PrintPageShell({ title, subtitle, children, pageBreak = true }) {
         <img src={SCHOOL_WATERMARK_SRC} alt="" className="max-h-[78%] w-auto opacity-[0.07]" />
       </div>
       <div className="relative z-10">
-        <div className="border-b border-[#e8dcc2] pb-4 text-center">
-          <div className="text-[18px] font-black text-slate-900">{title}</div>
-          {subtitle ? <div className="mt-2 text-[12px] leading-6 text-slate-600">{subtitle}</div> : null}
+        <div className="grid grid-cols-[92px_1fr_92px] items-center gap-3 border-b border-[#e8dcc2] pb-4">
+          <div className="flex justify-start">
+            <img src={SCHOOL_WATERMARK_SRC} alt="" className="h-16 w-auto opacity-90" />
+          </div>
+          <div className="text-center">
+            <div className="text-[12px] font-black tracking-wide text-slate-700">{copy.schoolName}</div>
+            <div className="mt-1 text-[10px] font-semibold text-slate-500">{SCHOOL_YEAR_LABEL}</div>
+            <div className="mt-3 text-[18px] font-black text-slate-950">{title}</div>
+            {subtitle ? <div className="mt-1 text-[11px] font-semibold text-slate-700">{subtitle}</div> : null}
+            {hint ? <div className="mt-2 text-[10px] leading-5 text-slate-500">{hint}</div> : null}
+          </div>
+          <div className="flex justify-end">
+            <div className="rounded-[16px] border border-slate-300 bg-white/90 px-3 py-2 text-center">
+              <div className="text-[9px] font-black text-slate-500">{SCHOOL_YEAR_LABEL}</div>
+              <div className="mt-1 text-[11px] font-semibold text-slate-800">{localeDateLabel(locale)}</div>
+            </div>
+          </div>
         </div>
         <div className="mt-5">{children}</div>
       </div>
@@ -952,96 +1030,179 @@ function PrintMetric({ label, value }) {
   );
 }
 
+function PrintSectionBlock({ title, hint, children }) {
+  return (
+    <section className="rounded-[22px] border border-slate-300 bg-white/90 p-4">
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-2">
+        <h3 className="text-[13px] font-black text-slate-900">{title}</h3>
+        {hint ? <span className="text-[10px] font-bold text-slate-500">{hint}</span> : null}
+      </div>
+      {children}
+    </section>
+  );
+}
+
+function PrintCheckItem({ checked, label }) {
+  return (
+    <div className={`rounded-[14px] border px-3 py-3 text-[12px] font-semibold ${checked ? 'border-emerald-300 bg-emerald-50 text-emerald-900' : 'border-slate-300 bg-slate-50 text-slate-700'}`}>
+      {checked ? '☑' : '☐'} {label}
+    </div>
+  );
+}
+
 function PrintableFamilyRegistration({ locale, labels, template, values, totalAmount, financeCatalogMap }) {
+  const copy = PRINT_COPY[locale] || PRINT_COPY.ar;
   const guardianFullName = computeGuardianFullName(values);
   const motherFullName = computeMotherFullName(values);
-  const familyPayments = nonEmptyPaymentRows(values.payment_entries || []);
+  const sharedPayments = sharedFamilyPaymentRows(values.payment_entries || []);
+  const expectedFamilyFeeTotal = values.students.reduce((sum, student) => sum + Number(financeCatalogMap.get(String(student.student_grade || ''))?.annual_fee || 0), 0);
+  const remainingProjected = Math.max(expectedFamilyFeeTotal - totalAmount, 0);
+
+  const familyField = (fieldId) => template.fields.find((field) => field.id === fieldId);
+  const studentField = (fieldId) => template.studentCardFields.find((field) => field.id === fieldId);
+  const familyValue = (fieldId, value) => {
+    const field = familyField(fieldId);
+    if (field?.type === 'select') return optionLabelForValue(field, value, locale);
+    return value;
+  };
+  const studentValue = (fieldId, value) => {
+    const field = studentField(fieldId);
+    if (field?.type === 'select') return optionLabelForValue(field, value, locale);
+    return value;
+  };
 
   return (
     <div className="space-y-6 text-black">
-      <PrintPageShell title={labels.familySheetTitle} subtitle={template.title[locale]} pageBreak={values.students.length > 0}>
-        <div className="grid gap-3 md:grid-cols-3">
-          <PrintMetric label={template.fields.find((field) => field.id === 'guardian_given_name')?.label?.[locale]} value={values.guardian_given_name} />
-          <PrintMetric label={template.fields.find((field) => field.id === 'guardian_father_name')?.label?.[locale]} value={values.guardian_father_name} />
-          <PrintMetric label={template.fields.find((field) => field.id === 'family_name')?.label?.[locale]} value={values.family_name} />
+      <PrintPageShell
+        locale={locale}
+        title={labels.familySheetTitle}
+        subtitle={copy.familyQuickSummary}
+        hint={copy.generatedFrom}
+        pageBreak={values.students.length > 0}
+      >
+        <div className="grid gap-3 md:grid-cols-4">
           <PrintMetric label={labels.familySummaryTitle} value={guardianFullName} />
-          <PrintMetric label={template.fields.find((field) => field.id === 'guardian_phone_primary')?.label?.[locale]} value={values.guardian_phone_primary} />
-          <PrintMetric label={template.fields.find((field) => field.id === 'guardian_phone_whatsapp')?.label?.[locale]} value={values.guardian_phone_whatsapp} />
-          <PrintMetric label={template.fields.find((field) => field.id === 'mother_given_name')?.label?.[locale]} value={values.mother_given_name} />
-          <PrintMetric label={template.fields.find((field) => field.id === 'mother_family_name')?.label?.[locale]} value={values.mother_family_name} />
-          <PrintMetric label={labels.documentsSummaryTitle} value={motherFullName || '—'} />
+          <PrintMetric label={copy.studentsCountLabel} value={localeNumber(locale, values.students.length)} />
+          <PrintMetric label={labels.expectedFeesLabel} value={localeNumber(locale, expectedFamilyFeeTotal)} />
+          <PrintMetric label={labels.projectedRemainingLabel} value={localeNumber(locale, remainingProjected)} />
         </div>
 
         <div className="mt-5 grid gap-4 md:grid-cols-2">
-          <PrintField label={template.fields.find((field) => field.id === 'living_with_in_iran')?.label?.[locale]} value={values.living_with_in_iran} />
-          <PrintField label={template.fields.find((field) => field.id === 'document_notes')?.label?.[locale]} value={values.document_notes} />
-          <PrintField label={template.fields.find((field) => field.id === 'general_family_health_notes')?.label?.[locale]} value={values.general_family_health_notes} wide />
+          <PrintSectionBlock title={template.sections.find((section) => section.key === 'guardian')?.title?.[locale]}>
+            <div className="grid gap-3 md:grid-cols-2">
+              <PrintField label={familyField('guardian_given_name')?.label?.[locale]} value={values.guardian_given_name} />
+              <PrintField label={familyField('guardian_father_name')?.label?.[locale]} value={values.guardian_father_name} />
+              <PrintField label={familyField('family_name')?.label?.[locale]} value={values.family_name} />
+              <PrintField label={familyField('guardian_username')?.label?.[locale]} value={values.guardian_username} />
+              <PrintField label={familyField('guardian_phone_primary')?.label?.[locale]} value={values.guardian_phone_primary} />
+              <PrintField label={familyField('guardian_phone_whatsapp')?.label?.[locale]} value={values.guardian_phone_whatsapp} />
+              <PrintField label={familyField('guardian_phone_emergency')?.label?.[locale]} value={values.guardian_phone_emergency} />
+              <PrintField label={familyField('guardian_nationality')?.label?.[locale]} value={familyValue('guardian_nationality', values.guardian_nationality)} />
+              <PrintField label={familyField('residence_type')?.label?.[locale]} value={familyValue('residence_type', values.residence_type)} />
+              <PrintField label={familyField('guardian_passport_number')?.label?.[locale]} value={values.guardian_passport_number} />
+              <PrintField label={familyField('guardian_work_type')?.label?.[locale]} value={familyValue('guardian_work_type', values.guardian_work_type)} />
+              <PrintField label={familyField('guardian_education_level')?.label?.[locale]} value={familyValue('guardian_education_level', values.guardian_education_level)} />
+            </div>
+          </PrintSectionBlock>
+
+          <PrintSectionBlock title={template.sections.find((section) => section.key === 'mother')?.title?.[locale]}>
+            <div className="grid gap-3 md:grid-cols-2">
+              <PrintField label={familyField('mother_given_name')?.label?.[locale]} value={values.mother_given_name} />
+              <PrintField label={familyField('mother_father_name')?.label?.[locale]} value={values.mother_father_name} />
+              <PrintField label={familyField('mother_family_name')?.label?.[locale]} value={values.mother_family_name} />
+              <PrintField label={familyField('mother_phone')?.label?.[locale]} value={values.mother_phone} />
+              <PrintField label={familyField('mother_whatsapp')?.label?.[locale]} value={values.mother_whatsapp} />
+              <PrintField label={familyField('mother_nationality')?.label?.[locale]} value={familyValue('mother_nationality', values.mother_nationality)} />
+              <PrintField label={familyField('mother_work_type')?.label?.[locale]} value={familyValue('mother_work_type', values.mother_work_type)} />
+              <PrintField label={familyField('mother_education_level')?.label?.[locale]} value={familyValue('mother_education_level', values.mother_education_level)} />
+              <PrintField label={labels.documentsSummaryTitle} value={motherFullName || labels.emptyValue} wide />
+            </div>
+          </PrintSectionBlock>
         </div>
 
-        <div className="mt-5 overflow-hidden rounded-[18px] border border-slate-300 bg-white/95">
-          <table className="min-w-full border-collapse text-[11px]">
-            <thead>
-              <tr className="bg-slate-50 text-slate-700">
-                <th className="border border-slate-300 px-2 py-2">#</th>
-                <th className="border border-slate-300 px-2 py-2">{template.studentCardFields.find((field) => field.id === 'student_full_name')?.label?.[locale]}</th>
-                <th className="border border-slate-300 px-2 py-2">{template.studentCardFields.find((field) => field.id === 'student_grade')?.label?.[locale]}</th>
-                <th className="border border-slate-300 px-2 py-2">{template.studentCardFields.find((field) => field.id === 'student_gender')?.label?.[locale]}</th>
-                <th className="border border-slate-300 px-2 py-2">{template.studentCardFields.find((field) => field.id === 'student_username')?.label?.[locale]}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {values.students.map((student, index) => (
-                <tr key={student.id}>
-                  <td className="border border-slate-300 px-2 py-2 text-center">{localeNumber(locale, index + 1)}</td>
-                  <td className="border border-slate-300 px-2 py-2 whitespace-pre-wrap break-words">{student.student_full_name || '—'}</td>
-                  <td className="border border-slate-300 px-2 py-2 whitespace-pre-wrap break-words">{financeCatalogMap.get(String(student.student_grade || ''))?.class_name || optionLabelForValue(template.studentCardFields.find((field) => field.id === 'student_grade'), student.student_grade, locale) || '—'}</td>
-                  <td className="border border-slate-300 px-2 py-2">{optionLabelForValue(template.studentCardFields.find((field) => field.id === 'student_gender'), student.student_gender, locale) || '—'}</td>
-                  <td className="border border-slate-300 px-2 py-2 whitespace-pre-wrap break-words">{student.student_username || '—'}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="mt-4 grid gap-4 md:grid-cols-[1.2fr_.8fr]">
+          <PrintSectionBlock title={template.sections.find((section) => section.key === 'family_context')?.title?.[locale]}>
+            <div className="grid gap-3">
+              <PrintField label={familyField('living_with_in_iran')?.label?.[locale]} value={values.living_with_in_iran} />
+              <PrintField label={familyField('general_family_health_notes')?.label?.[locale]} value={values.general_family_health_notes} />
+            </div>
+          </PrintSectionBlock>
+
+          <PrintSectionBlock title={copy.documentStatusTitle}>
+            <div className="grid gap-3">
+              <PrintCheckItem checked={values.document_copy_received} label={familyField('document_copy_received')?.label?.[locale]} />
+              <PrintCheckItem checked={values.document_original_received} label={familyField('document_original_received')?.label?.[locale]} />
+              <PrintField label={familyField('document_notes')?.label?.[locale]} value={values.document_notes} />
+              <PrintField label={copy.guardianSignatureLabel} value={values.guardian_signature} />
+            </div>
+          </PrintSectionBlock>
         </div>
 
-        <div className="mt-5 rounded-[18px] border border-slate-300 bg-white/90 p-4">
-          <div className="mb-3 text-sm font-black text-slate-900">{labels.paymentTableTitle}</div>
-          {familyPayments.length ? (
-            <div className="overflow-hidden rounded-[14px] border border-slate-300">
+        <div className="mt-4 grid gap-4">
+          <PrintSectionBlock title={template.sections.find((section) => section.key === 'students')?.title?.[locale]}>
+            <div className="overflow-hidden rounded-[14px] border border-slate-300 bg-white/95">
               <table className="min-w-full border-collapse text-[11px]">
                 <thead>
                   <tr className="bg-slate-50 text-slate-700">
-                    <th className="border border-slate-300 px-2 py-2">{labels.paymentColumns.row}</th>
-                    <th className="border border-slate-300 px-2 py-2">{labels.paymentColumns.student}</th>
-                    <th className="border border-slate-300 px-2 py-2">{labels.paymentColumns.cardNumber}</th>
-                    <th className="border border-slate-300 px-2 py-2">{labels.paymentColumns.trackingNumber}</th>
-                    <th className="border border-slate-300 px-2 py-2">{labels.paymentColumns.date}</th>
-                    <th className="border border-slate-300 px-2 py-2">{labels.paymentColumns.amount}</th>
-                    <th className="border border-slate-300 px-2 py-2">{labels.paymentColumns.notes}</th>
+                    <th className="border border-slate-300 px-2 py-2">#</th>
+                    <th className="border border-slate-300 px-2 py-2">{studentField('student_full_name')?.label?.[locale]}</th>
+                    <th className="border border-slate-300 px-2 py-2">{studentField('student_grade')?.label?.[locale]}</th>
+                    <th className="border border-slate-300 px-2 py-2">{studentField('student_gender')?.label?.[locale]}</th>
+                    <th className="border border-slate-300 px-2 py-2">{studentField('student_username')?.label?.[locale]}</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {familyPayments.map((row, index) => (
-                    <tr key={row.id}>
+                  {values.students.map((student, index) => (
+                    <tr key={student.id}>
                       <td className="border border-slate-300 px-2 py-2 text-center">{localeNumber(locale, index + 1)}</td>
-                      <td className="border border-slate-300 px-2 py-2 whitespace-pre-wrap break-words">{values.students.find((student) => student.id === row.student_ref)?.student_full_name || labels.studentLinkAll}</td>
-                      <td className="border border-slate-300 px-2 py-2 whitespace-pre-wrap break-words">{row.card_number || '—'}</td>
-                      <td className="border border-slate-300 px-2 py-2 whitespace-pre-wrap break-words">{row.tracking_number || '—'}</td>
-                      <td className="border border-slate-300 px-2 py-2">{row.payment_date ? formatDateForLocale(locale, row.payment_date) : '—'}</td>
-                      <td className="border border-slate-300 px-2 py-2">{row.amount ? localeNumber(locale, Number(row.amount)) : '—'}</td>
-                      <td className="border border-slate-300 px-2 py-2 whitespace-pre-wrap break-words">{row.notes || row.reference || '—'}</td>
+                      <td className="border border-slate-300 px-2 py-2 whitespace-pre-wrap break-words">{student.student_full_name || labels.emptyValue}</td>
+                      <td className="border border-slate-300 px-2 py-2 whitespace-pre-wrap break-words">{financeCatalogMap.get(String(student.student_grade || ''))?.class_name || studentValue('student_grade', student.student_grade) || labels.emptyValue}</td>
+                      <td className="border border-slate-300 px-2 py-2">{studentValue('student_gender', student.student_gender) || labels.emptyValue}</td>
+                      <td className="border border-slate-300 px-2 py-2 whitespace-pre-wrap break-words">{student.student_username || labels.emptyValue}</td>
                     </tr>
                   ))}
-                  <tr className="bg-brand-50">
-                    <td className="border border-slate-300 px-2 py-2 text-center font-black" colSpan={5}>{labels.paymentTotal}</td>
-                    <td className="border border-slate-300 px-2 py-2 font-black">{localeNumber(locale, totalAmount)}</td>
-                    <td className="border border-slate-300 px-2 py-2" />
-                  </tr>
                 </tbody>
               </table>
             </div>
-          ) : (
-            <div className="text-[12px] leading-7 text-slate-600">{labels.emptyValue}</div>
-          )}
+          </PrintSectionBlock>
+
+          <PrintSectionBlock title={copy.sharedPaymentsTitle} hint={labels.paymentTableTitle}>
+            {sharedPayments.length ? (
+              <div className="overflow-hidden rounded-[14px] border border-slate-300 bg-white/95">
+                <table className="min-w-full border-collapse text-[11px]">
+                  <thead>
+                    <tr className="bg-slate-50 text-slate-700">
+                      <th className="border border-slate-300 px-2 py-2">{labels.paymentColumns.row}</th>
+                      <th className="border border-slate-300 px-2 py-2">{labels.paymentColumns.cardNumber}</th>
+                      <th className="border border-slate-300 px-2 py-2">{labels.paymentColumns.trackingNumber}</th>
+                      <th className="border border-slate-300 px-2 py-2">{labels.paymentColumns.date}</th>
+                      <th className="border border-slate-300 px-2 py-2">{labels.paymentColumns.amount}</th>
+                      <th className="border border-slate-300 px-2 py-2">{labels.paymentColumns.notes}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {sharedPayments.map((row, index) => (
+                      <tr key={row.id}>
+                        <td className="border border-slate-300 px-2 py-2 text-center">{localeNumber(locale, index + 1)}</td>
+                        <td className="border border-slate-300 px-2 py-2 whitespace-pre-wrap break-words">{row.card_number || labels.emptyValue}</td>
+                        <td className="border border-slate-300 px-2 py-2 whitespace-pre-wrap break-words">{row.tracking_number || labels.emptyValue}</td>
+                        <td className="border border-slate-300 px-2 py-2">{row.payment_date ? formatDateForLocale(locale, row.payment_date) : labels.emptyValue}</td>
+                        <td className="border border-slate-300 px-2 py-2">{row.amount ? localeNumber(locale, Number(row.amount)) : labels.emptyValue}</td>
+                        <td className="border border-slate-300 px-2 py-2 whitespace-pre-wrap break-words">{row.notes || row.reference || labels.emptyValue}</td>
+                      </tr>
+                    ))}
+                    <tr className="bg-brand-50">
+                      <td className="border border-slate-300 px-2 py-2 text-center font-black" colSpan={4}>{labels.paymentTotal}</td>
+                      <td className="border border-slate-300 px-2 py-2 font-black">{localeNumber(locale, sumPaymentRows(sharedPayments))}</td>
+                      <td className="border border-slate-300 px-2 py-2" />
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="text-[12px] leading-7 text-slate-600">{copy.noPayments}</div>
+            )}
+          </PrintSectionBlock>
         </div>
       </PrintPageShell>
 
@@ -1050,97 +1211,164 @@ function PrintableFamilyRegistration({ locale, labels, template, values, totalAm
         const planCount = planCountForType(student.finance_plan_type || 'monthly', student.finance_installments_count || 1);
         const schedule = buildFinanceSchedulePreview(Number(financeItem?.annual_fee || 0), student.finance_plan_type || 'monthly', planCount, student.finance_plan_start_date || DEFAULT_PLAN_START_DATE);
         const directPayments = directPaymentRowsForStudent(values.payment_entries || [], student.id);
-        const classLabel = financeItem?.class_name || optionLabelForValue(template.studentCardFields.find((field) => field.id === 'student_grade'), student.student_grade, locale) || '—';
+        const classLabel = financeItem?.class_name || studentValue('student_grade', student.student_grade) || labels.emptyValue;
 
         return (
           <div key={student.id} className="space-y-6">
-            <PrintPageShell title={`${labels.studentAppendixTitle} ${localeNumber(locale, index + 1)}`} subtitle={student.student_full_name || labels.emptyValue} pageBreak>
+            <PrintPageShell
+              locale={locale}
+              title={`${labels.studentAppendixTitle} ${localeNumber(locale, index + 1)}`}
+              subtitle={student.student_full_name || labels.emptyValue}
+              hint={copy.pageProfileHint}
+              pageBreak
+            >
+              <div className="mb-4 rounded-[18px] border border-blue-100 bg-blue-50 px-4 py-3 text-[12px] leading-6 text-blue-900">
+                {copy.generatedNotice}
+              </div>
+
               <div className="grid gap-4 md:grid-cols-2">
-                <PrintField label={template.studentCardFields.find((field) => field.id === 'student_full_name')?.label?.[locale]} value={student.student_full_name} />
-                <PrintField label={template.studentCardFields.find((field) => field.id === 'student_birth_date')?.label?.[locale]} value={student.student_birth_date ? formatDateForLocale(locale, student.student_birth_date) : ''} />
-                <PrintField label={template.studentCardFields.find((field) => field.id === 'student_grade')?.label?.[locale]} value={classLabel} />
-                <PrintField label={template.studentCardFields.find((field) => field.id === 'student_section')?.label?.[locale]} value={optionLabelForValue(template.studentCardFields.find((field) => field.id === 'student_section'), student.student_section, locale) || student.student_section} />
-                <PrintField label={template.studentCardFields.find((field) => field.id === 'student_gender')?.label?.[locale]} value={optionLabelForValue(template.studentCardFields.find((field) => field.id === 'student_gender'), student.student_gender, locale)} />
-                <PrintField label={template.studentCardFields.find((field) => field.id === 'student_birth_place')?.label?.[locale]} value={student.student_birth_place} />
-                <PrintField label={template.studentCardFields.find((field) => field.id === 'student_passport_number')?.label?.[locale]} value={student.student_passport_number} />
-                <PrintField label={template.studentCardFields.find((field) => field.id === 'student_passport_expiry_date')?.label?.[locale]} value={student.student_passport_expiry_date ? formatDateForLocale(locale, student.student_passport_expiry_date) : ''} />
-                <PrintField label={template.studentCardFields.find((field) => field.id === 'student_previous_school')?.label?.[locale]} value={student.student_previous_school} />
-                <PrintField label={template.studentCardFields.find((field) => field.id === 'student_username')?.label?.[locale]} value={student.student_username} />
-                <PrintField label={template.studentCardFields.find((field) => field.id === 'student_initial_password')?.label?.[locale]} value={student.student_initial_password} />
-                <PrintField label={labels.familySummaryTitle} value={guardianFullName} />
-                <PrintField label={template.studentCardFields.find((field) => field.id === 'student_address_mashhad')?.label?.[locale]} value={student.student_address_mashhad} wide />
-                <PrintField label={template.studentCardFields.find((field) => field.id === 'student_address_iraq')?.label?.[locale]} value={student.student_address_iraq} wide />
-                <PrintField label={template.studentCardFields.find((field) => field.id === 'student_health_notes')?.label?.[locale]} value={student.student_health_notes} wide />
+                <PrintSectionBlock title={studentField('student_full_name')?.label?.[locale]}>
+                  <div className="grid gap-3 md:grid-cols-2">
+                    <PrintField label={studentField('student_full_name')?.label?.[locale]} value={student.student_full_name} />
+                    <PrintField label={studentField('student_birth_date')?.label?.[locale]} value={student.student_birth_date ? formatDateForLocale(locale, student.student_birth_date) : ''} />
+                    <PrintField label={studentField('student_gender')?.label?.[locale]} value={studentValue('student_gender', student.student_gender)} />
+                    <PrintField label={studentField('student_birth_place')?.label?.[locale]} value={student.student_birth_place} />
+                    <PrintField label={studentField('student_father_name')?.label?.[locale]} value={student.student_father_name} />
+                    <PrintField label={studentField('student_family_name')?.label?.[locale]} value={student.student_family_name} />
+                    <PrintField label={studentField('student_grade')?.label?.[locale]} value={classLabel} />
+                    <PrintField label={studentField('student_section')?.label?.[locale]} value={studentValue('student_section', student.student_section)} />
+                  </div>
+                </PrintSectionBlock>
+
+                <PrintSectionBlock title={copy.familyQuickSummary}>
+                  <div className="grid gap-3 md:grid-cols-2">
+                    <PrintField label={labels.familySummaryTitle} value={guardianFullName} />
+                    <PrintField label={familyField('guardian_phone_primary')?.label?.[locale]} value={values.guardian_phone_primary} />
+                    <PrintField label={familyField('guardian_phone_whatsapp')?.label?.[locale]} value={values.guardian_phone_whatsapp} />
+                    <PrintField label={familyField('mother_given_name')?.label?.[locale]} value={motherFullName} />
+                    <PrintField label={studentField('student_username')?.label?.[locale]} value={student.student_username} />
+                    <PrintField label={studentField('student_initial_password')?.label?.[locale]} value={student.student_initial_password} />
+                  </div>
+                </PrintSectionBlock>
+              </div>
+
+              <div className="mt-4 grid gap-4">
+                <PrintSectionBlock title={studentField('student_passport_number')?.label?.[locale]}>
+                  <div className="grid gap-3 md:grid-cols-2">
+                    <PrintField label={studentField('student_passport_number')?.label?.[locale]} value={student.student_passport_number} />
+                    <PrintField label={studentField('student_passport_expiry_date')?.label?.[locale]} value={student.student_passport_expiry_date ? formatDateForLocale(locale, student.student_passport_expiry_date) : ''} />
+                    <PrintField label={studentField('student_previous_school')?.label?.[locale]} value={student.student_previous_school} wide />
+                  </div>
+                </PrintSectionBlock>
+
+                <PrintSectionBlock title={template.sections.find((section) => section.key === 'family_context')?.title?.[locale]}>
+                  <div className="grid gap-3">
+                    <PrintField label={studentField('student_address_mashhad')?.label?.[locale]} value={student.student_address_mashhad} />
+                    <PrintField label={studentField('student_address_iraq')?.label?.[locale]} value={student.student_address_iraq} />
+                    <PrintField label={studentField('student_health_notes')?.label?.[locale]} value={student.student_health_notes} />
+                  </div>
+                </PrintSectionBlock>
               </div>
             </PrintPageShell>
 
-            <PrintPageShell title={`${labels.financeSummaryTitle} — ${student.student_full_name || labels.emptyValue}`} subtitle={classLabel} pageBreak={index !== values.students.length - 1}>
+            <PrintPageShell
+              locale={locale}
+              title={`${labels.financeSummaryTitle} — ${student.student_full_name || labels.emptyValue}`}
+              subtitle={classLabel}
+              hint={copy.pageFinanceHint}
+              pageBreak={index !== values.students.length - 1}
+            >
               <div className="grid gap-3 md:grid-cols-4">
                 <PrintMetric label={labels.classFeeLabel} value={financeItem ? `${localeNumber(locale, Number(financeItem.annual_fee || 0))} ${financeItem.currency}` : labels.classFeeMissing} />
                 <PrintMetric label={labels.monthlyApproxLabel} value={financeItem ? `${localeNumber(locale, Number(financeItem.monthly_fee || 0))} ${financeItem.currency}` : labels.emptyValue} />
                 <PrintMetric label={labels.planCountLabel} value={localeNumber(locale, planCount)} />
-                <PrintMetric label={labels.paymentTotal} value={localeNumber(locale, totalAmount)} />
+                <PrintMetric label={labels.paymentTotal} value={localeNumber(locale, sumPaymentRows(directPayments))} />
               </div>
 
-              <div className="mt-5 grid gap-4 md:grid-cols-3">
-                <PrintField label={template.studentCardFields.find((field) => field.id === 'finance_plan_type')?.label?.[locale]} value={optionLabelForValue(template.studentCardFields.find((field) => field.id === 'finance_plan_type'), student.finance_plan_type, locale)} />
-                <PrintField label={template.studentCardFields.find((field) => field.id === 'finance_installments_count')?.label?.[locale]} value={localeNumber(locale, planCount)} />
-                <PrintField label={template.studentCardFields.find((field) => field.id === 'finance_plan_start_date')?.label?.[locale]} value={student.finance_plan_start_date ? formatDateForLocale(locale, student.finance_plan_start_date) : ''} />
-              </div>
+              <div className="mt-5 grid gap-4 md:grid-cols-[.95fr_1.05fr]">
+                <PrintSectionBlock title={template.sections.find((section) => section.key === 'finance')?.title?.[locale]}>
+                  <div className="grid gap-3 md:grid-cols-1">
+                    <PrintField label={studentField('finance_plan_type')?.label?.[locale]} value={studentValue('finance_plan_type', student.finance_plan_type)} />
+                    <PrintField label={studentField('finance_installments_count')?.label?.[locale]} value={localeNumber(locale, planCount)} />
+                    <PrintField label={studentField('finance_plan_start_date')?.label?.[locale]} value={student.finance_plan_start_date ? formatDateForLocale(locale, student.finance_plan_start_date) : ''} />
+                    <PrintField label={labels.classFeeLabel} value={financeItem ? `${localeNumber(locale, Number(financeItem.annual_fee || 0))} ${financeItem.currency}` : labels.classFeeMissing} />
+                  </div>
+                </PrintSectionBlock>
 
-              <div className="mt-5 overflow-hidden rounded-[18px] border border-slate-300 bg-white/95">
-                <table className="min-w-full border-collapse text-[11px]">
-                  <thead>
-                    <tr className="bg-slate-50 text-slate-700">
-                      <th className="border border-slate-300 px-2 py-2">#</th>
-                      <th className="border border-slate-300 px-2 py-2">{labels.submittedAt}</th>
-                      <th className="border border-slate-300 px-2 py-2">{labels.paymentColumns.amount}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {schedule.length ? schedule.map((item) => (
-                      <tr key={`${student.id}-${item.installment_number}`}>
-                        <td className="border border-slate-300 px-2 py-2 text-center">{localeNumber(locale, item.installment_number)}</td>
-                        <td className="border border-slate-300 px-2 py-2">{item.due_date ? formatDateForLocale(locale, item.due_date) : '—'}</td>
-                        <td className="border border-slate-300 px-2 py-2">{localeNumber(locale, item.amount_due)} {financeItem?.currency || 'USD'}</td>
-                      </tr>
-                    )) : (
-                      <tr>
-                        <td className="border border-slate-300 px-2 py-3 text-center text-slate-500" colSpan={3}>{labels.installmentPreviewEmpty}</td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-
-              <div className="mt-5 rounded-[18px] border border-slate-300 bg-white/90 p-4">
-                <div className="mb-3 text-sm font-black text-slate-900">{labels.paymentColumns.student}</div>
-                {directPayments.length ? (
-                  <div className="overflow-hidden rounded-[14px] border border-slate-300">
+                <PrintSectionBlock title={copy.planScheduleTitle}>
+                  <div className="overflow-hidden rounded-[14px] border border-slate-300 bg-white/95">
                     <table className="min-w-full border-collapse text-[11px]">
                       <thead>
                         <tr className="bg-slate-50 text-slate-700">
-                          <th className="border border-slate-300 px-2 py-2">{labels.paymentColumns.row}</th>
-                          <th className="border border-slate-300 px-2 py-2">{labels.paymentColumns.date}</th>
+                          <th className="border border-slate-300 px-2 py-2">#</th>
+                          <th className="border border-slate-300 px-2 py-2">{labels.submittedAt}</th>
                           <th className="border border-slate-300 px-2 py-2">{labels.paymentColumns.amount}</th>
-                          <th className="border border-slate-300 px-2 py-2">{labels.paymentColumns.notes}</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {directPayments.map((row, paymentIndex) => (
-                          <tr key={row.id}>
-                            <td className="border border-slate-300 px-2 py-2 text-center">{localeNumber(locale, paymentIndex + 1)}</td>
-                            <td className="border border-slate-300 px-2 py-2">{row.payment_date ? formatDateForLocale(locale, row.payment_date) : '—'}</td>
-                            <td className="border border-slate-300 px-2 py-2">{row.amount ? localeNumber(locale, Number(row.amount)) : '—'}</td>
-                            <td className="border border-slate-300 px-2 py-2 whitespace-pre-wrap break-words">{row.notes || row.reference || '—'}</td>
+                        {schedule.length ? schedule.map((item) => (
+                          <tr key={`${student.id}-${item.installment_number}`}>
+                            <td className="border border-slate-300 px-2 py-2 text-center">{localeNumber(locale, item.installment_number)}</td>
+                            <td className="border border-slate-300 px-2 py-2">{item.due_date ? formatDateForLocale(locale, item.due_date) : labels.emptyValue}</td>
+                            <td className="border border-slate-300 px-2 py-2">{localeNumber(locale, item.amount_due)} {financeItem?.currency || 'USD'}</td>
                           </tr>
-                        ))}
+                        )) : (
+                          <tr>
+                            <td className="border border-slate-300 px-2 py-3 text-center text-slate-500" colSpan={3}>{labels.installmentPreviewEmpty}</td>
+                          </tr>
+                        )}
                       </tbody>
                     </table>
                   </div>
-                ) : (
-                  <div className="text-[12px] leading-7 text-slate-600">{labels.studentLinkAll}</div>
-                )}
+                </PrintSectionBlock>
+              </div>
+
+              <div className="mt-4 grid gap-4 md:grid-cols-[1.15fr_.85fr]">
+                <PrintSectionBlock title={copy.studentPaymentsTitle}>
+                  {directPayments.length ? (
+                    <div className="overflow-hidden rounded-[14px] border border-slate-300 bg-white/95">
+                      <table className="min-w-full border-collapse text-[11px]">
+                        <thead>
+                          <tr className="bg-slate-50 text-slate-700">
+                            <th className="border border-slate-300 px-2 py-2">{labels.paymentColumns.row}</th>
+                            <th className="border border-slate-300 px-2 py-2">{labels.paymentColumns.cardNumber}</th>
+                            <th className="border border-slate-300 px-2 py-2">{labels.paymentColumns.trackingNumber}</th>
+                            <th className="border border-slate-300 px-2 py-2">{labels.paymentColumns.date}</th>
+                            <th className="border border-slate-300 px-2 py-2">{labels.paymentColumns.amount}</th>
+                            <th className="border border-slate-300 px-2 py-2">{labels.paymentColumns.notes}</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {directPayments.map((row, paymentIndex) => (
+                            <tr key={row.id}>
+                              <td className="border border-slate-300 px-2 py-2 text-center">{localeNumber(locale, paymentIndex + 1)}</td>
+                              <td className="border border-slate-300 px-2 py-2 whitespace-pre-wrap break-words">{row.card_number || labels.emptyValue}</td>
+                              <td className="border border-slate-300 px-2 py-2 whitespace-pre-wrap break-words">{row.tracking_number || labels.emptyValue}</td>
+                              <td className="border border-slate-300 px-2 py-2">{row.payment_date ? formatDateForLocale(locale, row.payment_date) : labels.emptyValue}</td>
+                              <td className="border border-slate-300 px-2 py-2">{row.amount ? localeNumber(locale, Number(row.amount)) : labels.emptyValue}</td>
+                              <td className="border border-slate-300 px-2 py-2 whitespace-pre-wrap break-words">{row.notes || row.reference || labels.emptyValue}</td>
+                            </tr>
+                          ))}
+                          <tr className="bg-brand-50">
+                            <td className="border border-slate-300 px-2 py-2 text-center font-black" colSpan={4}>{labels.paymentTotal}</td>
+                            <td className="border border-slate-300 px-2 py-2 font-black">{localeNumber(locale, sumPaymentRows(directPayments))}</td>
+                            <td className="border border-slate-300 px-2 py-2" />
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <div className="text-[12px] leading-7 text-slate-600">{copy.noPayments}</div>
+                  )}
+                </PrintSectionBlock>
+
+                <PrintSectionBlock title={template.sections.find((section) => section.key === 'approval')?.title?.[locale]}>
+                  <div className="grid gap-3">
+                    <PrintField label={copy.guardianSignatureLabel} value={values.guardian_signature} />
+                    <PrintField label={copy.registrationOfficerLabel} value="" />
+                    <PrintField label={copy.financeOfficerLabel} value="" />
+                  </div>
+                </PrintSectionBlock>
               </div>
             </PrintPageShell>
           </div>
@@ -1782,7 +2010,7 @@ export default function FamilyRegistrationV3Shell({ locale, dictionary, initialS
               </div>
             </div>
           </button>
-          <button type="button" onClick={() => updateStep(FORM_STEPS.finance)} className={`rounded-[24px] border p-4 text-start ${isFinanceStep ? 'border-brand-300 bg-brand-50 text-brand-900' : 'border-slate-200 bg-white text-slate-700'}`}>
+          <button type="button" onClick={() => (isRegistrationStep ? goToFinanceStep() : updateStep(FORM_STEPS.finance))} className={`rounded-[24px] border p-4 text-start ${isFinanceStep ? 'border-brand-300 bg-brand-50 text-brand-900' : 'border-slate-200 bg-white text-slate-700'}`}>
             <div className="flex items-center gap-3">
               <span className={`flex h-9 w-9 items-center justify-center rounded-full text-sm font-black ${isFinanceStep ? 'bg-brand-500 text-white' : 'bg-slate-100 text-slate-600'}`}>2</span>
               <div>
