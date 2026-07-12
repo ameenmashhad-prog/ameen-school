@@ -130,6 +130,12 @@ const residenceOptions = [
   option('visit', 'زيارة', 'زیارتی', 'Visit')
 ];
 
+const applicantRelationOptions = [
+  option('father', 'الأب', 'پدر', 'Father'),
+  option('mother', 'الأم', 'مادر', 'Mother'),
+  option('other', 'أخرى', 'سایر', 'Other')
+];
+
 const studentGenderOptions = [
   option('male', 'ذكر', 'پسر', 'Male'),
   option('female', 'أنثى', 'دختر', 'Female')
@@ -260,7 +266,10 @@ const templatesMap = {
       field({ id:'document_original_received', type:'checkbox', ar:'استلام النسخة الأصلية', fa:'دریافت نسخه اصلی', en:'Original Document Received', width:'half', section:'documents' }),
       field({ id:'document_notes', type:'textarea', ar:'ملاحظات الوثائق', fa:'یادداشت‌های مدارک', en:'Document Notes', width:'full', section:'documents' }),
       field({ id:'accept_terms', type:'checkbox', ar:'أوافق على اعتماد البيانات العائلية وطباعة الطلب', fa:'با ثبت اطلاعات خانوادگی و چاپ فرم موافقم', en:'I accept the family data and print approval', required:true, width:'full', section:'approval' }),
-      field({ id:'guardian_signature', type:'signature', ar:'توقيع ولي الأمر', fa:'امضای ولی', en:'Guardian Signature', required:true, width:'half', section:'approval' })
+      field({ id:'applicant_relation', type:'select', ar:'صفة مقدم طلب التسجيل', fa:'نسبت ثبت‌نام‌کننده', en:'Applicant Relationship', required:true, width:'half', section:'approval', options:applicantRelationOptions }),
+      field({ id:'applicant_other_relation', type:'text', ar:'إذا كانت أخرى، اذكر الصفة', fa:'اگر سایر است، توضیح دهید', en:'If other, specify relationship', width:'half', section:'approval' }),
+      field({ id:'applicant_name', type:'text', ar:'اسم مقدم طلب التسجيل', fa:'نام ثبت‌نام‌کننده', en:'Applicant Name', required:true, width:'half', section:'approval' }),
+      field({ id:'accountant_receiver_name', type:'text', ar:'اسم مستلم الدفعة / المحاسب', fa:'نام دریافت‌کننده وجه / حسابدار', en:'Cashier / Receiver Name', width:'half', section:'approval' })
     ],
     studentCardFields: [
       field({ id:'student_given_name', type:'text', ar:'اسم الطالب', fa:'نام دانش‌آموز', en:'Student Name', required:true, width:'half', section:'students' }),
@@ -282,6 +291,8 @@ const templatesMap = {
       field({ id:'student_address_iraq', type:'textarea', ar:'عنوان السكن: العراق', fa:'نشانی سکونت: عراق', en:'Address in Iraq', width:'full', section:'students' }),
       field({ id:'student_health_notes', type:'textarea', ar:'ملاحظات صحية خاصة بالطالب', fa:'یادداشت سلامت دانش‌آموز', en:'Student Health Notes', width:'full', section:'students' }),
       field({ id:'student_photo', type:'file', ar:'صورة الطالب', fa:'عکس دانش‌آموز', en:'Student Photo', width:'half', section:'students', accept:'.jpg,.png,.jpeg,.webp' }),
+      field({ id:'student_passport_attachment', type:'file', ar:'صورة جواز سفر الطالب', fa:'تصویر گذرنامه دانش‌آموز', en:'Student Passport Image', width:'half', section:'students', accept:'.jpg,.png,.jpeg,.webp,.pdf' }),
+      field({ id:'student_academic_documents', type:'file', ar:'الشهادات أو التسلسل الدراسي', fa:'کارنامه یا سوابق تحصیلی', en:'Academic Certificates / Records', width:'half', section:'students', accept:'.pdf,.jpg,.png,.jpeg,.webp' }),
       field({ id:'student_username', type:'text', ar:'اسم المستخدم المقترح', fa:'نام کاربری پیشنهادی', en:'Suggested Username', width:'half', section:'students' }),
       field({ id:'student_initial_password', type:'text', ar:'كلمة المرور الأولية', fa:'رمز عبور اولیه', en:'Initial Password', width:'half', section:'students' })
     ]

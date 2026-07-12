@@ -18,9 +18,14 @@ import {
 const LOCAL_LANGUAGE_KEY = 'amin_forms_v3_locale';
 const LOCAL_FORM_STATE_KEY = 'amin_forms_v3_family_registration_v3_state';
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
-const PAYMENT_ROWS = 5;
 const DEFAULT_PLAN_START_DATE = '2026-09-10';
 const PLAN_COUNTS = { two: 2, three: 3, four: 4, six: 6, monthly: 9, quarterly: 3, custom: null };
+const PAYMENT_METHOD_OPTIONS = [
+  { value: 'cash', label: { ar: 'نقدي', fa: 'نقدی', en: 'Cash' } },
+  { value: 'bank_transfer', label: { ar: 'حساب بنكي', fa: 'واریز بانکی', en: 'Bank Transfer' } },
+  { value: 'hawala', label: { ar: 'حوالة', fa: 'حواله', en: 'Hawala' } },
+  { value: 'card', label: { ar: 'سحب بطاقة', fa: 'کارت‌خوان', en: 'Card / POS' } }
+];
 const FORM_STEPS = { registration: 'registration', finance: 'finance' };
 const SCHOOL_WATERMARK_SRC = '/branding/ameen-school-logo-watermark.png';
 const SCHOOL_YEAR_LABEL = '2026-2027';
@@ -31,7 +36,7 @@ const PRINT_COPY = {
     familyQuickSummary: 'ملخص عائلي سريع',
     studentsCountLabel: 'عدد الطلاب',
     documentStatusTitle: 'حالة الوثائق والاعتماد',
-    sharedPaymentsTitle: 'دفعات عائلية عامة',
+    sharedPaymentsTitle: 'سجل الدفعات المستلمة',
     studentPaymentsTitle: 'دفعات مرتبطة بهذا الطالب',
     noPayments: 'لا توجد دفعات مسجلة حالياً.',
     generatedNotice: 'هذه الصفحات مولدة من التسجيل الجديد: بيانات الطالب مستقلة، والماليات تأتي خلفها في صفحة منفصلة.',
@@ -58,7 +63,7 @@ const PRINT_COPY = {
     familyQuickSummary: 'خلاصه سریع خانواده',
     studentsCountLabel: 'تعداد دانش‌آموزان',
     documentStatusTitle: 'وضعیت مدارک و تأیید',
-    sharedPaymentsTitle: 'پرداخت‌های عمومی خانواده',
+    sharedPaymentsTitle: 'ثبت پرداخت‌های دریافتی',
     studentPaymentsTitle: 'پرداخت‌های مرتبط با این دانش‌آموز',
     noPayments: 'در حال حاضر پرداختی ثبت نشده است.',
     generatedNotice: 'این صفحات از ثبت‌نام جدید ساخته می‌شوند: اطلاعات دانش‌آموز مستقل است و صفحه مالی جداگانه در پشت آن می‌آید.',
@@ -85,7 +90,7 @@ const PRINT_COPY = {
     familyQuickSummary: 'Quick Family Summary',
     studentsCountLabel: 'Students Count',
     documentStatusTitle: 'Documents & Approval Status',
-    sharedPaymentsTitle: 'Shared Family Payments',
+    sharedPaymentsTitle: 'Received Payments Register',
     studentPaymentsTitle: 'Payments Linked to This Student',
     noPayments: 'No payments are recorded yet.',
     generatedNotice: 'These pages are generated from the new registration flow: the student profile is separate and the finance page follows behind it.',
@@ -109,16 +114,7 @@ const PRINT_COPY = {
 };
 
 function blankPaymentRows() {
-  return Array.from({ length: PAYMENT_ROWS }, (_, index) => ({
-    id: generateId(`payment_${index + 1}`),
-    student_ref: '',
-    card_number: '',
-    tracking_number: '',
-    reference: '',
-    payment_date: '',
-    amount: '',
-    notes: ''
-  }));
+  return [];
 }
 
 function fieldMapFromTemplate(template) {
@@ -186,6 +182,75 @@ function buildFinanceSchedulePreview(annualFee, planType, installmentsCount, sta
     });
   }
   return rows;
+}
+
+function normalizePaymentAmountToUsd(row) {
+  const amount = Number(String(row?.amount || '').replace(/,/g, '').trim());
+  if (!Number.isFinite(amount) || amount <= 0) return 0;
+  if (String(row?.currency || 'USD').toUpperCase() === 'IRR') {
+    const exchangeRate = Number(String(row?.exchange_rate || '').replace(/,/g, '').trim());
+    if (!Number.isFinite(exchangeRate) || exchangeRate <= 0) return 0;
+    return Math.round(((amount / exchangeRate) + Number.EPSILON) * 100) / 100;
+  }
+  return Math.round((amount + Number.EPSILON) * 100) / 100;
+}
+
+function buildDynamicPaymentRows(students, existingRows = [], financeCatalogMap = new Map()) {
+  const existingMap = new Map((existingRows || []).map((row) => [String(row.id), row]));
+  const generated = [];
+
+  (students || []).forEach((student) => {
+    const financeItem = financeCatalogMap.get(String(student.student_grade || '')) || null;
+    const installmentsCount = planCountForType(student.finance_plan_type || 'monthly', student.finance_installments_count || 1);
+    const schedule = buildFinanceSchedulePreview(Number(financeItem?.annual_fee || 0), student.finance_plan_type || 'monthly', installmentsCount, student.finance_plan_start_date || DEFAULT_PLAN_START_DATE);
+
+    if (!schedule.length) {
+      const fallbackId = `payment_${student.id}_1`;
+      const existing = existingMap.get(fallbackId) || {};
+      generated.push({
+        id: fallbackId,
+        student_ref: student.id,
+        installment_number: 1,
+        expected_due_date: student.finance_plan_start_date || DEFAULT_PLAN_START_DATE,
+        expected_amount_usd: '',
+        payment_date: existing.payment_date || '',
+        payment_method: existing.payment_method || 'cash',
+        currency: existing.currency || 'USD',
+        exchange_rate: existing.exchange_rate || '',
+        amount: existing.amount || '',
+        receiver_name: existing.receiver_name || '',
+        card_number: existing.card_number || '',
+        tracking_number: existing.tracking_number || '',
+        reference: existing.reference || '',
+        notes: existing.notes || ''
+      });
+      return;
+    }
+
+    schedule.forEach((item) => {
+      const rowId = `payment_${student.id}_${item.installment_number}`;
+      const existing = existingMap.get(rowId) || {};
+      generated.push({
+        id: rowId,
+        student_ref: student.id,
+        installment_number: item.installment_number,
+        expected_due_date: existing.expected_due_date || item.due_date || '',
+        expected_amount_usd: item.amount_due,
+        payment_date: existing.payment_date || '',
+        payment_method: existing.payment_method || 'cash',
+        currency: existing.currency || 'USD',
+        exchange_rate: existing.exchange_rate || '',
+        amount: existing.amount || '',
+        receiver_name: existing.receiver_name || '',
+        card_number: existing.card_number || '',
+        tracking_number: existing.tracking_number || '',
+        reference: existing.reference || '',
+        notes: existing.notes || ''
+      });
+    });
+  });
+
+  return generated;
 }
 
 function latinize(raw) {
@@ -328,6 +393,8 @@ function sanitizeStudentsForSubmit(students, financeCatalogMap = new Map()) {
       student_address_iraq: student.student_address_iraq,
       student_health_notes: student.student_health_notes,
       student_photo: sanitizeFileMeta(student.student_photo),
+      student_passport_attachment: sanitizeFileMeta(student.student_passport_attachment),
+      student_academic_documents: sanitizeFileMeta(student.student_academic_documents),
       student_username: student.student_username,
       student_initial_password: student.student_initial_password,
       finance_fee_structure_id: finance?.fee_structure_id || null,
@@ -461,10 +528,7 @@ function countRequiredTotal(template, values) {
 }
 
 function totalPayments(rows) {
-  return rows.reduce((sum, row) => {
-    const amount = Number(String(row.amount || '').replace(/,/g, '').trim());
-    return sum + (Number.isFinite(amount) ? amount : 0);
-  }, 0);
+  return rows.reduce((sum, row) => sum + normalizePaymentAmountToUsd(row), 0);
 }
 
 function countErrors(fieldErrors, studentErrors, globalErrors) {
@@ -503,7 +567,7 @@ function optionLabelForValue(field, value, locale) {
 }
 
 function nonEmptyPaymentRows(rows) {
-  return (rows || []).filter((row) => [row.student_ref, row.card_number, row.tracking_number, row.reference, row.payment_date, row.amount, row.notes].some((value) => String(value || '').trim()));
+  return (rows || []).filter((row) => [row.card_number, row.tracking_number, row.reference, row.payment_date, row.amount, row.notes, row.receiver_name].some((value) => String(value || '').trim()));
 }
 
 function directPaymentRowsForStudent(rows, studentId) {
@@ -579,7 +643,7 @@ function validateValues(template, values, labels, options = {}) {
         perStudentErrors[field.id] = labels.requiredField;
         return;
       }
-      if (field.id === 'student_photo' && value) {
+      if (field.type === 'file' && value) {
         if (value.size > MAX_FILE_SIZE) perStudentErrors[field.id] = labels.fileTooLarge;
         if (field.accept && value.name) {
           const accepted = field.accept.split(',').map((item) => item.trim().toLowerCase());
@@ -604,6 +668,23 @@ function validateValues(template, values, labels, options = {}) {
     if (duplicates.length) {
       globalErrors.push(labels.duplicateStudentNames);
     }
+  }
+
+  if ((!includeSections || includeSections.has('approval')) && values.applicant_relation === 'other' && !String(values.applicant_other_relation || '').trim()) {
+    fieldErrors.applicant_other_relation = labels.requiredField;
+  }
+
+  if (!includeSections || includeSections.has('finance')) {
+    (values.payment_entries || []).forEach((row, index) => {
+      const hasAmount = Number(String(row.amount || '').replace(/,/g, '').trim()) > 0;
+      if (!hasAmount) return;
+      if (!String(row.receiver_name || '').trim()) {
+        globalErrors.push(`${labels.paymentReceiverRequired} #${index + 1}`);
+      }
+      if (String(row.currency || 'USD').toUpperCase() === 'IRR' && !(Number(String(row.exchange_rate || '').replace(/,/g, '').trim()) > 0)) {
+        globalErrors.push(`${labels.paymentExchangeRateRequired} #${index + 1}`);
+      }
+    });
   }
 
   return { fieldErrors, studentErrors, globalErrors };
@@ -790,49 +871,70 @@ function SummaryCard({ title, rows }) {
 function PaymentsEditor({ locale, labels, rows, students, onChange, totalAmount }) {
   return (
     <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-      <div className="mb-3 text-sm font-black text-slate-900">{labels.paymentTableTitle}</div>
-      <div className="overflow-x-auto">
-        <table className="min-w-full border-collapse text-sm">
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <div className="text-sm font-black text-slate-900">{labels.paymentTableTitle}</div>
+          <div className="text-xs leading-6 text-slate-500">{labels.paymentDynamicHint}</div>
+        </div>
+        <StatusPill tone="brand">{labels.paymentTotal}: {localeNumber(locale, totalAmount)} USD</StatusPill>
+      </div>
+      <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white">
+        <table className="min-w-[1550px] border-collapse text-sm">
           <thead>
-            <tr className="bg-white text-slate-700">
+            <tr className="bg-slate-50 text-slate-700">
               <th className="border border-slate-200 px-2 py-2">{labels.paymentColumns.row}</th>
               <th className="border border-slate-200 px-2 py-2">{labels.paymentColumns.student}</th>
+              <th className="border border-slate-200 px-2 py-2">{labels.paymentColumns.installment}</th>
+              <th className="border border-slate-200 px-2 py-2">{labels.paymentColumns.expectedDate}</th>
+              <th className="border border-slate-200 px-2 py-2">{labels.paymentColumns.expectedAmountUsd}</th>
+              <th className="border border-slate-200 px-2 py-2">{labels.paymentColumns.method}</th>
+              <th className="border border-slate-200 px-2 py-2">{labels.paymentColumns.currency}</th>
+              <th className="border border-slate-200 px-2 py-2">{labels.paymentColumns.exchangeRate}</th>
+              <th className="border border-slate-200 px-2 py-2">{labels.paymentColumns.amount}</th>
+              <th className="border border-slate-200 px-2 py-2">{labels.paymentColumns.amountUsd}</th>
+              <th className="border border-slate-200 px-2 py-2">{labels.paymentColumns.receiver}</th>
               <th className="border border-slate-200 px-2 py-2">{labels.paymentColumns.cardNumber}</th>
               <th className="border border-slate-200 px-2 py-2">{labels.paymentColumns.trackingNumber}</th>
               <th className="border border-slate-200 px-2 py-2">{labels.paymentColumns.reference}</th>
               <th className="border border-slate-200 px-2 py-2">{labels.paymentColumns.date}</th>
-              <th className="border border-slate-200 px-2 py-2">{labels.paymentColumns.amount}</th>
               <th className="border border-slate-200 px-2 py-2">{labels.paymentColumns.notes}</th>
             </tr>
           </thead>
           <tbody>
-            {rows.map((row, index) => (
-              <tr key={row.id} className="bg-white">
-                <td className="border border-slate-200 px-2 py-2 text-center font-bold">{localeNumber(locale, index + 1)}</td>
-                <td className="border border-slate-200 px-2 py-2">
-                  <select value={row.student_ref || ''} onChange={(event) => onChange(index, 'student_ref', event.target.value)} className="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-2">
-                    <option value="">{labels.studentLinkAll}</option>
-                    {students.map((student) => (
-                      <option key={student.id} value={student.id}>{student.student_full_name || labels.studentCardTitle}</option>
-                    ))}
-                  </select>
-                </td>
-                <td className="border border-slate-200 px-2 py-2"><input value={row.card_number} onChange={(event) => onChange(index, 'card_number', event.target.value)} className="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-2" /></td>
-                <td className="border border-slate-200 px-2 py-2"><input value={row.tracking_number} onChange={(event) => onChange(index, 'tracking_number', event.target.value)} className="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-2" /></td>
-                <td className="border border-slate-200 px-2 py-2"><input value={row.reference} onChange={(event) => onChange(index, 'reference', event.target.value)} className="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-2" /></td>
-                <td className="border border-slate-200 px-2 py-2"><input type="date" value={row.payment_date} onChange={(event) => onChange(index, 'payment_date', event.target.value)} className="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-2" /></td>
-                <td className="border border-slate-200 px-2 py-2"><input type="number" value={row.amount} onChange={(event) => onChange(index, 'amount', event.target.value)} className="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-2" /></td>
-                <td className="border border-slate-200 px-2 py-2"><input value={row.notes} onChange={(event) => onChange(index, 'notes', event.target.value)} className="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-2" /></td>
-              </tr>
-            ))}
+            {rows.map((row, index) => {
+              const studentName = students.find((student) => student.id === row.student_ref)?.student_full_name || labels.studentCardTitle;
+              const amountUsd = normalizePaymentAmountToUsd(row);
+              return (
+                <tr key={row.id} className="bg-white align-top">
+                  <td className="border border-slate-200 px-2 py-2 text-center font-bold">{localeNumber(locale, index + 1)}</td>
+                  <td className="border border-slate-200 px-2 py-2 font-semibold text-slate-800">{studentName}</td>
+                  <td className="border border-slate-200 px-2 py-2 text-center">{localeNumber(locale, row.installment_number || index + 1)}</td>
+                  <td className="border border-slate-200 px-2 py-2"><input type="date" value={row.expected_due_date || ''} onChange={(event) => onChange(index, 'expected_due_date', event.target.value)} className="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-2" /></td>
+                  <td className="border border-slate-200 px-2 py-2 text-center font-semibold text-slate-900">{row.expected_amount_usd ? `${localeNumber(locale, row.expected_amount_usd)} USD` : labels.emptyValue}</td>
+                  <td className="border border-slate-200 px-2 py-2">
+                    <select value={row.payment_method || 'cash'} onChange={(event) => onChange(index, 'payment_method', event.target.value)} className="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-2">
+                      {PAYMENT_METHOD_OPTIONS.map((option) => <option key={option.value} value={option.value}>{option.label?.[locale] || option.value}</option>)}
+                    </select>
+                  </td>
+                  <td className="border border-slate-200 px-2 py-2">
+                    <select value={row.currency || 'USD'} onChange={(event) => onChange(index, 'currency', event.target.value)} className="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-2">
+                      <option value="USD">USD</option>
+                      <option value="IRR">IRR</option>
+                    </select>
+                  </td>
+                  <td className="border border-slate-200 px-2 py-2"><input type="number" value={row.exchange_rate || ''} onChange={(event) => onChange(index, 'exchange_rate', event.target.value)} className="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-2" placeholder={labels.paymentColumns.exchangeRatePlaceholder} /></td>
+                  <td className="border border-slate-200 px-2 py-2"><input type="number" value={row.amount || ''} onChange={(event) => onChange(index, 'amount', event.target.value)} className="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-2" /></td>
+                  <td className="border border-slate-200 px-2 py-2 text-center font-semibold text-slate-900">{amountUsd ? `${localeNumber(locale, amountUsd)} USD` : labels.emptyValue}</td>
+                  <td className="border border-slate-200 px-2 py-2"><input value={row.receiver_name || ''} onChange={(event) => onChange(index, 'receiver_name', event.target.value)} className="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-2" /></td>
+                  <td className="border border-slate-200 px-2 py-2"><input value={row.card_number || ''} onChange={(event) => onChange(index, 'card_number', event.target.value)} className="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-2" /></td>
+                  <td className="border border-slate-200 px-2 py-2"><input value={row.tracking_number || ''} onChange={(event) => onChange(index, 'tracking_number', event.target.value)} className="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-2" /></td>
+                  <td className="border border-slate-200 px-2 py-2"><input value={row.reference || ''} onChange={(event) => onChange(index, 'reference', event.target.value)} className="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-2" /></td>
+                  <td className="border border-slate-200 px-2 py-2"><input type="date" value={row.payment_date || ''} onChange={(event) => onChange(index, 'payment_date', event.target.value)} className="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-2" /></td>
+                  <td className="border border-slate-200 px-2 py-2"><input value={row.notes || ''} onChange={(event) => onChange(index, 'notes', event.target.value)} className="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-2" /></td>
+                </tr>
+              );
+            })}
           </tbody>
-          <tfoot>
-            <tr className="bg-brand-50">
-              <td className="border border-slate-200 px-2 py-2 text-center font-black" colSpan={6}>{labels.paymentTotal}</td>
-              <td className="border border-slate-200 px-2 py-2 font-black text-slate-900">{localeNumber(locale, totalAmount)}</td>
-              <td className="border border-slate-200 px-2 py-2" />
-            </tr>
-          </tfoot>
         </table>
       </div>
     </div>
@@ -974,7 +1076,6 @@ function FinanceStudentCard({ locale, labels, student, index, fieldById, finance
         <div className="mb-2 text-xs font-bold text-slate-500">{labels.financeIntegrationTitle}</div>
         <div className="flex flex-wrap gap-2">
           <StatusPill tone={financeItem ? 'success' : 'warning'}>{labels.classFeeLabel}: {financeItem ? `${localeNumber(locale, Number(financeItem.annual_fee || 0))} ${financeItem.currency}` : labels.classFeeMissing}</StatusPill>
-          <StatusPill tone={financeItem ? 'brand' : 'slate'}>{labels.monthlyApproxLabel}: {financeItem ? `${localeNumber(locale, Number(financeItem.monthly_fee || 0))} ${financeItem.currency}` : labels.emptyValue}</StatusPill>
           <StatusPill tone="slate">{labels.planCountLabel}: {localeNumber(locale, financePlanCount)}</StatusPill>
         </div>
         <div className="mt-3 text-xs leading-6 text-slate-500">
@@ -1024,12 +1125,12 @@ function PrintPageShell({ locale, title, subtitle, hint, metaLabel, metaValue, c
         <div className="absolute bottom-4 right-4 h-8 w-8 rounded-br-[18px] border-b-2 border-r-2 border-[#c9a24b]" />
       </div>
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center px-10">
-        <img src={SCHOOL_WATERMARK_SRC} alt="" className="max-h-[78%] w-auto opacity-[0.07]" />
+        <div className="h-[78%] w-full bg-contain bg-center bg-no-repeat opacity-[0.07]" style={{ backgroundImage: `url(${SCHOOL_WATERMARK_SRC})` }} />
       </div>
       <div className="relative z-10">
         <div className="grid grid-cols-[92px_1fr_92px] items-center gap-3 border-b border-[#e8dcc2] pb-4">
           <div className="flex justify-start">
-            <img src={SCHOOL_WATERMARK_SRC} alt="" className="h-16 w-auto opacity-90" />
+            <div className="h-16 w-16 bg-contain bg-left bg-no-repeat opacity-90" style={{ backgroundImage: `url(${SCHOOL_WATERMARK_SRC})` }} />
           </div>
           <div className="text-center">
             <div className="text-[12px] font-black tracking-wide text-slate-700">{copy.schoolName}</div>
@@ -1084,7 +1185,7 @@ function PrintableFamilyRegistration({ locale, labels, template, values, totalAm
   const copy = PRINT_COPY[locale] || PRINT_COPY.ar;
   const guardianFullName = computeGuardianFullName(values);
   const motherFullName = computeMotherFullName(values);
-  const sharedPayments = sharedFamilyPaymentRows(values.payment_entries || []);
+  const familyPaymentRows = nonEmptyPaymentRows(values.payment_entries || []);
   const printReference = receipt?.reportId || copy.draftReference;
   const expectedFamilyFeeTotal = values.students.reduce((sum, student) => sum + Number(financeCatalogMap.get(String(student.student_grade || ''))?.annual_fee || 0), 0);
   const remainingProjected = Math.max(expectedFamilyFeeTotal - totalAmount, 0);
@@ -1101,6 +1202,9 @@ function PrintableFamilyRegistration({ locale, labels, template, values, totalAm
     if (field?.type === 'select') return optionLabelForValue(field, value, locale);
     return value;
   };
+  const applicantRelationDisplay = values.applicant_relation === 'other'
+    ? (values.applicant_other_relation || familyValue('applicant_relation', values.applicant_relation))
+    : familyValue('applicant_relation', values.applicant_relation);
 
   return (
     <div className="space-y-6 text-black">
@@ -1166,7 +1270,8 @@ function PrintableFamilyRegistration({ locale, labels, template, values, totalAm
               <PrintCheckItem checked={values.document_copy_received} label={familyField('document_copy_received')?.label?.[locale]} />
               <PrintCheckItem checked={values.document_original_received} label={familyField('document_original_received')?.label?.[locale]} />
               <PrintField label={familyField('document_notes')?.label?.[locale]} value={values.document_notes} />
-              <PrintField label={copy.guardianSignatureLabel} value={values.guardian_signature} />
+              <PrintField label={familyField('applicant_relation')?.label?.[locale]} value={applicantRelationDisplay} />
+              <PrintField label={familyField('applicant_name')?.label?.[locale]} value={values.applicant_name} />
             </div>
           </PrintSectionBlock>
         </div>
@@ -1220,34 +1325,38 @@ function PrintableFamilyRegistration({ locale, labels, template, values, totalAm
           </PrintSectionBlock>
 
           <PrintSectionBlock title={copy.sharedPaymentsTitle} hint={labels.paymentTableTitle}>
-            {sharedPayments.length ? (
+            {familyPaymentRows.length ? (
               <div className="overflow-hidden rounded-[14px] border border-slate-300 bg-white/95">
                 <table className="min-w-full border-collapse text-[11px]">
                   <thead>
                     <tr className="bg-slate-50 text-slate-700">
                       <th className="border border-slate-300 px-2 py-2">{labels.paymentColumns.row}</th>
-                      <th className="border border-slate-300 px-2 py-2">{labels.paymentColumns.cardNumber}</th>
-                      <th className="border border-slate-300 px-2 py-2">{labels.paymentColumns.trackingNumber}</th>
-                      <th className="border border-slate-300 px-2 py-2">{labels.paymentColumns.date}</th>
+                      <th className="border border-slate-300 px-2 py-2">{labels.paymentColumns.student}</th>
+                      <th className="border border-slate-300 px-2 py-2">{labels.paymentColumns.method}</th>
+                      <th className="border border-slate-300 px-2 py-2">{labels.paymentColumns.currency}</th>
                       <th className="border border-slate-300 px-2 py-2">{labels.paymentColumns.amount}</th>
-                      <th className="border border-slate-300 px-2 py-2">{labels.paymentColumns.notes}</th>
+                      <th className="border border-slate-300 px-2 py-2">{labels.paymentColumns.amountUsd}</th>
+                      <th className="border border-slate-300 px-2 py-2">{labels.paymentColumns.receiver}</th>
+                      <th className="border border-slate-300 px-2 py-2">{labels.paymentColumns.date}</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {sharedPayments.map((row, index) => (
+                    {familyPaymentRows.map((row, index) => (
                       <tr key={row.id}>
                         <td className="border border-slate-300 px-2 py-2 text-center">{localeNumber(locale, index + 1)}</td>
-                        <td className="border border-slate-300 px-2 py-2 whitespace-pre-wrap break-words">{row.card_number || labels.emptyValue}</td>
-                        <td className="border border-slate-300 px-2 py-2 whitespace-pre-wrap break-words">{row.tracking_number || labels.emptyValue}</td>
-                        <td className="border border-slate-300 px-2 py-2">{row.payment_date ? formatDateForLocale(locale, row.payment_date) : labels.emptyValue}</td>
+                        <td className="border border-slate-300 px-2 py-2 whitespace-pre-wrap break-words">{values.students.find((student) => student.id === row.student_ref)?.student_full_name || labels.emptyValue}</td>
+                        <td className="border border-slate-300 px-2 py-2">{(PAYMENT_METHOD_OPTIONS.find((option) => option.value === row.payment_method)?.label || {})[locale] || row.payment_method || labels.emptyValue}</td>
+                        <td className="border border-slate-300 px-2 py-2">{row.currency || labels.emptyValue}</td>
                         <td className="border border-slate-300 px-2 py-2">{row.amount ? localeNumber(locale, Number(row.amount)) : labels.emptyValue}</td>
-                        <td className="border border-slate-300 px-2 py-2 whitespace-pre-wrap break-words">{row.notes || row.reference || labels.emptyValue}</td>
+                        <td className="border border-slate-300 px-2 py-2">{normalizePaymentAmountToUsd(row) ? localeNumber(locale, normalizePaymentAmountToUsd(row)) : labels.emptyValue}</td>
+                        <td className="border border-slate-300 px-2 py-2 whitespace-pre-wrap break-words">{row.receiver_name || labels.emptyValue}</td>
+                        <td className="border border-slate-300 px-2 py-2">{row.payment_date ? formatDateForLocale(locale, row.payment_date) : labels.emptyValue}</td>
                       </tr>
                     ))}
                     <tr className="bg-brand-50">
-                      <td className="border border-slate-300 px-2 py-2 text-center font-black" colSpan={4}>{labels.paymentTotal}</td>
-                      <td className="border border-slate-300 px-2 py-2 font-black">{localeNumber(locale, sumPaymentRows(sharedPayments))}</td>
-                      <td className="border border-slate-300 px-2 py-2" />
+                      <td className="border border-slate-300 px-2 py-2 text-center font-black" colSpan={5}>{labels.paymentTotal}</td>
+                      <td className="border border-slate-300 px-2 py-2 font-black">{localeNumber(locale, totalAmount)}</td>
+                      <td className="border border-slate-300 px-2 py-2" colSpan={2} />
                     </tr>
                   </tbody>
                 </table>
@@ -1338,9 +1447,8 @@ function PrintableFamilyRegistration({ locale, labels, template, values, totalAm
               metaValue={printReference}
               pageBreak={index !== values.students.length - 1}
             >
-              <div className="grid gap-3 md:grid-cols-5">
+              <div className="grid gap-3 md:grid-cols-4">
                 <PrintMetric label={labels.classFeeLabel} value={financeItem ? `${localeNumber(locale, Number(financeItem.annual_fee || 0))} ${financeItem.currency}` : labels.classFeeMissing} />
-                <PrintMetric label={labels.monthlyApproxLabel} value={financeItem ? `${localeNumber(locale, Number(financeItem.monthly_fee || 0))} ${financeItem.currency}` : labels.emptyValue} />
                 <PrintMetric label={labels.planCountLabel} value={localeNumber(locale, planCount)} />
                 <PrintMetric label={labels.paymentTotal} value={localeNumber(locale, studentPaidTotal)} />
                 <PrintMetric label={copy.remainingForStudentLabel} value={localeNumber(locale, studentRemainingTotal)} />
@@ -1425,7 +1533,9 @@ function PrintableFamilyRegistration({ locale, labels, template, values, totalAm
 
                 <PrintSectionBlock title={template.sections.find((section) => section.key === 'approval')?.title?.[locale]}>
                   <div className="grid gap-3">
-                    <PrintField label={copy.guardianSignatureLabel} value={values.guardian_signature} />
+                    <PrintField label={familyField('applicant_relation')?.label?.[locale]} value={applicantRelationDisplay} />
+                    <PrintField label={familyField('applicant_name')?.label?.[locale]} value={values.applicant_name} />
+                    <PrintField label={familyField('accountant_receiver_name')?.label?.[locale]} value={values.accountant_receiver_name} />
                     <PrintField label={copy.registrationOfficerLabel} value="" />
                     <PrintField label={copy.financeOfficerLabel} value="" />
                   </div>
@@ -1545,6 +1655,18 @@ export default function FamilyRegistrationV3Shell({ locale, dictionary, initialS
     loadVersions();
     return () => { cancelled = true; };
   }, [template.slug]);
+
+  useEffect(() => {
+    setValues((current) => {
+      const nextPaymentEntries = buildDynamicPaymentRows(current.students, current.payment_entries, financeCatalogMap);
+      if (JSON.stringify(nextPaymentEntries) === JSON.stringify(current.payment_entries)) {
+        return current;
+      }
+      const next = { ...current, payment_entries: nextPaymentEntries };
+      persistLocal(next);
+      return next;
+    });
+  }, [values.students, financeCatalogMap]);
 
   useEffect(() => {
     const timer = setInterval(async () => {
@@ -1710,7 +1832,8 @@ export default function FamilyRegistrationV3Shell({ locale, dictionary, initialS
           const updated = { ...student, _meta: { ...student._meta } };
           let normalizedValue = value;
 
-          if (fieldId === 'student_photo') normalizedValue = value?.rawFile ? sanitizeFileMeta(value.rawFile) : null;
+          const studentFieldDefinition = fieldById.get(fieldId);
+          if (studentFieldDefinition?.type === 'file') normalizedValue = value?.rawFile ? sanitizeFileMeta(value.rawFile) : null;
           if (fieldId === 'student_father_name') updated._meta.fatherManual = !options.forceInherited && String(normalizedValue || '').trim() !== String(current.guardian_given_name || '').trim();
           if (fieldId === 'student_family_name') updated._meta.familyManual = !options.forceInherited && String(normalizedValue || '').trim() !== String(current.family_name || '').trim();
           if (fieldId === 'student_full_name') updated._meta.fullNameManual = !options.forceAutoFullName;
@@ -1968,7 +2091,10 @@ export default function FamilyRegistrationV3Shell({ locale, dictionary, initialS
         },
         approval: {
           accept_terms: values.accept_terms,
-          guardian_signature: values.guardian_signature
+          applicant_relation: values.applicant_relation,
+          applicant_other_relation: values.applicant_other_relation,
+          applicant_name: values.applicant_name,
+          accountant_receiver_name: values.accountant_receiver_name
         }
       };
 
@@ -2211,6 +2337,7 @@ export default function FamilyRegistrationV3Shell({ locale, dictionary, initialS
               <button onClick={resetForm} className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-2 font-bold text-amber-800">{labels.reset}</button>
               <button onClick={prepareUploadTicket} className="rounded-2xl border border-brand-200 bg-brand-50 px-4 py-2 font-bold text-brand-800">{labels.prepareUpload}</button>
               <button onClick={saveNow} className="rounded-2xl border border-slate-200 px-4 py-2 font-bold text-slate-700">{labels.saveNow}</button>
+              <button onClick={() => window.print()} className="rounded-2xl border border-slate-200 px-4 py-2 font-bold text-slate-700">{labels.printPreview}</button>
               {isRegistrationStep ? (
                 <button onClick={goToFinanceStep} className="rounded-2xl bg-brand-500 px-4 py-2 font-bold text-white">{labels.goToFinanceStep}</button>
               ) : (
