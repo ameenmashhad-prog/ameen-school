@@ -827,6 +827,15 @@
     "projectedRemainingLabel": "Projected remaining after entered payments",
     "financeCatalogReady": "Class fees were loaded successfully from the finance database.",
     "financeCatalogLoading": "Loading class fees from the finance database...",
-    "financeCatalogError": "Could not load class fees right now. You can continue, but the finance link is temporarily incomplete."
+    "financeCatalogError": "Could not load class fees right now. You can continue, but the finance link is temporarily incomplete.",
+    "stepRegistrationTitle": "Family & Student Details",
+    "stepRegistrationDescription": "Complete guardian, mother, student, and document details first, then continue to a separate finance page.",
+    "stepFinanceTitle": "Finance & Print",
+    "stepFinanceDescription": "Review fees, installment plans, and payments, then approve and print the final file.",
+    "goToFinanceStep": "Next: Finance Page",
+    "backToRegistration": "Back to Registration",
+    "studentDataStepHint": "This step is only for student data. Fees and installment settings are now handled on the next finance page.",
+    "financeStepIntroTitle": "Separate finance page after registration",
+    "financeStepIntroDescription": "After finishing the family and student details, review class fees, installment plans, and payments here before submission and printing."
   }
 }
