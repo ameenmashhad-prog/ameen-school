@@ -301,6 +301,8 @@ function groupFamilies(familiesRows, studentsRows, finance, submissionsMap){
       finance_plan_type: row.finance_plan_type || '—',
       finance_installments_count: row.finance_installments_count || 0,
       finance_plan_start_date: row.finance_plan_start_date || null,
+      submission_username: (submissionStudent && submissionStudent.student_username) || row.generated_username || '',
+      submission_initial_password: (submissionStudent && submissionStudent.student_initial_password) || row.initial_password || '',
       passport_attachment_name: (row.passport_attachment && row.passport_attachment.name) || (submissionStudent && submissionStudent.student_passport_attachment && submissionStudent.student_passport_attachment.name) || '',
       academic_documents_name: (row.academic_documents_attachment && row.academic_documents_attachment.name) || (submissionStudent && submissionStudent.student_academic_documents && submissionStudent.student_academic_documents.name) || '',
       public_student_id: publicStudent ? publicStudent.id : null,
@@ -434,6 +436,7 @@ function renderFamilies(){
       + '</div>'
       + '<div class="request-actions">'
       +   '<button class="btn blue" type="button" onclick="activateAccount(\'family\',\''+esc(item.family_id)+'\')">تفعيل الحساب</button>'
+      +   '<button class="btn" type="button" onclick="printFamilyAdminPacket('+jse(item.family_id)+')">طباعة نسخة إدارية</button>'
       +   '<button class="btn" type="button" onclick="setStatus(\'registration_families\',\''+esc(item.family_id)+'\',\'reviewed\')">تمت المراجعة</button>'
       +   '<button class="btn green" type="button" onclick="setStatus(\'registration_families\',\''+esc(item.family_id)+'\',\'approved\')">اعتماد</button>'
       +   '<button class="btn red" type="button" onclick="setStatus(\'registration_families\',\''+esc(item.family_id)+'\',\'rejected\')">رفض</button>'
@@ -441,6 +444,174 @@ function renderFamilies(){
       + '</article>';
   }).join('')+'</div>';
 }
+
+function familyPrintMoney(v){return Number(v||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}
+function familyPrintDate(v){
+  if(!v) return '—';
+  const d = new Date(v);
+  if(Number.isNaN(d.getTime())) return '—';
+  return new Intl.DateTimeFormat('ar', {year:'numeric',month:'long',day:'numeric'}).format(d);
+}
+function applicantRelationLabel(item){
+  if(String(item.applicant_relation||'').toLowerCase() === 'other') return item.applicant_other_relation || 'أخرى';
+  return ({father:'الأب',mother:'الأم'})[String(item.applicant_relation||'').toLowerCase()] || item.applicant_relation || '—';
+}
+function buildFamilyPrintWindowHTML(item){
+  const familyTotal = item.students.reduce((sum, st)=>sum + Number(st.annual_fee_snapshot||0), 0);
+  const familyPayments = (item.finance_payment_entries||[]).reduce((sum, row)=>sum + paymentUsdAmount(row), 0);
+  const familyRemaining = Math.max(familyTotal - familyPayments, 0);
+  const studentsRows = (item.students || []).map((st, index) => `
+    <tr>
+      <td>${index + 1}</td>
+      <td>${esc(st.student_name || '—')}</td>
+      <td>${esc(st.class_name || '—')}</td>
+      <td>${esc(st.section || '—')}</td>
+      <td>${esc(st.submission_username || '—')}</td>
+      <td>${esc(st.submission_initial_password || '—')}</td>
+    </tr>
+  `).join('');
+  const studentSections = (item.students || []).map((st, index) => {
+    const paymentRows = (item.finance_payment_entries || []).filter(row => String(row.student_ref||'') === String(st.registration_student_id));
+    const paymentRowsHtml = paymentRows.length
+      ? paymentRows.map((row, rowIndex) => `
+          <tr>
+            <td>${rowIndex + 1}</td>
+            <td>${esc(row.payment_method || '—')}</td>
+            <td>${esc(row.currency || 'USD')}</td>
+            <td>${esc(row.amount ? familyPrintMoney(row.amount) : '—')}</td>
+            <td>${esc(paymentUsdAmount(row) ? familyPrintMoney(paymentUsdAmount(row)) : '—')}</td>
+            <td>${esc(row.receiver_name || item.finance_receiver_name || item.accountant_receiver_name || '—')}</td>
+            <td>${esc(row.payment_date ? familyPrintDate(row.payment_date) : '—')}</td>
+            <td>${esc(row.reference || row.tracking_number || '—')}</td>
+          </tr>
+        `).join('')
+      : '<tr><td colspan="8">لا توجد دفعات مرتبطة بهذا الطالب حتى الآن.</td></tr>';
+    return `
+      <section class="student-block">
+        <div class="student-head">
+          <h3>الطالب ${index + 1}: ${esc(st.student_name || '—')}</h3>
+          <span>${esc(st.class_name || '—')} / ${esc(st.section || '—')}</span>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-box"><b>اسم المستخدم</b><span>${esc(st.submission_username || '—')}</span></div>
+          <div class="meta-box"><b>كلمة المرور المرجعية</b><span>${esc(st.submission_initial_password || '—')}</span></div>
+          <div class="meta-box"><b>الخطة</b><span>${esc(st.finance_plan_type || '—')}</span></div>
+          <div class="meta-box"><b>عدد الأقساط</b><span>${esc(st.finance_installments_count || '—')}</span></div>
+          <div class="meta-box"><b>الرسوم السنوية</b><span>${familyPrintMoney(st.annual_fee_snapshot || 0)} USD</span></div>
+          <div class="meta-box"><b>المتبقي</b><span>${familyPrintMoney(st.finance_remaining || 0)} USD</span></div>
+          <div class="meta-box wide"><b>مرفق الجواز</b><span>${esc(st.passport_attachment_name || '—')}</span></div>
+          <div class="meta-box wide"><b>المرفقات الدراسية</b><span>${esc(st.academic_documents_name || '—')}</span></div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>طريقة الدفع</th>
+              <th>العملة</th>
+              <th>المبلغ</th>
+              <th>المعادِل USD</th>
+              <th>المستلم</th>
+              <th>تاريخ الاستلام</th>
+              <th>المرجع</th>
+            </tr>
+          </thead>
+          <tbody>${paymentRowsHtml}</tbody>
+        </table>
+      </section>
+    `;
+  }).join('');
+  return `<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>نسخة إدارية — ${esc(item.guardian_name || 'طلب أسرة')}</title>
+<style>
+  body{font-family:Tahoma,Arial,sans-serif;background:#fff;color:#111;margin:0;padding:24px}
+  .sheet{max-width:980px;margin:0 auto;border:1px solid #d6c28c;border-radius:24px;padding:24px;position:relative;overflow:hidden}
+  .sheet:before{content:'';position:absolute;inset:12px;border:1px solid #ead9aa;border-radius:18px;pointer-events:none}
+  .header{text-align:center;border-bottom:2px solid #d6c28c;padding-bottom:14px;margin-bottom:18px}
+  .header h1{margin:0;font-size:26px;color:#0b6e4f}
+  .header h2{margin:8px 0 0;font-size:18px}
+  .sub{color:#666;font-size:13px;margin-top:6px}
+  .meta-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:16px 0}
+  .meta-box{border:1px solid #d9e2ef;border-radius:14px;padding:12px;background:#fafcff}
+  .meta-box.wide{grid-column:span 3}
+  .meta-box b{display:block;font-size:12px;color:#555;margin-bottom:6px}
+  .meta-box span{font-size:14px;font-weight:700}
+  .note{padding:14px 16px;background:#fff8e8;border:1px solid #f0ddb1;border-radius:16px;color:#775311;margin:14px 0}
+  table{width:100%;border-collapse:collapse;margin-top:14px}
+  th,td{border:1px solid #d9e2ef;padding:10px 8px;font-size:13px;vertical-align:top;text-align:right}
+  th{background:#f5f8fc}
+  .student-block{margin-top:22px;padding-top:18px;border-top:2px dashed #d9e2ef;page-break-inside:avoid}
+  .student-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+  .student-head h3{margin:0;font-size:18px}
+  .sign-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:20px}
+  .sign-box{min-height:92px;border:1px dashed #b6c2d2;border-radius:16px;padding:12px;background:#fcfdff}
+  .sign-box b{display:block;margin-bottom:32px}
+  .print-btn{position:fixed;top:16px;left:16px;background:#0b6e4f;color:#fff;border:0;border-radius:10px;padding:10px 18px;font-weight:700;cursor:pointer}
+  @media print{body{padding:0}.print-btn{display:none}.sheet{border:0;border-radius:0;max-width:none;padding:16px}.sheet:before{display:none}@page{size:A4;margin:1cm}}
+</style>
+</head>
+<body>
+<button class="print-btn" onclick="window.print()">طباعة النسخة الإدارية</button>
+<div class="sheet">
+  <div class="header">
+    <h1>مجمع أمين الرضا التعليمي</h1>
+    <h2>نسخة إدارية لطلب تسجيل الأسرة</h2>
+    <div class="sub">مرجع الطلب: ${esc(item.forms_v3_submission_ref || item.family_id || '—')} — تاريخ الطلب: ${esc(familyPrintDate(item.created_at))}</div>
+  </div>
+  <div class="meta-grid">
+    <div class="meta-box"><b>ولي الأمر</b><span>${esc(item.guardian_name || '—')}</span></div>
+    <div class="meta-box"><b>الهاتف</b><span>${esc(item.phone_primary || '—')}</span></div>
+    <div class="meta-box"><b>اسم العائلة</b><span>${esc(item.family_name || '—')}</span></div>
+    <div class="meta-box"><b>مقدم طلب التسجيل</b><span>${esc(item.applicant_name || '—')}</span></div>
+    <div class="meta-box"><b>صفة مقدم الطلب</b><span>${esc(applicantRelationLabel(item))}</span></div>
+    <div class="meta-box"><b>عدد الطلاب</b><span>${esc(item.students ? item.students.length : 0)}</span></div>
+    <div class="meta-box"><b>المراجع الإداري</b><span>${esc(item.admin_reviewer_name || '—')}</span></div>
+    <div class="meta-box"><b>تاريخ المراجعة</b><span>${esc(item.admin_reviewed_at ? familyPrintDate(item.admin_reviewed_at) : '—')}</span></div>
+    <div class="meta-box"><b>مستلم الدفعات / المحاسب</b><span>${esc(item.finance_receiver_name || item.accountant_receiver_name || item.payment_receivers_text || '—')}</span></div>
+  </div>
+  <div class="note">إجمالي متوقع: ${familyPrintMoney(familyTotal)} USD — مدخل حالياً: ${familyPrintMoney(familyPayments)} USD — متبقي: ${familyPrintMoney(familyRemaining)} USD</div>
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>اسم الطالب</th>
+        <th>الصف</th>
+        <th>الشعبة</th>
+        <th>اسم المستخدم</th>
+        <th>كلمة المرور المرجعية</th>
+      </tr>
+    </thead>
+    <tbody>${studentsRows}</tbody>
+  </table>
+  ${studentSections}
+  <div class="sign-grid">
+    <div class="sign-box"><b>اعتماد المراجع الإداري</b><span>${esc(item.admin_reviewer_name || '—')}</span></div>
+    <div class="sign-box"><b>اعتماد المحاسب / المستلم</b><span>${esc(item.finance_receiver_name || item.accountant_receiver_name || '—')}</span></div>
+    <div class="sign-box"><b>اعتماد الإدارة</b><span>${esc(({pending:'قيد المراجعة',reviewed:'تمت المراجعة',approved:'معتمد',rejected:'مرفوض'})[String(item.family_status||'').toLowerCase()] || '—')}</span></div>
+  </div>
+</div>
+</body>
+</html>`;
+}
+function printFamilyAdminPacket(familyId){
+  const item = familyGroups.find(group => String(group.family_id) === String(familyId));
+  if(!item){
+    toast('تعذر الطباعة','لم يتم العثور على بطاقة الأسرة المطلوبة.');
+    return;
+  }
+  const win = window.open('', '_blank', 'width=1100,height=900');
+  if(!win){
+    toast('تعذر الطباعة','المتصفح منع فتح نافذة الطباعة.');
+    return;
+  }
+  win.document.write(buildFamilyPrintWindowHTML(item));
+  win.document.close();
+  setTimeout(()=>{ try{ win.focus(); }catch(_e){} }, 200);
+}
+
 function renderTeachers(){
   const list = getFilteredTeachers();
   $('#teachersMeta').textContent = list.length ? ('عرض '+list.length+' طلب معلم') : 'لا توجد طلبات معلمين مطابقة للبحث الحالي.';
@@ -704,6 +875,7 @@ window.applyQuickFilter = applyQuickFilter;
 window.openFinanceForRegistrationStudent = openFinanceForRegistrationStudent;
 window.openCreditTransferForRegistrationStudent = openCreditTransferForRegistrationStudent;
 window.stampFamilyOperator = stampFamilyOperator;
+window.printFamilyAdminPacket = printFamilyAdminPacket;
 </script>
 <script src="assets/ux-enhancements.js?v=20260706-3"></script>
 <script src="assets/amin-theme-injector.js"></script>
