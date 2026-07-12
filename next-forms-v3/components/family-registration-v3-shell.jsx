@@ -40,7 +40,17 @@ const PRINT_COPY = {
     registrationOfficerLabel: 'اعتماد التسجيل',
     financeOfficerLabel: 'اعتماد المالية',
     pageProfileHint: 'صفحة بيانات الطالب',
-    pageFinanceHint: 'صفحة الماليات الخاصة بالطالب'
+    pageFinanceHint: 'صفحة الماليات الخاصة بالطالب',
+    requestReferenceLabel: 'مرجع الطلب',
+    generatedOnLabel: 'تاريخ الطباعة',
+    officialUseTitle: 'اعتماد واستعمال إداري',
+    approvalNote: 'هذه النسخة منظمة لتسهيل المراجعة والطباعة دون تكرار أو التباس بين بيانات الطالب والماليات.',
+    draftReference: 'مسودة قبل الإرسال',
+    studentDataTitle: 'بيانات الطالب الأساسية',
+    familyLinkTitle: 'صلة الطالب بالعائلة',
+    financeStatusTitle: 'الوضع المالي المختصر',
+    remainingForStudentLabel: 'المتبقي على الطالب',
+    organizationalNoteLabel: 'ملاحظة تنظيمية'
   },
   fa: {
     schoolName: 'مجتمع آموزشی امین‌الرضا',
@@ -57,7 +67,17 @@ const PRINT_COPY = {
     registrationOfficerLabel: 'تأیید ثبت‌نام',
     financeOfficerLabel: 'تأیید مالی',
     pageProfileHint: 'صفحه اطلاعات دانش‌آموز',
-    pageFinanceHint: 'صفحه مالی مخصوص دانش‌آموز'
+    pageFinanceHint: 'صفحه مالی مخصوص دانش‌آموز',
+    requestReferenceLabel: 'مرجع درخواست',
+    generatedOnLabel: 'تاریخ چاپ',
+    officialUseTitle: 'تأیید و استفاده اداری',
+    approvalNote: 'این نسخه برای مرور و چاپ شفاف طراحی شده تا بین اطلاعات دانش‌آموز و مالی تداخل ایجاد نشود.',
+    draftReference: 'پیش‌نویس قبل از ارسال',
+    studentDataTitle: 'اطلاعات اصلی دانش‌آموز',
+    familyLinkTitle: 'ارتباط دانش‌آموز با خانواده',
+    financeStatusTitle: 'وضعیت مالی خلاصه',
+    remainingForStudentLabel: 'مانده دانش‌آموز',
+    organizationalNoteLabel: 'یادداشت اجرایی'
   },
   en: {
     schoolName: 'Amin Al-Ridha Educational Complex',
@@ -74,7 +94,17 @@ const PRINT_COPY = {
     registrationOfficerLabel: 'Registration Approval',
     financeOfficerLabel: 'Finance Approval',
     pageProfileHint: 'Student profile page',
-    pageFinanceHint: 'Student finance page'
+    pageFinanceHint: 'Student finance page',
+    requestReferenceLabel: 'Request Reference',
+    generatedOnLabel: 'Printed On',
+    officialUseTitle: 'Administrative Use & Approval',
+    approvalNote: 'This print version is organized for review and filing without duplicating student and finance details.',
+    draftReference: 'Draft before submission',
+    studentDataTitle: 'Core Student Details',
+    familyLinkTitle: 'Student & Family Link',
+    financeStatusTitle: 'Finance Snapshot',
+    remainingForStudentLabel: 'Student Remaining Balance',
+    organizationalNoteLabel: 'Operational Note'
   }
 };
 
@@ -978,7 +1008,7 @@ function FinanceStudentCard({ locale, labels, student, index, fieldById, finance
   );
 }
 
-function PrintPageShell({ locale, title, subtitle, hint, children, pageBreak = true }) {
+function PrintPageShell({ locale, title, subtitle, hint, metaLabel, metaValue, children, pageBreak = true }) {
   const copy = PRINT_COPY[locale] || PRINT_COPY.ar;
 
   return (
@@ -1010,8 +1040,8 @@ function PrintPageShell({ locale, title, subtitle, hint, children, pageBreak = t
           </div>
           <div className="flex justify-end">
             <div className="rounded-[16px] border border-slate-300 bg-white/90 px-3 py-2 text-center">
-              <div className="text-[9px] font-black text-slate-500">{SCHOOL_YEAR_LABEL}</div>
-              <div className="mt-1 text-[11px] font-semibold text-slate-800">{localeDateLabel(locale)}</div>
+              <div className="text-[9px] font-black text-slate-500">{metaLabel || copy.generatedOnLabel}</div>
+              <div className="mt-1 text-[11px] font-semibold text-slate-800">{metaValue || localeDateLabel(locale)}</div>
             </div>
           </div>
         </div>
@@ -1050,11 +1080,12 @@ function PrintCheckItem({ checked, label }) {
   );
 }
 
-function PrintableFamilyRegistration({ locale, labels, template, values, totalAmount, financeCatalogMap }) {
+function PrintableFamilyRegistration({ locale, labels, template, values, totalAmount, financeCatalogMap, receipt }) {
   const copy = PRINT_COPY[locale] || PRINT_COPY.ar;
   const guardianFullName = computeGuardianFullName(values);
   const motherFullName = computeMotherFullName(values);
   const sharedPayments = sharedFamilyPaymentRows(values.payment_entries || []);
+  const printReference = receipt?.reportId || copy.draftReference;
   const expectedFamilyFeeTotal = values.students.reduce((sum, student) => sum + Number(financeCatalogMap.get(String(student.student_grade || ''))?.annual_fee || 0), 0);
   const remainingProjected = Math.max(expectedFamilyFeeTotal - totalAmount, 0);
 
@@ -1078,6 +1109,8 @@ function PrintableFamilyRegistration({ locale, labels, template, values, totalAm
         title={labels.familySheetTitle}
         subtitle={copy.familyQuickSummary}
         hint={copy.generatedFrom}
+        metaLabel={copy.requestReferenceLabel}
+        metaValue={printReference}
         pageBreak={values.students.length > 0}
       >
         <div className="grid gap-3 md:grid-cols-4">
@@ -1134,6 +1167,26 @@ function PrintableFamilyRegistration({ locale, labels, template, values, totalAm
               <PrintCheckItem checked={values.document_original_received} label={familyField('document_original_received')?.label?.[locale]} />
               <PrintField label={familyField('document_notes')?.label?.[locale]} value={values.document_notes} />
               <PrintField label={copy.guardianSignatureLabel} value={values.guardian_signature} />
+            </div>
+          </PrintSectionBlock>
+        </div>
+
+        <div className="mt-4 grid gap-4 md:grid-cols-[1.15fr_.85fr]">
+          <PrintSectionBlock title={copy.officialUseTitle}>
+            <div className="grid gap-3 md:grid-cols-2">
+              <PrintField label={copy.requestReferenceLabel} value={printReference} />
+              <PrintField label={copy.generatedOnLabel} value={localeDateLabel(locale)} />
+              <PrintField label={copy.registrationOfficerLabel} value="" />
+              <PrintField label={copy.financeOfficerLabel} value="" />
+              <PrintField label={copy.organizationalNoteLabel} value={copy.approvalNote} wide />
+            </div>
+          </PrintSectionBlock>
+
+          <PrintSectionBlock title={labels.financeSummaryTitle}>
+            <div className="grid gap-3">
+              <PrintField label={labels.paymentTotal} value={localeNumber(locale, totalAmount)} />
+              <PrintField label={labels.expectedFeesLabel} value={localeNumber(locale, expectedFamilyFeeTotal)} />
+              <PrintField label={labels.projectedRemainingLabel} value={localeNumber(locale, remainingProjected)} />
             </div>
           </PrintSectionBlock>
         </div>
@@ -1213,6 +1266,9 @@ function PrintableFamilyRegistration({ locale, labels, template, values, totalAm
         const directPayments = directPaymentRowsForStudent(values.payment_entries || [], student.id);
         const classLabel = financeItem?.class_name || studentValue('student_grade', student.student_grade) || labels.emptyValue;
 
+        const studentPaidTotal = sumPaymentRows(directPayments);
+        const studentRemainingTotal = Math.max(Number(financeItem?.annual_fee || 0) - studentPaidTotal, 0);
+
         return (
           <div key={student.id} className="space-y-6">
             <PrintPageShell
@@ -1220,6 +1276,8 @@ function PrintableFamilyRegistration({ locale, labels, template, values, totalAm
               title={`${labels.studentAppendixTitle} ${localeNumber(locale, index + 1)}`}
               subtitle={student.student_full_name || labels.emptyValue}
               hint={copy.pageProfileHint}
+              metaLabel={copy.requestReferenceLabel}
+              metaValue={printReference}
               pageBreak
             >
               <div className="mb-4 rounded-[18px] border border-blue-100 bg-blue-50 px-4 py-3 text-[12px] leading-6 text-blue-900">
@@ -1227,7 +1285,7 @@ function PrintableFamilyRegistration({ locale, labels, template, values, totalAm
               </div>
 
               <div className="grid gap-4 md:grid-cols-2">
-                <PrintSectionBlock title={studentField('student_full_name')?.label?.[locale]}>
+                <PrintSectionBlock title={copy.studentDataTitle}>
                   <div className="grid gap-3 md:grid-cols-2">
                     <PrintField label={studentField('student_full_name')?.label?.[locale]} value={student.student_full_name} />
                     <PrintField label={studentField('student_birth_date')?.label?.[locale]} value={student.student_birth_date ? formatDateForLocale(locale, student.student_birth_date) : ''} />
@@ -1240,7 +1298,7 @@ function PrintableFamilyRegistration({ locale, labels, template, values, totalAm
                   </div>
                 </PrintSectionBlock>
 
-                <PrintSectionBlock title={copy.familyQuickSummary}>
+                <PrintSectionBlock title={copy.familyLinkTitle}>
                   <div className="grid gap-3 md:grid-cols-2">
                     <PrintField label={labels.familySummaryTitle} value={guardianFullName} />
                     <PrintField label={familyField('guardian_phone_primary')?.label?.[locale]} value={values.guardian_phone_primary} />
@@ -1276,17 +1334,20 @@ function PrintableFamilyRegistration({ locale, labels, template, values, totalAm
               title={`${labels.financeSummaryTitle} — ${student.student_full_name || labels.emptyValue}`}
               subtitle={classLabel}
               hint={copy.pageFinanceHint}
+              metaLabel={copy.requestReferenceLabel}
+              metaValue={printReference}
               pageBreak={index !== values.students.length - 1}
             >
-              <div className="grid gap-3 md:grid-cols-4">
+              <div className="grid gap-3 md:grid-cols-5">
                 <PrintMetric label={labels.classFeeLabel} value={financeItem ? `${localeNumber(locale, Number(financeItem.annual_fee || 0))} ${financeItem.currency}` : labels.classFeeMissing} />
                 <PrintMetric label={labels.monthlyApproxLabel} value={financeItem ? `${localeNumber(locale, Number(financeItem.monthly_fee || 0))} ${financeItem.currency}` : labels.emptyValue} />
                 <PrintMetric label={labels.planCountLabel} value={localeNumber(locale, planCount)} />
-                <PrintMetric label={labels.paymentTotal} value={localeNumber(locale, sumPaymentRows(directPayments))} />
+                <PrintMetric label={labels.paymentTotal} value={localeNumber(locale, studentPaidTotal)} />
+                <PrintMetric label={copy.remainingForStudentLabel} value={localeNumber(locale, studentRemainingTotal)} />
               </div>
 
               <div className="mt-5 grid gap-4 md:grid-cols-[.95fr_1.05fr]">
-                <PrintSectionBlock title={template.sections.find((section) => section.key === 'finance')?.title?.[locale]}>
+                <PrintSectionBlock title={copy.financeStatusTitle}>
                   <div className="grid gap-3 md:grid-cols-1">
                     <PrintField label={studentField('finance_plan_type')?.label?.[locale]} value={studentValue('finance_plan_type', student.finance_plan_type)} />
                     <PrintField label={studentField('finance_installments_count')?.label?.[locale]} value={localeNumber(locale, planCount)} />
@@ -2182,7 +2243,7 @@ export default function FamilyRegistrationV3Shell({ locale, dictionary, initialS
               <div className="mb-3 text-xs text-slate-500">{labels.printSheetHint}</div>
               <div className="rounded-2xl border border-slate-100 bg-slate-50 p-3">
                 <div className="mb-3 flex items-center justify-between gap-3 text-xs text-slate-500"><span>{labels.printPaperLabel}</span><StatusPill tone="slate">{forms.builder.printModes.portrait}</StatusPill></div>
-                <div className="max-h-[780px] overflow-auto"><div className="origin-top scale-[0.5]"><PrintableFamilyRegistration locale={activeLocale} labels={labels} template={template} values={values} totalAmount={totalAmount} financeCatalogMap={financeCatalogMap} /></div></div>
+                <div className="max-h-[780px] overflow-auto"><div className="origin-top scale-[0.5]"><PrintableFamilyRegistration locale={activeLocale} labels={labels} template={template} values={values} totalAmount={totalAmount} financeCatalogMap={financeCatalogMap} receipt={receipt} /></div></div>
               </div>
             </section>
           </aside>
@@ -2190,7 +2251,7 @@ export default function FamilyRegistrationV3Shell({ locale, dictionary, initialS
       </section>
 
       <section className="print-only py-6">
-        <PrintableFamilyRegistration locale={activeLocale} labels={labels} template={template} values={values} totalAmount={totalAmount} financeCatalogMap={financeCatalogMap} />
+        <PrintableFamilyRegistration locale={activeLocale} labels={labels} template={template} values={values} totalAmount={totalAmount} financeCatalogMap={financeCatalogMap} receipt={receipt} />
         <div className="mx-auto mt-4 w-full max-w-[794px] rounded-2xl border border-brand-100 bg-brand-50 px-4 py-3 text-sm text-brand-800">{labels.printReceiptBanner}</div>
       </section>
     </main>
