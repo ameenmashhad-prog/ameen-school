@@ -6,7 +6,7 @@
 <title>طلبات التسجيل — مدارس أمين الرضا</title>
 <link rel="stylesheet" href="assets/amin.css?v=20260706-5">
 <link rel="icon" href="/favicon.ico" sizes="any">
-<link rel="stylesheet" href="assets/registration.css?v=20260711-5">
+<link rel="stylesheet" href="assets/registration.css?v=20260711-6">
 <link rel="stylesheet" href="assets/i18n.css">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="assets/amin-logo-small.png">
@@ -154,6 +154,7 @@ const state = { query:'', status:'all', scope:'all', lastLoadedAt:null };
 let familiesRaw = [];
 let familyGroups = [];
 let teachersRaw = [];
+let financeContext = { publicStudents: [], studentFees: [], installments: [], transfers: [] };
 let accessReady = false;
 
 function normalizeStatus(value){
@@ -177,8 +178,49 @@ function formatDate(value){
   return new Intl.DateTimeFormat('ar', {year:'numeric',month:'short',day:'numeric'}).format(d);
 }
 function money(v){return Number(v||0).toLocaleString('en-US',{style:'currency',currency:'USD',maximumFractionDigits:2})}
-function groupFamilies(familiesRows, studentsRows){
+function amountRemaining(fee){return Math.max(Number(fee&&fee.net_amount||0)-Number(fee&&fee.total_paid||0),0)}
+function financeStatusLabel(status){return ({paid:'مدفوع بالكامل',partial:'دفع جزئي',unpaid:'غير مدفوع'})[String(status||'').toLowerCase()]||'بدون ملف'}
+function groupFamilies(familiesRows, studentsRows, finance){
   const bucket = new Map();
+  const publicStudentByKey = new Map();
+  const feeByStudentId = new Map();
+  const installmentAggByFeeId = new Map();
+  const transferAggByFeeId = new Map();
+  const today = new Date().toISOString().slice(0,10);
+
+  (finance.publicStudents || []).forEach(row => {
+    const key = [String(row.student_name || '').trim().toLowerCase(), String(row.class_id || '')].join('__');
+    if(!publicStudentByKey.has(key)) publicStudentByKey.set(key, row);
+  });
+
+  [...(finance.studentFees || [])]
+    .sort((a,b)=>new Date(b.updated_at||0)-new Date(a.updated_at||0))
+    .forEach(fee => {
+      const studentId = String(fee.student_id || '');
+      if(studentId && !feeByStudentId.has(studentId)) feeByStudentId.set(studentId, fee);
+    });
+
+  (finance.installments || []).forEach(inst => {
+    const feeId = String(inst.student_fee_id || '');
+    if(!feeId) return;
+    if(!installmentAggByFeeId.has(feeId)) installmentAggByFeeId.set(feeId, { open:0, overdue:0 });
+    const agg = installmentAggByFeeId.get(feeId);
+    const due = Number(inst.amount_due || 0);
+    const paid = Number(inst.amount_paid || 0);
+    const remaining = Math.max(due - paid, 0);
+    if(remaining > 0){
+      agg.open += 1;
+      if(inst.due_date && String(inst.due_date) < today) agg.overdue += 1;
+    }
+  });
+
+  (finance.transfers || []).forEach(tr => {
+    [String(tr.from_student_fee_id || ''), String(tr.to_student_fee_id || '')].forEach(feeId => {
+      if(!feeId) return;
+      transferAggByFeeId.set(feeId, (transferAggByFeeId.get(feeId) || 0) + 1);
+    });
+  });
+
   (familiesRows || []).forEach(row => {
     bucket.set(row.id, {
       family_id: row.id,
@@ -193,6 +235,7 @@ function groupFamilies(familiesRows, studentsRows){
       students: []
     });
   });
+
   (studentsRows || []).forEach(row => {
     const id = row.family_id;
     if(!bucket.has(id)){
@@ -210,6 +253,11 @@ function groupFamilies(familiesRows, studentsRows){
       });
     }
     const entry = bucket.get(id);
+    const studentKey = [String(row.student_name || '').trim().toLowerCase(), String(row.class_id || '')].join('__');
+    const publicStudent = publicStudentByKey.get(studentKey) || null;
+    const fee = publicStudent ? feeByStudentId.get(String(publicStudent.id)) : null;
+    const instAgg = fee ? (installmentAggByFeeId.get(String(fee.id)) || { open:0, overdue:0 }) : { open:0, overdue:0 };
+    const transferCount = fee ? (transferAggByFeeId.get(String(fee.id)) || 0) : 0;
     entry.students.push({
       registration_student_id: row.id,
       student_name: row.student_name || '—',
@@ -220,7 +268,16 @@ function groupFamilies(familiesRows, studentsRows){
       monthly_fee_snapshot: Number(row.monthly_fee_snapshot || 0),
       finance_plan_type: row.finance_plan_type || '—',
       finance_installments_count: row.finance_installments_count || 0,
-      finance_plan_start_date: row.finance_plan_start_date || null
+      finance_plan_start_date: row.finance_plan_start_date || null,
+      public_student_id: publicStudent ? publicStudent.id : null,
+      finance_fee_id: fee ? fee.id : null,
+      finance_status: fee ? String(fee.status || '') : '',
+      finance_total_paid: fee ? Number(fee.total_paid || 0) : 0,
+      finance_remaining: fee ? amountRemaining(fee) : 0,
+      credit_balance: fee ? Number(fee.credit_balance || 0) : 0,
+      open_installments_count: instAgg.open,
+      overdue_installments_count: instAgg.overdue,
+      transfer_count: transferCount
     });
   });
   return Array.from(bucket.values()).sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));
@@ -233,7 +290,8 @@ function buildSearchTextFamily(item){
     item.students.map(s=>s.class_name).join(' '),
     item.students.map(s=>s.section).join(' '),
     item.family_name,
-    item.students.map(s=>s.finance_plan_type).join(' ')
+    item.students.map(s=>s.finance_plan_type).join(' '),
+    item.students.map(s=>s.finance_status).join(' ')
   ].join(' ').toLowerCase();
 }
 function buildSearchTextTeacher(item){
@@ -280,15 +338,29 @@ function renderFamilies(){
     const familyPayments = (item.finance_payment_entries||[]).reduce((sum, row)=>sum + Number(row.amount||0), 0);
     const familyRemaining = Math.max(familyTotal - familyPayments, 0);
     const students = item.students.map(st => {
-      const financeActions = normalizeStatus(item.family_status)==='approved'
+      const financeBadges = st.finance_fee_id
+        ? '<div class="reg-chip-row" style="margin-top:8px">'
+          + '<span class="reg-chip">'+esc(financeStatusLabel(st.finance_status))+'</span>'
+          + '<span class="reg-chip">المتبقي: '+esc(money(st.finance_remaining))+'</span>'
+          + '<span class="reg-chip">أقساط مفتوحة: '+esc(st.open_installments_count)+'</span>'
+          + (st.overdue_installments_count ? '<span class="reg-chip">متأخر: '+esc(st.overdue_installments_count)+'</span>' : '')
+          + (st.credit_balance>0 ? '<span class="reg-chip">رصيد دائن: '+esc(money(st.credit_balance))+'</span>' : '')
+          + (st.transfer_count>0 ? '<span class="reg-chip">تحويلات: '+esc(st.transfer_count)+'</span>' : '')
+          + '</div>'
+        : '<div class="reg-chip-row" style="margin-top:8px"><span class="reg-chip">لا يوجد ملف مالي بعد</span></div>';
+      const financeActions = normalizeStatus(item.family_status)==='approved' && st.finance_fee_id
         ? '<div class="reg-inline-actions" style="margin-top:8px">'
           + '<button class="btn small blue" type="button" onclick="openFinanceForRegistrationStudent('+jse(st.registration_student_id)+', '+jse('students')+')">الملف المالي</button>'
           + '<button class="btn small gold" type="button" onclick="openFinanceForRegistrationStudent('+jse(st.registration_student_id)+', '+jse('payment')+')">دفعة</button>'
           + '<button class="btn small" type="button" onclick="openFinanceForRegistrationStudent('+jse(st.registration_student_id)+', '+jse('plans')+')">الخطة</button>'
+          + (st.credit_balance>0 ? '<button class="btn small" type="button" onclick="openCreditTransferForRegistrationStudent('+jse(st.registration_student_id)+')">تحويل رصيد</button>' : '')
           + '</div>'
-        : '<small class="muted">فعّل الحساب أولاً لفتح الملف المالي لهذا الطالب.</small>';
+        : (normalizeStatus(item.family_status)==='approved'
+            ? '<small class="muted">تم الاعتماد، لكن لم يظهر ملف مالي بعد. حدّث الصفحة أو راجع التفعيل.</small>'
+            : '<small class="muted">فعّل الحساب أولاً لفتح الملف المالي لهذا الطالب.</small>');
       return '<li><b>'+esc(st.student_name)+'</b> — '+esc(st.class_name)+' / '+esc(st.section || '—')
       +'<br><small class="muted">الرسوم السنوية: '+esc(money(st.annual_fee_snapshot))+' · الخطة: '+esc(st.finance_plan_type || '—')+' · عدد الأقساط: '+esc(st.finance_installments_count || '—')+'</small>'
+      + financeBadges
       + financeActions + '</li>';
     }).join('');
     return '<article class="request-card">'
@@ -440,6 +512,15 @@ async function openFinanceForRegistrationStudent(registrationStudentId, mode){
   location.href = 'finance-pro.html?lite=1&studentId=' + encodeURIComponent(target.id) + '&mode=' + encodeURIComponent(mode || 'students');
 }
 
+async function openCreditTransferForRegistrationStudent(registrationStudentId){
+  const allStudents = familyGroups.flatMap(group => group.students || []);
+  const regStudent = allStudents.find(student => String(student.registration_student_id) === String(registrationStudentId));
+  if(!regStudent){ toast('تعذر فتح تحويل الرصيد','لم يتم العثور على الطالب داخل بطاقة التسجيل الحالية.'); return; }
+  if(!regStudent.finance_fee_id || !(Number(regStudent.credit_balance||0) > 0)){ toast('لا يوجد رصيد دائن','هذا الطالب لا يملك رصيداً دائناً صالحاً للتحويل حالياً.'); return; }
+  localStorage.setItem('finance_credit_transfer_fee', regStudent.finance_fee_id);
+  location.href = 'finance-credit-report.html?transferFeeId=' + encodeURIComponent(regStudent.finance_fee_id);
+}
+
 async function loadAll(){
   if(!accessReady){
     accessReady = await ensure();
@@ -447,11 +528,21 @@ async function loadAll(){
   }
   $('#familiesBox').innerHTML = '<div class="reg-empty"><b>جاري تحميل طلبات الأسر والطلاب...</b><p>لحظات وسيتم تحديث القائمة.</p></div>';
   $('#teachersBox').innerHTML = '<div class="reg-empty"><b>جاري تحميل طلبات المعلمين...</b><p>لحظات وسيتم تحديث القائمة.</p></div>';
-  const [familiesRes, studentsRes, teachersRes] = await Promise.all([
+  const [familiesRes, studentsRes, teachersRes, publicStudentsRes, feeRes, installmentRes, transferRes] = await Promise.all([
     sb.from('registration_families').select('id,guardian_name,phone_primary,status,created_at,family_name,finance_payment_entries,general_family_health_notes,document_notes').order('created_at',{ascending:false}),
-    sb.from('registration_students').select('id,family_id,student_name,section,status,created_at,student_class_label,annual_fee_snapshot,monthly_fee_snapshot,finance_plan_type,finance_installments_count,finance_plan_start_date').order('created_at',{ascending:false}),
-    sb.from('registration_teachers').select('*').order('created_at',{ascending:false})
+    sb.from('registration_students').select('id,family_id,student_name,class_id,section,status,created_at,student_class_label,annual_fee_snapshot,monthly_fee_snapshot,finance_plan_type,finance_installments_count,finance_plan_start_date').order('created_at',{ascending:false}),
+    sb.from('registration_teachers').select('*').order('created_at',{ascending:false}),
+    sb.from('students').select('id,student_name,class_id,parent_id,created_at').order('created_at',{ascending:false}),
+    sb.from('student_fees').select('id,student_id,net_amount,total_paid,credit_balance,status,updated_at,created_at').order('updated_at',{ascending:false}),
+    sb.from('student_installments').select('student_fee_id,amount_due,amount_paid,due_date,status'),
+    sb.from('finance_credit_transfers').select('id,from_student_fee_id,to_student_fee_id,created_at')
   ]);
+  financeContext = {
+    publicStudents: publicStudentsRes.error ? [] : (publicStudentsRes.data || []),
+    studentFees: feeRes.error ? [] : (feeRes.data || []),
+    installments: installmentRes.error ? [] : (installmentRes.data || []),
+    transfers: transferRes.error ? [] : (transferRes.data || [])
+  };
   if(familiesRes.error || studentsRes.error){
     familiesRaw = [];
     familyGroups = [];
@@ -459,7 +550,7 @@ async function loadAll(){
     $('#familiesBox').innerHTML = '<div class="reg-empty"><b>تعذر تحميل طلبات الأسر</b><p>'+esc(message)+'</p></div>';
   } else {
     familiesRaw = studentsRes.data || [];
-    familyGroups = groupFamilies(familiesRes.data || [], studentsRes.data || []);
+    familyGroups = groupFamilies(familiesRes.data || [], studentsRes.data || [], financeContext);
   }
   if(teachersRes.error){
     teachersRaw = [];
@@ -498,6 +589,7 @@ window.loadAll = loadAll;
 window.resetFilters = resetFilters;
 window.applyQuickFilter = applyQuickFilter;
 window.openFinanceForRegistrationStudent = openFinanceForRegistrationStudent;
+window.openCreditTransferForRegistrationStudent = openCreditTransferForRegistrationStudent;
 </script>
 <script src="assets/ux-enhancements.js?v=20260706-3"></script>
 <script src="assets/amin-theme-injector.js"></script>
