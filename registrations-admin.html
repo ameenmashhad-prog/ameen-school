@@ -470,6 +470,19 @@ function applicantRelationLabel(item){
   if(String(item.applicant_relation||'').toLowerCase() === 'other') return item.applicant_other_relation || 'أخرى';
   return ({father:'الأب',mother:'الأم'})[String(item.applicant_relation||'').toLowerCase()] || item.applicant_relation || '—';
 }
+function paymentStatusLabelForRow(row){
+  const expected = Number(row && row.expected_amount_usd || 0);
+  const paidUsd = paymentUsdAmount(row);
+  if(paidUsd <= 0) return 'غير مدفوع';
+  if(expected > 0 && paidUsd + 0.009 < expected) return 'دفع جزئي';
+  return 'مدفوع';
+}
+function paymentStatusClassForRow(row){
+  const label = paymentStatusLabelForRow(row);
+  if(label === 'مدفوع') return 'state-paid';
+  if(label === 'دفع جزئي') return 'state-partial';
+  return 'state-unpaid';
+}
 function buildFamilyPrintWindowHTML(item){
   const familyTotal = item.students.reduce((sum, st)=>sum + Number(st.annual_fee_snapshot||0), 0);
   const familyPayments = (item.finance_payment_entries||[]).reduce((sum, row)=>sum + paymentUsdAmount(row), 0);
@@ -477,6 +490,34 @@ function buildFamilyPrintWindowHTML(item){
   const familyAttachmentName = (item.family_attachment_obj && (item.family_attachment_obj.file_name || item.family_attachment_obj.name)) || '—';
   const studentsWithPassport = (item.students || []).filter(st => st.passport_attachment_name).length;
   const studentsWithAcademicDocs = (item.students || []).filter(st => st.academic_documents_name).length;
+  const orderedFamilyPayments = [...(item.finance_payment_entries || [])].sort((a,b)=>
+    String(a.student_ref || '').localeCompare(String(b.student_ref || ''))
+    || Number(a.installment_number || 0) - Number(b.installment_number || 0)
+    || String(a.expected_due_date || '').localeCompare(String(b.expected_due_date || ''))
+  );
+  const familyPaymentRowsHtml = orderedFamilyPayments.length
+    ? orderedFamilyPayments.map((row, index) => {
+        const student = (item.students || []).find(st => String(st.registration_student_id) === String(row.student_ref || ''));
+        const paidUsd = paymentUsdAmount(row);
+        const statusLabel = paymentStatusLabelForRow(row);
+        const statusClass = paymentStatusClassForRow(row);
+        return `
+          <tr>
+            <td>${index + 1}</td>
+            <td>${esc(student ? student.student_name : '—')}</td>
+            <td>${esc(row.installment_number || '—')}</td>
+            <td>${esc(row.expected_due_date ? familyPrintDate(row.expected_due_date) : '—')}</td>
+            <td>${esc(row.expected_amount_usd ? familyPrintMoney(row.expected_amount_usd) : '—')}</td>
+            <td>${esc(row.currency || 'USD')}</td>
+            <td>${esc(row.amount ? familyPrintMoney(row.amount) : '—')}</td>
+            <td>${esc(paidUsd ? familyPrintMoney(paidUsd) : '—')}</td>
+            <td>${esc(row.exchange_rate ? familyPrintMoney(row.exchange_rate) : '—')}</td>
+            <td>${esc(row.receiver_name || item.finance_receiver_name || item.accountant_receiver_name || '—')}</td>
+            <td><span class="state-pill ${statusClass}">${esc(statusLabel)}</span></td>
+          </tr>
+        `;
+      }).join('')
+    : '<tr><td colspan="10">لا توجد دفعات مسجلة على هذا الطلب حتى الآن.</td></tr>';
   const studentsRows = (item.students || []).map((st, index) => `
     <tr>
       <td>${index + 1}</td>
@@ -489,20 +530,33 @@ function buildFamilyPrintWindowHTML(item){
   `).join('');
   const studentSections = (item.students || []).map((st, index) => {
     const paymentRows = (item.finance_payment_entries || []).filter(row => String(row.student_ref||'') === String(st.registration_student_id));
+    const studentPaidUsd = paymentRows.reduce((sum, row) => sum + paymentUsdAmount(row), 0);
+    const studentExpected = Number(st.annual_fee_snapshot || 0);
+    const studentRemaining = Math.max(studentExpected - studentPaidUsd, 0);
     const paymentRowsHtml = paymentRows.length
-      ? paymentRows.map((row, rowIndex) => `
+      ? paymentRows.map((row, rowIndex) => {
+          const paidUsd = paymentUsdAmount(row);
+          const statusLabel = paymentStatusLabelForRow(row);
+          const statusClass = paymentStatusClassForRow(row);
+          return `
           <tr>
             <td>${rowIndex + 1}</td>
+            <td>${esc(row.installment_number || '—')}</td>
+            <td>${esc(row.expected_due_date ? familyPrintDate(row.expected_due_date) : '—')}</td>
+            <td>${esc(row.expected_amount_usd ? familyPrintMoney(row.expected_amount_usd) : '—')}</td>
             <td>${esc(row.payment_method || '—')}</td>
             <td>${esc(row.currency || 'USD')}</td>
             <td>${esc(row.amount ? familyPrintMoney(row.amount) : '—')}</td>
-            <td>${esc(paymentUsdAmount(row) ? familyPrintMoney(paymentUsdAmount(row)) : '—')}</td>
+            <td>${esc(paidUsd ? familyPrintMoney(paidUsd) : '—')}</td>
+            <td>${esc(row.exchange_rate ? familyPrintMoney(row.exchange_rate) : '—')}</td>
             <td>${esc(row.receiver_name || item.finance_receiver_name || item.accountant_receiver_name || '—')}</td>
             <td>${esc(row.payment_date ? familyPrintDate(row.payment_date) : '—')}</td>
+            <td><span class="state-pill ${statusClass}">${esc(statusLabel)}</span></td>
             <td>${esc(row.reference || row.tracking_number || '—')}</td>
           </tr>
-        `).join('')
-      : '<tr><td colspan="8">لا توجد دفعات مرتبطة بهذا الطالب حتى الآن.</td></tr>';
+        `;
+        }).join('')
+      : '<tr><td colspan="13">لا توجد دفعات مرتبطة بهذا الطالب حتى الآن.</td></tr>';
     return `
       <section class="student-block">
         <div class="student-head">
@@ -515,7 +569,9 @@ function buildFamilyPrintWindowHTML(item){
           <div class="meta-box"><b>الخطة</b><span>${esc(st.finance_plan_type || '—')}</span></div>
           <div class="meta-box"><b>عدد الأقساط</b><span>${esc(st.finance_installments_count || '—')}</span></div>
           <div class="meta-box"><b>الرسوم السنوية</b><span>${familyPrintMoney(st.annual_fee_snapshot || 0)} USD</span></div>
-          <div class="meta-box"><b>المتبقي</b><span>${familyPrintMoney(st.finance_remaining || 0)} USD</span></div>
+          <div class="meta-box"><b>المقبوض فعلياً</b><span>${familyPrintMoney(studentPaidUsd)} USD</span></div>
+          <div class="meta-box"><b>المتبقي</b><span>${familyPrintMoney(studentRemaining)} USD</span></div>
+          <div class="meta-box"><b>الملف المالي</b><span>${esc(st.finance_fee_id ? 'تم إنشاؤه' : 'لم يُنشأ بعد')}</span></div>
           <div class="meta-box wide"><b>مرفق الجواز</b><span>${esc(st.passport_attachment_name || '—')}</span></div>
           <div class="meta-box wide"><b>المرفقات الدراسية</b><span>${esc(st.academic_documents_name || '—')}</span></div>
           <div class="meta-box wide"><b>حالة المرفقات</b><span>${esc(st.passport_attachment_name ? 'جواز مرفوع' : 'لا يوجد جواز مرفوع')} — ${esc(st.academic_documents_name ? 'سجل دراسي مرفوع' : 'لا يوجد سجل دراسي مرفوع')}</span></div>
@@ -524,12 +580,17 @@ function buildFamilyPrintWindowHTML(item){
           <thead>
             <tr>
               <th>#</th>
+              <th>القسط</th>
+              <th>تاريخ الاستحقاق</th>
+              <th>المتوقع USD</th>
               <th>طريقة الدفع</th>
               <th>العملة</th>
               <th>المبلغ</th>
               <th>المعادِل USD</th>
+              <th>سعر الصرف</th>
               <th>المستلم</th>
               <th>تاريخ الاستلام</th>
+              <th>الحالة</th>
               <th>المرجع</th>
             </tr>
           </thead>
@@ -568,6 +629,10 @@ function buildFamilyPrintWindowHTML(item){
   .sign-box{min-height:92px;border:1px dashed #b6c2d2;border-radius:16px;padding:12px;background:#fcfdff}
   .sign-box b{display:block;margin-bottom:32px}
   .print-btn{position:fixed;top:16px;left:16px;background:#0b6e4f;color:#fff;border:0;border-radius:10px;padding:10px 18px;font-weight:700;cursor:pointer}
+  .state-pill{display:inline-flex;align-items:center;justify-content:center;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:700}
+  .state-paid{background:#e9f9ef;color:#0b6e4f}
+  .state-partial{background:#fff5df;color:#8a5a10}
+  .state-unpaid{background:#fff0f0;color:#b42318}
   @media print{body{padding:0}.print-btn{display:none}.sheet{border:0;border-radius:0;max-width:none;padding:16px}.sheet:before{display:none}@page{size:A4;margin:1cm}}
 </style>
 </head>
@@ -608,6 +673,25 @@ function buildFamilyPrintWindowHTML(item){
       </tr>
     </thead>
     <tbody>${studentsRows}</tbody>
+  </table>
+  <h3 style="margin:22px 0 8px">السجل المالي العائلي</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>الطالب</th>
+        <th>القسط</th>
+        <th>تاريخ الاستحقاق</th>
+        <th>المتوقع USD</th>
+        <th>العملة</th>
+        <th>المبلغ</th>
+        <th>المعادِل USD</th>
+        <th>سعر الصرف</th>
+        <th>المستلم</th>
+        <th>الحالة</th>
+      </tr>
+    </thead>
+    <tbody>${familyPaymentRowsHtml}</tbody>
   </table>
   ${studentSections}
   <div class="sign-grid">
