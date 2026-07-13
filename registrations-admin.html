@@ -262,6 +262,7 @@ function groupFamilies(familiesRows, studentsRows, finance, submissionsMap){
       finance_received_at: row.finance_received_at || null,
       payment_receivers_text: paymentReceiverSummary(paymentEntries),
       forms_submission_status: submission ? String(submission.status || '') : '',
+      family_attachment_obj: (row.family_attachment && row.family_attachment.object_path ? row.family_attachment : ((submission && submission.submission_values && submission.submission_values.documents && submission.submission_values.documents.family_attachment && submission.submission_values.documents.family_attachment.object_path) ? submission.submission_values.documents.family_attachment : (submission && submission.uploaded_attachment && submission.uploaded_attachment.object_path ? submission.uploaded_attachment : null))),
       submission_students: Array.isArray(submission && submission.submission_values && submission.submission_values.students) ? submission.submission_values.students : [],
       students: []
     });
@@ -303,8 +304,10 @@ function groupFamilies(familiesRows, studentsRows, finance, submissionsMap){
       finance_plan_start_date: row.finance_plan_start_date || null,
       submission_username: (submissionStudent && submissionStudent.student_username) || row.generated_username || '',
       submission_initial_password: (submissionStudent && submissionStudent.student_initial_password) || row.initial_password || '',
-      passport_attachment_name: (row.passport_attachment && row.passport_attachment.name) || (submissionStudent && submissionStudent.student_passport_attachment && submissionStudent.student_passport_attachment.name) || '',
-      academic_documents_name: (row.academic_documents_attachment && row.academic_documents_attachment.name) || (submissionStudent && submissionStudent.student_academic_documents && submissionStudent.student_academic_documents.name) || '',
+      passport_attachment: (row.passport_attachment && row.passport_attachment.object_path ? row.passport_attachment : (submissionStudent && submissionStudent.student_passport_attachment && submissionStudent.student_passport_attachment.object_path ? submissionStudent.student_passport_attachment : null)),
+      academic_documents_attachment: (row.academic_documents_attachment && row.academic_documents_attachment.object_path ? row.academic_documents_attachment : (submissionStudent && submissionStudent.student_academic_documents && submissionStudent.student_academic_documents.object_path ? submissionStudent.student_academic_documents : null)),
+      passport_attachment_name: (row.passport_attachment && row.passport_attachment.name) || (submissionStudent && submissionStudent.student_passport_attachment && submissionStudent.student_passport_attachment.file_name) || (submissionStudent && submissionStudent.student_passport_attachment && submissionStudent.student_passport_attachment.name) || '',
+      academic_documents_name: (row.academic_documents_attachment && row.academic_documents_attachment.name) || (submissionStudent && submissionStudent.student_academic_documents && submissionStudent.student_academic_documents.file_name) || (submissionStudent && submissionStudent.student_academic_documents && submissionStudent.student_academic_documents.name) || '',
       public_student_id: publicStudent ? publicStudent.id : null,
       finance_fee_id: fee ? fee.id : null,
       finance_status: fee ? String(fee.status || '') : '',
@@ -411,6 +414,12 @@ function renderFamilies(){
             + (st.academic_documents_name ? '<span class="reg-chip">سجل دراسي: '+esc(st.academic_documents_name)+'</span>' : '')
             + '</div>'
           : '')
+      + (((st.passport_attachment && st.passport_attachment.object_path) || (st.academic_documents_attachment && st.academic_documents_attachment.object_path))
+          ? '<div class="reg-inline-actions" style="margin-top:8px">'
+            + ((st.passport_attachment && st.passport_attachment.object_path) ? '<button class="btn small" type="button" onclick="openFormsV3StoredAttachment('+jse(st.passport_attachment.bucket || 'forms-v3-uploads')+', '+jse(st.passport_attachment.object_path)+', '+jse(st.passport_attachment.file_name || st.passport_attachment_name || 'passport')+')">فتح الجواز</button>' : '')
+            + ((st.academic_documents_attachment && st.academic_documents_attachment.object_path) ? '<button class="btn small" type="button" onclick="openFormsV3StoredAttachment('+jse(st.academic_documents_attachment.bucket || 'forms-v3-uploads')+', '+jse(st.academic_documents_attachment.object_path)+', '+jse(st.academic_documents_attachment.file_name || st.academic_documents_name || 'academic-docs')+')">فتح السجل الدراسي</button>' : '')
+            + '</div>'
+          : '')
       + financeBadges
       + financeActions + '</li>';
     }).join('');
@@ -427,6 +436,11 @@ function renderFamilies(){
       + '<div class="request-meta-line"><b>مقدم طلب التسجيل:</b> <span>'+esc(item.applicant_name || '—')+' — '+esc(applicantRelationText)+'</span></div>'
       + '<div class="request-meta-line"><b>مستلم الدفعات / المحاسب:</b> <span>'+esc(financeReceiverText)+'</span></div>'
       + '<div class="request-meta-line"><b>المراجع الإداري:</b> <span>'+esc(adminReviewText)+'</span></div>'
+      + '<div class="request-meta-line"><b>المرفق العائلي:</b> <span>'+esc((item.family_attachment_obj && (item.family_attachment_obj.file_name || item.family_attachment_obj.name)) || '—')+'</span>'
+      + ((item.family_attachment_obj && item.family_attachment_obj.object_path)
+          ? ' <button class="btn small" type="button" onclick="openFormsV3StoredAttachment('+jse(item.family_attachment_obj.bucket || 'forms-v3-uploads')+', '+jse(item.family_attachment_obj.object_path)+', '+jse(item.family_attachment_obj.file_name || item.family_attachment_obj.name || 'family-attachment')+')">فتح المرفق</button>'
+          : '')
+      + '</div>'
       + '<div class="request-meta-line"><b>ملاحظات الأسرة:</b> <span>'+esc(item.general_family_health_notes || '—')+'</span></div>'
       + '<div class="request-meta-line"><b>ملاحظات الوثائق:</b> <span>'+esc(item.document_notes || '—')+'</span></div>'
       + '<ul class="request-list">'+students+'</ul>'
@@ -794,6 +808,39 @@ async function openFinanceForRegistrationStudent(registrationStudentId, mode){
   location.href = 'finance-pro.html?lite=1&studentId=' + encodeURIComponent(target.id) + '&mode=' + encodeURIComponent(mode || 'students');
 }
 
+
+async function openFormsV3StoredAttachment(bucket, objectPath, fileName){
+  if(!bucket || !objectPath){
+    toast('المرفق غير متاح','لا يوجد مسار صالح لهذا المرفق حالياً.');
+    return;
+  }
+  try{
+    const {data,error} = await sb.storage.from(bucket).createSignedUrl(objectPath, 3600);
+    if(error) throw error;
+    const signedUrl = data && data.signedUrl;
+    if(!signedUrl) throw new Error('signed_url_missing');
+    const link = document.createElement('a');
+    link.href = signedUrl;
+    link.target = '_blank';
+    link.rel = 'noopener';
+    if(fileName) link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  }catch(error){
+    const msg = String(error && error.message || error || '');
+    if(msg.includes('Object not found')){
+      toast('المرفق غير موجود','قد يكون هذا الطلب قديماً أو لم يُرفع الملف فعلياً بعد.');
+      return;
+    }
+    if(msg.includes('new row violates') || msg.includes('permission') || msg.includes('not allowed')){
+      toast('يلزم تحديث SQL', 'شغّل ملف sql/archive/169_forms_v3_uploads_admin_storage_read.sql ثم أعد المحاولة.');
+      return;
+    }
+    toast('تعذر فتح المرفق', msg || 'تعذر إنشاء رابط مؤقت للمرفق.');
+  }
+}
+
 async function openCreditTransferForRegistrationStudent(registrationStudentId){
   const allStudents = familyGroups.flatMap(group => group.students || []);
   const regStudent = allStudents.find(student => String(student.registration_student_id) === String(registrationStudentId));
@@ -818,7 +865,7 @@ async function loadAll(){
     sb.from('student_fees').select('id,student_id,net_amount,total_paid,credit_balance,status,updated_at,created_at').order('updated_at',{ascending:false}),
     sb.from('student_installments').select('student_fee_id,amount_due,amount_paid,due_date,status'),
     sb.from('finance_credit_transfers').select('id,from_student_fee_id,to_student_fee_id,created_at'),
-    sb.from('forms_v3_submissions').select('submission_ref,submission_values,status,review_note,updated_at').eq('form_slug','family-registration-v3').order('created_at',{ascending:false})
+    sb.from('forms_v3_submissions').select('submission_ref,submission_values,uploaded_attachment,status,review_note,updated_at').eq('form_slug','family-registration-v3').order('created_at',{ascending:false})
   ]);
   financeContext = {
     publicStudents: publicStudentsRes.error ? [] : (publicStudentsRes.data || []),
@@ -874,6 +921,7 @@ window.resetFilters = resetFilters;
 window.applyQuickFilter = applyQuickFilter;
 window.openFinanceForRegistrationStudent = openFinanceForRegistrationStudent;
 window.openCreditTransferForRegistrationStudent = openCreditTransferForRegistrationStudent;
+window.openFormsV3StoredAttachment = openFormsV3StoredAttachment;
 window.stampFamilyOperator = stampFamilyOperator;
 window.printFamilyAdminPacket = printFamilyAdminPacket;
 </script>

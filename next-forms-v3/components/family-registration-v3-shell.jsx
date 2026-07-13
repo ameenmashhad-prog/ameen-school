@@ -582,6 +582,10 @@ function sumPaymentRows(rows) {
   return (rows || []).reduce((sum, row) => sum + (Number(row.amount || 0) || 0), 0);
 }
 
+function studentFileKey(studentId, fieldId) {
+  return `${studentId}:${fieldId}`;
+}
+
 function validateValues(template, values, labels, options = {}) {
   const fieldErrors = {};
   const studentErrors = {};
@@ -1581,7 +1585,7 @@ export default function FamilyRegistrationV3Shell({ locale, dictionary, initialS
   const [uploadTicket, setUploadTicket] = useState(null);
   const [uploadedAttachment, setUploadedAttachment] = useState(null);
   const [uploadState, setUploadState] = useState('idle');
-  const [fileObjects, setFileObjects] = useState({ family_attachment: null });
+  const [fileObjects, setFileObjects] = useState({ family_attachment: null, studentFiles: {} });
   const [actionFlash, setActionFlash] = useState('');
   const [financeCatalog, setFinanceCatalog] = useState([]);
   const [financeCatalogState, setFinanceCatalogState] = useState('loading');
@@ -1833,7 +1837,16 @@ export default function FamilyRegistrationV3Shell({ locale, dictionary, initialS
           let normalizedValue = value;
 
           const studentFieldDefinition = fieldById.get(fieldId);
-          if (studentFieldDefinition?.type === 'file') normalizedValue = value?.rawFile ? sanitizeFileMeta(value.rawFile) : null;
+          if (studentFieldDefinition?.type === 'file') {
+            setFileObjects((files) => ({
+              ...files,
+              studentFiles: {
+                ...(files.studentFiles || {}),
+                [studentFileKey(studentId, fieldId)]: value?.rawFile || null
+              }
+            }));
+            normalizedValue = value?.rawFile ? sanitizeFileMeta(value.rawFile) : null;
+          }
           if (fieldId === 'student_father_name') updated._meta.fatherManual = !options.forceInherited && String(normalizedValue || '').trim() !== String(current.guardian_given_name || '').trim();
           if (fieldId === 'student_family_name') updated._meta.familyManual = !options.forceInherited && String(normalizedValue || '').trim() !== String(current.family_name || '').trim();
           if (fieldId === 'student_full_name') updated._meta.fullNameManual = !options.forceAutoFullName;
@@ -1918,7 +1931,7 @@ export default function FamilyRegistrationV3Shell({ locale, dictionary, initialS
     setReceipt(null);
     setUploadTicket(null);
     setUploadedAttachment(null);
-    setFileObjects({ family_attachment: null });
+    setFileObjects({ family_attachment: null, studentFiles: {} });
     setUploadState('idle');
     persistLocal(next, null, null, null);
     setSubmitState('idle');
@@ -1980,6 +1993,36 @@ export default function FamilyRegistrationV3Shell({ locale, dictionary, initialS
     }
   }
 
+  async function requestAndUploadAttachment({ fieldId, fileMeta, rawFile }) {
+    if (!fileMeta?.name || !rawFile) return null;
+    const ticketResult = await requestUploadTicketRpc({
+      form_slug: template.slug,
+      locale: activeLocale,
+      field_id: fieldId,
+      file_name: fileMeta.name,
+      content_type: fileMeta.type || 'application/octet-stream',
+      byte_size: fileMeta.size || 0
+    });
+    if (ticketResult?.ok === false) throw new Error(ticketResult.error || `upload_ticket_failed_${fieldId}`);
+    const ticketPayload = ticketResult?.data || ticketResult;
+    const ticketId = ticketPayload?.ticket_id || ticketPayload?.ticketId || ticketPayload?.upload_token;
+    if (!ticketId) throw new Error(`upload_ticket_missing_${fieldId}`);
+    const uploadResult = await uploadAttachmentTransport({
+      ticketId,
+      formSlug: template.slug,
+      fieldId,
+      file: rawFile
+    });
+    if (uploadResult?.ok === false) throw new Error(uploadResult.error || `upload_failed_${fieldId}`);
+    return {
+      bucket: uploadResult.bucket,
+      object_path: uploadResult.object_path,
+      file_name: uploadResult.file_name,
+      content_type: uploadResult.content_type,
+      byte_size: uploadResult.byte_size
+    };
+  }
+
   function goToFinanceStep() {
     const validation = validateValues(template, values, labels, { includeSections: ['guardian', 'mother', 'students', 'family_context', 'documents'] });
     setFieldErrors(validation.fieldErrors);
@@ -1996,7 +2039,7 @@ export default function FamilyRegistrationV3Shell({ locale, dictionary, initialS
   }
 
   async function submitForm() {
-    const validation = validateValues(template, values, labels, { requirePreparedUpload: Boolean(values.family_attachment?.name && !uploadTicket) });
+    const validation = validateValues(template, values, labels);
     setFieldErrors(validation.fieldErrors);
     setStudentErrors(validation.studentErrors);
     setGlobalErrors(validation.globalErrors);
@@ -2012,31 +2055,52 @@ export default function FamilyRegistrationV3Shell({ locale, dictionary, initialS
     try {
       let attachmentPayload = uploadedAttachment;
 
-      if (values.family_attachment?.name) {
-        if (!uploadTicket?.ticketId) {
-          setFieldErrors((current) => ({ ...current, family_attachment: labels.uploadTicketRequired }));
+      if (values.family_attachment?.name && !attachmentPayload) {
+        const rawFile = fileObjects.family_attachment;
+        if (!rawFile) {
+          setFieldErrors((current) => ({ ...current, family_attachment: labels.fileNeedsReselect }));
           setSubmitState('validation_error');
           return;
         }
 
-        if (!attachmentPayload) {
-          const rawFile = fileObjects.family_attachment;
-          if (!rawFile) {
-            setFieldErrors((current) => ({ ...current, family_attachment: labels.fileNeedsReselect }));
-            setSubmitState('validation_error');
-            return;
-          }
-
-          setUploadState('uploading');
-          const uploadResult = await uploadAttachmentTransport({ ticketId: uploadTicket.ticketId, formSlug: template.slug, fieldId: 'family_attachment', file: rawFile });
-          if (uploadResult?.ok === false) throw new Error(uploadResult.error || 'upload_failed');
-          attachmentPayload = uploadResult;
-          setUploadedAttachment(uploadResult);
-          setUploadState('uploaded');
-        }
+        setUploadState('uploading');
+        attachmentPayload = await requestAndUploadAttachment({
+          fieldId: 'family_attachment',
+          fileMeta: values.family_attachment,
+          rawFile
+        });
+        setUploadedAttachment(attachmentPayload);
+        setUploadState('uploaded');
       }
 
-      const normalizedStudents = sanitizeStudentsForSubmit(values.students, financeCatalogMap);
+      const normalizedStudents = sanitizeStudentsForSubmit(values.students, financeCatalogMap).map((student) => {
+        const passportRawFile = fileObjects.studentFiles?.[studentFileKey(student.id, 'student_passport_attachment')] || null;
+        const academicRawFile = fileObjects.studentFiles?.[studentFileKey(student.id, 'student_academic_documents')] || null;
+        return {
+          ...student,
+          _passport_raw_file: passportRawFile,
+          _academic_raw_file: academicRawFile
+        };
+      });
+
+      for (const student of normalizedStudents) {
+        if (student.student_passport_attachment?.name && student._passport_raw_file) {
+          student.student_passport_attachment = await requestAndUploadAttachment({
+            fieldId: `student_passport_attachment_${student.id}`,
+            fileMeta: student.student_passport_attachment,
+            rawFile: student._passport_raw_file
+          });
+        }
+        if (student.student_academic_documents?.name && student._academic_raw_file) {
+          student.student_academic_documents = await requestAndUploadAttachment({
+            fieldId: `student_academic_documents_${student.id}`,
+            fileMeta: student.student_academic_documents,
+            rawFile: student._academic_raw_file
+          });
+        }
+        delete student._passport_raw_file;
+        delete student._academic_raw_file;
+      }
       const payloadValues = {
         guardian_name: guardianFullName,
         guardian_full_name: guardianFullName,
