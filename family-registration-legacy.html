@@ -24,7 +24,7 @@
     </header>
 
     <section class="reg-hero no-print">
-      <div class="reg-title"><h2>تسجيل أولياء الأمور والطلاب</h2><p>استمارة العام الدراسي 2026-2027 مع توليد تلقائي لاسم المستخدم وكلمة المرور الأولية بحسب البيانات المدخلة.</p></div>
+      <div class="reg-title"><h2>تسجيل أولياء الأمور والطلاب</h2><p>استمارة العام الدراسي 2026-2027 مع توليد اسم المستخدم، بينما تُنشأ كلمة مرور عشوائية عند التفعيل الإداري.</p></div>
       <aside class="reg-side"><div class="steps"><div class="step"><b>1</b><span>بيانات ولي الأمر والأم</span></div><div class="step"><b>2</b><span>بيانات الطلاب</span></div><div class="step"><b>3</b><span>الإرسال والطباعة</span></div></div></aside>
     </section>
 
@@ -51,9 +51,9 @@
 
     <section class="reg-mini-grid no-print">
       <div class="info-card"><h4>هواتف التواصل</h4><p>يفضّل إدخال هاتف أساسي واضح مع واتساب لتسريع المتابعة والاعتماد.</p></div>
-      <div class="info-card"><h4>تواريخ الميلاد والجوازات</h4><p>أدخلي التواريخ بعناية لأن كلمة المرور الأولية تُبنى منها وتُستخدم أيضاً في التحقق الإداري.</p></div>
+      <div class="info-card"><h4>تواريخ الميلاد والجوازات</h4><p>أدخلي التواريخ بعناية للتحقق الإداري فقط؛ لا تُستخدم تواريخ الميلاد ككلمات مرور.</p></div>
       <div class="info-card"><h4>الصفوف والشعب المطلوبة</h4><p>اختيار الصف الصحيح لكل طالب من البداية يخفف التعديل اللاحق على الإدارة.</p></div>
-      <div class="info-card"><h4>اسم المستخدم وكلمة المرور</h4><p>يُولَّدان تلقائياً من البيانات ويمكن تعديل اسم المستخدم لاحقاً من الإدارة إذا لزم.</p></div>
+      <div class="info-card"><h4>اسم المستخدم وكلمة المرور</h4><p>يُقترح اسم المستخدم من البيانات، وتُنشأ كلمة المرور المؤقتة عشوائياً عند التفعيل وتظهر للإدارة مرة واحدة.</p></div>
     </section>
 
     <section class="reg-subnav no-print">
@@ -80,7 +80,7 @@
             <div class="field col-4"><label>اسم الأب *</label><input id="guardianFather" class="input" required></div>
             <div class="field col-4"><label>اسم العائلة *</label><input id="familyName" class="input" required></div>
             <div class="field col-4"><label>اسم المستخدم المقترح</label><input id="guardianUsername" class="input" dir="ltr"></div>
-            <div class="field col-4"><label>كلمة المرور = تاريخ الميلاد (يوم‌شهر‌سنة)</label><input id="guardianPassword" class="input" dir="ltr" readonly></div>
+            <div class="field col-4"><label>بيانات الدخول</label><input id="guardianPassword" class="input" value="تُنشأ عند التفعيل الإداري" readonly disabled></div>
             <div class="field col-4"><label>رقم جواز السفر</label><input id="guardianPassport" class="input"></div>
 
             <div class="field col-6"><label>تاريخ ميلاد ولي الأمر *</label><div class="date-box tri-date" id="guardianBirthBox" data-name="guardian_birth_date"><div class="date-row"><select class="select tri-mode"><option value="gregorian">ميلادي</option><option value="hijri">هجري</option><option value="persian">شمسي</option></select><input class="input tri-y" inputmode="numeric" placeholder="السنة"><input class="input tri-m" inputmode="numeric" placeholder="الشهر"><input class="input tri-d" inputmode="numeric" placeholder="اليوم"></div><input type="hidden" class="tri-iso" name="guardian_birth_date" required><div class="date-summary"><span class="badge blue tri-g">ميلادي —</span><span class="badge gold tri-h">هجري —</span><span class="badge green tri-p">شمسي —</span><span class="badge tri-age">العمر —</span></div></div></div>

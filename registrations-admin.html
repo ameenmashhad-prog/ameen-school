@@ -122,6 +122,17 @@
   </div>
 </main>
 <div id="toast" class="toast"></div>
+<dialog id="activationCredentialsDialog" style="max-width:760px;width:calc(100% - 32px);border:0;border-radius:24px;padding:0;box-shadow:0 24px 80px rgba(15,23,42,.35)">
+  <section style="padding:24px;background:#fff" dir="rtl">
+    <h2 style="margin:0 0 8px">بيانات دخول مؤقتة — عرض لمرة واحدة</h2>
+    <p class="muted" style="line-height:1.8">انسخ البيانات وسلّمها عبر قناة آمنة. لا تُطبع في ملف التسجيل ولا تُحفظ في الصفحة بعد إغلاق النافذة.</p>
+    <pre id="activationCredentialsText" style="direction:ltr;text-align:left;white-space:pre-wrap;overflow:auto;background:#0f172a;color:#e2e8f0;border-radius:16px;padding:16px;line-height:1.8"></pre>
+    <div class="reg-inline-actions" style="margin-top:16px">
+      <button class="btn blue" type="button" onclick="copyActivationCredentials()">نسخ البيانات</button>
+      <button class="btn" type="button" onclick="closeActivationCredentials()">إغلاق ومسح</button>
+    </div>
+  </section>
+</dialog>
 
 <script src="libs/supabase.min.js"></script>
 <script src="assets/config.js?v=20260710-2"></script>
@@ -148,6 +159,38 @@ function toast(title,msg){
 }
 function progressItem(cls,icon,title,detail){
   return '<li class="reg-check-item '+cls+'"><span class="reg-check-icon">'+esc(icon)+'</span><div><b>'+esc(title)+'</b><small>'+esc(detail)+'</small></div></li>';
+}
+function showActivationCredentials(credentials){
+  const rows = Array.isArray(credentials) ? credentials : [];
+  if(!rows.length) return;
+  const roleLabel = {parent:'ولي الأمر',student:'الطالب',teacher:'المعلم'};
+  const text = rows.map((item,index)=>[
+    '# '+(index+1)+' — '+(roleLabel[item.role]||item.role||'حساب'),
+    'Name: '+(item.name||'—'),
+    'Login: '+(item.login||'—'),
+    'Temporary password: '+(item.temporary_password||'—')
+  ].join('\n')).join('\n\n');
+  const box = $('#activationCredentialsText');
+  const dialog = $('#activationCredentialsDialog');
+  if(!box || !dialog) return;
+  box.textContent = text;
+  dialog.showModal();
+}
+async function copyActivationCredentials(){
+  const text = $('#activationCredentialsText')?.textContent || '';
+  if(!text) return;
+  try{
+    await navigator.clipboard.writeText(text);
+    toast('تم النسخ','احفظ البيانات مؤقتاً وسلّمها عبر قناة آمنة.');
+  }catch(_error){
+    toast('تعذر النسخ','حدد النص وانسخه يدوياً.');
+  }
+}
+function closeActivationCredentials(){
+  const box = $('#activationCredentialsText');
+  const dialog = $('#activationCredentialsDialog');
+  if(box) box.textContent = '';
+  if(dialog?.open) dialog.close();
 }
 
 const state = { query:'', status:'all', scope:'all', lastLoadedAt:null };
@@ -303,7 +346,6 @@ function groupFamilies(familiesRows, studentsRows, finance, submissionsMap){
       finance_installments_count: row.finance_installments_count || 0,
       finance_plan_start_date: row.finance_plan_start_date || null,
       submission_username: (submissionStudent && submissionStudent.student_username) || row.generated_username || '',
-      submission_initial_password: (submissionStudent && submissionStudent.student_initial_password) || row.initial_password || '',
       passport_attachment: (row.passport_attachment && row.passport_attachment.object_path ? row.passport_attachment : (submissionStudent && submissionStudent.student_passport_attachment && submissionStudent.student_passport_attachment.object_path ? submissionStudent.student_passport_attachment : null)),
       academic_documents_attachment: (row.academic_documents_attachment && row.academic_documents_attachment.object_path ? row.academic_documents_attachment : (submissionStudent && submissionStudent.student_academic_documents && submissionStudent.student_academic_documents.object_path ? submissionStudent.student_academic_documents : null)),
       passport_attachment_name: (row.passport_attachment && row.passport_attachment.name) || (submissionStudent && submissionStudent.student_passport_attachment && submissionStudent.student_passport_attachment.file_name) || (submissionStudent && submissionStudent.student_passport_attachment && submissionStudent.student_passport_attachment.name) || '',
@@ -525,7 +567,6 @@ function buildFamilyPrintWindowHTML(item){
       <td>${esc(st.class_name || '—')}</td>
       <td>${esc(st.section || '—')}</td>
       <td>${esc(st.submission_username || '—')}</td>
-      <td>${esc(st.submission_initial_password || '—')}</td>
     </tr>
   `).join('');
   const studentSections = (item.students || []).map((st, index) => {
@@ -565,7 +606,7 @@ function buildFamilyPrintWindowHTML(item){
         </div>
         <div class="meta-grid">
           <div class="meta-box"><b>اسم المستخدم</b><span>${esc(st.submission_username || '—')}</span></div>
-          <div class="meta-box"><b>كلمة المرور المرجعية</b><span>${esc(st.submission_initial_password || '—')}</span></div>
+          <div class="meta-box"><b>بيانات الدخول</b><span>تُنشأ عند التفعيل وتُعرض مرة واحدة فقط</span></div>
           <div class="meta-box"><b>الخطة</b><span>${esc(st.finance_plan_type || '—')}</span></div>
           <div class="meta-box"><b>عدد الأقساط</b><span>${esc(st.finance_installments_count || '—')}</span></div>
           <div class="meta-box"><b>الرسوم السنوية</b><span>${familyPrintMoney(st.annual_fee_snapshot || 0)} USD</span></div>
@@ -669,7 +710,6 @@ function buildFamilyPrintWindowHTML(item){
         <th>الصف</th>
         <th>الشعبة</th>
         <th>اسم المستخدم</th>
-        <th>كلمة المرور المرجعية</th>
       </tr>
     </thead>
     <tbody>${studentsRows}</tbody>
@@ -850,42 +890,25 @@ async function stampFamilyOperator(familyId, mode){
 }
 async function activateAccount(type,id){
   toast('جاري تفعيل الحساب...', 'يرجى الانتظار');
-  let data = null;
-  let error = null;
-
-  const primary = await sb.rpc('activate_registered_user_rpc',{p_reg_type:type,p_reg_id:id});
-  data = primary.data;
-  error = primary.error;
+  const {data,error} = await sb.rpc('activate_registered_user_rpc',{p_reg_type:type,p_reg_id:id});
 
   if(error){
     const msg = String(error.message || '');
-    const isMissingWrapper = msg.includes('activate_registered_user_rpc');
-    const isOldAmbiguous = msg.includes('Could not choose the best candidate function') || msg.includes('PGRST203');
-
-    if(isMissingWrapper || isOldAmbiguous){
-      toast('يلزم تحديث SQL', 'شغّل الملف sql/archive/142_fix_activate_registered_user_rpc_ambiguity.sql ثم أعد المحاولة');
+    if(msg.includes('activate_registered_user_rpc') || msg.includes('PGRST203')){
+      toast('يلزم تحديث الأمان', 'شغّل الملف sql/archive/170_critical_registration_and_forms_security_lockdown.sql ثم أعد المحاولة.');
       return;
     }
-
-    const fallback = await sb.rpc('activate_registered_user',{p_reg_type:type,p_reg_id:id});
-    data = fallback.data;
-    error = fallback.error;
-  }
-
-  if(error){
-    const msg = String(error.message || '');
-    if(msg.includes('null value in column "name" of relation "students"') || (msg.includes('relation "students"') && msg.includes('column "name"'))){
-      toast('يلزم تحديث SQL', 'شغّل الملف sql/archive/143_fix_registration_family_activation_students_name.sql ثم أعد المحاولة');
-      return;
-    }
-    toast('خطأ في التفعيل', error.message);
+    toast('خطأ في التفعيل', msg || 'تعذر تفعيل الحساب');
     return;
   }
-  if(data && !data.ok){
-    toast('فشل التفعيل', data.error || 'حدث خطأ غير معروف');
+  if(!data || !data.ok){
+    const reason = data?.error || 'حدث خطأ غير معروف';
+    toast(reason.includes('forbidden') ? 'غير مصرح' : 'فشل التفعيل', reason);
     return;
   }
-  toast('تم التفعيل بنجاح', (data && data.message) || 'تم إنشاء الحساب في Auth و users');
+
+  toast('تم التفعيل بنجاح', data.message || 'تم إنشاء الحساب وتأمين كلمة المرور المؤقتة.');
+  showActivationCredentials(data.credentials || []);
   await loadAll();
 }
 async function openFinanceForRegistrationStudent(registrationStudentId, mode){
@@ -951,9 +974,9 @@ async function loadAll(){
   $('#familiesBox').innerHTML = '<div class="reg-empty"><b>جاري تحميل طلبات الأسر والطلاب...</b><p>لحظات وسيتم تحديث القائمة.</p></div>';
   $('#teachersBox').innerHTML = '<div class="reg-empty"><b>جاري تحميل طلبات المعلمين...</b><p>لحظات وسيتم تحديث القائمة.</p></div>';
   const [familiesRes, studentsRes, teachersRes, publicStudentsRes, feeRes, installmentRes, transferRes, submissionsRes] = await Promise.all([
-    sb.from('registration_families').select('*').order('created_at',{ascending:false}),
-    sb.from('registration_students').select('*').order('created_at',{ascending:false}),
-    sb.from('registration_teachers').select('*').order('created_at',{ascending:false}),
+    sb.from('registration_families').select('id,guardian_name,phone_primary,status,created_at,family_name,forms_v3_submission_ref,finance_payment_entries,general_family_health_notes,document_notes,applicant_relation,applicant_other_relation,applicant_name,accountant_receiver_name,admin_reviewer_name,admin_reviewer_id,admin_reviewed_at,finance_receiver_name,finance_receiver_id,finance_received_at,family_attachment').order('created_at',{ascending:false}),
+    sb.from('registration_students').select('id,family_id,student_name,class_id,student_class_label,section,annual_fee_snapshot,monthly_fee_snapshot,finance_plan_type,finance_installments_count,finance_plan_start_date,generated_username,passport_attachment,academic_documents_attachment,status,created_at').order('created_at',{ascending:false}),
+    sb.from('registration_teachers').select('id,full_name,phone,email,qualification,specialization,years_experience,status,created_at').order('created_at',{ascending:false}),
     sb.from('students').select('id,student_name,class_id,parent_id,created_at').order('created_at',{ascending:false}),
     sb.from('student_fees').select('id,student_id,net_amount,total_paid,credit_balance,status,updated_at,created_at').order('updated_at',{ascending:false}),
     sb.from('student_installments').select('student_fee_id,amount_due,amount_paid,due_date,status'),
@@ -1006,7 +1029,14 @@ function bindFilters(){
   $('#statusFilter').addEventListener('change',e=>{state.status = e.target.value; renderAll();});
   $('#scopeFilter').addEventListener('change',e=>{state.scope = e.target.value; renderAll();});
 }
-window.addEventListener('load',()=>{bindFilters(); loadAll();});
+window.addEventListener('load',()=>{
+  bindFilters();
+  $('#activationCredentialsDialog')?.addEventListener('close',()=>{
+    const box = $('#activationCredentialsText');
+    if(box) box.textContent = '';
+  });
+  loadAll();
+});
 window.setStatus = setStatus;
 window.activateAccount = activateAccount;
 window.loadAll = loadAll;
@@ -1017,6 +1047,8 @@ window.openCreditTransferForRegistrationStudent = openCreditTransferForRegistrat
 window.openFormsV3StoredAttachment = openFormsV3StoredAttachment;
 window.stampFamilyOperator = stampFamilyOperator;
 window.printFamilyAdminPacket = printFamilyAdminPacket;
+window.copyActivationCredentials = copyActivationCredentials;
+window.closeActivationCredentials = closeActivationCredentials;
 </script>
 <script src="assets/ux-enhancements.js?v=20260706-3"></script>
 <script src="assets/amin-theme-injector.js"></script>
