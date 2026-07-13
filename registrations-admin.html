@@ -474,6 +474,9 @@ function buildFamilyPrintWindowHTML(item){
   const familyTotal = item.students.reduce((sum, st)=>sum + Number(st.annual_fee_snapshot||0), 0);
   const familyPayments = (item.finance_payment_entries||[]).reduce((sum, row)=>sum + paymentUsdAmount(row), 0);
   const familyRemaining = Math.max(familyTotal - familyPayments, 0);
+  const familyAttachmentName = (item.family_attachment_obj && (item.family_attachment_obj.file_name || item.family_attachment_obj.name)) || '—';
+  const studentsWithPassport = (item.students || []).filter(st => st.passport_attachment_name).length;
+  const studentsWithAcademicDocs = (item.students || []).filter(st => st.academic_documents_name).length;
   const studentsRows = (item.students || []).map((st, index) => `
     <tr>
       <td>${index + 1}</td>
@@ -515,6 +518,7 @@ function buildFamilyPrintWindowHTML(item){
           <div class="meta-box"><b>المتبقي</b><span>${familyPrintMoney(st.finance_remaining || 0)} USD</span></div>
           <div class="meta-box wide"><b>مرفق الجواز</b><span>${esc(st.passport_attachment_name || '—')}</span></div>
           <div class="meta-box wide"><b>المرفقات الدراسية</b><span>${esc(st.academic_documents_name || '—')}</span></div>
+          <div class="meta-box wide"><b>حالة المرفقات</b><span>${esc(st.passport_attachment_name ? 'جواز مرفوع' : 'لا يوجد جواز مرفوع')} — ${esc(st.academic_documents_name ? 'سجل دراسي مرفوع' : 'لا يوجد سجل دراسي مرفوع')}</span></div>
         </div>
         <table>
           <thead>
@@ -585,8 +589,13 @@ function buildFamilyPrintWindowHTML(item){
     <div class="meta-box"><b>المراجع الإداري</b><span>${esc(item.admin_reviewer_name || '—')}</span></div>
     <div class="meta-box"><b>تاريخ المراجعة</b><span>${esc(item.admin_reviewed_at ? familyPrintDate(item.admin_reviewed_at) : '—')}</span></div>
     <div class="meta-box"><b>مستلم الدفعات / المحاسب</b><span>${esc(item.finance_receiver_name || item.accountant_receiver_name || item.payment_receivers_text || '—')}</span></div>
+    <div class="meta-box wide"><b>المرفق العائلي</b><span>${esc(familyAttachmentName)}</span></div>
+    <div class="meta-box"><b>طلاب لديهم جواز مرفوع</b><span>${esc(studentsWithPassport)}</span></div>
+    <div class="meta-box"><b>طلاب لديهم سجل دراسي مرفوع</b><span>${esc(studentsWithAcademicDocs)}</span></div>
+    <div class="meta-box"><b>الحالة الإلكترونية للمرفقات</b><span>${esc(familyAttachmentName !== '—' ? 'يوجد مرفق عائلي' : 'لا يوجد مرفق عائلي')}</span></div>
   </div>
   <div class="note">إجمالي متوقع: ${familyPrintMoney(familyTotal)} USD — مدخل حالياً: ${familyPrintMoney(familyPayments)} USD — متبقي: ${familyPrintMoney(familyRemaining)} USD</div>
+  <div class="note">هذه النسخة الإدارية تُظهر أسماء المرفقات المعتمدة للمراجعة الورقية، بينما فتح الملفات نفسها يتم من لوحة المراجعة الإلكترونية.</div>
   <table>
     <thead>
       <tr>
