@@ -1,0 +1,10 @@
+خطوات الرفع من موقع GitHub:
+1) افتح مستودع ameen-school على فرع main.
+2) اضغط Add file ثم Upload files.
+3) افتح هذا المجلد UPLOAD_TO_GITHUB على جهازك.
+4) حدد كل ما بداخله (لا تسحب المجلد الأب نفسه)، ثم اسحب الملفات والمجلدات إلى صفحة GitHub.
+5) تأكد أن المسارات ظاهرة مثل next-forms-v3/... و assets/... و sql/...
+6) اكتب: security: apply registration and Forms v3 lockdown 170
+7) اختر Commit directly to main ثم Commit changes.
+8) انتظر اكتمال Vercel Deployments.
+9) في مشروع next-forms-v3 على Vercel أضف FORMS_RATE_LIMIT_SECRET بقيمة عشوائية قوية.
