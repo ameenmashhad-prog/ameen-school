@@ -140,13 +140,6 @@ function normalizePhone(value) {
   return String(value || '').replace(/[^0-9+]/g, '');
 }
 
-function birthDatePasswordFromISO(iso) {
-  if (!iso || typeof iso !== 'string') return '';
-  const parts = iso.split('-');
-  if (parts.length !== 3) return '';
-  return `${parts[2]}${parts[1]}${parts[0]}`;
-}
-
 function planCountForType(planType, currentValue = 1) {
   const mapped = PLAN_COUNTS[planType];
   if (mapped == null) return Math.max(1, Number(currentValue) || 1);
@@ -324,7 +317,9 @@ function makeEmptyStudent(template, familyValues) {
   student.student_father_name = String(familyValues.guardian_given_name || '');
   student.student_family_name = String(familyValues.family_name || '');
   student.student_full_name = computeStudentFullName(student);
-  student.student_initial_password = '';
+  // Credentials are generated once by the protected admin activation RPC.
+  // Never derive or store a password from a student's birth date.
+  delete student.student_initial_password;
   student.finance_plan_type = 'monthly';
   student.finance_installments_count = '9';
   student.finance_plan_start_date = DEFAULT_PLAN_START_DATE;
@@ -396,7 +391,6 @@ function sanitizeStudentsForSubmit(students, financeCatalogMap = new Map()) {
       student_passport_attachment: sanitizeFileMeta(student.student_passport_attachment),
       student_academic_documents: sanitizeFileMeta(student.student_academic_documents),
       student_username: student.student_username,
-      student_initial_password: student.student_initial_password,
       finance_fee_structure_id: finance?.fee_structure_id || null,
       finance_currency: finance?.currency || 'USD',
       finance_academic_year: finance?.academic_year || '2026-2027',
@@ -472,7 +466,7 @@ function normalizeFamilyValues(template, values) {
     normalizedStudent.finance_plan_type = normalizedStudent.finance_plan_type || 'monthly';
     normalizedStudent.finance_installments_count = String(planCountForType(normalizedStudent.finance_plan_type, normalizedStudent.finance_installments_count || 1));
     normalizedStudent.finance_plan_start_date = normalizedStudent.finance_plan_start_date || DEFAULT_PLAN_START_DATE;
-    normalizedStudent.student_initial_password = birthDatePasswordFromISO(normalizedStudent.student_birth_date) || normalizedStudent.student_initial_password || '';
+    delete normalizedStudent.student_initial_password;
     return normalizedStudent;
   });
 
@@ -991,7 +985,7 @@ function StudentCard({ locale, labels, student, index, fieldById, financeCatalog
         <div className="flex flex-wrap gap-2">
           <StatusPill tone={autoFullName ? 'brand' : 'warning'}>{labels.cardComputedName}: {student.student_full_name || labels.emptyValue}</StatusPill>
           <StatusPill tone="slate">{labels.cardUsername}: {student.student_username || labels.emptyValue}</StatusPill>
-          <StatusPill tone="slate">{labels.cardPassword}: {student.student_initial_password || labels.emptyValue}</StatusPill>
+          <StatusPill tone="slate">{labels.cardPassword}: {labels.generatedAtActivation}</StatusPill>
           <StatusPill tone="success">{fieldById.get('student_grade')?.label?.[locale]}: {selectedGrade}</StatusPill>
         </div>
       </div>
@@ -1051,7 +1045,6 @@ function StudentCard({ locale, labels, student, index, fieldById, financeCatalog
         })}
 
         <InputField field={fieldById.get('student_username')} locale={locale} value={student.student_username} error={studentErrors?.student_username} onChange={(fieldId, value) => onFieldChange(student.id, fieldId, value)} labels={labels} />
-        <InputField field={fieldById.get('student_initial_password')} locale={locale} value={student.student_initial_password} error={studentErrors?.student_initial_password} onChange={(fieldId, value) => onFieldChange(student.id, fieldId, value)} labels={labels} />
       </div>
     </div>
   );
@@ -1418,7 +1411,7 @@ function PrintableFamilyRegistration({ locale, labels, template, values, totalAm
                     <PrintField label={familyField('guardian_phone_whatsapp')?.label?.[locale]} value={values.guardian_phone_whatsapp} />
                     <PrintField label={familyField('mother_given_name')?.label?.[locale]} value={motherFullName} />
                     <PrintField label={studentField('student_username')?.label?.[locale]} value={student.student_username} />
-                    <PrintField label={studentField('student_initial_password')?.label?.[locale]} value={student.student_initial_password} />
+                    <PrintField label={studentField('student_initial_password')?.label?.[locale]} value={labels.generatedAtActivation} />
                   </div>
                 </PrintSectionBlock>
               </div>
@@ -1592,6 +1585,12 @@ export default function FamilyRegistrationV3Shell({ locale, dictionary, initialS
   const [currentStep, setCurrentStep] = useState(initialStep);
 
   const meta = localeMeta[activeLocale] || localeMeta.ar;
+  // Must be initialized before the effects that reference it. Keeping this below
+  // those effects caused a production-only TDZ crash in the browser.
+  const financeCatalogMap = useMemo(
+    () => new Map(financeCatalog.map((item) => [String(item.class_id), item])),
+    [financeCatalog]
+  );
 
   useEffect(() => {
     const remembered = window.localStorage.getItem(LOCAL_LANGUAGE_KEY);
@@ -1699,7 +1698,6 @@ export default function FamilyRegistrationV3Shell({ locale, dictionary, initialS
   const requiredDone = useMemo(() => countRequiredDone(template, values), [template, values]);
   const requiredTotal = useMemo(() => countRequiredTotal(template, values), [template, values]);
   const totalAmount = useMemo(() => totalPayments(values.payment_entries || []), [values.payment_entries]);
-  const financeCatalogMap = useMemo(() => new Map(financeCatalog.map((item) => [String(item.class_id), item])), [financeCatalog]);
   const expectedFamilyFeeTotal = useMemo(() => values.students.reduce((sum, student) => sum + Number(financeCatalogMap.get(String(student.student_grade || ''))?.annual_fee || 0), 0), [values.students, financeCatalogMap]);
   const remainingProjected = Math.max(expectedFamilyFeeTotal - totalAmount, 0);
   const guardianFullName = useMemo(() => computeGuardianFullName(values), [values]);
@@ -1788,7 +1786,6 @@ export default function FamilyRegistrationV3Shell({ locale, dictionary, initialS
         student_passport_expiry_date: '',
         student_photo: null,
         student_username: '',
-        student_initial_password: '',
         _meta: { ...source._meta, fullNameManual: false, usernameManual: false }
       };
       const next = { ...current, students: [...current.students, duplicate] };

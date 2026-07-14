@@ -15,8 +15,9 @@ const tgju = read('api/exchange-tgju.js');
 assert(!/Access-Control-Allow-Origin['"],\s*['"]\*/.test(tgju), 'TGJU endpoint must not use wildcard CORS');
 
 const registration = read('assets/registration.js');
-assert(!registration.includes('${d}${m}${y}'), 'registration passwords must not be date based');
-assert(registration.includes('randomTempPassword'), 'registration must generate random temp passwords');
+assert(!registration.includes('birthDatePasswordFromISO'), 'registration passwords must not be date based');
+assert(!registration.includes('randomTempPassword'), 'public registration must not generate or retain passwords');
+assert(registration.includes('initial_password:null'), 'credentials must be created only by protected admin activation');
 
 const counselor = read('assets/counselor.js');
 assert(!/localStorage\.setItem\(['"]counselor_lock_pin['"]/.test(counselor), 'counselor PIN must not be stored plaintext');

@@ -50,6 +50,8 @@ export async function GET() {
       ok: true,
       items,
       updated_at: new Date().toISOString()
+    }, {
+      headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600' }
     });
   } catch (error) {
     return NextResponse.json({ ok: false, error: error.message || 'finance_catalog_failed' }, { status: 500 });

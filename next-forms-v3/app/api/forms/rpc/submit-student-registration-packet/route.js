@@ -1,8 +1,10 @@
-import { NextResponse } from 'next/server';
-import { callFormRpc } from '@/lib/rpc/server-rpc';
+import { handlePublicRpc } from '@/lib/security/forms-api-security';
 
 export async function POST(request) {
-  const payload = await request.json();
-  const data = await callFormRpc('forms_submit_student_registration_packet_v3', payload);
-  return NextResponse.json(data);
+  return handlePublicRpc(request, 'forms_submit_student_registration_packet_v3', {
+    action: 'submit-student-registration-packet',
+    limit: 5,
+    windowSeconds: 600,
+    maxBytes: 2097152
+  });
 }

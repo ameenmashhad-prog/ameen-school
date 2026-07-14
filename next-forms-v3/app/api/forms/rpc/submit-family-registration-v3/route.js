@@ -1,8 +1,10 @@
-import { NextResponse } from 'next/server';
-import { callFormRpc } from '@/lib/rpc/server-rpc';
+import { handlePublicRpc } from '@/lib/security/forms-api-security';
 
 export async function POST(request) {
-  const payload = await request.json();
-  const data = await callFormRpc('forms_submit_family_registration_v3', payload);
-  return NextResponse.json(data);
+  return handlePublicRpc(request, 'forms_submit_family_registration_v3', {
+    action: 'submit-family-registration-v3',
+    limit: 5,
+    windowSeconds: 600,
+    maxBytes: 2097152
+  });
 }

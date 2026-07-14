@@ -848,6 +848,7 @@
     "financeStepIntroDescription": "After finishing the family and student details, review class fees, installment plans, and payments here before submission and printing.",
     "paymentDynamicHint": "This table is generated automatically from the installment count and plan start date. You can edit the expected due date, payment method, currency, exchange rate, receiver name, and references.",
     "paymentReceiverRequired": "Receiver name is required for payment row",
-    "paymentExchangeRateRequired": "Exchange rate is required for IRR payment row"
+    "paymentExchangeRateRequired": "Exchange rate is required for IRR payment row",
+    "generatedAtActivation": "Created once during admin activation"
   }
 }

@@ -349,27 +349,5 @@ grant execute on function public.activate_registered_user(uuid, text) to authent
 -- إعادة تحميل كاش المخطط في PostgREST فوراً حتى يرى الواجهة الأمامية الدالة بدون تأخير
 NOTIFY pgrst, 'reload schema';
 
--- ============================================================================
--- التفعيل الفوري لمعلم التجربة (سليمان معروف slyman) وضمان كلمة المرور 08031989
--- ============================================================================
-do $$
-declare
-  v_slyman_id uuid;
-  v_res jsonb;
-begin
-  select id into v_slyman_id from public.registration_teachers
-  where lower(generated_username) = 'slyman' or id = '31468aba-8340-47fd-b4b0-a1c9ddf0f73e' limit 1;
-  
-  if v_slyman_id is not null then
-    v_res := public.activate_registered_user('teacher', v_slyman_id);
-    
-    -- ضمان تأكيد كلمة المرور 08031989 وتأكيد البريد 100%
-    update auth.users
-    set encrypted_password = crypt('08031989', gen_salt('bf')),
-        email_confirmed_at = coalesce(email_confirmed_at, now()),
-        updated_at = now()
-    where lower(email) = 'slyman@ameen.iq' or id = v_slyman_id;
-    
-    raise notice '>> تم تفعيل المعلم slyman وضمان كلمة المرور 08031989 بنجاح: %', v_res;
-  end if;
-end $$;
+-- Removed: historical test-account auto-activation and hard-coded password.
+-- Use the protected activation workflow from migration 170 instead.
