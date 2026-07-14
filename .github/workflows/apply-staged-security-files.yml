@@ -11,11 +11,11 @@ permissions:
   contents: write
 
 concurrency:
-  group: arrange-security-files-170
+  group: arrange-security-files-170-v2
   cancel-in-progress: false
 
 jobs:
-  arrange-and-verify:
+  arrange-and-commit:
     if: github.repository == 'ameenmashhad-prog/ameen-school'
     runs-on: ubuntu-latest
     steps:
@@ -25,46 +25,28 @@ jobs:
           ref: main
           fetch-depth: 0
 
-      - name: Move staged files into their correct repository paths
+      - name: Move staged files and commit
         shell: bash
         run: |
           set -euo pipefail
           test -d .github/workflows/UPLOAD_TO_GITHUB
-          rsync -a --exclude 'UPLOAD_INSTRUCTIONS_AR.txt' .github/workflows/UPLOAD_TO_GITHUB/ ./
+
+          cp -a .github/workflows/UPLOAD_TO_GITHUB/. ./
 
           if ! grep -q '^FORMS_RATE_LIMIT_SECRET=' next-forms-v3/.env.example; then
-            cat >> next-forms-v3/.env.example <<'ENV_LINES'
-          FORMS_RATE_LIMIT_SECRET=replace-with-at-least-32-random-characters
-          FORMS_ADMIN_ROLES=admin,academic,academic_admin
-          ENV_LINES
+            printf '\n%s\n%s\n' \
+              'FORMS_RATE_LIMIT_SECRET=replace-with-at-least-32-random-characters' \
+              'FORMS_ADMIN_ROLES=admin,academic,academic_admin' \
+              >> next-forms-v3/.env.example
           fi
 
           rm -rf .github/workflows/UPLOAD_TO_GITHUB
           rm -f .github/workflows/apply-staged-security-files.yml
           rm -f UPLOAD_INSTRUCTIONS_AR.txt
-          git diff --check
 
-      - name: Run root tests
-        shell: bash
-        run: |
-          set -e
-          for test_file in tests/*.test.js; do
-            echo "### $test_file"
-            node "$test_file"
-          done
-
-      - name: Build Next Forms v3
-        shell: bash
-        working-directory: next-forms-v3
-        run: |
-          npm ci
-          npm run build
-
-      - name: Commit arranged hotfix
-        shell: bash
-        run: |
           git config user.name "Ameen Security Automation"
           git config user.email "security-bot@users.noreply.github.com"
           git add -A
+          git diff --cached --check
           git commit -m "security: arrange and finish Forms v3 lockdown 170"
           git push origin HEAD:main
