@@ -1,0 +1,193 @@
+📁 Patch 1: assets/config.js
+المسار على GitHub: assets/config.js
+رابط مباشر: https://github.com/ameenmashhad-prog/ameen-school/blob/main/assets/config.js
+
+المحتوى الكامل الجديد (الصقه كاملاً):
+
+JavaScript
+
+(function(){
+ 'use strict';
+ window.AMIN_CONFIG = {
+ schoolName: 'مدارس أمين الرضا (ع)',
+ supabaseUrl: window.location.origin + '/api',
+ supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im92Y2p6c3JxcWdqc2Jxc3d0a3JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2MjIxNjIsImV4cCI6MjA5NjE5ODE2Mn0._sPE8K26oTCEGlxBaG_vBk-U2yDNKFV1por5YIv8xko',
+ realtimeEnabled: false,
+ authStorageKey: 'amin-ovcjzsrqqgjsbqswtkro-auth-v2',
+ analyticsEnabled: true,
+ analyticsTable: 'ui_analytics_events',
+ academicMonths: [9,10,11,12,1,2,3,4,5],
+ defaultAttendanceType: 'daily',
+ familyRegistrationV3Url: 'https://next-forms-v3.vercel.app/ar/forms/family-registration-v3',
+ familyRegistrationV3AutoRedirect: true
+ };
+}());
+التغيير الوحيد: السطر الأخير familyRegistrationV3AutoRedirect: true (كان false).
+
+Commit message:
+
+text
+
+chore(phase-2): enable v3 auto-redirect for family registration
+اختبار بعد التطبيق:
+
+افتح https://your-domain.vercel.app/family-registration.html في المتصفح
+يجب أن ينقلك تلقائياً إلى https://next-forms-v3.vercel.app/ar/forms/family-registration-v3
+📁 Patch 2: super-admin.html
+المسار: super-admin.html
+رابط: https://github.com/ameenmashhad-prog/ameen-school/blob/main/super-admin.html
+
+التغيير: احذف السطر التالي من الملف:
+
+HTML
+
+<script src="assets/amin-theme-injector.js"></script>
+أين يوجد بالضبط (في القسم بين وسوم </head> و <body>):
+
+HTML
+
+      <script src="assets/ux-enhancements.js?v=20260706-3"></script>
+      <script src="assets/smart-alerts.js"></script>
+      <script src="assets/amin-theme-injector.js"></script>   ← احذف هذا السطر
+      <script src="assets/amin-icons.js?v=20260706-3" defer></script>
+بعد الحذف يجب أن يصبح:
+
+HTML
+
+      <script src="assets/ux-enhancements.js?v=20260706-3"></script>
+      <script src="assets/smart-alerts.js"></script>
+      <script src="assets/amin-icons.js?v=20260706-3" defer></script>
+ملاحظة: الإصدار inline من amin-theme-injector.js (الذي يظهر في <script> ضمن </body> عبر content+'<script src=...') سيبقى — هذا هو الذي نريده (تحميل واحد).
+
+Commit message:
+
+text
+
+fix(super-admin): remove duplicate amin-theme-injector.js
+اختبار بعد التطبيق:
+
+افتح https://your-domain.vercel.app/super-admin.html
+افتح DevTools → Console
+يجب ألا ترى أي تحذير عن script مكرر
+تحقق من Network tab: amin-theme-injector.js يجب أن يُحمَّل مرة واحدة فقط
+📁 Patch 3: counselor.html
+المسار: counselor.html
+رابط: https://github.com/ameenmashhad-prog/ameen-school/blob/main/counselor.html
+
+التغيير: نفس النمط بالضبط.
+
+احذف السطر:
+
+HTML
+
+<script src="assets/amin-theme-injector.js"></script>
+الموقع المتوقع (بين ux-enhancements.js و amin-icons.js):
+
+HTML
+
+      <script src="assets/ux-enhancements.js?v=20260706-3"></script>
+      <script src="assets/smart-alerts.js"></script>
+      <script src="assets/amin-theme-injector.js"></script>   ← احذف هذا السطر
+      <script src="assets/amin-icons.js?v=20260706-3" defer></script>
+بعد الحذف:
+
+HTML
+
+      <script src="assets/ux-enhancements.js?v=20260706-3"></script>
+      <script src="assets/smart-alerts.js"></script>
+      <script src="assets/amin-icons.js?v=20260706-3" defer></script>
+Commit message:
+
+text
+
+fix(counselor): remove duplicate amin-theme-injector.js
+اختبار بعد التطبيق:
+
+افتح https://your-domain.vercel.app/counselor.html
+DevTools Console: لا أخطاء
+Network: amin-theme-injector.js يُحمَّل مرة واحدة فقط
+📁 Patch 4: family-registration.html
+المسار: family-registration.html
+رابط: https://github.com/ameenmashhad-prog/ameen-school/blob/main/family-registration.html
+
+التغيير: احذف زر "فتح النسخة السابقة مؤقتاً" بالكامل.
+
+ابحث عن هذا الجزء:
+
+HTML
+
+      <a href="https://next-forms-v3.vercel.app/ar/forms/family-registration-v3?source=hard-switch">فتح النسخة الجديدة</a>
+      <a href="family-registration-legacy.html">فتح النسخة السابقة مؤقتاً</a>
+استبدله بـ:
+
+HTML
+
+      <a href="https://next-forms-v3.vercel.app/ar/forms/family-registration-v3?source=hard-switch">فتح النسخة الجديدة</a>
+(أي احذف السطر الثاني فقط)
+
+Commit message:
+
+text
+
+fix(family-registration): remove broken legacy link (file deleted)
+اختبار بعد التطبيق:
+
+افتح https://your-domain.vercel.app/family-registration.html
+يجب أن ترى زر واحد فقط: "فتح النسخة الجديدة"
+لا أخطاء 404
+📁 Patch 5: .vercelignore (ملف جديد)
+المسار: .vercelignore (في جذر المستودع)
+رابط الإنشاء: https://github.com/ameenmashhad-prog/ameen-school/new/main?filename=.vercelignore
+
+المحتوى الكامل:
+
+text
+
+# ============================================================
+# .vercelignore — الملفات التي لا تُنشر على Vercel
+# التاريخ: 2026-07-17 (المرحلة 2)
+# ============================================================
+
+# أدوات تشخيصية ومعاينات — لا تُنشر علناً
+dev-tools/
+clear-session.html
+deployment-check.html
+preview-mockup.html
+
+# ملفات معاينة V3 — تبقى في المستودع للأرشيف
+SHOW_ME_FAMILY_REGISTRATION_V3.html
+
+# أرشيف توثيقي (يُنشأ في المرحلة 3)
+docs/archive/
+
+# ملفات مؤقتة وقوالب
+*.template.html
+family-registration-v3-bridge.html
+family-registration-v3-hard-switch.template.html
+
+# ملاحظة: الملفات المدرجة هنا تبقى في git ولا تُحذف
+# لكنها لن تكون متاحة على الدومين العام
+Commit message:
+
+text
+
+chore(vercel): ignore diagnostic and preview files from deploy
+اختبار بعد التطبيق (انتظر حتى Vercel يعيد النشر):
+
+https://your-domain.vercel.app/clear-session.html → 404
+https://your-domain.vercel.app/deployment-check.html → 404 (إن وجد)
+https://your-domain.vercel.app/SHOW_ME_FAMILY_REGISTRATION_V3.html → 404
+📋 ملخص الـ5 Patches
+#	الملف	سطر التغيير	commit
+1	assets/config.js	false → true	chore(phase-2): enable v3 auto-redirect
+2	super-admin.html	احذف سطر	fix(super-admin): remove duplicate script
+3	counselor.html	احذف سطر	fix(counselor): remove duplicate script
+4	family-registration.html	احذف زر	fix(family-registration): remove broken legacy link
+5	.vercelignore	ملف جديد	chore(vercel): ignore diagnostic files
+🎯 بعد نجاح كل الـ5
+أرسل لي:
+
+✅ "تم تطبيق كل الـ5"
+نتيجة select * from public.rls_phase1_health_check(); (للتأكد أن المرحلة 1 لم تتأثر)
+رابط أو screenshot لأي صفحة (تثبت أن كل شيء يعمل)
+⏳ ابدأ عندما تكون جاهزاً. أرسل لي التقدم بعد كل patch إذا أردت، أو دفعة واحدة في النهاية.
