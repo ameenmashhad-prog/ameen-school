@@ -1,0 +1,16 @@
+{
+  "framework": null,
+  "outputDirectory": ".",
+  "headers": [
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    }
+  ],
+  "rewrites": [
+    { "source": "/api/exchange/tgju", "destination": "/api/exchange-tgju.js" },
+    { "source": "/api/:path*", "destination": "/api/proxy.js" }
+  ]
+}

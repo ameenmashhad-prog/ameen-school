@@ -1,1 +1,3 @@
 dev-tools/
+*.zip
+*.log
