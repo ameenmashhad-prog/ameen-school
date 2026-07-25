@@ -999,6 +999,60 @@ function StudentCard({ locale, labels, student, index, fieldById, financeCatalog
     return /^[0-9]{10}$/.test(String(code).trim());
   }
 
+  // Shamsi to Gregorian conversion using TripleDate logic (persianToJD + jdToGregorian)
+  function shamsiToGregorian(shamsiStr) {
+    if (!shamsiStr) return '';
+    try {
+      // Parse Shamsi date: allow YYYY/MM/DD, YYYY-MM-DD, DD/MM/YYYY
+      const cleaned = String(shamsiStr).replace(/[^\d\/\-]/g, ' ').trim();
+      let parts = cleaned.split(/[\/\-]/).map(p=>parseInt(p,10)).filter(n=>!isNaN(n));
+      let y,m,d;
+      if (parts.length===3) {
+        // Detect if first part is year (1400+) or day
+        if (parts[0] > 1000) { y=parts[0]; m=parts[1]; d=parts[2]; }
+        else if (parts[2] > 1000) { y=parts[2]; m=parts[1]; d=parts[0]; }
+        else return '';
+      } else return '';
+      if (y<1000 || m<1 || m>12 || d<1 || d>31) return '';
+      
+      // Persian to JD then to Gregorian
+      const GREGORIAN_EPOCH = 1721425.5;
+      const PERSIAN_EPOCH = 1948320.5;
+      function mod(a,b){ return a - b*Math.floor(a/b); }
+      function isLeapGregorian(year){ return (year%4===0)&&(!(year%100===0)||(year%400===0)); }
+      function persianToJD(year,month,day){
+        const epbase = year - (year>=0?474:473);
+        const epyear = 474 + mod(epbase,2820);
+        return day + (month<=7 ? (month-1)*31 : (month-1)*30+6) + Math.floor((epyear*682-110)/2816) + (epyear-1)*365 + Math.floor(epbase/2820)*1029983 + (PERSIAN_EPOCH-1);
+      }
+      function gregorianToJD(year,month,day){
+        return (GREGORIAN_EPOCH-1)+(365*(year-1))+Math.floor((year-1)/4)-Math.floor((year-1)/100)+Math.floor((year-1)/400)+Math.floor((((367*month)-362)/12)+(month<=2?0:(isLeapGregorian(year)?-1:-2))+day);
+      }
+      function jdToGregorian(jd){
+        var wjd = Math.floor(jd-0.5)+0.5;
+        var depoch = wjd - GREGORIAN_EPOCH;
+        var quadricent = Math.floor(depoch/146097);
+        var dqc = mod(depoch,146097);
+        var cent = Math.floor(dqc/36524);
+        var dcent = mod(dqc,36524);
+        var quad = Math.floor(dcent/1461);
+        var dquad = mod(dcent,1461);
+        var yindex = Math.floor(dquad/365);
+        var year = (quadricent*400)+(cent*100)+(quad*4)+yindex;
+        if (!(cent===4||yindex===4)) year++;
+        var yearday = wjd - gregorianToJD(year,1,1);
+        var leapadj = (wjd < gregorianToJD(year,3,1)) ? 0 : (isLeapGregorian(year)?1:2);
+        var month = Math.floor(((yearday+leapadj)*12+373)/367);
+        var day = (wjd - gregorianToJD(year,month,1))+1;
+        return {year,month,day};
+      }
+      const jd = persianToJD(y,m,d);
+      const g = jdToGregorian(jd);
+      const pad = n=> n<10?'0'+n:''+n;
+      return `${g.year}-${pad(g.month)}-${pad(g.day)}`;
+    } catch { return ''; }
+  }
+
   return (
     <div className="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-3">
@@ -1902,10 +1956,20 @@ export default function FamilyRegistrationV3Shell({ locale, dictionary, initialS
           if (fieldId === 'student_passport_expiry_date' && normalizedValue) {
             updated['student_passport_days_remaining'] = calculatePassportDaysRemaining(normalizedValue);
           }
-          // Also recalc if birth date is changed via shamsi input (reverse)
-          if (fieldId === 'student_birth_date_shamsi_display') {
-            // If user types Shamsi date, we keep it as display only, but could convert back
-            // For now, keep as is - user requested opposite conversion also possible
+          // Reverse: If user types Shamsi date, convert to Gregorian
+          if (fieldId === 'student_birth_date_shamsi_display' && normalizedValue) {
+            try {
+              const gregorian = shamsiToGregorian(normalizedValue);
+              if (gregorian) {
+                // Only update Gregorian if valid and different to avoid loop
+                if (gregorian !== updated['student_birth_date'] && gregorian !== current.students.find(s=>s.id===studentId)?.student_birth_date) {
+                  updated['student_birth_date'] = gregorian;
+                  // Also update the Shamsi display to normalized format
+                  const normalizedShamsi = gregorianToShamsi(gregorian);
+                  if (normalizedShamsi) updated['student_birth_date_shamsi_display'] = normalizedShamsi;
+                }
+              }
+            } catch {}
           }
 
           return updated;
