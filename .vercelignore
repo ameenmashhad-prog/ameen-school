@@ -1,4 +1,1 @@
-# Minimal ignore - deploy everything except dev artifacts
 dev-tools/
-*.zip
-*.log
