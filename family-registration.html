@@ -3,91 +3,75 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>تسجيل الأسرة والطلاب — مدارس أمين الرضا</title>
+<title>تسجيل الأسرة والطلاب — النسخة الموحدة 2026-2027</title>
 <link rel="stylesheet" href="assets/amin.css?v=20260706-6">
-<link rel="stylesheet" href="assets/i18n.css">
 <link rel="icon" href="/favicon.ico">
 <style>
-.hero{max-width:900px;margin:0 auto 24px;background:linear-gradient(135deg,#081426 0%,#0B6E4F 100%);color:#fff;padding:28px;border-radius:24px}
-.hero h1{font-size:26px;margin:0 0 8px}
-.hero p{opacity:.9;line-height:1.8;margin:0}
-.grid{max-width:900px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
-.card{background:#fff;border:1px solid var(--border-subtle);border-radius:18px;padding:20px;box-shadow:var(--shadow-soft);transition:.2s}
-.card:hover{transform:translateY(-4px);box-shadow:var(--shadow-soft-lg)}
-.card h3{font-size:16px;margin:0 0 8px}
-.card p{font-size:13px;color:var(--text-secondary);line-height:1.6;margin:0 0 12px;min-height:40px}
-.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 14px;border-radius:10px;border:1px solid var(--border-subtle);background:#fff;font-weight:700;text-decoration:none;cursor:pointer;font-family:inherit}
-.btn-primary{background:#0B6E4F;color:#fff;border-color:#0B6E4F}
-.badge{display:inline-block;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:700}
+body{background:var(--bg);font-family:var(--font-arabic);margin:0;padding:0}
+.hero{max-width:800px;margin:40px auto 24px;background:linear-gradient(135deg,#081426 0%,#0B6E4F 100%);color:#fff;padding:32px;border-radius:24px;text-align:center}
+.hero h1{font-size:28px;margin:0 0 10px}
+.hero p{opacity:.9;line-height:1.8;margin:0;font-size:15px}
+.card{max-width:800px;margin:0 auto;background:#fff;border:2px solid #0B6E4F;border-radius:20px;padding:28px;box-shadow:0 10px 30px rgba(0,0,0,.08)}
+.badge{display:inline-block;padding:5px 12px;border-radius:999px;font-size:11px;font-weight:700;margin:2px}
 .b-green{background:#dcfce7;color:#166534}
-.b-gold{background:#fef3c7;color:#92400e}
-.b-red{background:#fee2e2;color:#991b1b}
 .b-blue{background:#dbeafe;color:#1e40af}
+.b-gold{background:#fef3c7;color:#92400e}
+.features{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:20px 0}
+.feat{display:flex;gap:8px;align-items:flex-start;padding:10px;background:#f8fafc;border-radius:12px;border:1px solid #e2e8f0}
+.feat b{font-size:13px}
+.feat small{color:#64748b;font-size:11px;display:block;margin-top:2px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:14px 20px;border-radius:12px;border:none;font-weight:800;cursor:pointer;text-decoration:none;font-family:inherit;justify-content:center}
+.btn-primary{background:#0B6E4F;color:#fff;width:100%;font-size:16px}
+.btn-secondary{background:#fff;border:1px solid #cbd5e1;color:#334155}
+.secondary-row{display:flex;gap:10px;margin-top:12px}
+.secondary-row a{flex:1;text-align:center}
+@media(max-width:600px){.features{grid-template-columns:1fr}.secondary-row{flex-direction:column}}
 </style>
 </head>
-<body style="background:var(--bg);padding:24px;font-family:var(--font-arabic)">
+<body>
 <div class="hero">
-  <h1>📝 تسجيل الأسرة والطلاب — 2026-2027</h1>
-  <p>النسخة الجديدة V3 على <code>next-forms-v3.vercel.app</code> متوقفة حالياً (404). استخدم إحدى النسخ العاملة أدناه — كلها محدثة بآخر المزايا (كود سيدا، نوع الطالب، شمسى/ميلادي، صلاحية الجواز، فرع 1 و 2).</p>
-  <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
-    <span class="badge b-red">V3 على vercel.app متوقف 404</span>
-    <span class="badge b-green">النسخ المحلية تعمل 100%</span>
+  <h1>📝 التسجيل الموحد — نسخة واحدة نهائية</h1>
+  <p>تم دمج كل النسخ المكررة في نسخة واحدة نظيفة. تتضمن كل طلباتك الجديدة بدون تكرار.</p>
+</div>
+
+<div class="card">
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+    <span class="badge b-green">✅ نسخة موحدة نهائية</span>
+    <span class="badge b-blue">69 وحدة</span>
+    <span class="badge b-gold">بدون تكرار</span>
+  </div>
+
+  <h3 style="margin:0 0 12px">المزايا المدمجة في هذه النسخة:</h3>
+  <div class="features">
+    <div class="feat"><span>🔢</span><div><b>كود سيدا 10 أرقام</b><small>تحقق تلقائي + Badge صالح/غير صالح</small></div></div>
+    <div class="feat"><span>👨‍🎓</span><div><b>نوع الطالب</b><small>نظامي / مستمع / خارجي / أخرى</small></div></div>
+    <div class="feat"><span>📅</span><div><b>ميلادي ↔ شمسي</b><small>تكتب ميلادي يحسب شمسي، والعكس (تحويل عكسي)</small></div></div>
+    <div class="feat"><span>🛂</span><div><b>صلاحية الجواز</b><small>الأيام الباقية ملونة: أخضر/أصفر/أحمر</small></div></div>
+    <div class="feat"><span>🏫</span><div><b>فرع 1 و 2</b><small>عدد الطلاب في مجمع أمين الرضا 1 و 2</small></div></div>
+    <div class="feat"><span>👨‍👩‍👧</span><div><b>استيراد ولي أمر سابق</b><small>بحث بالاسم/هاتف ويملأ تلقائياً</small></div></div>
+    <div class="feat"><span>🖨️</span><div><b>طباعتين منفصلتين</b><small>فردية لكل طالب + عائلية</small></div></div>
+    <div class="feat"><span>💬</span><div><b>رسائل المعلمين</b><small>عقوبات تأخر + شكر عبر واتساب/داخلي/SMS</small></div></div>
+  </div>
+
+  <a href="family-registration-legacy.html" class="btn btn-primary">🚀 فتح استمارة التسجيل الموحدة الآن</a>
+
+  <div class="secondary-row">
+    <a href="print-student-individual.html" class="btn btn-secondary">🖨️ طباعة فردية</a>
+    <a href="print-family-form.html" class="btn btn-secondary">👨‍👩‍👧‍👦 طباعة عائلية</a>
+  </div>
+
+  <div style="margin-top:20px;padding:14px;background:#f8fafc;border-radius:12px;border:1px dashed #cbd5e1">
+    <small style="color:#64748b;line-height:1.7">
+      <b>تم حذف الزيادات:</b> تم نقل 4 ملفات مكررة (bridge, hard-switch.template, SHOW_ME, preview-mockup) إلى <code>docs/archive/duplicate-registration-forms/</code> ولم تعد تظهر في الموقع.<br>
+      الآن يوجد <b>مسار واحد واضح</b> للتسجيل بدل 6 نسخ مكررة.
+    </small>
   </div>
 </div>
 
-<div class="grid">
-  <div class="card" style="border-color:#0B6E4F;border-width:2px">
-    <h3>✅ النسخة المحسنة الجديدة V2 (موصى بها)</h3>
-    <p>تتضمن كل طلباتك: كود سيدا 10 أرقام، نوع الطالب (نظامي/مستمع/خارجي/أخرى)، ميلادي وشمسي بجانب بعض مع تحويل عكسي، الأيام الباقية للجواز، عدد طلاب فرع 1 و 2، استيراد ولي أمر سابق، وطباعتين.</p>
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <a class="btn btn-primary" href="family-registration-legacy.html">فتح الاستمارة المحسنة ↗</a>
-      <span class="badge b-green">تعمل بدون V3</span>
-    </div>
-    <small style="display:block;margin-top:10px;color:#64748b">هذه هي النسخة القديمة المحدثة بـ 69 وحدة، تعمل مباشرة مع Supabase بدون مشروع Vercel منفصل</small>
-  </div>
-
-  <div class="card">
-    <h3>🖨️ طباعة فردية — كود سيدا + شمسي + جواز</h3>
-    <p>استمارة طالب واحد: تدخل كود سيدا أو معرف الطالب → تطبع ورقة فردية فيها سيدا، نوع، ميلادي وشمسي، الأيام الباقية للجواز ملونة.</p>
-    <a class="btn btn-primary" href="print-student-individual.html">فتح الطباعة الفردية ↗</a>
-  </div>
-
-  <div class="card">
-    <h3>👨‍👩‍👧‍👦 طباعة عائلية — فرع 1 و 2</h3>
-    <p>استمارة عائلية: تدخل معرف العائلة → تطبع ورقة العائلة فيها عدد طلاب مجمع أمين الرضا 1 و 2 + كل الأبناء مع سيدا وصلاحية الجواز + استيراد ولي أمر سابق.</p>
-    <a class="btn btn-primary" href="print-family-form.html">فتح الطباعة العائلية ↗</a>
-  </div>
-
-  <div class="card">
-    <h3>📋 مركز التوحيد — كل الصفحات</h3>
-    <p>صفحة واحدة فيها كل 69 صفحة للمشروع مع بحث حي — تحل مشكلة الصفحات المختفية.</p>
-    <a class="btn" href="all-pages-hub.html">فتح مركز التوحيد ↗</a>
-  </div>
-
-  <div class="card">
-    <h3>🔧 استكشاف أخطاء V3</h3>
-    <p>V3 يحتاج مشروع Vercel منفصل بـ Root Directory = next-forms-v3. إذا كان متوقف، أنشئ مشروع جديد في Vercel → Import → ameenmashhad-prog/ameen-school → Root Directory: next-forms-v3 → Deploy</p>
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <a class="btn" href="https://vercel.com/new/clone?repository-url=https://github.com/ameenmashhad-prog/ameen-school&root-directory=next-forms-v3" target="_blank">إنشاء مشروع V3 جديد ↗</a>
-      <span class="badge b-gold">يحتاج 2 دقيقة</span>
-    </div>
-  </div>
-
-  <div class="card">
-    <h3>📝 النسخة الأصلية القديمة (احتياط)</h3>
-    <p>النسخة الأصلية قبل التحديثات — تعمل بدون كود سيدا وشمسى.</p>
-    <a class="btn" href="family-registration-legacy.html">فتح القديمة ↗</a>
-  </div>
-</div>
-
-<div style="max-width:900px;margin:24px auto 0;padding:16px;background:#fff;border:1px solid var(--border-subtle);border-radius:16px">
-  <h4 style="margin:0 0 8px">ℹ️ لماذا V3 يعطي 404؟</h4>
-  <p style="margin:0;color:#64748b;font-size:13px;line-height:1.7">
-    مشروع <code>next-forms-v3.vercel.app</code> على Vercel متوقف أو محذوف (DEPLOYMENT_NOT_FOUND). 
-    كل الطلبات <code>/ar/forms/family-registration-v3</code> تعطي 404. 
-    الحل: إما إعادة نشر المشروع من Vercel Dashboard، أو استخدام النسخ المحلية العاملة أعلاه التي تحتوي كل مزاياك الجديدة (سيدا، شمسي، جواز، فرع 1 و 2).
-    تم إصلاح <code>family-registration.html</code> الآن ليعرض هذه البدائل بدل التحويل التلقائي المكسور.
-  </p>
+<div style="max-width:800px;margin:16px auto;text-align:center">
+  <a href="all-pages-hub.html" style="color:#64748b;font-size:13px;text-decoration:none">📋 مركز التوحيد — كل الصفحات (69)</a>
+  <span style="margin:0 8px;color:#cbd5e1">•</span>
+  <a href="teacher-messages-admin.html" style="color:#64748b;font-size:13px;text-decoration:none">💬 رسائل المعلمين</a>
 </div>
 
 <script src="assets/amin-theme-injector.js"></script>
