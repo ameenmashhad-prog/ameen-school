@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>طباعة استمارة عائلية — فرع 1 و 2 + استيراد ولي أمر</title>
+<link rel="stylesheet" href="assets/amin.css">
+<style>
+.print-shell{max-width:900px;margin:0 auto;background:#fff;border:1px solid #c9a24b;border-radius:24px;padding:24px}
+.header{text-align:center;border-bottom:2px solid #e8dcc2;padding-bottom:16px;margin-bottom:20px}
+.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.field{border:1px solid #e2e8f0;border-radius:12px;padding:12px;background:#f8fafc}
+.field small{display:block;color:#64748b;font-size:11px;font-weight:700;margin-bottom:4px}
+table{width:100%;border-collapse:collapse;margin-top:12px}
+th,td{border:1px solid #e2e8f0;padding:8px;text-align:right;font-size:13px}
+th{background:#f1f5f9}
+@media print{.no-print{display:none} .print-shell{border:none;box-shadow:none}}
+</style>
+</head>
+<body style="background:#f1f5f9;padding:20px;font-family:Tahoma">
+<div class="no-print" style="max-width:900px;margin:0 auto 16px;display:flex;gap:8px">
+  <input id="familyId" placeholder="معرف العائلة أو اسم ولي الأمر" style="flex:1;padding:12px;border:1px solid #cbd5e1;border-radius:12px">
+  <button onclick="loadFamily()" style="padding:12px 18px;background:#0B6E4F;color:#fff;border:none;border-radius:12px;font-weight:700;cursor:pointer">تحميل</button>
+  <button onclick="window.print()" style="padding:12px 18px;background:#c9a24b;color:#fff;border:none;border-radius:12px;font-weight:700;cursor:pointer">طباعة عائلية</button>
+</div>
+
+<div class="print-shell" id="root">
+  <div class="header">
+    <h1>👨‍👩‍👧‍👦 استمارة عائلية — مجمع أمين الرضا</h1>
+    <small>تتضمن عدد الطلاب في فرع 1 وفرع 2 + استيراد ولي أمر سابق + كل الأبناء</small>
+  </div>
+  <div id="content" style="text-align:center;color:#64748b;padding:40px">أدخل معرف العائلة أو ابحث باسم ولي الأمر</div>
+</div>
+
+<script src="libs/supabase.min.js"></script>
+<script src="assets/config.js"></script>
+<script>
+const $=s=>document.querySelector(s);
+function esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+let sb=null;
+function client(){ if(sb) return sb; sb=supabase.createClient(AMIN_CONFIG.supabaseUrl, AMIN_CONFIG.supabaseAnonKey, {auth:{persistSession:true,autoRefreshToken:true,storageKey:AMIN_CONFIG.authStorageKey}}); return sb; }
+
+async function loadFamily(){
+  const val=$('#familyId').value.trim();
+  if(!val){ alert('أدخل معرف العائلة'); return; }
+  $('#content').innerHTML='⏳ جاري التحميل...';
+  try{
+    const c=client();
+    // Try view first
+    let {data,error} = await c.from('v_family_form').select('*').or(`family_id.eq.${val},guardian_name.ilike.%${val}%`).maybeSingle();
+    if(!data){
+      // Fallback to registration_families
+      const res = await c.from('registration_families').select('*, registration_students(*)').or(`id.eq.${val},guardian_name.ilike.%${val}%`).maybeSingle();
+      if(res.data){
+        data={
+          family_id: res.data.id,
+          guardian_name: res.data.guardian_name,
+          family_name: res.data.family_name,
+          phone_primary: res.data.phone_primary,
+          phone_whatsapp: res.data.phone_whatsapp,
+          students_in_branch_1: res.data.students_in_branch_1,
+          students_in_branch_2: res.data.students_in_branch_2,
+          students_count: res.data.registration_students?.length||0,
+          student_names: (res.data.registration_students||[]).map(s=>s.student_name).join('، '),
+          created_at: res.data.created_at,
+          students: res.data.registration_students||[]
+        };
+      }
+    }
+    if(!data) throw new Error('العائلة غير موجودة');
+
+    const students = data.students || [];
+    // If students not in view, fetch separately
+    let studentRows = '';
+    if(students.length){
+      studentRows = students.map((s,i)=>`
+        <tr>
+          <td>${i+1}</td>
+          <td>${esc(s.student_name||s.name||'—')}</td>
+          <td>${esc(s.seda_code||'—')}</td>
+          <td>${esc(s.student_type||s.type||'نظامي')}</td>
+          <td>${esc(s.birth_date||'—')}</td>
+          <td>${esc(s.passport_days_remaining!=null ? s.passport_days_remaining+' يوم' : '—')}</td>
+        </tr>
+      `).join('');
+    }else{
+      // Try to get student names splitted
+      const names = (data.student_names||'').split('،');
+      studentRows = names.map((n,i)=>`<tr><td>${i+1}</td><td>${esc(n.trim())}</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>`).join('');
+    }
+
+    $('#content').innerHTML=`
+      <div class="grid2">
+        <div class="field"><small>اسم ولي الأمر</small><b>${esc(data.guardian_name||'—')} ${esc(data.family_name||'')}</b></div>
+        <div class="field"><small>الهاتف الأساسي</small><b>${esc(data.phone_primary||'—')}</b></div>
+        <div class="field"><small>واتساب</small><b>${esc(data.phone_whatsapp||'—')}</b></div>
+        <div class="field"><small>عدد الطلاب في الفرع</small><b>${esc(data.students_count||0)} طالب</b></div>
+        <div class="field"><small>طلاب في مجمع أمين الرضا 1</small><b>${esc(data.students_in_branch_1||0)}</b></div>
+        <div class="field"><small>طلاب في مجمع أمين الرضا 2</small><b>${esc(data.students_in_branch_2||0)}</b></div>
+        <div class="field" style="grid-column:1/-1"><small>معرف العائلة</small><b style="font-family:monospace;font-size:11px">${esc(data.family_id)}</b></div>
+      </div>
+      <h3 style="margin-top:20px">👨‍🎓 الأبناء المسجلون</h3>
+      <table>
+        <thead><tr><th>#</th><th>اسم الطالب</th><th>كود سيدا</th><th>النوع</th><th>الميلاد</th><th>صلاحية الجواز</th></tr></thead>
+        <tbody>${studentRows || '<tr><td colspan=6 style="text-align:center">لا يوجد طلاب</td></tr>'}</tbody>
+      </table>
+      <div style="margin-top:20px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px;text-align:center">
+        <div><small>توقيع ولي الأمر</small><div style="height:60px;border-bottom:1px solid #000;margin-top:20px"></div></div>
+        <div><small>اعتماد التسجيل</small><div style="height:60px;border-bottom:1px solid #000;margin-top:20px"></div></div>
+        <div><small>اعتماد المالية</small><div style="height:60px;border-bottom:1px solid #000;margin-top:20px"></div></div>
+      </div>
+    `;
+  }catch(e){
+    $('#content').innerHTML=`<div style="background:#fee2e2;color:#991b1b;padding:16px;border-radius:12px">❌ ${esc(e.message)}</div>`;
+  }
+}
+
+// Auto-search existing parent on typing (import feature)
+let searchTimeout=null;
+document.getElementById('familyId')?.addEventListener('input', (e)=>{
+  clearTimeout(searchTimeout);
+  const val=e.target.value.trim();
+  if(val.length<2) return;
+  searchTimeout=setTimeout(async ()=>{
+    try{
+      const c=client();
+      const {data} = await c.rpc('search_existing_parents', {p_search: val});
+      if(data && data.length){
+        // Show dropdown suggestion
+        console.log('Found existing parents:', data);
+        // Could auto-fill if exact match
+      }
+    }catch(err){ console.warn(err); }
+  }, 500);
+});
+</script>
+</body>
+</html>

@@ -83,7 +83,12 @@
     {key:'previewMockup', group:'analyticsAdmin', perm:'system', color:'rose', icon:'grid', href:'preview-mockup.html?lite=1', title:{ar:'معاينة التصميم الجديد',fa:'پیش‌نمایش طراحی جدید',en:'Design Preview Mockup'}, desc:{ar:'معاينة هوية بصرية مقترحة',fa:'پیش‌نمایش هویت بصری پیشنهادی',en:'Preview of proposed visual identity'}},
     {key:'dashboardLegacy', group:'analyticsAdmin', perm:'admin', color:'slate', icon:'grid', href:'dashboard.html?lite=1', badge:'LEGACY', title:{ar:'لوحة التحكم القديمة',fa:'داشبورد قدیمی',en:'Legacy Dashboard'}, desc:{ar:'اللوحة القديمة المعتمدة على app_modules من DB',fa:'داشبورد قدیمی مبتنی بر app_modules از DB',en:'Legacy dashboard based on DB app_modules'}},
 
-  ];
+
+    {key:'printStudent', group:'academic', perm:'registrations', color:'gold', icon:'trophy', href:'print-student-individual.html?lite=1', badge:'NEW', title:{ar:'طباعة فردية - كود سيدا وشمسى',fa:'چاپ فردی - کد سیدا و شمسی',en:'Individual Print - SEDA & Shamsi'}, desc:{ar:'استمارة طالب فردية مع كود سيدا 10 أرقام، ميلادي وشمسي، وأيام صلاحية الجواز',fa:'فرم فردی دانش‌آموز با کد سیدا 10 رقمی، میلادی و شمسی، روزهای اعتبار گذرنامه',en:'Individual student form with 10-digit SEDA, Gregorian/Shamsi, passport days'}},
+    {key:'printFamily', group:'academic', perm:'registrations', color:'teal', icon:'people', href:'print-family-form.html?lite=1', badge:'NEW', title:{ar:'طباعة عائلية - فرع 1 و 2',fa:'چاپ خانوادگی - شعبه 1 و 2',en:'Family Print - Branch 1 & 2'}, desc:{ar:'استمارة عائلية مع عدد الطلاب في مجمع أمين الرضا 1 و 2 واستيراد ولي أمر سابق',fa:'فرم خانوادگی با تعداد دانش‌آموزان در مجتمع امین الرضا 1 و 2 و وارد کردن ولی سابق',en:'Family form with branch counts and parent import'}},
+    {key:'teacherMessages', group:'people', perms:['admin','hr'], color:'emerald', icon:'phone', href:'teacher-messages-admin.html?lite=1', badge:'NEW', title:{ar:'رسائل المعلمين - عقوبات وشكر',fa:'پیام‌های معلمان - تنبیه و تشکر',en:'Teacher Messages - Penalties & Thanks'}, desc:{ar:'تسجيل رسائل إدارية للمعلمين بسبب التأخر المستمر عبر واتساب وداخل الموقع، ورسائل شكر',fa:'ثبت پیام‌های اداری برای معلمان به دلیل تأخیر مستمر از طریق واتساپ و داخل سایت، و پیام‌های تشکر',en:'Record admin messages for teachers for continuous delay via WhatsApp/in-app, and thank you messages'}},
+
+  ];;
 
 
   const iconPaths = {

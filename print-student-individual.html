@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>طباعة استمارة طالب فردية — كود سيدا + شمسى + جواز</title>
+<link rel="stylesheet" href="assets/amin.css?v=20260706-6">
+<link rel="icon" href="/favicon.ico">
+<style>
+.print-shell{max-width:794px;margin:0 auto;background:#fff;border:1px solid #c9a24b;border-radius:24px;padding:24px;box-shadow:0 10px 30px rgba(0,0,0,.08)}
+.print-header{border-bottom:2px solid #e8dcc2;padding-bottom:16px;margin-bottom:20px;text-align:center}
+.print-header h1{font-size:22px;margin:0 0 6px}
+.print-header small{color:#666}
+.field-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.field{border:1px solid #e2e8f0;border-radius:12px;padding:12px;background:#f8fafc}
+.field small{display:block;color:#64748b;font-size:11px;margin-bottom:4px;font-weight:700}
+.field b{font-size:14px}
+.badge{display:inline-block;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:700}
+.b-green{background:#dcfce7;color:#166534}
+.b-red{background:#fee2e2;color:#991b1b}
+.b-gold{background:#fef3c7;color:#92400e}
+.b-blue{background:#dbeafe;color:#1e40af}
+@media print{.no-print{display:none} .print-shell{border:none;box-shadow:none}}
+</style>
+</head>
+<body style="background:#f1f5f9;padding:24px;font-family:Tahoma">
+<div class="no-print" style="max-width:794px;margin:0 auto 16px;display:flex;gap:8px;flex-wrap:wrap">
+  <input id="studentId" placeholder="أدخل معرف الطالب أو كود سيدا" style="flex:1;min-width:240px;padding:12px;border:1px solid #cbd5e1;border-radius:12px">
+  <button onclick="loadStudent()" style="padding:12px 18px;background:#0B6E4F;color:#fff;border:none;border-radius:12px;cursor:pointer;font-weight:700">تحميل</button>
+  <button onclick="window.print()" style="padding:12px 18px;background:#c9a24b;color:#fff;border:none;border-radius:12px;cursor:pointer;font-weight:700">طباعة</button>
+  <button onclick="location.href='all-pages-hub.html'" style="padding:12px 18px;background:#fff;border:1px solid #cbd5e1;border-radius:12px;cursor:pointer">رجوع</button>
+</div>
+
+<div class="print-shell" id="printRoot">
+  <div class="print-header">
+    <h1>🎓 استمارة طالب فردية — مجمع أمين الرضا التعليمي</h1>
+    <small>تتضمن كود سيدا 10 أرقام + تاريخ ميلاد ميلادي وشمسي + صلاحية الجواز + نوع التسجيل</small>
+  </div>
+  <div id="content">
+    <div style="text-align:center;padding:40px;color:#64748b">أدخل معرف الطالب أو كود سيدا ثم اضغط تحميل</div>
+  </div>
+</div>
+
+<script src="libs/supabase.min.js"></script>
+<script src="assets/config.js"></script>
+<script>
+const $ = s=>document.querySelector(s);
+function esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+function gregorianToShamsi(iso){
+  if(!iso) return '—';
+  try{ return new Intl.DateTimeFormat('fa-IR-u-ca-persian',{year:'numeric',month:'long',day:'numeric'}).format(new Date(iso+'T00:00:00')); }
+  catch{ return '—'; }
+}
+function daysRemaining(expiry){
+  if(!expiry) return {text:'بدون جواز',cls:'b-blue'};
+  const today=new Date(); today.setHours(0,0,0,0);
+  const exp=new Date(expiry+'T00:00:00');
+  const diff=Math.ceil((exp-today)/86400000);
+  if(diff<0) return {text:`منتهي منذ ${Math.abs(diff)} يوم`,cls:'b-red'};
+  if(diff<30) return {text:`${diff} يوم - عاجل 🔴`,cls:'b-red'};
+  if(diff<90) return {text:`${diff} يوم - انتبه 🟡`,cls:'b-gold'};
+  return {text:`${diff} يوم - صالح 🟢`,cls:'b-green'};
+}
+
+let sb=null;
+function client(){
+  if(sb) return sb;
+  sb=supabase.createClient(window.AMIN_CONFIG.supabaseUrl, window.AMIN_CONFIG.supabaseAnonKey, {auth:{persistSession:true,autoRefreshToken:true,storageKey:window.AMIN_CONFIG.authStorageKey}});
+  return sb;
+}
+
+async function loadStudent(){
+  const idVal = $('#studentId').value.trim();
+  if(!idVal){ alert('أدخل معرف الطالب أو كود سيدا'); return; }
+  $('#content').innerHTML='<div style="text-align:center;padding:30px">⏳ جاري التحميل...</div>';
+  try{
+    const c=client();
+    // Try by seda_code first, then by id
+    let {data,error} = await c.from('v_student_individual_form').select('*').eq('seda_code', idVal).maybeSingle();
+    if((!data || error) && idVal.length>8){
+      const res = await c.from('v_student_individual_form').select('*').eq('student_id', idVal).maybeSingle();
+      data=res.data; error=res.error;
+    }
+    if(!data){
+      // Fallback: search registration_students directly
+      const res2 = await c.from('registration_students').select('*, registration_families!inner(guardian_name,phone_primary,students_in_branch_1,students_in_branch_2)').or(`seda_code.eq.${idVal},id.eq.${idVal}`).maybeSingle();
+      if(res2.data){
+        // Map to view format
+        data={
+          student_id: res2.data.id,
+          student_name: res2.data.student_name,
+          seda_code: res2.data.seda_code,
+          student_type: res2.data.student_type,
+          birth_gregorian: res2.data.birth_date,
+          birth_shamsi: res2.data.birth_date_shamsi_display || gregorianToShamsi(res2.data.birth_date),
+          gender: res2.data.gender,
+          passport_number: res2.data.passport_number,
+          passport_expiry_date: res2.data.passport_expiry_date,
+          passport_days_remaining: res2.data.passport_days_remaining,
+          passport_status: '',
+          guardian_name: res2.data.registration_families?.guardian_name || '',
+          phone_primary: res2.data.registration_families?.phone_primary || '',
+          students_in_branch_1: res2.data.registration_families?.students_in_branch_1 || 0,
+          students_in_branch_2: res2.data.registration_families?.students_in_branch_2 || 0,
+          class_name: ''
+        };
+      }
+    }
+    if(!data || error) throw new Error(error?.message || 'الطالب غير موجود');
+    
+    const shamsi = data.birth_shamsi || gregorianToShamsi(data.birth_gregorian);
+    const greg = data.birth_gregorian ? new Date(data.birth_gregorian).toLocaleDateString('en-GB') : '—';
+    const days = data.passport_days_remaining != null ? daysRemaining(data.passport_expiry_date) : {text:data.passport_status||'—',cls:'b-blue'};
+    const typeLabel = {regular:'نظامي',listener:'مستمع',external:'خارجي',other:'أخرى'}[data.student_type] || data.student_type || 'نظامي';
+
+    $('#content').innerHTML=`
+      <div class="field-grid">
+        <div class="field"><small>اسم الطالب</small><b>${esc(data.student_name)}</b></div>
+        <div class="field"><small>كود سيدا (10 أرقام)</small><b style="font-family:monospace;letter-spacing:1px">${esc(data.seda_code||'—')}</b> ${data.seda_code && !/^[0-9]{10}$/.test(data.seda_code) ? '<span class="badge b-red">غير صالح</span>' : '<span class="badge b-green">صالح</span>'}</div>
+        <div class="field"><small>نوع التسجيل</small><b>${esc(typeLabel)}</b></div>
+        <div class="field"><small>الجنس</small><b>${esc(data.gender||'—')}</b></div>
+        <div class="field"><small>تاريخ الميلاد الميلادي</small><b>${esc(greg)}</b><br><small style="color:#0B6E4F">Gregorian: ${esc(data.birth_gregorian||'—')}</small></div>
+        <div class="field"><small>تاريخ الميلاد الشمسي (محسوب تلقائياً)</small><b>${esc(shamsi)}</b><br><small style="color:#92400e">Shamsi: ${esc(shamsi)}</small></div>
+        <div class="field"><small>رقم جواز السفر</small><b>${esc(data.passport_number||'—')}</b></div>
+        <div class="field"><small>انتهاء الجواز</small><b>${esc(data.passport_expiry_date||'—')}</b></div>
+        <div class="field" style="grid-column:1/-1"><small>الأيام الباقية لصلاحية الجواز</small><b><span class="badge ${days.cls}">${esc(days.text)}</span></b> ${data.passport_days_remaining!=null ? `<small>(${data.passport_days_remaining} يوم)</small>` : ''}</div>
+        <div class="field"><small>ولي الأمر</small><b>${esc(data.guardian_name||'—')}</b></div>
+        <div class="field"><small>هاتف ولي الأمر</small><b>${esc(data.phone_primary||'—')}</b></div>
+        <div class="field"><small>عدد الطلاب في مجمع أمين الرضا 1</small><b>${esc(data.students_in_branch_1||0)}</b></div>
+        <div class="field"><small>عدد الطلاب في مجمع أمين الرضا 2</small><b>${esc(data.students_in_branch_2||0)}</b></div>
+        <div class="field"><small>الصف</small><b>${esc(data.class_name||'—')}</b></div>
+        <div class="field"><small>معرف الطالب</small><b style="font-family:monospace;font-size:11px">${esc(data.student_id)}</b></div>
+      </div>
+      <div style="margin-top:20px;border-top:2px dashed #e2e8f0;padding-top:16px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px;text-align:center">
+        <div><small>توقيع ولي الأمر</small><div style="height:60px;border-bottom:1px solid #000;margin-top:20px"></div></div>
+        <div><small>اعتماد التسجيل</small><div style="height:60px;border-bottom:1px solid #000;margin-top:20px"></div></div>
+        <div><small>اعتماد المالية</small><div style="height:60px;border-bottom:1px solid #000;margin-top:20px"></div></div>
+      </div>
+      <div style="margin-top:16px;text-align:center;color:#64748b;font-size:11px">طُبعت من نظام أمين الرضا - استمارة فردية - ${new Date().toLocaleString('ar-IQ')}</div>
+    `;
+  }catch(e){
+    $('#content').innerHTML=`<div style="padding:20px;background:#fee2e2;color:#991b1b;border-radius:12px">❌ خطأ: ${esc(e.message)}</div>`;
+  }
+}
+</script>
+</body>
+</html>

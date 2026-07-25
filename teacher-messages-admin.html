@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>رسائل المعلمين — عقوبات وشكر — مدارس أمين الرضا</title>
+<link rel="stylesheet" href="assets/amin.css?v=20260706-6">
+<link rel="icon" href="/favicon.ico">
+<style>
+.msg-grid{display:grid;grid-template-columns:1fr 1.2fr;gap:16px}
+.msg-card{background:#fff;border:1px solid var(--border-subtle);border-radius:18px;padding:18px;box-shadow:var(--shadow-soft)}
+.msg-card h3{margin-bottom:12px}
+.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.field label{display:block;font-size:13px;color:var(--text-secondary);margin-bottom:6px;font-weight:700}
+.input, .select, textarea{width:100%;padding:10px 12px;border:1px solid var(--border-subtle);border-radius:10px;font-family:inherit}
+textarea{min-height:100px;resize:vertical}
+.badge{display:inline-block;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:700}
+.b-red{background:#fee2e2;color:#991b1b}
+.b-green{background:#dcfce7;color:#166534}
+.b-gold{background:#fef3c7;color:#92400e}
+.b-blue{background:#dbeafe;color:#1e40af}
+.table-wrap{overflow:auto}
+@media(max-width:900px){.msg-grid{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><div class="brand-mark">💬</div><div><h1>رسائل المعلمين</h1><small>عقوبات وشكر وإنذارات</small></div></div>
+    <div class="profile-mini"><div class="avatar">👨‍🏫</div><div><b id="profileName">...</b><small id="profileRole">...</small></div></div>
+    <nav class="nav">
+      <button onclick="location.href='super-admin.html'">👑 المسؤول الأعلى</button>
+      <button onclick="location.href='teacher-punctuality-admin.html'">⏱️ تأخير المعلمين</button>
+      <button onclick="location.href='teacher-payroll-finance.html'">💵 رواتب المعلمين</button>
+      <button onclick="location.href='hr.html'">👥 الموارد البشرية</button>
+      <button onclick="location.href='portal.html'">🏛️ البوابة الموحدة</button>
+    </nav>
+    <div class="side-footer"><button id="logoutBtn" class="btn red block">تسجيل الخروج</button></div>
+  </aside>
+  <main class="main">
+    <header class="topbar">
+      <button class="btn mobile-menu" id="mobileMenuBtn">☰</button>
+      <h2>💬 رسائل إدارية للمعلمين — عقوبات وشكر</h2>
+      <div class="top-actions">
+        <button id="refreshBtn" class="btn blue">تحديث</button>
+      </div>
+    </header>
+
+    <div class="msg-grid">
+      <div class="msg-card">
+        <h3>✉️ إرسال رسالة جديدة</h3>
+        <div class="form-grid">
+          <div class="field" style="grid-column:1/-1">
+            <label>اختر المعلم *</label>
+            <select id="teacherSelect" class="select"></select>
+          </div>
+          <div class="field">
+            <label>نوع الرسالة *</label>
+            <select id="messageType" class="select">
+              <option value="penalty">🚨 عقوبة تأخير مستمر</option>
+              <option value="warning">⚠️ إنذار</option>
+              <option value="thank_you">🙏 شكر وتقدير</option>
+              <option value="notice">📢 تنبيه إداري</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>عدد أيام التأخير (للعقوبات)</label>
+            <input id="delayDays" type="number" class="input" placeholder="مثال: 5" min="0">
+          </div>
+          <div class="field" style="grid-column:1/-1">
+            <label>عنوان الرسالة / السبب *</label>
+            <input id="messageReason" class="input" placeholder="مثال: تأخر مستمر عن الحصة الأولى لمدة 5 أيام">
+          </div>
+          <div class="field" style="grid-column:1/-1">
+            <label>نص الرسالة التفصيلي *</label>
+            <textarea id="messageBody" placeholder="اكتب نص الرسالة هنا... سيتم إرسالها عبر الطرق المختارة"></textarea>
+          </div>
+          <div class="field" style="grid-column:1/-1">
+            <label>طرق الإرسال *</label>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px">
+              <label style="display:flex;align-items:center;gap:6px"><input type="checkbox" id="methodInApp" checked> 📱 داخل الموقع</label>
+              <label style="display:flex;align-items:center;gap:6px"><input type="checkbox" id="methodWhatsapp" checked> 💬 واتساب</label>
+              <label style="display:flex;align-items:center;gap:6px"><input type="checkbox" id="methodSms"> 📩 SMS</label>
+            </div>
+          </div>
+          <div class="field" style="grid-column:1/-1">
+            <button id="sendBtn" class="btn" style="background:#0B6E4F;color:#fff;width:100%;padding:14px;font-weight:700;border:none;border-radius:12px;cursor:pointer">إرسال الرسالة 🚀</button>
+          </div>
+        </div>
+        <div id="previewBox" style="margin-top:16px;padding:12px;background:#f8fafc;border-radius:12px;border:1px dashed #cbd5e1;display:none"></div>
+      </div>
+
+      <div class="msg-card">
+        <h3>📋 سجل الرسائل الأخيرة</h3>
+        <div style="display:flex;gap:8px;margin-bottom:12px">
+          <select id="filterType" class="select" style="flex:1">
+            <option value="">كل الأنواع</option>
+            <option value="penalty">عقوبات</option>
+            <option value="thank_you">شكر</option>
+            <option value="warning">إنذارات</option>
+            <option value="notice">تنبيهات</option>
+          </select>
+          <button onclick="loadMessages()" class="btn blue">تحديث</button>
+        </div>
+        <div id="messagesList" class="table-wrap"></div>
+      </div>
+    </div>
+
+    <div class="msg-card" style="margin-top:16px">
+      <h3>📊 إحصائيات سريعة</h3>
+      <div class="kpis" id="statsRoot" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px"></div>
+    </div>
+  </main>
+</div>
+
+<div id="toast" class="toast"></div>
+<script src="libs/supabase.min.js"></script>
+<script src="assets/config.js"></script>
+<script src="assets/teacher-messages.js?v=20260707-1"></script>
+<script src="assets/ux-enhancements.js"></script>
+</body>
+</html>
