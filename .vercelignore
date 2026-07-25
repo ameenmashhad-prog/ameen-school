@@ -1,9 +1,22 @@
+# ===== توحيد النشر - لا تحجب صفحات الإنتاج =====
+# نحجب فقط الملفات التطويرية الحقيقية، وليس صفحات مرتبطة من super-admin أو البوابة
+
 dev-tools/
-clear-session.html
-deployment-check.html
-preview-mockup.html
-SHOW_ME_FAMILY_REGISTRATION_V3.html
 docs/archive/
-*.template.html
-family-registration-v3-bridge.html
-family-registration-v3-hard-switch.template.html
+*.zip
+*.patch
+*.log
+
+# ملفات المراجعة المؤقتة (اختياري)
+AGENT_REVIEW_AR.md
+
+# لا تحجب هذه الملفات بعد الآن - كانت تسبب 404:
+# clear-session.html
+# deployment-check.html
+# preview-mockup.html
+# SHOW_ME_FAMILY_REGISTRATION_V3.html
+# family-registration-v3-bridge.html
+# لقد تم فك الحجب عنها لتكون ظاهرة
+
+# يمكن إبقاء القوالب مخفية إذا أردت
+# *.template.html
