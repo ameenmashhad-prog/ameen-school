@@ -10,7 +10,7 @@
     }
   ],
   "rewrites": [
-    { "source": "/api/exchange/tgju", "destination": "/api/exchange-tgju.js" },
-    { "source": "/api/:path*", "destination": "/api/proxy.js" }
+    { "source": "/api/exchange/tgju", "destination": "/api/exchange-tgju" },
+    { "source": "/api/:path*", "destination": "/api/proxy" }
   ]
 }
