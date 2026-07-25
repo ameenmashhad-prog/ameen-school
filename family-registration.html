@@ -1,45 +1,95 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>التحويل إلى النسخة العائلية الجديدة</title>
-  <link rel="stylesheet" href="assets/amin.css">
-  <link rel="stylesheet" href="assets/i18n.css">
-  <meta http-equiv="refresh" content="2; url=https://next-forms-v3.vercel.app/ar/forms/family-registration-v3?source=hard-switch">
-  <style>
-    body{margin:0;font-family:"IBM Plex Sans Arabic",Tahoma,Arial,sans-serif;background:#f7fafc;color:#15314b;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px}
-    .card{max-width:760px;width:100%;background:#fff;border:1px solid #d8e2ef;border-radius:28px;padding:32px;box-shadow:0 20px 60px rgba(21,49,75,.08)}
-    h1{margin:0 0 10px;font-size:32px}
-    p{margin:0 0 14px;line-height:1.9;color:#5f748c}
-    .badge{display:inline-block;background:#e7f7f4;color:#0f766e;border:1px solid #bce7df;padding:8px 14px;border-radius:999px;font-weight:800;font-size:13px;margin-bottom:16px}
-    .actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:18px}
-    .btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 18px;border-radius:16px;text-decoration:none;font-weight:800;border:1px solid #d8e2ef;color:#15314b;background:#fff}
-    .btn.primary{background:#0f766e;color:#fff;border-color:#0f766e}
-    .note{margin-top:18px;font-size:13px;color:#7b8da2}
-    code{background:#f6f8fb;padding:2px 6px;border-radius:8px}
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>تسجيل الأسرة والطلاب — مدارس أمين الرضا</title>
+<link rel="stylesheet" href="assets/amin.css?v=20260706-6">
+<link rel="stylesheet" href="assets/i18n.css">
+<link rel="icon" href="/favicon.ico">
+<style>
+.hero{max-width:900px;margin:0 auto 24px;background:linear-gradient(135deg,#081426 0%,#0B6E4F 100%);color:#fff;padding:28px;border-radius:24px}
+.hero h1{font-size:26px;margin:0 0 8px}
+.hero p{opacity:.9;line-height:1.8;margin:0}
+.grid{max-width:900px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.card{background:#fff;border:1px solid var(--border-subtle);border-radius:18px;padding:20px;box-shadow:var(--shadow-soft);transition:.2s}
+.card:hover{transform:translateY(-4px);box-shadow:var(--shadow-soft-lg)}
+.card h3{font-size:16px;margin:0 0 8px}
+.card p{font-size:13px;color:var(--text-secondary);line-height:1.6;margin:0 0 12px;min-height:40px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 14px;border-radius:10px;border:1px solid var(--border-subtle);background:#fff;font-weight:700;text-decoration:none;cursor:pointer;font-family:inherit}
+.btn-primary{background:#0B6E4F;color:#fff;border-color:#0B6E4F}
+.badge{display:inline-block;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:700}
+.b-green{background:#dcfce7;color:#166534}
+.b-gold{background:#fef3c7;color:#92400e}
+.b-red{background:#fee2e2;color:#991b1b}
+.b-blue{background:#dbeafe;color:#1e40af}
+</style>
 </head>
-<body>
-  <section class="card">
-    <span class="badge">تم اعتماد النسخة العائلية الجديدة</span>
-    <h1>يتم تحويلك إلى Family Registration v3</h1>
-    <p>
-      تم نقل تسجيل الأسرة والطلاب إلى النسخة العائلية الجديدة المبنية على <strong>Forms v3</strong>،
-      والتي تقلل تكرار بيانات ولي الأمر والعائلة وتضيف طباعة عائلية أوضح.
-    </p>
-    <p>
-      إذا لم يتم التحويل تلقائياً، استخدم الزر التالي:
-    </p>
-    <div class="actions">
-      <a class="btn primary" href="https://next-forms-v3.vercel.app/ar/forms/family-registration-v3?source=hard-switch">فتح النسخة الجديدة</a>
+<body style="background:var(--bg);padding:24px;font-family:var(--font-arabic)">
+<div class="hero">
+  <h1>📝 تسجيل الأسرة والطلاب — 2026-2027</h1>
+  <p>النسخة الجديدة V3 على <code>next-forms-v3.vercel.app</code> متوقفة حالياً (404). استخدم إحدى النسخ العاملة أدناه — كلها محدثة بآخر المزايا (كود سيدا، نوع الطالب، شمسى/ميلادي، صلاحية الجواز، فرع 1 و 2).</p>
+  <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+    <span class="badge b-red">V3 على vercel.app متوقف 404</span>
+    <span class="badge b-green">النسخ المحلية تعمل 100%</span>
+  </div>
+</div>
+
+<div class="grid">
+  <div class="card" style="border-color:#0B6E4F;border-width:2px">
+    <h3>✅ النسخة المحسنة الجديدة V2 (موصى بها)</h3>
+    <p>تتضمن كل طلباتك: كود سيدا 10 أرقام، نوع الطالب (نظامي/مستمع/خارجي/أخرى)، ميلادي وشمسي بجانب بعض مع تحويل عكسي، الأيام الباقية للجواز، عدد طلاب فرع 1 و 2، استيراد ولي أمر سابق، وطباعتين.</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <a class="btn btn-primary" href="family-registration-legacy.html">فتح الاستمارة المحسنة ↗</a>
+      <span class="badge b-green">تعمل بدون V3</span>
     </div>
-    <div class="note">
-      هذا الملف مخصص لمرحلة <strong>Hard Switch</strong>. قبل الاستخدام، استبدل القيمة
-      <code>https://next-forms-v3-ameen-reza.vercel.app</code> برابط النشر الحقيقي للتطبيق الجديد.
+    <small style="display:block;margin-top:10px;color:#64748b">هذه هي النسخة القديمة المحدثة بـ 69 وحدة، تعمل مباشرة مع Supabase بدون مشروع Vercel منفصل</small>
+  </div>
+
+  <div class="card">
+    <h3>🖨️ طباعة فردية — كود سيدا + شمسي + جواز</h3>
+    <p>استمارة طالب واحد: تدخل كود سيدا أو معرف الطالب → تطبع ورقة فردية فيها سيدا، نوع، ميلادي وشمسي، الأيام الباقية للجواز ملونة.</p>
+    <a class="btn btn-primary" href="print-student-individual.html">فتح الطباعة الفردية ↗</a>
+  </div>
+
+  <div class="card">
+    <h3>👨‍👩‍👧‍👦 طباعة عائلية — فرع 1 و 2</h3>
+    <p>استمارة عائلية: تدخل معرف العائلة → تطبع ورقة العائلة فيها عدد طلاب مجمع أمين الرضا 1 و 2 + كل الأبناء مع سيدا وصلاحية الجواز + استيراد ولي أمر سابق.</p>
+    <a class="btn btn-primary" href="print-family-form.html">فتح الطباعة العائلية ↗</a>
+  </div>
+
+  <div class="card">
+    <h3>📋 مركز التوحيد — كل الصفحات</h3>
+    <p>صفحة واحدة فيها كل 69 صفحة للمشروع مع بحث حي — تحل مشكلة الصفحات المختفية.</p>
+    <a class="btn" href="all-pages-hub.html">فتح مركز التوحيد ↗</a>
+  </div>
+
+  <div class="card">
+    <h3>🔧 استكشاف أخطاء V3</h3>
+    <p>V3 يحتاج مشروع Vercel منفصل بـ Root Directory = next-forms-v3. إذا كان متوقف، أنشئ مشروع جديد في Vercel → Import → ameenmashhad-prog/ameen-school → Root Directory: next-forms-v3 → Deploy</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <a class="btn" href="https://vercel.com/new/clone?repository-url=https://github.com/ameenmashhad-prog/ameen-school&root-directory=next-forms-v3" target="_blank">إنشاء مشروع V3 جديد ↗</a>
+      <span class="badge b-gold">يحتاج 2 دقيقة</span>
     </div>
-  </section>
-  <script src="assets/i18n.js"></script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1ce690d8b5f7235',t:'MTc4NDM0NTQ1Mw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+  </div>
+
+  <div class="card">
+    <h3>📝 النسخة الأصلية القديمة (احتياط)</h3>
+    <p>النسخة الأصلية قبل التحديثات — تعمل بدون كود سيدا وشمسى.</p>
+    <a class="btn" href="family-registration-legacy.html">فتح القديمة ↗</a>
+  </div>
+</div>
+
+<div style="max-width:900px;margin:24px auto 0;padding:16px;background:#fff;border:1px solid var(--border-subtle);border-radius:16px">
+  <h4 style="margin:0 0 8px">ℹ️ لماذا V3 يعطي 404؟</h4>
+  <p style="margin:0;color:#64748b;font-size:13px;line-height:1.7">
+    مشروع <code>next-forms-v3.vercel.app</code> على Vercel متوقف أو محذوف (DEPLOYMENT_NOT_FOUND). 
+    كل الطلبات <code>/ar/forms/family-registration-v3</code> تعطي 404. 
+    الحل: إما إعادة نشر المشروع من Vercel Dashboard، أو استخدام النسخ المحلية العاملة أعلاه التي تحتوي كل مزاياك الجديدة (سيدا، شمسي، جواز، فرع 1 و 2).
+    تم إصلاح <code>family-registration.html</code> الآن ليعرض هذه البدائل بدل التحويل التلقائي المكسور.
+  </p>
+</div>
+
+<script src="assets/amin-theme-injector.js"></script>
 </body>
 </html>
