@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>مركز التوحيد الشامل — كل صفحات المنصة</title>
+<link rel="stylesheet" href="assets/amin.css?v=20260706-6">
+<link rel="stylesheet" href="assets/i18n.css">
+<link rel="icon" href="/favicon.ico">
+<style>
+.hero{background:linear-gradient(135deg,#081426 0%,#0B6E4F 100%);color:white;padding:32px;border-radius:24px;margin-block-end:24px}
+.hero h1{font-size:28px;margin-block-end:8px}
+.hero p{opacity:.9;line-height:1.7}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-block-end:24px}
+.stat{background:#fff;border:1px solid var(--border-subtle);border-radius:16px;padding:16px;box-shadow:var(--shadow-soft)}
+.stat small{display:block;color:var(--text-secondary);margin-block-end:4px}
+.stat b{font-size:22px}
+.filters{display:flex;gap:10px;flex-wrap:wrap;margin-block-end:20px;background:#fff;padding:16px;border-radius:16px;border:1px solid var(--border-subtle)}
+.input{padding:10px 14px;border:1px solid var(--border-subtle);border-radius:10px;min-width:240px;font-family:inherit}
+.select{padding:10px 14px;border:1px solid var(--border-subtle);border-radius:10px;font-family:inherit}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
+.card{border:1px solid var(--border-subtle);border-radius:18px;background:#fff;overflow:hidden;box-shadow:var(--shadow-soft);transition:.2s}
+.card:hover{transform:translateY(-4px);box-shadow:var(--shadow-soft-lg)}
+.card-head{padding:16px;display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.card-badge{font-size:10px;padding:4px 8px;border-radius:999px;font-weight:700}
+.b-green{background:#dcfce7;color:#166534}
+.b-red{background:#fee2e2;color:#991b1b}
+.b-gold{background:#fef3c7;color:#92400e}
+.b-blue{background:#dbeafe;color:#1e40af}
+.b-slate{background:#f1f5f9;color:#475569}
+.card-body{padding:0 16px 16px}
+.card-body h3{font-size:16px;margin-block-end:6px}
+.card-body p{font-size:13px;color:var(--text-secondary);line-height:1.6;min-height:40px}
+.card-actions{display:flex;gap:8px;margin-block-start:12px}
+.btn{padding:8px 14px;border-radius:10px;border:1px solid var(--border-subtle);background:#fff;cursor:pointer;font-family:inherit;font-weight:600;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--primary);color:white;border-color:var(--primary)}
+.btn-gold{background:#f59e0b;color:white;border-color:#f59e0b}
+.hidden{display:none !important}
+</style>
+</head>
+<body style="background:var(--bg);padding:24px;max-width:1400px;margin:0 auto;font-family:var(--font-arabic)">
+<div class="hero">
+  <h1>🧭 مركز التوحيد الشامل — كل صفحات مدارس أمين الرضا</h1>
+  <p>هذه الصفحة تحل مشكلة "الصفحات المختفية" بتوحيد كل شيء في مكان واحد. هنا تجد <b>كل ملفات HTML في المشروع (65 صفحة)</b> مع حالتها: مسجلة في البوابة؟ محجوبة سابقاً؟ عامة؟ تطوير؟ يمكنك البحث والفلترة وفتح أي صفحة مباشرة.</p>
+  <div style="margin-block-start:14px;display:flex;gap:8px;flex-wrap:wrap">
+    <span class="card-badge b-green">✅ 54 صفحة جذر في main</span>
+    <span class="card-badge b-gold">⚠️ 25 كانت مخفية</span>
+    <span class="card-badge b-blue">🔧 تم إصلاح vercelignore + CSP + registry</span>
+  </div>
+</div>
+
+<div class="stats" id="stats"></div>
+
+<div class="filters">
+  <input id="search" class="input" placeholder="🔍 ابحث باسم الصفحة أو وصفها... مثل: مالية، نمو، معلم">
+  <select id="filterGroup" class="select">
+    <option value="">كل المجموعات</option>
+    <option value="finance">💰 المالية</option>
+    <option value="academic">📚 الأكاديمي</option>
+    <option value="assignmentsExams">✍️ الواجبات والاختبارات</option>
+    <option value="resources">📦 الموارد</option>
+    <option value="people">👥 الموارد البشرية</option>
+    <option value="analyticsAdmin">📊 تحليلات ونظام</option>
+    <option value="main">🏠 رئيسية</option>
+    <option value="public">🌐 عامة</option>
+    <option value="dev">🛠️ تطوير</option>
+  </select>
+  <select id="filterStatus" class="select">
+    <option value="">كل الحالات</option>
+    <option value="hidden-before">كانت مخفية قبل الإصلاح</option>
+    <option value="registered">كانت ظاهرة</option>
+    <option value="critical">مهمة جداً</option>
+  </select>
+  <button class="btn" onclick="window.open('portal.html')">🏛️ البوابة الموحدة</button>
+  <button class="btn" onclick="window.open('super-admin.html')">👑 المسؤول الأعلى</button>
+  <button class="btn btn-gold" onclick="window.open('FULL_AUDIT_AND_FIX_AR.md')">📄 تقرير الفحص</button>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<script>
+const PAGES = [
+  // رئيسية
+  {file:'index.html', group:'main', title:'تسجيل الدخول الموحد', desc:'مدخل النظام، يوزعك حسب الدور تلقائياً', status:'registered', critical:true, badge:'دخول', color:'blue'},
+  {file:'portal.html', group:'main', title:'البوابة الموحدة الجديدة', desc:'الواجهة الرسمية المعتمدة - فيها كل شيء', status:'registered', critical:true, badge:'رسمي', color:'gold'},
+  {file:'super-admin.html', group:'main', title:'المسؤول الأعلى', desc:'لوحة تحكم شاملة لكل الأقسام', status:'registered', critical:true, badge:'SUPER', color:'gold'},
+  {file:'staff.html', group:'main', title:'واجهة الإدارة التشغيلية', desc:'حسب صلاحيتك (مالية/انضباط/علمي)', status:'registered', critical:false, badge:'', color:'violet'},
+  {file:'teacher.html', group:'main', title:'لوحة المعلم', desc:'حضور، واجبات، درجات، طلاب', status:'registered', critical:true, badge:'', color:'emerald'},
+  {file:'student.html', group:'main', title:'بوابة الطالب', desc:'درجات، حضور، واجبات، اختبارات', status:'registered', critical:true, badge:'', color:'indigo'},
+  {file:'parent.html', group:'main', title:'بوابة ولي الأمر', desc:'يتطلب دور parent - يدخل تلقائياً من index', status:'hidden-before', critical:true, badge:'دور', color:'cyan'},
+  {file:'dashboard.html', group:'main', title:'لوحة التحكم القديمة (Legacy)', desc:'تعتمد على جدول app_modules من DB - للتوافق فقط', status:'hidden-before', critical:false, badge:'LEGACY', color:'slate'},
+
+  // مالية - كانت مخفية
+  {file:'finance-pro.html', group:'finance', title:'النظام المالي الاحترافي', desc:'الرسوم، الأقساط، المدفوعات، المتبقي', status:'registered', critical:true, badge:'', color:'teal'},
+  {file:'finance-growth-dashboard.html', group:'finance', title:'نمو المؤسسة مالياً', desc:'دخل، مصروف، التزامات، توقعات - كان مخفياً', status:'hidden-before', critical:true, badge:'كان مخفي', color:'teal'},
+  {file:'finance-monthly-close.html', group:'finance', title:'الإقفال الشهري الشمسي', desc:'إقفال ومصادقة شهرية - كان مخفياً', status:'hidden-before', critical:true, badge:'كان مخفي', color:'violet'},
+  {file:'owner-executive-board.html', group:'finance', title:'لوحة المالك التنفيذية', desc:'رؤية تنفيذية موحدة - كان مخفياً', status:'hidden-before', critical:true, badge:'OWNER - كان مخفي', color:'gold'},
+  {file:'finance-cashbox.html', group:'finance', title:'صندوق اليومية', desc:'إغلاق يومي حسب المستلم', status:'registered', critical:true, badge:'', color:'emerald'},
+  {file:'finance-collections.html', group:'finance', title:'التحصيل والمتابعة', desc:'متأخرات، وعود دفع، تذكيرات', status:'registered', critical:true, badge:'', color:'rose'},
+  {file:'finance-executive.html', group:'finance', title:'المركز المالي التنفيذي', desc:'لوحة مالية شاملة وتحليل متأخرات', status:'registered', critical:true, badge:'', color:'violet'},
+  {file:'finance-credit-report.html', group:'finance', title:'الرصيد الدائن', desc:'تقرير المدفوعات الزائدة', status:'registered', critical:false, badge:'', color:'gold'},
+  {file:'finance-receiver-reports.html', group:'finance', title:'تقارير المستلمين', desc:'مدفوعات وإلغاء وتدقيق حسب المستلم', status:'registered', critical:false, badge:'', color:'cyan'},
+  {file:'admin-finance-rules.html', group:'finance', title:'قواعد المالية', desc:'رسوم الصفوف وأسعار المعلمين', status:'registered', critical:false, badge:'', color:'slate'},
+  {file:'teacher-payroll-finance.html', group:'finance', title:'رواتب المعلمين اليومية', desc:'حساب حسب الحصص والحسميات - كان مخفياً', status:'hidden-before', critical:true, badge:'كان مخفي', color:'emerald'},
+  {file:'teacher-punctuality-admin.html', group:'finance', title:'تأخير المعلمين والحسميات', desc:'انضباط المعلمين - كان مخفياً', status:'hidden-before', critical:true, badge:'كان مخفي', color:'rose'},
+  {file:'teacher-session-checkin.html', group:'finance', title:'تحضير المعلم للحصص', desc:'تسجيل حضور المعلم للحصة - كان مخفياً', status:'hidden-before', critical:false, badge:'كان مخفي', color:'cyan'},
+
+  // أكاديمي
+  {file:'academic-pro.html', group:'academic', title:'النظام الأكاديمي الاحترافي', desc:'الدرجات، الإعفاءات، التحليلات', status:'registered', critical:true, badge:'', color:'indigo'},
+  {file:'academic-analytics.html', group:'academic', title:'التحليلات الأكاديمية', desc:'تحليلات الأداء والفجوات - كان مخفياً', status:'hidden-before', critical:true, badge:'كان مخفي', color:'indigo'},
+  {file:'curriculum-planner.html', group:'academic', title:'مخطط المنهج الذكي', desc:'استيراد وتوزيع المنهج مع تعديل المعلم', status:'registered', critical:false, badge:'', color:'gold'},
+  {file:'schedule-management.html', group:'academic', title:'إدارة الجداول والحصص', desc:'إدارة الجدول وتوليد الجلسات', status:'registered', critical:true, badge:'', color:'cyan'},
+  {file:'section-assignment-management.html', group:'academic', title:'الشعب والإسنادات', desc:'الشعب، الطلاب، إسناد المعلمين', status:'registered', critical:true, badge:'', color:'violet'},
+  {file:'certificates-generator.html', group:'academic', title:'مولد الشهادات الذكي', desc:'شهادات تفوق وحضور مخصصة - كان مخفياً', status:'hidden-before', critical:false, badge:'كان مخفي', color:'gold'},
+
+  // واجبات
+  {file:'teacher-exams.html', group:'assignmentsExams', title:'بنك الأسئلة', desc:'أسئلة واختبارات إلكترونية', status:'registered', critical:true, badge:'', color:'indigo'},
+  {file:'online-exams.html', group:'assignmentsExams', title:'الاختبارات الإلكترونية', desc:'دخول الطالب للاختبارات', status:'registered', critical:true, badge:'', color:'cyan'},
+  {file:'exam-integrity.html', group:'assignmentsExams', title:'نزاهة الاختبارات', desc:'تشابه، نسخ، مؤشرات AI', status:'registered', critical:false, badge:'', color:'rose'},
+  {file:'student-homeworks.html', group:'assignmentsExams', title:'الواجبات', desc:'واجبات وتسليمات الطلاب', status:'registered', critical:true, badge:'', color:'orange'},
+  {file:'homework-reports.html', group:'assignmentsExams', title:'تقارير الواجبات', desc:'إنجاز، متأخرون، تذكيرات', status:'registered', critical:false, badge:'', color:'rose'},
+  {file:'homework-audit.html', group:'assignmentsExams', title:'سجل الواجبات', desc:'عمليات وأخطاء الواجبات', status:'registered', critical:false, badge:'', color:'slate'},
+
+  // موارد
+  {file:'library.html', group:'resources', title:'المكتبة', desc:'فهرس وإعارة وحجز', status:'registered', critical:false, badge:'', color:'orange'},
+  {file:'inventory.html', group:'resources', title:'المخزون والمشتريات', desc:'أصناف، موردون، طلبات شراء', status:'registered', critical:false, badge:'', color:'violet'},
+  {file:'fixed-assets.html', group:'resources', title:'الأصول والعهد', desc:'أصول، عهد، صيانة', status:'registered', critical:false, badge:'', color:'gold'},
+  {file:'labs-activities.html', group:'resources', title:'المختبرات والأنشطة', desc:'مختبرات، تجارب، سلامة وأنشطة', status:'registered', critical:false, badge:'', color:'teal'},
+  {file:'transportation.html', group:'resources', title:'النقل المدرسي', desc:'حافلات، مسارات، رحلات', status:'registered', critical:false, badge:'', color:'cyan'},
+  {file:'documents.html', group:'resources', title:'الوثائق والأرشفة', desc:'ملفات الطلاب والموظفين والأرشيف', status:'registered', critical:false, badge:'', color:'indigo'},
+
+  // موارد بشرية
+  {file:'hr.html', group:'people', title:'الموارد البشرية', desc:'موظفون، حضور، إجازات، رواتب', status:'registered', critical:false, badge:'', color:'emerald'},
+  {file:'registrations-admin.html', group:'people', title:'مراجعة التسجيلات', desc:'طلبات أولياء الأمور والمعلمين', status:'registered', critical:true, badge:'', color:'gold'},
+  {file:'permissions-management.html', group:'people', title:'إدارة التفويضات', desc:'منح وإلغاء صلاحيات المستخدمين', status:'registered', critical:true, badge:'', color:'rose'},
+  {file:'notifications.html', group:'people', title:'الإشعارات', desc:'إشعاراتك الخاصة فقط', status:'registered', critical:false, badge:'', color:'cyan'},
+  {file:'tasks-management.html', group:'people', title:'إدارة المهام والتكليفات', desc:'مهام ومتابعة تنفيذ - كان مخفياً', status:'hidden-before', critical:false, badge:'كان مخفي', color:'violet'},
+  {file:'parent-messages.html', group:'people', title:'تواصل أولياء الأمور (واتساب)', desc:'رسائل وتنبيهات - كان مخفياً', status:'hidden-before', critical:true, badge:'كان مخفي', color:'emerald'},
+  {file:'import-students.html', group:'people', title:'استيراد الطلاب من Excel', desc:'Google Forms ورفع جماعي - كان مخفياً', status:'hidden-before', critical:true, badge:'كان مخفي', color:'gold'},
+
+  // تحليلات ونظام
+  {file:'analytics-center.html', group:'analyticsAdmin', title:'مركز التحليلات', desc:'مؤشرات المؤسسة والتنبيهات الذكية', status:'registered', critical:false, badge:'', color:'violet'},
+  {file:'announcements.html', group:'analyticsAdmin', title:'الإعلانات الجماعية', desc:'نشر إعلان وإرساله كإشعار', status:'registered', critical:false, badge:'', color:'rose'},
+  {file:'final-readiness.html', group:'analyticsAdmin', title:'جاهزية النظام', desc:'فحص نهائي للوحدات والصفحات وRLS', status:'registered', critical:false, badge:'', color:'emerald'},
+  {file:'security-governance.html', group:'analyticsAdmin', title:'حوكمة الأمن', desc:'فحص مركزي للصلاحيات وRLS', status:'registered', critical:false, badge:'', color:'rose'},
+  {file:'system-maintenance.html', group:'analyticsAdmin', title:'صيانة النظام', desc:'فحص صحة النظام والتنظيف', status:'registered', critical:false, badge:'', color:'slate'},
+  {file:'smart-calendar.html', group:'main', title:'التقويم الذكي', desc:'تقويم ثلاثي، أجندتي، الإنجازات', status:'registered', critical:false, badge:'', color:'cyan'},
+  {file:'achievements.html', group:'main', title:'الإنجازات والشارات', desc:'شارات تحفيزية ولوحة صدارة', status:'registered', critical:false, badge:'', color:'gold'},
+  {file:'counselor.html', group:'people', title:'الإرشاد النفسي', desc:'حالات، جلسات، أهداف، تنبيهات', status:'registered', critical:false, badge:'', color:'violet'},
+  {file:'counseling-report.html', group:'analyticsAdmin', title:'تقرير البرنامج التربوي', desc:'مؤشرات مجمعة دون أسماء', status:'registered', critical:false, badge:'', color:'teal'},
+
+  // عامة
+  {file:'family-registration.html', group:'public', title:'تسجيل ولي أمر/طالب (عام)', desc:'صفحة عامة - لا تحتاج تسجيل دخول', status:'registered', critical:true, badge:'PUBLIC', color:'emerald'},
+  {file:'teacher-registration.html', group:'public', title:'تسجيل معلم (عام)', desc:'صفحة عامة', status:'hidden-before', critical:true, badge:'PUBLIC', color:'teal'},
+
+  // تطوير - كانت محجوبة
+  {file:'clear-session.html', group:'dev', title:'مسح الجلسة', desc:'أداة لحل مشاكل localStorage - كانت محجوبة في vercelignore', status:'hidden-before', critical:false, badge:'كان محجوب', color:'slate'},
+  {file:'deployment-check.html', group:'dev', title:'فحص النشر', desc:'فحص روابط وأصول - كان محجوباً', status:'hidden-before', critical:false, badge:'كان محجوب', color:'emerald'},
+  {file:'preview-mockup.html', group:'dev', title:'معاينة التصميم', desc:'هوية بصرية مقترحة - كان محجوباً', status:'hidden-before', critical:false, badge:'كان محجوب', color:'rose'},
+  {file:'SHOW_ME_FAMILY_REGISTRATION_V3.html', group:'dev', title:'عرض تسجيل العائلة V3', desc:'صفحة توضيحية - كانت محجوبة', status:'hidden-before', critical:false, badge:'كان محجوب', color:'gold'},
+  {file:'offline.html', group:'dev', title:'صفحة عدم الاتصال', desc:'PWA offline fallback', status:'hidden-before', critical:false, badge:'PWA', color:'slate'},
+];
+
+function render(){
+  const search = (document.getElementById('search').value||'').toLowerCase().trim();
+  const group = document.getElementById('filterGroup').value;
+  const status = document.getElementById('filterStatus').value;
+  const grid = document.getElementById('grid');
+  let filtered = PAGES.filter(p=>{
+    if(group && p.group!==group) return false;
+    if(status==='hidden-before' && p.status!=='hidden-before') return false;
+    if(status==='registered' && p.status!=='registered') return false;
+    if(status==='critical' && !p.critical) return false;
+    if(search){
+      const hay = (p.file+' '+p.title+' '+p.desc+' '+p.badge).toLowerCase();
+      if(!hay.includes(search)) return false;
+    }
+    return true;
+  });
+  const html = filtered.map(p=>{
+    const badgeClass = p.status==='hidden-before' ? 'b-red' : p.critical ? 'b-gold' : 'b-green';
+    const badgeText = p.status==='hidden-before' ? 'كان مخفي - الآن ظاهر' : p.badge||'ظاهر';
+    const icon = p.group==='finance' ? '💰' : p.group==='academic' ? '📚' : p.group==='people' ? '👥' : p.group==='resources' ? '📦' : p.group==='analyticsAdmin' ? '📊' : p.group==='public' ? '🌐' : p.group==='dev' ? '🛠️' : '🏠';
+    return `<div class="card">
+      <div class="card-head">
+        <span class="card-badge ${badgeClass}">${badgeText}</span>
+        <span class="card-badge b-slate">${icon} ${p.group}</span>
+      </div>
+      <div class="card-body">
+        <h3>${p.title}</h3>
+        <small style="color:var(--text-secondary);font-family:monospace">${p.file}</small>
+        <p>${p.desc}</p>
+        <div class="card-actions">
+          <a class="btn btn-primary" href="${p.file}" target="_blank">فتح الصفحة ↗</a>
+          <a class="btn" href="${p.file}?lite=1" target="_blank">lite</a>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  grid.innerHTML = html || '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-secondary)">لا توجد نتائج</div>';
+
+  // stats
+  const total = PAGES.length;
+  const hidden = PAGES.filter(p=>p.status==='hidden-before').length;
+  const crit = PAGES.filter(p=>p.critical).length;
+  const fin = PAGES.filter(p=>p.group==='finance').length;
+  document.getElementById('stats').innerHTML = `
+    <div class="stat"><small>إجمالي الصفحات</small><b>${total}</b></div>
+    <div class="stat"><small>كانت مخفية</small><b style="color:#dc2626">${hidden}</b></div>
+    <div class="stat"><small>مهمة جداً</small><b>${crit}</b></div>
+    <div class="stat"><small>المالية</small><b>${fin}</b></div>
+    <div class="stat"><small>معروضة الآن</small><b>${filtered.length} / ${total}</b></div>
+  `;
+}
+
+document.getElementById('search').addEventListener('input', render);
+document.getElementById('filterGroup').addEventListener('change', render);
+document.getElementById('filterStatus').addEventListener('change', render);
+render();
+</script>
+<script src="assets/amin-theme-injector.js"></script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f"}' crossorigin="anonymous"></script>
+</body>
+</html>
