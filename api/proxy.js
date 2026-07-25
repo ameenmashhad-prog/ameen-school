@@ -27,9 +27,27 @@ function originAllowed(req) {
 }
 
 function normalizeTargetPath(req) {
-  let path = req.url || '';
-  path = path.replace(/^\/api\/proxy(?=\/|\?|$)/, '');
-  path = path.replace(/^\/api(?=\/|\?|$)/, '');
+  let rawUrl = req.url || '';
+  // Parse URL to handle Vercel's :path* behavior which may add ?path=...
+  // Example: /api/proxy?path=rest/v1/users&select=*  or  /api/rest/v1/users?select=*
+  try {
+    const urlObj = new URL(rawUrl, 'http://localhost');
+    let pathParam = urlObj.searchParams.get('path');
+    // Vercel sometimes encodes path as path=rest/v1/users
+    if (pathParam) {
+      // pathParam may be like "rest/v1/users" without leading slash
+      if (!pathParam.startsWith('/')) pathParam = '/' + pathParam;
+      // Preserve other query params except 'path'
+      urlObj.searchParams.delete('path');
+      const remainingQuery = urlObj.searchParams.toString();
+      return pathParam + (remainingQuery ? '?' + remainingQuery : '');
+    }
+  } catch {}
+  
+  // Fallback: original logic
+  let path = rawUrl;
+  path = path.replace(/^\/api\/proxy(?=\/|$|\?)/, '');
+  path = path.replace(/^\/api(?=\/|$|\?)/, '');
   if (!path.startsWith('/')) path = '/' + path;
   return path;
 }
@@ -55,10 +73,12 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   const targetPath = normalizeTargetPath(req);
-  if (!ALLOWED_PREFIXES.some(p => targetPath.startsWith(p))) {
-    return res.status(403).json({ error: 'supabase_path_not_allowed', path: targetPath.split('?')[0] });
+  // Security: only allow specific prefixes, and strip query for check
+  const pathWithoutQuery = targetPath.split('?')[0];
+  if (!ALLOWED_PREFIXES.some(p => pathWithoutQuery.startsWith(p))) {
+    return res.status(403).json({ error: 'supabase_path_not_allowed', path: pathWithoutQuery });
   }
-  if (targetPath.startsWith('/realtime/')) {
+  if (pathWithoutQuery.startsWith('/realtime/')) {
     return res.status(403).json({ error: 'realtime_websocket_not_supported_by_proxy' });
   }
 
