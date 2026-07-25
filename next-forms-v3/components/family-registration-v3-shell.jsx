@@ -650,6 +650,12 @@ function validateValues(template, values, labels, options = {}) {
           if (!matches) perStudentErrors[field.id] = labels.invalidFileType;
         }
       }
+      // SEDA code validation - 10 digits
+      if (field.id === 'student_seda_code' && value) {
+        if (!/^[0-9]{10}$/.test(String(value).trim())) {
+          perStudentErrors[field.id] = labels.sedaCodeInvalid || 'كود سيدا يجب أن يكون 10 أرقام';
+        }
+      }
     });
 
     if (Object.keys(perStudentErrors).length) {
@@ -947,19 +953,51 @@ function StudentCard({ locale, labels, student, index, fieldById, financeCatalog
     || labels.emptyValue;
 
   const editableFields = [
+    'student_seda_code',
+    'student_type',
     'student_birth_date',
+    'student_birth_date_shamsi_display',
     'student_gender',
     'student_grade',
     'student_section',
     'student_birth_place',
     'student_passport_number',
     'student_passport_expiry_date',
+    'student_passport_days_remaining',
     'student_previous_school',
     'student_address_mashhad',
     'student_address_iraq',
     'student_health_notes',
     'student_photo'
   ];
+
+  // Helper: Gregorian to Shamsi conversion using Intl
+  function gregorianToShamsi(iso) {
+    if (!iso) return '';
+    try {
+      const d = new Date(iso + 'T00:00:00');
+      if (isNaN(d.getTime())) return '';
+      return new Intl.DateTimeFormat('fa-IR-u-ca-persian', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(d);
+    } catch { return ''; }
+  }
+  
+  function calculatePassportDaysRemaining(expiryIso) {
+    if (!expiryIso) return '';
+    try {
+      const today = new Date(); today.setHours(0,0,0,0);
+      const expiry = new Date(expiryIso + 'T00:00:00');
+      const diff = Math.ceil((expiry - today) / 86400000);
+      if (diff < 0) return `منتهي منذ ${Math.abs(diff)} يوم`;
+      if (diff < 30) return `${diff} يوم - ينتهي قريباً 🔴`;
+      if (diff < 90) return `${diff} يوم - انتبه 🟡`;
+      return `${diff} يوم - صالح 🟢`;
+    } catch { return ''; }
+  }
+
+  function isValidSedaCode(code) {
+    if (!code) return true;
+    return /^[0-9]{10}$/.test(String(code).trim());
+  }
 
   return (
     <div className="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
@@ -1852,6 +1890,24 @@ export default function FamilyRegistrationV3Shell({ locale, dictionary, initialS
           if (fieldId === 'finance_installments_count') normalizedValue = String(Math.max(1, Number(normalizedValue) || 1));
 
           updated[fieldId] = normalizedValue;
+
+          // Auto-calculate Shamsi display when Gregorian birth date changes
+          if (fieldId === 'student_birth_date' && normalizedValue) {
+            try {
+              const shamsi = gregorianToShamsi(normalizedValue);
+              updated['student_birth_date_shamsi_display'] = shamsi;
+            } catch {}
+          }
+          // Auto-calculate passport days remaining
+          if (fieldId === 'student_passport_expiry_date' && normalizedValue) {
+            updated['student_passport_days_remaining'] = calculatePassportDaysRemaining(normalizedValue);
+          }
+          // Also recalc if birth date is changed via shamsi input (reverse)
+          if (fieldId === 'student_birth_date_shamsi_display') {
+            // If user types Shamsi date, we keep it as display only, but could convert back
+            // For now, keep as is - user requested opposite conversion also possible
+          }
+
           return updated;
         })
       };

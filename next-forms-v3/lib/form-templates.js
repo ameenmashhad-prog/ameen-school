@@ -136,6 +136,13 @@ const applicantRelationOptions = [
   option('other', 'أخرى', 'سایر', 'Other')
 ];
 
+const studentTypeOptions = [
+  option('regular', 'نظامي', 'نظامي', 'Regular'),
+  option('listener', 'مستمع', 'شنونده', 'Listener'),
+  option('external', 'خارجي', 'خارجی', 'External'),
+  option('other', 'أخرى', 'سایر', 'Other')
+];
+
 const studentGenderOptions = [
   option('male', 'ذكر', 'پسر', 'Male'),
   option('female', 'أنثى', 'دختر', 'Female')
@@ -259,6 +266,9 @@ const templatesMap = {
       field({ id:'mother_education_notes', type:'text', ar:'توضيحات التحصيل الدراسي', fa:'توضیحات تحصیلی', en:'Education Notes', width:'full', section:'mother' }),
       field({ id:'mother_work_type', type:'select', ar:'العمل', fa:'شغل', en:'Work Type', width:'half', section:'mother', options:motherWorkOptions }),
       field({ id:'mother_work_notes', type:'text', ar:'توضيح العمل', fa:'توضیح شغل', en:'Work Notes', width:'half', section:'mother' }),
+      field({ id:'students_in_branch_1', type:'number', ar:'عدد الطلاب المسجلين في مجمع أمين الرضا 1', fa:'تعداد دانش‌آموزان ثبت‌نام شده در مجتمع امین الرضا 1', en:'Number of Students in Amin Al-Reza Complex 1', width:'half', section:'family_context', placeholder:{ ar:'مثال: 2', fa:'مثال: 2', en:'Example: 2' } }),
+      field({ id:'students_in_branch_2', type:'number', ar:'عدد الطلاب المسجلين في مجمع أمين الرضا 2', fa:'تعداد دانش‌آموزان ثبت‌نام شده در مجتمع امین الرضا 2', en:'Number of Students in Amin Al-Reza Complex 2', width:'half', section:'family_context', placeholder:{ ar:'مثال: 1', fa:'مثال: 1', en:'Example: 1' } }),
+      field({ id:'existing_parent_search', type:'text', ar:'استيراد ولي أمر سابق (ابحث بالاسم أو الهاتف)', fa:'وارد کردن ولی سابق (جستجو با نام یا تلفن)', en:'Import Existing Parent (search by name/phone)', width:'full', section:'family_context', placeholder:{ ar:'اكتب اسم ولي الأمر المسجل سابقاً للاستيراد التلقائي', fa:'نام ولی ثبت‌نام شده قبلی را برای وارد کردن خودکار بنویسید', en:'Type previously registered parent name to auto-import' } }),
       field({ id:'living_with_in_iran', type:'text', ar:'مع من يعيش الطالب / الطلاب في إيران', fa:'دانش‌آموزان در ایران با چه کسی زندگی می‌کنند', en:'Who the Students Live with in Iran', width:'half', section:'family_context' }),
       field({ id:'general_family_health_notes', type:'textarea', ar:'ملاحظات صحية / عائلية عامة', fa:'یادداشت‌های سلامت / خانوادگی', en:'General Health / Family Notes', width:'full', section:'family_context' }),
       field({ id:'family_attachment', type:'file', ar:'مرفق عائلي أو صحي', fa:'پیوست خانوادگی یا سلامت', en:'Family or Health Attachment', section:'documents', accept:'.pdf,.jpg,.png,.jpeg' }),
@@ -276,7 +286,10 @@ const templatesMap = {
       field({ id:'student_father_name', type:'text', ar:'اسم الأب', fa:'نام پدر', en:'Father Name', required:true, width:'half', section:'students' }),
       field({ id:'student_family_name', type:'text', ar:'اسم العائلة', fa:'نام خانوادگی', en:'Family Name', required:true, width:'half', section:'students' }),
       field({ id:'student_full_name', type:'text', ar:'الاسم الكامل المحسوب', fa:'نام کامل محاسبه‌شده', en:'Computed Full Name', required:true, width:'full', section:'students' }),
-      field({ id:'student_birth_date', type:'date', ar:'تاريخ الميلاد', fa:'تاریخ تولد', en:'Date of Birth', required:true, width:'half', section:'students' }),
+      field({ id:'student_seda_code', type:'text', ar:'كود سيدا (10 أرقام)', fa:'کد سیدا (10 رقم)', en:'SEDA Code (10 digits)', required:false, width:'half', section:'students', placeholder:{ ar:'مثال: 1234567890', fa:'مثال: 1234567890', en:'Example: 1234567890' } }),
+      field({ id:'student_type', type:'select', ar:'نوع تسجيل الطالب', fa:'نوع ثبت‌نام دانش‌آموز', en:'Student Type', required:true, width:'half', section:'students', options:studentTypeOptions }),
+      field({ id:'student_birth_date', type:'date', ar:'تاريخ الميلاد الميلادي', fa:'تاریخ تولد میلادی', en:'Gregorian Date of Birth', required:true, width:'half', section:'students' }),
+      field({ id:'student_birth_date_shamsi_display', type:'text', ar:'تاريخ الميلاد الشمسي (يحسب تلقائياً)', fa:'تاریخ تولد شمسی (خودکار)', en:'Shamsi Birth Date (auto)', width:'half', section:'students', placeholder:{ ar:'يظهر تلقائياً بجانب الميلادي', fa:'خودکار کنار میلادی نمایش داده می‌شود', en:'Auto-calculated from Gregorian' } }),
       field({ id:'student_gender', type:'select', ar:'الجنس', fa:'جنسیت', en:'Gender', required:true, width:'half', section:'students', options:studentGenderOptions }),
       field({ id:'student_grade', type:'select', ar:'الصف', fa:'پایه', en:'Grade', required:true, width:'half', section:'students', options:studentGradeOptions }),
       field({ id:'student_section', type:'select', ar:'الشعبة', fa:'کلاس / بخش', en:'Section', width:'half', section:'students', options:studentSectionOptions }),
@@ -286,6 +299,7 @@ const templatesMap = {
       field({ id:'student_birth_place', type:'text', ar:'مكان الولادة', fa:'محل تولد', en:'Birth Place', width:'half', section:'students' }),
       field({ id:'student_passport_number', type:'text', ar:'رقم الجواز', fa:'شماره گذرنامه', en:'Passport Number', width:'half', section:'students' }),
       field({ id:'student_passport_expiry_date', type:'date', ar:'تاريخ انتهاء الجواز', fa:'تاریخ پایان گذرنامه', en:'Passport Expiry Date', width:'half', section:'students' }),
+      field({ id:'student_passport_days_remaining', type:'text', ar:'الأيام الباقية لصلاحية الجواز (يحسب تلقائياً)', fa:'روزهای باقی‌مانده اعتبار گذرنامه', en:'Passport Days Remaining (auto)', width:'half', section:'students', placeholder:{ ar:'يحسب تلقائياً', fa:'خودکار محاسبه می‌شود', en:'Auto-calculated' } }),
       field({ id:'student_previous_school', type:'text', ar:'المدرسة السابقة', fa:'مدرسه قبلی', en:'Previous School', width:'half', section:'students' }),
       field({ id:'student_address_mashhad', type:'textarea', ar:'عنوان السكن: مشهد', fa:'نشانی سکونت: مشهد', en:'Address in Mashhad', width:'full', section:'students' }),
       field({ id:'student_address_iraq', type:'textarea', ar:'عنوان السكن: العراق', fa:'نشانی سکونت: عراق', en:'Address in Iraq', width:'full', section:'students' }),
