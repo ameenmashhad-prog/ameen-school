@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>استمارة تسجيل مخصصة — طباعة مضغوطة مع كل الخانات الجديدة</title>
+<link rel="icon" href="/favicon.ico">
+<style>
+@page{size:A4;margin:8mm}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"IBM Plex Sans Arabic","Cairo",Tahoma,Arial,sans-serif;background:#f1f5f9;color:#1e293b;font-size:11px;line-height:1.4}
+.no-print{max-width:900px;margin:0 auto 12px;display:flex;gap:8px;flex-wrap:wrap;padding:12px}
+.btn{padding:10px 14px;border-radius:10px;border:1px solid #cbd5e1;background:#fff;font-weight:700;cursor:pointer;text-decoration:none;font-family:inherit;font-size:12px}
+.btn-primary{background:#0B6E4F;color:#fff;border-color:#0B6E4F}
+.print-page{width:210mm;min-height:297mm;margin:0 auto;background:#fff;box-shadow:0 0 0 1px #e2e8f0;padding:6mm 8mm;position:relative;overflow:hidden}
+@media print{
+  body{background:#fff;padding:0}
+  .no-print{display:none !important}
+  .print-page{box-shadow:none;border:none;margin:0;width:100%;min-height:auto;padding:5mm 6mm}
+  @page{margin:6mm}
+}
+/* Header */
+.header{display:grid;grid-template-columns:90px 1fr 80px;gap:8px;align-items:center;border:2px solid #0B6E4F;border-radius:8px;padding:6px 10px;margin-bottom:6px;background:linear-gradient(135deg,#f0fdf4 0%,#fff 100%)}
+.logo{width:70px;height:70px;object-fit:contain}
+.header-center{text-align:center}
+.header-center h1{font-size:14px;margin:0;color:#0B6E4F;font-weight:900}
+.header-center h2{font-size:12px;margin:2px 0;font-weight:800;border-bottom:2px solid #0B6E4F;display:inline-block;padding-bottom:2px}
+.header-center .sub{font-size:9px;color:#64748b;margin-top:2px}
+.header-left{text-align:left;font-size:9px}
+.header-left .box{border:1px dashed #0B6E4F;padding:4px 6px;border-radius:6px;text-align:center;min-height:50px;display:flex;align-items:center;justify-content:center;background:#fff}
+.date-line{display:flex;justify-content:space-between;gap:8px;font-size:10px;margin-bottom:5px;padding:4px 6px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px}
+.date-line b{font-size:11px}
+/* Tables - compact like reference */
+table{width:100%;border-collapse:collapse;margin-bottom:5px;table-layout:fixed}
+th,td{border:1px solid #334155;padding:4px 5px;text-align:right;vertical-align:top;word-wrap:break-word;overflow-wrap:anywhere}
+th{background:#e2e8f0;font-size:10px;font-weight:800;color:#1e293b}
+td{font-size:10px;background:#fff}
+td.label{background:#f1f5f9;font-weight:700;width:16%;font-size:9.5px;color:#334155}
+td.value{width:34%}
+tr.section td{background:#0B6E4F;color:#fff;font-weight:800;font-size:11px;text-align:center;padding:3px}
+.small{font-size:8.5px;color:#64748b}
+.badge{display:inline-block;padding:1px 6px;border-radius:999px;font-size:8px;font-weight:800}
+.b-green{background:#dcfce7;color:#166534}
+.b-red{background:#fee2e2;color:#991b1b}
+.b-gold{background:#fef3c7;color:#92400e}
+.b-blue{background:#dbeafe;color:#1e40af}
+/* Compact rows */
+.compact td{padding:2.5px 4px}
+.finance td{font-size:9.5px}
+.sig-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:8px}
+.sig-box{border-top:1px solid #000;padding-top:4px;text-align:center;font-size:9px;margin-top:20px}
+.sig-box b{display:block;font-size:10px}
+.footer-note{margin-top:6px;padding:6px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;font-size:8.5px;line-height:1.5;color:#475569}
+.login-explain{margin-top:6px;padding:6px 8px;background:#fef3c7;border:1px solid #f59e0b;border-radius:6px;font-size:9px;line-height:1.6}
+.login-explain b{color:#92400e}
+</style>
+</head>
+<body>
+
+<div class="no-print">
+  <input id="searchInput" placeholder="ابحث باسم ولي أمر أو كود سيدا أو معرف عائلة" style="flex:1;min-width:260px;padding:10px;border:1px solid #cbd5e1;border-radius:10px">
+  <button onclick="loadDemo()" class="btn btn-primary">تحميل بيانات تجريبية للمعاينة</button>
+  <button onclick="window.print()" class="btn">🖨️ طباعة</button>
+  <a href="family-registration.html" class="btn">📝 التسجيل</a>
+</div>
+
+<div class="print-page" id="printRoot">
+  <!-- Header with logo -->
+  <div class="header">
+    <img src="assets/school-logo-3d.png" alt="شعار المدرسة" class="logo" onerror="this.src='assets/amin-logo.png'">
+    <div class="header-center">
+      <h1>مجمع أمين الرضا التعليمي</h1>
+      <h2>استمارة تسجيل الطالب لعام 2026-2027</h2>
+      <div class="sub">نسخة مخصصة مضغوطة — تتضمن كل الخانات الجديدة بدون فراغات</div>
+    </div>
+    <div class="header-left">
+      <div class="box">صورة الطالب<br><small>3×4</small></div>
+    </div>
+  </div>
+
+  <div class="date-line">
+    <span>تاريخ التسجيل: <b>.... / .... / 2026</b> م</span>
+    <span>أنا الولي: <b>........................................</b> أتقدم بطلب تسجيل لابني / لبنتي في الصف .................. مع العلم بشروط التسجيل والموافق عليها.</span>
+    <span>رقم الطلب: <b id="reqNo">FAM-XXXX</b></span>
+  </div>
+
+  <!-- Student Info - Enhanced with new fields -->
+  <table>
+    <tr class="section"><td colspan="6">أولاً: معلومات الطالب — مع الخانات الجديدة</td></tr>
+    <tr>
+      <td class="label">الاسم الثلاثي:</td>
+      <td class="value" colspan="2" id="v_student_name">........................................</td>
+      <td class="label">كود سيدا (10 أرقام):</td>
+      <td class="value"><span id="v_seda" style="font-family:monospace;letter-spacing:1px">1234567890</span> <span class="badge b-green">صالح</span></td>
+      <td class="label">نوع التسجيل:</td>
+      <td class="value"><span class="badge b-blue" id="v_student_type">نظامي</span> <small>(مستمع/خارجي/نظامي/أخرى)</small></td>
+    </tr>
+    <tr>
+      <td class="label">تاريخ الولادة ميلادي:</td>
+      <td class="value" id="v_birth_greg">12/02/2012</td>
+      <td class="label">تاريخ الولادة شمسي (محسوب تلقائياً):</td>
+      <td class="value" id="v_birth_shamsi">1390/11/23 <small>ش</small></td>
+      <td class="label">الجنس:</td>
+      <td class="value">ذكر / أنثى</td>
+    </tr>
+    <tr>
+      <td class="label">رقم الجواز:</td>
+      <td class="value" id="v_passport_no">..................</td>
+      <td class="label">تاريخ انتهاء الجواز:</td>
+      <td class="value" id="v_passport_exp">2027/12/31</td>
+      <td class="label">الأيام الباقية:</td>
+      <td class="value"><span class="badge b-green" id="v_passport_days">485 يوم - صالح 🟢</span></td>
+    </tr>
+    <tr>
+      <td class="label">الهاتف للدروس الالكترونية:</td>
+      <td class="value" colspan="2">................................................</td>
+      <td class="label">المدرسة السابقة:</td>
+      <td class="value" colspan="2">................................................</td>
+    </tr>
+    <tr>
+      <td class="label">عنوان السكن: مشهد:</td>
+      <td class="value" colspan="5">........................................................................................................................</td>
+    </tr>
+    <tr>
+      <td class="label">عنوان السكن: العراق:</td>
+      <td class="value" colspan="5">........................................................................................................................</td>
+    </tr>
+  </table>
+
+  <!-- Father & Mother - compact -->
+  <table>
+    <tr class="section"><td colspan="6">ثانياً: معلومات ولي الأمر (الأب)</td></tr>
+    <tr>
+      <td class="label">الاسم الثلاثي:</td>
+      <td class="value" colspan="2"></td>
+      <td class="label">التحصيل الدراسي:</td>
+      <td class="value"></td>
+      <td class="label">هاتف الولي الخاص:</td>
+      <td class="value"></td>
+    </tr>
+    <tr>
+      <td class="label">العمل وعنوان العمل:</td>
+      <td class="value" colspan="5"></td>
+    </tr>
+    <tr class="section"><td colspan="6">معلومات الأم</td></tr>
+    <tr>
+      <td class="label">الاسم الثلاثي:</td>
+      <td class="value" colspan="2"></td>
+      <td class="label">التحصيل الدراسي:</td>
+      <td class="value"></td>
+      <td class="label">هاتف الأم:</td>
+      <td class="value"></td>
+    </tr>
+    <tr>
+      <td class="label">العمل وعنوان العمل:</td>
+      <td class="value" colspan="5"></td>
+    </tr>
+  </table>
+
+  <!-- Finance - compact like reference image -->
+  <table class="finance">
+    <tr class="section"><td colspan="5">المرحلة الدراسية والرسوم — مع فرع 1 و 2</td></tr>
+    <tr>
+      <td class="label" style="width:18%">المرحلة الابتدائية (من الأول حتى السادس)</td>
+      <td class="value" style="width:12%">$ 500 أو ما يعادلها بالتوامان</td>
+      <td class="label" style="width:18%">عدد الطلاب في مجمع أمين الرضا 1:</td>
+      <td class="value" style="width:8%" id="v_branch1">2</td>
+      <td class="label" style="width:44%" rowspan="4">
+        <small>الرسوم تشمل التعليم فقط، لا تشمل الزي والكتب والرحلات. القسط يحتسب كاملاً مهما كانت مدة الدوام.</small><br>
+        <div style="margin-top:4px">
+          <span class="badge b-blue">ولي أمر سابق: <span id="v_existing_parent">لا يوجد — تسجيل جديد</span></span>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td class="label">الأول والثاني المتوسط</td>
+      <td class="value">$ 550</td>
+      <td class="label">عدد الطلاب في مجمع أمين الرضا 2:</td>
+      <td class="value" id="v_branch2">1</td>
+    </tr>
+    <tr>
+      <td class="label">الرابع والخامس الإعدادي</td>
+      <td class="value">$ 700</td>
+      <td class="label">إجمالي الطلاب للعائلة:</td>
+      <td class="value">3</td>
+    </tr>
+    <tr>
+      <td class="label">الثالث المتوسط (بدون امتحان نهائي)</td>
+      <td class="value">$ 350</td>
+      <td class="label">السادس الإعدادي للتسجيل في قم:</td>
+      <td class="value">$ 50</td>
+    </tr>
+  </table>
+
+  <!-- Health and living -->
+  <table>
+    <tr>
+      <td class="label" style="width:22%;background:#fef3c7">تنبيه صحي:</td>
+      <td class="value" colspan="3" style="font-size:9px">اذا كان الطالب عنده مشكلة في الكلام او في السمع او يعاني من مشاكل جسمية مثل القلب – الرئة – السكر وغيره، يجب تزويد الادارة بملفه الصحي عند التسجيل (.................)<br>مع من يعيش الطالب في ايران؟ (.................)</td>
+    </tr>
+  </table>
+
+  <!-- Siblings -->
+  <table>
+    <tr>
+      <td class="label" style="width:40%">أسماء الطلاب المسجلين في المجمع (الاسم والصف): 1/ .......... 2/ .......... 3/ .......... 4/ ..........</td>
+      <td class="label" style="width:10%">توقيع ولي الأمر:</td>
+      <td class="value" style="width:50%"></td>
+    </tr>
+  </table>
+
+  <!-- Financial payments table like reference -->
+  <table class="finance">
+    <tr class="section"><td colspan="7">الأمور المالية — سجل الدفعات (مثل النموذج المرجعي)</td></tr>
+    <tr>
+      <th style="width:5%">رديف</th>
+      <th style="width:15%">شماره کارت</th>
+      <th style="width:15%">پیگیری</th>
+      <th style="width:12%">مرجع</th>
+      <th style="width:12%">تاريخ</th>
+      <th style="width:15%">مبلغ</th>
+      <th style="width:26%">ملاحظات</th>
+    </tr>
+    <tr><td>1</td><td></td><td></td><td></td><td> / / </td><td></td><td></td></tr>
+    <tr><td>2</td><td></td><td></td><td></td><td> / / </td><td></td><td></td></tr>
+    <tr><td>3</td><td></td><td></td><td></td><td> / / </td><td></td><td></td></tr>
+    <tr><td>4</td><td></td><td></td><td></td><td> / / </td><td></td><td></td></tr>
+    <tr><td>5</td><td></td><td></td><td></td><td> / / </td><td></td><td></td></tr>
+    <tr><td colspan="5" style="text-align:center;font-weight:800">المجموع الكلي</td><td></td><td></td></tr>
+  </table>
+
+  <table>
+    <tr>
+      <td class="label" style="width:15%">استلام استنساخ الوثيقة ☐</td>
+      <td class="label" style="width:15%">استلام النسخة الأصلية ☐</td>
+      <td class="label" style="width:15%">توضيحات:</td>
+      <td class="value" style="width:35%">.................................................................................................</td>
+      <td class="label" style="width:10%">توقيع ولي الأمر:</td>
+      <td class="value" style="width:10%"></td>
+    </tr>
+  </table>
+
+  <div class="footer-note">
+    تم تسجيل الطالب من قبل: ................................ بتاريخ: .... / .... / .... &nbsp;&nbsp; توقيع مسؤول التسجيل: .................. &nbsp;&nbsp; توقيع المسؤول المالي: .................. &nbsp;&nbsp; توقيع مدير المجمع: ..................
+  </div>
+
+  <div class="login-explain">
+    <b>ما معنى (بيانات الدخول تنشأ عند التفعيل الإداري)؟</b><br>
+    عند التسجيل، نقترح <b>اسم مستخدم</b> فقط (مثلاً <code>s1a7ad41</code>). أما <b>كلمة المرور</b> فلا ننشئها ولا نطبعها في الاستمارة لأسباب أمنية. 
+    عندما توافق الإدارة على الطلب وتفعل الحساب، النظام ينشئ كلمة مرور عشوائية قوية (8 أحرف + أرقام + رمز) مرة واحدة فقط، ويعرضها للمسؤول في لوحة <code>registrations-admin.html</code> ليرسلها لولي الأمر عبر واتساب. 
+    ولي الأمر يغيرها عند أول دخول. لذلك ترى في الاستمارة "تُنشأ عند التفعيل الإداري" بدل كلمة مرور مطبوعة.
+  </div>
+
+  <div class="sig-grid">
+    <div class="sig-box"><b>توقيع ولي الأمر</b></div>
+    <div class="sig-box"><b>توقيع مسؤول التسجيل</b></div>
+    <div class="sig-box"><b>توقيع مدير المجمع</b></div>
+  </div>
+</div>
+
+<script>
+function loadDemo(){
+  document.getElementById('reqNo').textContent='FAM-'+Date.now().toString().slice(-6);
+  document.getElementById('v_student_name').textContent='أحمد محمد علي - مثال حي';
+  document.getElementById('v_seda').textContent='1234567890';
+  document.getElementById('v_student_type').textContent='نظامي';
+  document.getElementById('v_birth_greg').textContent='2012-02-12';
+  document.getElementById('v_birth_shamsi').textContent='1390/11/23';
+  document.getElementById('v_passport_no').textContent='A12345678';
+  document.getElementById('v_passport_exp').textContent='2027-12-31';
+  document.getElementById('v_passport_days').textContent='485 يوم - صالح 🟢';
+  document.getElementById('v_branch1').textContent='2';
+  document.getElementById('v_branch2').textContent='1';
+  document.getElementById('v_existing_parent').textContent='نعم - ولي أمر مسجل سابقاً (محمد سعيد)';
+}
+
+function esc(v){return String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')}
+
+// Auto-load if family_id in URL
+const params=new URLSearchParams(location.search);
+if(params.get('seda')||params.get('family')||params.get('student')){
+  document.getElementById('searchInput')?.setAttribute('value', params.get('seda')||params.get('family')||params.get('student'));
+}
+</script>
+</body>
+</html>
