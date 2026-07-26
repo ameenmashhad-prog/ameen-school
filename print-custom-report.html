@@ -81,10 +81,11 @@ tr.section td{background:#0B6E4F;color:#fff;font-weight:800;font-size:11px;text-
     <div class="header-center">
       <h1>مجمع أمين الرضا التعليمي</h1>
       <h2>استمارة تسجيل الطالب لعام 2026-2027</h2>
-      <div class="sub">نسخة مخصصة مضغوطة — تتضمن كل الخانات الجديدة بدون فراغات</div>
+      <div class="sub">نسخة مخصصة مضغوطة — تتضمن كل الخانات الجديدة بدون فراغات + QR code</div>
     </div>
     <div class="header-left">
-      <div class="box">صورة الطالب<br><small>3×4</small></div>
+      <div id="qrcode" style="width:70px;height:70px;background:#fff;padding:2px;border-radius:6px;border:1px solid #0B6E4F"></div>
+      <small style="display:block;text-align:center;margin-top:2px;font-size:7px">QR: سيدا + دخول</small>
     </div>
   </div>
 
@@ -268,6 +269,28 @@ tr.section td{background:#0B6E4F;color:#fff;font-weight:800;font-size:11px;text-
   </div>
 </div>
 
+<script src="libs/supabase.min.js"></script>
+<script src="assets/config.js"></script>
+<script src="assets/qrcode.min.js"></script>
+<script>
+let qrInstance=null;
+function generateQR(){
+  const seda=document.getElementById('v_seda')?.textContent||'1234567890';
+  const user=document.getElementById('v_username')?.textContent||'s1a7ad41';
+  const pass=document.getElementById('v_password')?.textContent?.split(' ')[0]||'A7b!9k2@';
+  const name=document.getElementById('v_student_name')?.textContent||'طالب';
+  const data=`SEDA:${seda}|USER:${user}|PASS:${pass}|NAME:${name}|SCHOOL:Ameen Al-Reza`;
+  const el=document.getElementById('qrcode');
+  if(!el) return;
+  el.innerHTML='';
+  try{
+    qrInstance=new QRCode(el,{text:data,width:70,height:70,colorDark:'#0B6E4F',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
+  }catch(e){
+    // Fallback: use API
+    el.innerHTML=`<img src="https://api.qrserver.com/v1/create-qr-code/?size=70x70&data=${encodeURIComponent(data)}" style="width:70px;height:70px" alt="QR">`;
+  }
+}
+</script>
 <script>
 // Dynamic payments builder based on installments count and dates
 function addMonthsToDate(date, months){
@@ -322,6 +345,7 @@ function loadDemo(){
   document.getElementById('v_branch2').textContent='1';
   document.getElementById('v_existing_parent').textContent='نعم - ولي أمر مسجل سابقاً (محمد سعيد)';
   buildDynamicPayments();
+  setTimeout(generateQR, 100);
 }
 
 function esc(v){return String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')}
