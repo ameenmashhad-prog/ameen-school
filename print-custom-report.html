@@ -267,37 +267,34 @@ tr.section td{background:#0B6E4F;color:#fff;font-weight:800;font-size:11px;text-
     <div class="sig-box"><b>توقيع مسؤول التسجيل</b></div>
     <div class="sig-box"><b>توقيع مدير المجمع</b></div>
   </div>
+
+  <div style="margin-top:12px;display:grid;grid-template-columns:90px 1fr 90px;gap:10px;align-items:center;border:1px solid #0B6E4F;border-radius:10px;padding:8px;background:linear-gradient(135deg,#f0fdf4 0%,#fff 100%)">
+    <div id="qrcodeLogin" style="width:80px;height:80px;background:#fff;padding:3px;border-radius:8px;border:1px solid #0B6E4F"></div>
+    <div style="text-align:center">
+      <b style="font-size:11px">QR دخول مباشر — امسح للدخول فوراً</b><br>
+      <small style="font-size:8.5px;color:#64748b">يحتوي رابط تسجيل الدخول + اسم المستخدم + كلمة المرور — يفتح صفحة الدخول مع تعبئة تلقائية</small><br>
+      <code id="loginUrlText" style="font-size:7.5px;word-break:break-all;background:#f8fafc;padding:2px 4px;border-radius:4px;display:inline-block;margin-top:4px;max-width:320px">https://ameen-school-awtt.vercel.app/</code>
+    </div>
+    <div style="text-align:center;font-size:8px;color:#0B6E4F">
+      <div>الموقع</div>
+      <b>ameen-school-awtt.vercel.app</b>
+      <div style="margin-top:4px">📱 امسح للدخول</div>
+    </div>
+  </div>
 </div>
+
 
 <script src="libs/supabase.min.js"></script>
 <script src="assets/config.js"></script>
 <script src="assets/qrcode.min.js"></script>
 <script>
 let qrInstance=null;
-function generateQR(){
-  const seda=document.getElementById('v_seda')?.textContent||'1234567890';
-  const user=document.getElementById('v_username')?.textContent||'s1a7ad41';
-  const pass=document.getElementById('v_password')?.textContent?.split(' ')[0]||'A7b!9k2@';
-  const name=document.getElementById('v_student_name')?.textContent||'طالب';
-  const data=`SEDA:${seda}|USER:${user}|PASS:${pass}|NAME:${name}|SCHOOL:Ameen Al-Reza`;
-  const el=document.getElementById('qrcode');
-  if(!el) return;
-  el.innerHTML='';
-  try{
-    qrInstance=new QRCode(el,{text:data,width:70,height:70,colorDark:'#0B6E4F',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
-  }catch(e){
-    // Fallback: use API
-    el.innerHTML=`<img src="https://api.qrserver.com/v1/create-qr-code/?size=70x70&data=${encodeURIComponent(data)}" style="width:70px;height:70px" alt="QR">`;
-  }
-}
-</script>
-<script>
-// Dynamic payments builder based on installments count and dates
+let qrLoginInstance=null;
+
 function addMonthsToDate(date, months){
   const d=new Date(date);
   const day=d.getDate();
   d.setMonth(d.getMonth()+months);
-  // Handle month overflow
   if(d.getDate()<day) d.setDate(0);
   return d;
 }
@@ -310,23 +307,41 @@ function formatDate(date){
 function buildDynamicPayments(){
   const count=parseInt(document.getElementById('installmentsCount')?.value||'5');
   const annualFee=parseFloat(document.getElementById('annualFee')?.value||'500');
-  const startDateStr='2026-09-10'; // Default school year start
-  const startDate=new Date(startDateStr+'T00:00:00');
-  const perInstallment = count>0 ? (annualFee/count) : annualFee;
-  
-  let html='';
-  let totalExpected=0;
+  const startDate=new Date('2026-09-10T00:00:00');
+  const per=count>0?(annualFee/count):annualFee;
+  let html=''; let total=0;
   for(let i=1;i<=count;i++){
-    const dueDate=addMonthsToDate(startDate, (i-1));
-    const amount = i===count ? (annualFee - totalExpected) : perInstallment;
-    totalExpected+=amount;
-    html+=`<tr><td>${i}</td><td>${formatDate(dueDate)}</td><td>$ ${amount.toFixed(2)}</td><td></td><td></td><td> / / </td><td></td></tr>`;
+    const due=addMonthsToDate(startDate,i-1);
+    const amount=i===count?(annualFee-total):per;
+    total+=amount;
+    html+=`<tr><td>${i}</td><td>${formatDate(due)}</td><td>$ ${amount.toFixed(2)}</td><td></td><td></td><td> / / </td><td></td></tr>`;
   }
   document.getElementById('paymentsBody').innerHTML=html;
   document.getElementById('totalExpected').textContent=`$ ${annualFee.toFixed(2)}`;
-  // Reset paid/remaining
-  document.getElementById('totalPaid').textContent='';
-  document.getElementById('totalRemaining').textContent=`$ ${annualFee.toFixed(2)}`;
+}
+
+function generateQR(){
+  const seda=document.getElementById('v_seda')?.textContent?.trim()||'1234567890';
+  const user=document.getElementById('v_username')?.textContent?.trim()||'s1a7ad41';
+  const passRaw=document.getElementById('v_password')?.textContent||'A7b!9k2@';
+  const pass=passRaw.split(' ')[0].trim()||'A7b!9k2@';
+  const name=document.getElementById('v_student_name')?.textContent?.trim()||'طالب';
+  const data=`SEDA:${seda}|USER:${user}|PASS:${pass}|NAME:${name}|SCHOOL:Ameen Al-Reza`;
+  const el=document.getElementById('qrcode');
+  if(el){
+    el.innerHTML='';
+    try{ new QRCode(el,{text:data,width:70,height:70,colorDark:'#0B6E4F',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M}); }
+    catch(e){ el.innerHTML=`<img src="https://api.qrserver.com/v1/create-qr-code/?size=70x70&data=${encodeURIComponent(data)}" style="width:70px;height:70px">`; }
+  }
+  const loginUrl=`https://ameen-school-awtt.vercel.app/index.html?username=${encodeURIComponent(user)}&password=${encodeURIComponent(pass)}`;
+  const el2=document.getElementById('qrcodeLogin');
+  const urlText=document.getElementById('loginUrlText');
+  if(urlText) urlText.textContent=loginUrl;
+  if(el2){
+    el2.innerHTML='';
+    try{ new QRCode(el2,{text:loginUrl,width:80,height:80,colorDark:'#081426',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M}); }
+    catch(e){ el2.innerHTML=`<img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${encodeURIComponent(loginUrl)}" style="width:80px;height:80px">`; }
+  }
 }
 
 function loadDemo(){
@@ -339,29 +354,19 @@ function loadDemo(){
   document.getElementById('v_passport_no').textContent='A12345678';
   document.getElementById('v_passport_exp').textContent='2027-12-31';
   document.getElementById('v_passport_days').textContent='485 يوم - صالح 🟢';
-  document.getElementById('v_password').innerHTML='A7b!9k2@ <span class="badge b-gold">مرجع مدرسة - يحفظ بأمان</span>';
+  document.getElementById('v_password').innerHTML='A7b!9k2@ <span class="badge b-gold">مرجع مدرسة</span>';
   document.getElementById('v_username').textContent='s1a7ad41';
   document.getElementById('v_branch1').textContent='2';
   document.getElementById('v_branch2').textContent='1';
-  document.getElementById('v_existing_parent').textContent='نعم - ولي أمر مسجل سابقاً (محمد سعيد)';
+  document.getElementById('v_existing_parent').textContent='ولي أمر سابق';
   buildDynamicPayments();
-  setTimeout(generateQR, 100);
+  setTimeout(generateQR,200);
 }
 
-function esc(v){return String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')}
-
-// Auto-build on change
-document.getElementById('installmentsCount')?.addEventListener('change', buildDynamicPayments);
-document.getElementById('annualFee')?.addEventListener('input', buildDynamicPayments);
-
-// Initial build
+document.getElementById('installmentsCount')?.addEventListener('change', ()=>{ buildDynamicPayments(); generateQR(); });
+document.getElementById('annualFee')?.addEventListener('input', ()=>{ buildDynamicPayments(); generateQR(); });
 buildDynamicPayments();
-
-// Auto-load if family_id in URL
-const params=new URLSearchParams(location.search);
-if(params.get('seda')||params.get('family')||params.get('student')){
-  document.getElementById('searchInput')?.setAttribute('value', params.get('seda')||params.get('family')||params.get('student'));
-}
+setTimeout(generateQR,500);
 </script>
 </body>
 </html>
