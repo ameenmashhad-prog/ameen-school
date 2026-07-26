@@ -57,9 +57,19 @@ tr.section td{background:#0B6E4F;color:#fff;font-weight:800;font-size:11px;text-
 </head>
 <body>
 
-<div class="no-print">
+  <div class="no-print">
   <input id="searchInput" placeholder="ابحث باسم ولي أمر أو كود سيدا أو معرف عائلة" style="flex:1;min-width:260px;padding:10px;border:1px solid #cbd5e1;border-radius:10px">
-  <button onclick="loadDemo()" class="btn btn-primary">تحميل بيانات تجريبية للمعاينة</button>
+  <select id="installmentsCount" style="padding:10px;border:1px solid #cbd5e1;border-radius:10px;min-width:90px">
+    <option value="5">5 أقساط (افتراضي)</option>
+    <option value="2">قسطان</option>
+    <option value="3">3 أقساط</option>
+    <option value="4">4 أقساط</option>
+    <option value="6">6 أقساط</option>
+    <option value="9">9 أقساط شهرية</option>
+    <option value="12">12 قسط</option>
+  </select>
+  <input id="annualFee" type="number" placeholder="الرسوم السنوية $" value="500" style="width:120px;padding:10px;border:1px solid #cbd5e1;border-radius:10px">
+  <button onclick="loadDemo()" class="btn btn-primary">تحميل تجريبي + دفعات ديناميكية</button>
   <button onclick="window.print()" class="btn">🖨️ طباعة</button>
   <a href="family-registration.html" class="btn">📝 التسجيل</a>
 </div>
@@ -86,7 +96,7 @@ tr.section td{background:#0B6E4F;color:#fff;font-weight:800;font-size:11px;text-
 
   <!-- Student Info - Enhanced with new fields -->
   <table>
-    <tr class="section"><td colspan="6">أولاً: معلومات الطالب — مع الخانات الجديدة</td></tr>
+    <tr class="section"><td colspan="8">أولاً: معلومات الطالب — مع الخانات الجديدة + بيانات الدخول للمرجع الورقي</td></tr>
     <tr>
       <td class="label">الاسم الثلاثي:</td>
       <td class="value" colspan="2" id="v_student_name">........................................</td>
@@ -98,10 +108,12 @@ tr.section td{background:#0B6E4F;color:#fff;font-weight:800;font-size:11px;text-
     <tr>
       <td class="label">تاريخ الولادة ميلادي:</td>
       <td class="value" id="v_birth_greg">12/02/2012</td>
-      <td class="label">تاريخ الولادة شمسي (محسوب تلقائياً):</td>
+      <td class="label">تاريخ الولادة شمسي:</td>
       <td class="value" id="v_birth_shamsi">1390/11/23 <small>ش</small></td>
       <td class="label">الجنس:</td>
       <td class="value">ذكر / أنثى</td>
+      <td class="label">كلمة المرور (مرجع ورقي):</td>
+      <td class="value" id="v_password" style="font-family:monospace;background:#fef3c7">A7b!9k2@ <span class="badge b-gold">مرجع مدرسة</span></td>
     </tr>
     <tr>
       <td class="label">رقم الجواز:</td>
@@ -110,20 +122,22 @@ tr.section td{background:#0B6E4F;color:#fff;font-weight:800;font-size:11px;text-
       <td class="value" id="v_passport_exp">2027/12/31</td>
       <td class="label">الأيام الباقية:</td>
       <td class="value"><span class="badge b-green" id="v_passport_days">485 يوم - صالح 🟢</span></td>
+      <td class="label">اسم المستخدم:</td>
+      <td class="value" id="v_username" style="font-family:monospace">s1a7ad41</td>
     </tr>
     <tr>
       <td class="label">الهاتف للدروس الالكترونية:</td>
-      <td class="value" colspan="2">................................................</td>
+      <td class="value" colspan="3">................................................</td>
       <td class="label">المدرسة السابقة:</td>
-      <td class="value" colspan="2">................................................</td>
+      <td class="value" colspan="3">................................................</td>
     </tr>
     <tr>
       <td class="label">عنوان السكن: مشهد:</td>
-      <td class="value" colspan="5">........................................................................................................................</td>
+      <td class="value" colspan="7">........................................................................................................................</td>
     </tr>
     <tr>
       <td class="label">عنوان السكن: العراق:</td>
-      <td class="value" colspan="5">........................................................................................................................</td>
+      <td class="value" colspan="7">........................................................................................................................</td>
     </tr>
   </table>
 
@@ -209,24 +223,26 @@ tr.section td{background:#0B6E4F;color:#fff;font-weight:800;font-size:11px;text-
     </tr>
   </table>
 
-  <!-- Financial payments table like reference -->
-  <table class="finance">
-    <tr class="section"><td colspan="7">الأمور المالية — سجل الدفعات (مثل النموذج المرجعي)</td></tr>
+  <!-- Financial payments table - DYNAMIC based on installments count and dates -->
+  <table class="finance" id="paymentsTable">
+    <tr class="section"><td colspan="7">الأمور المالية — سجل الدفعات الديناميكي (حسب عدد وموعد الدفعات)</td></tr>
     <tr>
       <th style="width:5%">رديف</th>
+      <th style="width:12%">تاريخ الاستحقاق</th>
+      <th style="width:12%">المبلغ المتوقع</th>
       <th style="width:15%">شماره کارت</th>
       <th style="width:15%">پیگیری</th>
-      <th style="width:12%">مرجع</th>
-      <th style="width:12%">تاريخ</th>
-      <th style="width:15%">مبلغ</th>
-      <th style="width:26%">ملاحظات</th>
+      <th style="width:15%">تاريخ الدفع</th>
+      <th style="width:26%">المبلغ المدفوع + ملاحظات</th>
     </tr>
-    <tr><td>1</td><td></td><td></td><td></td><td> / / </td><td></td><td></td></tr>
-    <tr><td>2</td><td></td><td></td><td></td><td> / / </td><td></td><td></td></tr>
-    <tr><td>3</td><td></td><td></td><td></td><td> / / </td><td></td><td></td></tr>
-    <tr><td>4</td><td></td><td></td><td></td><td> / / </td><td></td><td></td></tr>
-    <tr><td>5</td><td></td><td></td><td></td><td> / / </td><td></td><td></td></tr>
-    <tr><td colspan="5" style="text-align:center;font-weight:800">المجموع الكلي</td><td></td><td></td></tr>
+    <tbody id="paymentsBody">
+      <tr><td>1</td><td>2026/09/10</td><td>$ 55</td><td></td><td></td><td> / / </td><td></td></tr>
+      <tr><td>2</td><td>2026/10/10</td><td>$ 55</td><td></td><td></td><td> / / </td><td></td></tr>
+      <tr><td>3</td><td>2026/11/10</td><td>$ 55</td><td></td><td></td><td> / / </td><td></td></tr>
+      <tr><td>4</td><td>2026/12/10</td><td>$ 55</td><td></td><td></td><td> / / </td><td></td></tr>
+      <tr><td>5</td><td>2027/01/10</td><td>$ 55</td><td></td><td></td><td> / / </td><td></td></tr>
+    </tbody>
+    <tr><td colspan="2" style="text-align:center;font-weight:800">المجموع الكلي</td><td id="totalExpected">$ 500</td><td colspan="2"></td><td id="totalPaid"></td><td id="totalRemaining"></td></tr>
   </table>
 
   <table>
@@ -242,13 +258,7 @@ tr.section td{background:#0B6E4F;color:#fff;font-weight:800;font-size:11px;text-
 
   <div class="footer-note">
     تم تسجيل الطالب من قبل: ................................ بتاريخ: .... / .... / .... &nbsp;&nbsp; توقيع مسؤول التسجيل: .................. &nbsp;&nbsp; توقيع المسؤول المالي: .................. &nbsp;&nbsp; توقيع مدير المجمع: ..................
-  </div>
-
-  <div class="login-explain">
-    <b>ما معنى (بيانات الدخول تنشأ عند التفعيل الإداري)؟</b><br>
-    عند التسجيل، نقترح <b>اسم مستخدم</b> فقط (مثلاً <code>s1a7ad41</code>). أما <b>كلمة المرور</b> فلا ننشئها ولا نطبعها في الاستمارة لأسباب أمنية. 
-    عندما توافق الإدارة على الطلب وتفعل الحساب، النظام ينشئ كلمة مرور عشوائية قوية (8 أحرف + أرقام + رمز) مرة واحدة فقط، ويعرضها للمسؤول في لوحة <code>registrations-admin.html</code> ليرسلها لولي الأمر عبر واتساب. 
-    ولي الأمر يغيرها عند أول دخول. لذلك ترى في الاستمارة "تُنشأ عند التفعيل الإداري" بدل كلمة مرور مطبوعة.
+    <br><small style="color:#0B6E4F">ملاحظة: تمت إضافة خانة كلمة المرور في الأعلى كمرجع ورقي للمدرسة في حال فقدانها — تحفظ في مكان آمن ولا تعطى إلا لولي الأمر</small>
   </div>
 
   <div class="sig-grid">
@@ -259,6 +269,43 @@ tr.section td{background:#0B6E4F;color:#fff;font-weight:800;font-size:11px;text-
 </div>
 
 <script>
+// Dynamic payments builder based on installments count and dates
+function addMonthsToDate(date, months){
+  const d=new Date(date);
+  const day=d.getDate();
+  d.setMonth(d.getMonth()+months);
+  // Handle month overflow
+  if(d.getDate()<day) d.setDate(0);
+  return d;
+}
+function formatDate(date){
+  const y=date.getFullYear();
+  const m=String(date.getMonth()+1).padStart(2,'0');
+  const d=String(date.getDate()).padStart(2,'0');
+  return `${y}/${m}/${d}`;
+}
+function buildDynamicPayments(){
+  const count=parseInt(document.getElementById('installmentsCount')?.value||'5');
+  const annualFee=parseFloat(document.getElementById('annualFee')?.value||'500');
+  const startDateStr='2026-09-10'; // Default school year start
+  const startDate=new Date(startDateStr+'T00:00:00');
+  const perInstallment = count>0 ? (annualFee/count) : annualFee;
+  
+  let html='';
+  let totalExpected=0;
+  for(let i=1;i<=count;i++){
+    const dueDate=addMonthsToDate(startDate, (i-1));
+    const amount = i===count ? (annualFee - totalExpected) : perInstallment;
+    totalExpected+=amount;
+    html+=`<tr><td>${i}</td><td>${formatDate(dueDate)}</td><td>$ ${amount.toFixed(2)}</td><td></td><td></td><td> / / </td><td></td></tr>`;
+  }
+  document.getElementById('paymentsBody').innerHTML=html;
+  document.getElementById('totalExpected').textContent=`$ ${annualFee.toFixed(2)}`;
+  // Reset paid/remaining
+  document.getElementById('totalPaid').textContent='';
+  document.getElementById('totalRemaining').textContent=`$ ${annualFee.toFixed(2)}`;
+}
+
 function loadDemo(){
   document.getElementById('reqNo').textContent='FAM-'+Date.now().toString().slice(-6);
   document.getElementById('v_student_name').textContent='أحمد محمد علي - مثال حي';
@@ -269,12 +316,22 @@ function loadDemo(){
   document.getElementById('v_passport_no').textContent='A12345678';
   document.getElementById('v_passport_exp').textContent='2027-12-31';
   document.getElementById('v_passport_days').textContent='485 يوم - صالح 🟢';
+  document.getElementById('v_password').innerHTML='A7b!9k2@ <span class="badge b-gold">مرجع مدرسة - يحفظ بأمان</span>';
+  document.getElementById('v_username').textContent='s1a7ad41';
   document.getElementById('v_branch1').textContent='2';
   document.getElementById('v_branch2').textContent='1';
   document.getElementById('v_existing_parent').textContent='نعم - ولي أمر مسجل سابقاً (محمد سعيد)';
+  buildDynamicPayments();
 }
 
 function esc(v){return String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')}
+
+// Auto-build on change
+document.getElementById('installmentsCount')?.addEventListener('change', buildDynamicPayments);
+document.getElementById('annualFee')?.addEventListener('input', buildDynamicPayments);
+
+// Initial build
+buildDynamicPayments();
 
 // Auto-load if family_id in URL
 const params=new URLSearchParams(location.search);
