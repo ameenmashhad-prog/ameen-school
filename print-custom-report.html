@@ -174,36 +174,42 @@ tr.section td{background:#0B6E4F;color:#fff;font-weight:800;font-size:11px;text-
 
   <!-- Finance - compact like reference image -->
   <table class="finance">
-    <tr class="section"><td colspan="5">المرحلة الدراسية والرسوم — مع فرع 1 و 2</td></tr>
+    <tr class="section"><td colspan="6">المرحلة الدراسية والرسوم — مع فرع 1 و 2 + QR العائلة</td></tr>
     <tr>
       <td class="label" style="width:18%">المرحلة الابتدائية (من الأول حتى السادس)</td>
       <td class="value" style="width:12%">$ 500 أو ما يعادلها بالتوامان</td>
-      <td class="label" style="width:18%">عدد الطلاب في مجمع أمين الرضا 1:</td>
-      <td class="value" style="width:8%" id="v_branch1">2</td>
-      <td class="label" style="width:44%" rowspan="4">
-        <small>الرسوم تشمل التعليم فقط، لا تشمل الزي والكتب والرحلات. القسط يحتسب كاملاً مهما كانت مدة الدوام.</small><br>
-        <div style="margin-top:4px">
-          <span class="badge b-blue">ولي أمر سابق: <span id="v_existing_parent">لا يوجد — تسجيل جديد</span></span>
+      <td class="label" style="width:14%">عدد الطلاب في مجمع أمين الرضا 1:</td>
+      <td class="value" style="width:6%" id="v_branch1">2</td>
+      <td class="label" style="width:14%">عدد الطلاب في مجمع أمين الرضا 2:</td>
+      <td class="value" style="width:6%" id="v_branch2">1</td>
+      <td class="value" style="width:30%" rowspan="4">
+        <div style="display:flex;gap:8px;align-items:center">
+          <div id="qrcodeFamily" style="width:70px;height:70px;background:#fff;padding:2px;border-radius:6px;border:1px solid #0B6E4F;flex-shrink:0"></div>
+          <div style="flex:1">
+            <small style="font-size:8px"><b>QR العائلة:</b> فرع 1 و 2 + كل الأبناء + سيدا</small><br>
+            <small style="font-size:7.5px;color:#64748b">امسح لعرض بيانات العائلة كاملة مع الأبناء وأكواد سيدا</small><br>
+            <span class="badge b-blue" style="margin-top:2px">ولي أمر سابق: <span id="v_existing_parent">لا يوجد — تسجيل جديد</span></span>
+          </div>
+        </div>
+        <div style="margin-top:6px;font-size:8px;color:#475569;line-height:1.4">
+          الرسوم تشمل التعليم فقط، لا تشمل الزي والكتب والرحلات. القسط يحتسب كاملاً مهما كانت مدة الدوام.
         </div>
       </td>
     </tr>
     <tr>
       <td class="label">الأول والثاني المتوسط</td>
       <td class="value">$ 550</td>
-      <td class="label">عدد الطلاب في مجمع أمين الرضا 2:</td>
-      <td class="value" id="v_branch2">1</td>
+      <td class="label">إجمالي الطلاب للعائلة:</td>
+      <td class="value">3</td>
+      <td class="label">السادس الإعدادي للتسجيل في قم:</td>
+      <td class="value">$ 50</td>
     </tr>
     <tr>
       <td class="label">الرابع والخامس الإعدادي</td>
       <td class="value">$ 700</td>
-      <td class="label">إجمالي الطلاب للعائلة:</td>
-      <td class="value">3</td>
-    </tr>
-    <tr>
       <td class="label">الثالث المتوسط (بدون امتحان نهائي)</td>
       <td class="value">$ 350</td>
-      <td class="label">السادس الإعدادي للتسجيل في قم:</td>
-      <td class="value">$ 50</td>
+      <td class="label" colspan="2" style="text-align:center;font-size:8px">📱 3 QR Codes: أعلى (سيدا+دخول) | وسط (عائلة) | أسفل (دخول مباشر)</td>
     </tr>
   </table>
 
@@ -326,13 +332,19 @@ function generateQR(){
   const passRaw=document.getElementById('v_password')?.textContent||'A7b!9k2@';
   const pass=passRaw.split(' ')[0].trim()||'A7b!9k2@';
   const name=document.getElementById('v_student_name')?.textContent?.trim()||'طالب';
-  const data=`SEDA:${seda}|USER:${user}|PASS:${pass}|NAME:${name}|SCHOOL:Ameen Al-Reza`;
-  const el=document.getElementById('qrcode');
-  if(el){
-    el.innerHTML='';
-    try{ new QRCode(el,{text:data,width:70,height:70,colorDark:'#0B6E4F',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M}); }
-    catch(e){ el.innerHTML=`<img src="https://api.qrserver.com/v1/create-qr-code/?size=70x70&data=${encodeURIComponent(data)}" style="width:70px;height:70px">`; }
+  const branch1=document.getElementById('v_branch1')?.textContent?.trim()||'2';
+  const branch2=document.getElementById('v_branch2')?.textContent?.trim()||'1';
+  
+  // QR1: Top - SEDA + login
+  const data1=`SEDA:${seda}|USER:${user}|PASS:${pass}|NAME:${name}|SCHOOL:Ameen Al-Reza`;
+  const el1=document.getElementById('qrcode');
+  if(el1){
+    el1.innerHTML='';
+    try{ new QRCode(el1,{text:data1,width:70,height:70,colorDark:'#0B6E4F',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M}); }
+    catch(e){ el1.innerHTML=`<img src="https://api.qrserver.com/v1/create-qr-code/?size=70x70&data=${encodeURIComponent(data1)}" style="width:70px;height:70px">`; }
   }
+  
+  // QR2: Bottom - direct login
   const loginUrl=`https://ameen-school-awtt.vercel.app/index.html?username=${encodeURIComponent(user)}&password=${encodeURIComponent(pass)}`;
   const el2=document.getElementById('qrcodeLogin');
   const urlText=document.getElementById('loginUrlText');
@@ -341,6 +353,15 @@ function generateQR(){
     el2.innerHTML='';
     try{ new QRCode(el2,{text:loginUrl,width:80,height:80,colorDark:'#081426',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M}); }
     catch(e){ el2.innerHTML=`<img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${encodeURIComponent(loginUrl)}" style="width:80px;height:80px">`; }
+  }
+  
+  // QR3: Middle - Family data (branch 1&2 + all children)
+  const familyData=`FAMILY|Branch1:${branch1}|Branch2:${branch2}|Total:${parseInt(branch1)+parseInt(branch2)}|Students:${name}(${seda})|Type:${document.getElementById('v_student_type')?.textContent||'نظامي'}|Parent:${document.getElementById('v_existing_parent')?.textContent||'New'}`;
+  const el3=document.getElementById('qrcodeFamily');
+  if(el3){
+    el3.innerHTML='';
+    try{ new QRCode(el3,{text:familyData,width:70,height:70,colorDark:'#7C5CFF',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M}); }
+    catch(e){ el3.innerHTML=`<img src="https://api.qrserver.com/v1/create-qr-code/?size=70x70&data=${encodeURIComponent(familyData)}" style="width:70px;height:70px">`; }
   }
 }
 
