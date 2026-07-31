@@ -159,7 +159,26 @@ function render(id){
 async function markRead(id){try{const {data,error}=await client().rpc('mark_notification_read',{p_notification_id:id});if(error)throw error;if(data&&data.ok===false){toast('تعذر التحديث',data.message||'خطأ','red');return}toast('تم','تم تعليم الإشعار كمقروء','green');await load()}catch(e){toast('تعذر التحديث',e.message||String(e),'red')}}
 async function markAll(){try{const {data,error}=await client().rpc('mark_all_notifications_read');if(error)throw error;toast('تم','تم تعليم '+(data?.count||0)+' إشعار كمقروء','green');await load()}catch(e){toast('تعذر التحديث',e.message||String(e),'red')}}
 async function markCriticalRead(){try{const criticalIds=DATA.notifications.filter(n=>(n.is_unread||!n.read_at)&&n.importance==='critical').map(n=>n.id);for(const id of criticalIds){await client().rpc('mark_notification_read',{p_notification_id:id});}toast('تم','تم تعليم كل الحرجة كمقروءة','green');await load()}catch(e){toast('خطأ',e.message,'red')}}
-function bind(){$$('.nav button[data-view]').forEach(b=>b.addEventListener('click',()=>render(b.dataset.view)));$('#mobileMenuBtn')?.addEventListener('click',()=>$('#sidebar').classList.toggle('open'));$('#logoutBtn')?.addEventListener('click',async()=>{await client().auth.signOut({scope:'local'});location.href='index.html'});$('#refreshBtn')?.addEventListener('click',load);$('#markAllBtn')?.addEventListener('click',markAll)}
+function bind(){
+  $$('.nav button[data-view]').forEach(b=>b.addEventListener('click',()=>render(b.dataset.view)));
+  $('#mobileMenuBtn')?.addEventListener('click',()=>$('#sidebar').classList.toggle('open'));
+  $('#logoutBtn')?.addEventListener('click',async()=>{await client().auth.signOut({scope:'local'});location.href='index.html'});
+  $('#refreshBtn')?.addEventListener('click',load);
+  $('#markAllBtn')?.addEventListener('click',markAll);
+  $('#enablePushBtn')?.addEventListener('click',async()=>{
+    const granted=await requestPushPermission();
+    if(granted){ toast('تم','تم تفعيل إشعارات المتصفح للحرجة والمهمة','green'); playCriticalSound(); }
+    else toast('تنبيه','لم يتم السماح بالإشعارات - فعليها من إعدادات المتصفح','red');
+  });
+  // Auto-request permission if critical unread exists after load
+  setTimeout(async()=>{
+    const criticalUnread=DATA.notifications.filter(n=>(n.is_unread||!n.read_at)&&n.importance==='critical').length;
+    if(criticalUnread>0 && Notification.permission==='default'){
+      const btn=$('#enablePushBtn');
+      if(btn){ btn.style.animation='pulse 1s infinite'; btn.textContent='🔴 فعلي إشعارات الحرجة الآن!'; }
+    }
+  },2000);
+}
 async function init(){client();if(!await ensure())return;bind();await load()}
 window.NotificationsCenter={init,render,markRead,markAll,markCriticalRead};
 }());
