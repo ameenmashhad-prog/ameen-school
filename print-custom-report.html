@@ -172,45 +172,74 @@ tr.section td{background:#0B6E4F;color:#fff;font-weight:800;font-size:11px;text-
     </tr>
   </table>
 
-  <!-- Finance - compact like reference image -->
+    <!-- Finance - compact like reference image - consistent cell sizes -->
   <table class="finance">
-    <tr class="section"><td colspan="6">المرحلة الدراسية والرسوم — مع فرع 1 و 2 + QR العائلة</td></tr>
+    <tr class="section"><td colspan="4">المرحلة الدراسية والرسوم</td></tr>
     <tr>
-      <td class="label" style="width:18%">المرحلة الابتدائية (من الأول حتى السادس)</td>
-      <td class="value" style="width:12%">$ 500 أو ما يعادلها بالتوامان</td>
-      <td class="label" style="width:14%">عدد الطلاب في مجمع أمين الرضا 1:</td>
-      <td class="value" style="width:6%" id="v_branch1">2</td>
-      <td class="label" style="width:14%">عدد الطلاب في مجمع أمين الرضا 2:</td>
-      <td class="value" style="width:6%" id="v_branch2">1</td>
-      <td class="value" style="width:30%" rowspan="4">
-        <div style="display:flex;gap:8px;align-items:center">
-          <div id="qrcodeFamily" style="width:70px;height:70px;background:#fff;padding:2px;border-radius:6px;border:1px solid #0B6E4F;flex-shrink:0"></div>
-          <div style="flex:1">
-            <small style="font-size:8px"><b>QR العائلة:</b> فرع 1 و 2 + كل الأبناء + سيدا</small><br>
-            <small style="font-size:7.5px;color:#64748b">امسح لعرض بيانات العائلة كاملة مع الأبناء وأكواد سيدا</small><br>
-            <span class="badge b-blue" style="margin-top:2px">ولي أمر سابق: <span id="v_existing_parent">لا يوجد — تسجيل جديد</span></span>
-          </div>
-        </div>
-        <div style="margin-top:6px;font-size:8px;color:#475569;line-height:1.4">
-          الرسوم تشمل التعليم فقط، لا تشمل الزي والكتب والرحلات. القسط يحتسب كاملاً مهما كانت مدة الدوام.
-        </div>
+      <td class="label" style="width:38%;font-size:9.5px">المرحلة الابتدائية (من الأول حتى السادس)</td>
+      <td class="value" style="width:12%;font-size:10px;font-weight:800;text-align:center">$ 500</td>
+      <td class="label" style="width:25%;font-size:9px">عدد الطلاب في مجمع أمين الرضا 1:</td>
+      <td class="value" style="width:8%;text-align:center" id="v_branch1">2</td>
+      <td class="value" style="width:17%;text-align:center" rowspan="3">
+        <div id="qrcodeFamily" style="width:60px;height:60px;background:#fff;padding:2px;border-radius:6px;border:1px solid #0B6E4F;margin:0 auto"></div>
+        <small style="font-size:7px;display:block;margin-top:2px">QR العائلة<br>فرع 1 و 2 + الأبناء</small>
       </td>
     </tr>
     <tr>
-      <td class="label">الأول والثاني المتوسط</td>
-      <td class="value">$ 550</td>
-      <td class="label">إجمالي الطلاب للعائلة:</td>
-      <td class="value">3</td>
-      <td class="label">السادس الإعدادي للتسجيل في قم:</td>
-      <td class="value">$ 50</td>
+      <td class="label" style="font-size:9.5px">الأول والثاني المتوسط</td>
+      <td class="value" style="font-size:10px;font-weight:800;text-align:center">$ 550</td>
+      <td class="label" style="font-size:9px">عدد الطلاب في مجمع أمين الرضا 2:</td>
+      <td class="value" style="text-align:center" id="v_branch2">1</td>
     </tr>
     <tr>
-      <td class="label">الرابع والخامس الإعدادي</td>
-      <td class="value">$ 700</td>
-      <td class="label">الثالث المتوسط (بدون امتحان نهائي)</td>
-      <td class="value">$ 350</td>
-      <td class="label" colspan="2" style="text-align:center;font-size:8px">📱 3 QR Codes: أعلى (سيدا+دخول) | وسط (عائلة) | أسفل (دخول مباشر)</td>
+      <td class="label" style="font-size:9.5px">الثالث المتوسط (بدون امتحان نهائي)</td>
+      <td class="value" style="font-size:10px;font-weight:800;text-align:center">$ 350</td>
+      <td class="label" style="font-size:9.5px">الرابع والخامس الإعدادي</td>
+      <td class="value" style="font-size:10px;font-weight:800;text-align:center">$ 700</td>
     </tr>
+    <tr>
+      <td class="label" style="font-size:9.5px">السادس الإعدادي للتسجيل في قم:</td>
+      <td class="value" style="font-size:10px;font-weight:800;text-align:center">$ 50</td>
+      <td class="label" style="font-size:8px" colspan="2">أو ما يعادلها بالتوامان — الرسوم تشمل التعليم فقط، لا تشمل الزي والكتب والرحلات</td>
+      <td class="value" style="font-size:7px;text-align:center">📱 3 QR: سيدا+دخول | عائلة | دخول مباشر</td>
+    </tr>
+  </table>
+
+  <!-- Dynamic Payments as plain text appendix (not table cells) -->
+  <div id="paymentsAppendix" style="margin-top:6px;padding:8px;background:#fff;border:1px solid #334155;border-radius:6px">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
+      <b style="font-size:10px">📅 ملحق الأقساط الديناميكي (نص عادي — لا يأخذ مساحة جدول):</b>
+      <div style="display:flex;gap:6px;align-items:center">
+        <span class="badge b-blue" id="totalExpectedBadge" style="font-size:9px">$ 500 إجمالي</span>
+        <div id="qrcodePayments" style="width:50px;height:50px;background:#fff;padding:2px;border-radius:6px;border:1px solid #F6B93B;display:inline-block"></div>
+      </div>
+    </div>
+    <div id="paymentsPlainText" style="font-size:9px;line-height:1.8;white-space:pre-wrap;word-break:break-word;background:#f8fafc;padding:6px;border-radius:6px;border:1px dashed #cbd5e1">
+القسط 1: $100 - 2026/09/10 | القسط 2: $100 - 2026/10/10 | القسط 3: $100 - 2026/11/10 | القسط 4: $100 - 2026/12/10 | القسط 5: $100 - 2027/01/10
+    </div>
+    <div style="margin-top:4px;display:flex;gap:4px;flex-wrap:wrap">
+      <span class="badge b-green" style="font-size:8px">ديناميكي حسب العدد والموعد</span>
+      <span class="badge b-gold" style="font-size:8px">QR الدفعات يحوي كل الأقساط</span>
+    </div>
+  </div>
+
+  <!-- Financial payments table - simplified for actual payments (actual payments, not expected) -->
+  <table class="finance" id="paymentsTableActual" style="margin-top:6px">
+    <tr class="section"><td colspan="6">سجل الدفعات الفعلية (المستلمة)</td></tr>
+    <tr>
+      <th style="width:6%">رديف</th>
+      <th style="width:16%">تاريخ الدفع</th>
+      <th style="width:18%">شماره کارت</th>
+      <th style="width:18%">پیگیری</th>
+      <th style="width:12%">مبلغ</th>
+      <th style="width:30%">ملاحظات</th>
+    </tr>
+    <tbody>
+      <tr><td>1</td><td> / / </td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>2</td><td> / / </td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>3</td><td> / / </td><td></td><td></td><td></td><td></td></tr>
+    </tbody>
+    <tr><td colspan="4" style="text-align:center;font-weight:800">المجموع المدفوع</td><td id="totalPaid"></td><td id="totalRemaining"></td></tr>
   </table>
 
   <!-- Health and living -->
@@ -316,23 +345,22 @@ function buildDynamicPayments(){
   const annualFee=parseFloat(document.getElementById('annualFee')?.value||'500');
   const startDate=new Date('2026-09-10T00:00:00');
   const per=count>0?(annualFee/count):annualFee;
-  let html=''; let total=0;
-  let paymentsData=[]; // For QR
+  let plainText=''; 
+  let total=0;
+  let paymentsData=[];
   for(let i=1;i<=count;i++){
     const due=addMonthsToDate(startDate,i-1);
     const amount=i===count?(annualFee-total):per;
     total+=amount;
     const dueStr=formatDate(due);
     paymentsData.push(`${i}:${dueStr}:$${amount.toFixed(2)}`);
-    if(i===1){
-      html+=`<tr><td>${i}</td><td>${dueStr}</td><td>$ ${amount.toFixed(2)}</td><td></td><td></td><td> / / </td><td></td><td rowspan="${count+1}" style="text-align:center;vertical-align:middle"><div id="qrcodePayments" style="width:80px;height:80px;background:#fff;padding:3px;border-radius:8px;border:1px solid #0B6E4F;margin:0 auto"></div><small style="font-size:7px;display:block;margin-top:2px">QR: كل الأقساط<br>${count} قسط - $${annualFee}</small></td></tr>`;
-    } else {
-      html+=`<tr><td>${i}</td><td>${dueStr}</td><td>$ ${amount.toFixed(2)}</td><td></td><td></td><td> / / </td><td></td></tr>`;
-    }
+    plainText+=`القسط ${i}: $${amount.toFixed(2)} - ${dueStr}${i<count?' | ':''}`;
   }
-  document.getElementById('paymentsBody').innerHTML=html;
-  document.getElementById('totalExpected').textContent=`$ ${annualFee.toFixed(2)}`;
-  // Store for QR
+  // Plain text appendix (not table cells) - as requested
+  const plainEl=document.getElementById('paymentsPlainText');
+  if(plainEl) plainEl.textContent=plainText;
+  const badge=document.getElementById('totalExpectedBadge');
+  if(badge) badge.textContent=`$ ${annualFee.toFixed(2)} إجمالي - ${count} أقساط`;
   window._paymentsDataForQR = paymentsData.join('|');
 }
 
