@@ -88,6 +88,7 @@
     {key:'printFamily', group:'academic', perm:'registrations', color:'teal', icon:'people', href:'print-family-form.html?lite=1', badge:'NEW', title:{ar:'طباعة عائلية - فرع 1 و 2',fa:'چاپ خانوادگی - شعبه 1 و 2',en:'Family Print - Branch 1 & 2'}, desc:{ar:'استمارة عائلية مع عدد الطلاب في مجمع أمين الرضا 1 و 2 واستيراد ولي أمر سابق',fa:'فرم خانوادگی با تعداد دانش‌آموزان در مجتمع امین الرضا 1 و 2 و وارد کردن ولی سابق',en:'Family form with branch counts and parent import'}},
     {key:'teacherMessages', group:'people', perms:['admin','hr'], color:'emerald', icon:'phone', href:'teacher-messages-admin.html?lite=1', badge:'NEW', title:{ar:'رسائل المعلمين - عقوبات وشكر',fa:'پیام‌های معلمان - تنبیه و تشکر',en:'Teacher Messages - Penalties & Thanks'}, desc:{ar:'تسجيل رسائل إدارية للمعلمين بسبب التأخر المستمر عبر واتساب وداخل الموقع، ورسائل شكر',fa:'ثبت پیام‌های اداری برای معلمان به دلیل تأخیر مستمر از طریق واتساپ و داخل سایت، و پیام‌های تشکر',en:'Record admin messages for teachers for continuous delay via WhatsApp/in-app, and thank you messages'}},
 
+    {key:'notificationPreferences', group:'people', perm:'notifications', color:'violet', icon:'settings', href:'notification-preferences.html?lite=1', title:{ar:'تفضيلات الإشعارات',fa:'تنظیمات اعلان‌ها',en:'Notification Preferences'}, desc:{ar:'تحكم كامل بالأهمية والطرق وأوقات عدم الإزعاج',fa:'کنترل کامل اهمیت، روش‌ها و ساعات مزاحم نشدن',en:'Full control over importance, delivery methods and quiet hours'}},
   ];;
 
 

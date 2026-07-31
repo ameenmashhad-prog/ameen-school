@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>تفضيلات الإشعارات — مدارس أمين الرضا</title>
+<link rel="stylesheet" href="assets/amin.css?v=20260706-7">
+<link rel="icon" href="/favicon.ico">
+<style>
+.pref-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.pref-card{background:#fff;border:1px solid var(--border-subtle);border-radius:18px;padding:18px;box-shadow:var(--shadow-soft)}
+.pref-card h3{margin:0 0 12px;font-size:16px;display:flex;align-items:center;gap:8px}
+.switch-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f1f5f9}
+.switch-row:last-child{border:none}
+.switch{position:relative;width:44px;height:24px;background:#cbd5e1;border-radius:999px;cursor:pointer;transition:.2s}
+.switch.on{background:#0B6E4F}
+.switch::after{content:'';position:absolute;top:2px;right:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.switch.on::after{transform:translateX(-20px)}
+.time-input{padding:8px;border:1px solid #cbd5e1;border-radius:8px;width:110px}
+.badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700}
+.b-red{background:#fee2e2;color:#dc2626}
+.b-orange{background:#fef3c7;color:#d97706}
+.b-blue{background:#dbeafe;color:#2563eb}
+.b-slate{background:#f1f5f9;color:#64748b}
+@media(max-width:800px){.pref-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><div class="brand-mark">🔔</div><div><h1>تفضيلات الإشعارات</h1><small>تحكم كامل بالأهمية والطرق</small></div></div>
+    <div class="profile-mini"><div class="avatar">👤</div><div><b id="profileName">...</b><small id="profileRole">...</small></div></div>
+    <nav class="nav">
+      <button onclick="location.href='notifications.html'">← العودة للإشعارات</button>
+      <button onclick="location.href='portal.html'">🏛️ البوابة الموحدة</button>
+    </nav>
+    <div class="side-footer"><button id="logoutBtn" class="btn red block">تسجيل الخروج</button></div>
+  </aside>
+  <main class="main">
+    <header class="topbar">
+      <button class="btn mobile-menu" id="mobileMenuBtn">☰</button>
+      <h2>🔔 تفضيلات الإشعارات — تحكم كامل</h2>
+      <div class="top-actions">
+        <button id="saveBtn" class="btn" style="background:#0B6E4F;color:#fff">💾 حفظ التفضيلات</button>
+      </div>
+    </header>
+
+    <div class="pref-grid" id="prefsRoot">
+      <div style="grid-column:1/-1;text-align:center;padding:40px">⏳ جاري تحميل تفضيلاتك...</div>
+    </div>
+
+    <div class="pref-card" style="margin-top:16px;background:linear-gradient(135deg,#f0fdf4 0%,#fff 100%);border-color:#0B6E4F">
+      <h3>ℹ️ كيف يعمل نظام الأهمية؟</h3>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px">
+        <div style="background:#fee2e2;padding:10px;border-radius:10px;text-align:center"><b>🔴 حرجة</b><br><small>عقوبة، غياب جماعي، نزاهة</small><br><small>واتساب+SMS+داخلي+صوت+Push</small></div>
+        <div style="background:#fef3c7;padding:10px;border-radius:10px;text-align:center"><b>🟠 مهمة</b><br><small>غياب >20%، قسط متأخر</small><br><small>واتساب+داخلي+Push</small></div>
+        <div style="background:#dbeafe;padding:10px;border-radius:10px;text-align:center"><b>🔵 متوسطة</b><br><small>واجب جديد، إعلان</small><br><small>داخلي فقط</small></div>
+        <div style="background:#f1f5f9;padding:10px;border-radius:10px;text-align:center"><b>⚪ منخفضة</b><br><small>شكر، تهنئة</small><br><small>ملخص يومي 8 صباحاً</small></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div id="toast" class="toast"></div>
+<script src="libs/supabase.min.js"></script>
+<script src="assets/config.js"></script>
+<script src="assets/notification-preferences.js?v=1"></script>
+</body>
+</html>
