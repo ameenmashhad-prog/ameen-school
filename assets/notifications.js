@@ -11,6 +11,34 @@ function toast(t,m,type=''){const el=$('#toast');if(!el)return;el.innerHTML=`<b>
 function fmtDate(v){if(!v)return'—';try{return new Date(v).toLocaleString('ar-IQ')}catch{return v}}
 function roleLabel(r){return ({admin:'إدارة',teacher:'معلم',student:'طالب',parent:'ولي أمر',finance:'مالية',academic:'أكاديمي'}[r]||r||'مستخدم')}
 async function ensure(){const {data:{session}}=await client().auth.getSession();if(!session){location.href='index.html';return false}const {data:u}=await client().from('users').select('*').eq('id',session.user.id).maybeSingle();if(!u){location.href='index.html';return false}ME=u;$('#profileName').textContent=u.name||u.email;$('#profileRole').textContent=roleLabel(u.role);return true}
+function playCriticalSound(){
+  try{
+    const ctx=new (window.AudioContext||window.webkitAudioContext)();
+    const osc=ctx.createOscillator(); const gain=ctx.createGain();
+    osc.type='sine'; osc.frequency.setValueAtTime(880,ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(440,ctx.currentTime+0.5);
+    gain.gain.setValueAtTime(0.3,ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01,ctx.currentTime+0.6);
+    osc.connect(gain); gain.connect(ctx.destination); osc.start(); osc.stop(ctx.currentTime+0.6);
+  }catch(e){}
+}
+
+async function requestPushPermission(){
+  if(!('Notification' in window)) return false;
+  if(Notification.permission==='granted') return true;
+  if(Notification.permission==='denied') return false;
+  try{ const p=await Notification.requestPermission(); return p==='granted'; }catch{ return false; }
+}
+
+function showPushNotification(title,body,type){
+  if(!('Notification' in window)||Notification.permission!=='granted') return;
+  try{
+    const notif=new Notification(`${type==='critical'?'🚨':type==='high'?'⚠️':'🔔'} ${title}`,{body, icon:'/assets/amin-logo-small.png', requireInteraction:type==='critical', tag:`notif-${type}-${Date.now()}`});
+    notif.onclick=()=>{ window.focus(); notif.close(); };
+    setTimeout(()=>{ try{notif.close();}catch(e){} }, type==='critical'?10000:6000);
+  }catch(e){}
+}
+
+async function load(){
 async function load(){
   let notifications=[];
   try{
@@ -39,6 +67,24 @@ async function load(){
     return new Date(b.created_at)-new Date(a.created_at);
   });
   DATA.notifications=notifications;
+  // Handle importance: play sound and push for critical/high unread
+  try{
+    const criticalUnread=notifications.filter(n=>(n.is_unread||!n.read_at)&&n.importance==='critical');
+    const highUnread=notifications.filter(n=>(n.is_unread||!n.read_at)&&n.importance==='high');
+    if(criticalUnread.length>0){
+      playCriticalSound();
+      requestPushPermission().then(g=>{
+        if(g){
+          criticalUnread.slice(0,2).forEach(n=>showPushNotification(n.title,n.body||'', 'critical'));
+          if(criticalUnread.length>2) showPushNotification(`${criticalUnread.length} إشعارات حرجة`, `${criticalUnread.length} إشعارات حرجة تحتاج انتباهك فوراً`, 'critical');
+        }
+      });
+    } else if(highUnread.length>0){
+      requestPushPermission().then(g=>{
+        if(g) highUnread.slice(0,1).forEach(n=>showPushNotification(n.title,n.body||'', 'high'));
+      });
+    }
+  }catch(e){ console.warn(e); }
   render(ACTIVE);
 }
 function importanceBadge(n){

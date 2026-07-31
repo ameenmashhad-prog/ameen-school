@@ -161,6 +161,107 @@ var SmartAlerts = {
     } catch(e) {}
   },
 
+  playCriticalSound: function() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(880, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.5);
+      gain.gain.setValueAtTime(0.3, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.6);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.6);
+      // Second beep for critical
+      setTimeout(()=>{
+        try{
+          const osc2 = ctx.createOscillator();
+          const gain2 = ctx.createGain();
+          osc2.type = 'sine';
+          osc2.frequency.setValueAtTime(880, ctx.currentTime);
+          osc2.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.5);
+          gain2.gain.setValueAtTime(0.3, ctx.currentTime);
+          gain2.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.6);
+          osc2.connect(gain2);
+          gain2.connect(ctx.destination);
+          osc2.start();
+          osc2.stop(ctx.currentTime + 0.6);
+        }catch(e){}
+      }, 300);
+    } catch(e){ console.warn('Audio failed', e); }
+  },
+
+  requestPushPermission: async function() {
+    if (!('Notification' in window)) return false;
+    if (Notification.permission === 'granted') return true;
+    if (Notification.permission === 'denied') return false;
+    try {
+      const perm = await Notification.requestPermission();
+      return perm === 'granted';
+    } catch { return false; }
+  },
+
+  showPushNotification: function(title, body, type) {
+    if (!('Notification' in window) || Notification.permission !== 'granted') return;
+    const icons = { critical: '🚨', high: '⚠️', medium: '📢', low: '📄', danger: '🚨', warning: '⚠️', info: '📢' };
+    const icon = icons[type] || '🔔';
+    try {
+      const notif = new Notification(`${icon} ${title}`, {
+        body: body,
+        icon: '/assets/amin-logo-small.png',
+        badge: '/assets/amin-logo-small.png',
+        tag: `amin-${type}-${Date.now()}`,
+        requireInteraction: type==='critical'||type==='danger',
+        silent: false
+      });
+      notif.onclick = function(){ window.focus(); location.href='notifications.html'; this.close(); };
+      setTimeout(()=>{ try{ notif.close(); }catch(e){} }, type==='critical'?10000:6000);
+    } catch(e){ console.warn('Push failed', e); }
+  },
+
+  handleImportanceSoundsAndPush: function() {
+    const critical = this.alerts.filter(a=>a.type==='critical'||a.type==='danger');
+    const high = this.alerts.filter(a=>a.type==='high'||a.type==='warning');
+    // Check if we already notified for these critical alerts to avoid spam
+    const lastNotified = JSON.parse(localStorage.getItem('amin_last_critical_ids')||'[]');
+    const newCritical = critical.filter(a=>!lastNotified.includes(a.title+'|'+a.msg));
+    
+    if (newCritical.length > 0) {
+      this.playCriticalSound();
+      this.requestPushPermission().then(granted=>{
+        if(granted){
+          newCritical.slice(0,2).forEach(a=>{
+            this.showPushNotification(a.title, a.msg, 'critical');
+          });
+          if(critical.length>2){
+            this.showPushNotification(`${critical.length} تنبيهات حرجة`, `${critical.length} تنبيهات حرجة تحتاج انتباهك فوراً`, 'critical');
+          }
+        }
+      });
+      localStorage.setItem('amin_last_critical_ids', JSON.stringify(critical.map(a=>a.title+'|'+a.msg)));
+    }
+    
+    // For high importance, push without sound (or softer)
+    if (high.length > 0 && critical.length===0) {
+      const lastHighNotified = JSON.parse(localStorage.getItem('amin_last_high_ids')||'[]');
+      const newHigh = high.filter(a=>!lastHighNotified.includes(a.title+'|'+a.msg));
+      if(newHigh.length>0){
+        this.requestPushPermission().then(granted=>{
+          if(granted){
+            newHigh.slice(0,1).forEach(a=>{
+              this.showPushNotification(a.title, a.msg, 'high');
+            });
+          }
+        });
+        localStorage.setItem('amin_last_high_ids', JSON.stringify(high.map(a=>a.title+'|'+a.msg)));
+      }
+    }
+  },
+
+  render: function() {
   render: function() {
     var old = document.getElementById('smartAlertsBar');
     if(old) old.remove();
@@ -169,6 +270,8 @@ var SmartAlerts = {
     bar.id = 'smartAlertsBar';
     bar.innerHTML = this._buildHTML();
     document.body.appendChild(bar);
+    // Play sound and push for critical/high after rendering
+    try { this.handleImportanceSoundsAndPush(); } catch(e){ console.warn(e); }
   },
 
   renderEmptyBar: function() {
