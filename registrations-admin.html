@@ -740,6 +740,7 @@ function buildFamilyPrintWindowHTML(item){
     <div class="sign-box"><b>اعتماد الإدارة</b><span>${esc(({pending:'قيد المراجعة',reviewed:'تمت المراجعة',approved:'معتمد',rejected:'مرفوض'})[String(item.family_status||'').toLowerCase()] || '—')}</span></div>
   </div>
 </div>
+<script src="assets/lang-switcher.js"></script>
 </body>
 </html>`;
 }
@@ -1053,5 +1054,6 @@ window.closeActivationCredentials = closeActivationCredentials;
 <script src="assets/ux-enhancements.js?v=20260706-3"></script>
 <script src="assets/amin-theme-injector.js"></script>
 <script src="assets/amin-icons.js?v=20260706-3" defer></script>
+<script src="assets/lang-switcher.js"></script>
 </body>
 </html>
