@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>الفصل الدراسي — على نمط Google Classroom — مدارس أمين الرضا</title>
+<link rel="stylesheet" href="assets/amin.css?v=20260706-8">
+<link rel="icon" href="/favicon.ico">
+<style>
+.classroom-header{position:relative;background:linear-gradient(135deg,#0B6E4F 0%,#081426 100%);color:#fff;border-radius:20px;padding:24px;margin-bottom:16px;overflow:hidden}
+.classroom-header::before{content:'';position:absolute;top:-50%;right:-20%;width:60%;height:200%;background:radial-gradient(ellipse,rgba(255,255,255,.1) 0%,transparent 70%);pointer-events:none}
+.classroom-header h1{font-size:22px;margin:0 0 6px;position:relative;z-index:1}
+.classroom-header p{opacity:.9;font-size:13px;margin:0;position:relative;z-index:1}
+.classroom-tabs{display:flex;gap:4px;background:#fff;border:1px solid var(--border-subtle);border-radius:14px;padding:4px;width:fit-content;margin-bottom:16px;box-shadow:var(--shadow-soft)}
+.classroom-tab{padding:10px 16px;border-radius:10px;border:none;background:transparent;cursor:pointer;font-family:inherit;font-weight:700;font-size:13px;color:var(--text-secondary);transition:.2s}
+.classroom-tab.active{background:#0B6E4F;color:#fff;box-shadow:0 2px 8px rgba(11,110,79,.3)}
+.stream-grid{display:grid;grid-template-columns:1fr 300px;gap:16px}
+.post-card{background:#fff;border:1px solid var(--border-subtle);border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:var(--shadow-soft);transition:.2s}
+.post-card:hover{box-shadow:var(--shadow-soft-lg);transform:translateY(-1px)}
+.post-card.pinned{border-color:#f59e0b;border-width:2px;background:linear-gradient(135deg,#fffbeb 0%,#fff 100%)}
+.post-header{display:flex;gap:10px;align-items:flex-start;margin-bottom:10px}
+.post-avatar{width:40px;height:40px;background:linear-gradient(135deg,#0B6E4F,#081426);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0}
+.post-meta{flex:1}
+.post-meta b{font-size:14px;display:block}
+.post-meta small{color:#64748b;font-size:11px}
+.post-badge{padding:3px 8px;border-radius:999px;font-size:10px;font-weight:700}
+.b-blue{background:#dbeafe;color:#1e40af}
+.b-green{background:#dcfce7;color:#166534}
+.b-gold{background:#fef3c7;color:#92400e}
+.b-red{background:#fee2e2;color:#991b1b}
+.b-purple{background:#ede9fe;color:#7c3aed}
+.post-content{font-size:14px;line-height:1.7;color:#1e293b;margin:10px 0;white-space:pre-wrap}
+.post-attachments{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.attachment{border:1px solid #e2e8f0;border-radius:10px;padding:8px 12px;background:#f8fafc;display:flex;gap:8px;align-items:center;font-size:12px;text-decoration:none;color:#334155}
+.post-actions{display:flex;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid #f1f5f9}
+.post-actions button{padding:6px 12px;border-radius:8px;border:1px solid #e2e8f0;background:#fff;cursor:pointer;font-size:12px;font-weight:600}
+.post-actions button:hover{background:#f1f5f9}
+.comments{margin-top:12px;border-top:1px solid #f1f5f9;padding-top:10px}
+.comment{display:flex;gap:8px;padding:8px 0;border-bottom:1px solid #f8fafc}
+.comment:last-child{border:none}
+.comment-avatar{width:28px;height:28px;background:#e2e8f0;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.comment-body{flex:1;background:#f8fafc;border-radius:12px;padding:8px 12px}
+.comment-body b{font-size:12px}
+.comment-body p{font-size:12px;margin:4px 0 0;color:#334155}
+.add-comment{display:flex;gap:8px;margin-top:10px}
+.add-comment input{flex:1;padding:10px 12px;border:1px solid #e2e8f0;border-radius:20px;font-family:inherit;font-size:13px}
+.add-comment button{padding:8px 16px;background:#0B6E4F;color:#fff;border:none;border-radius:20px;cursor:pointer;font-weight:700}
+.classwork-item{display:flex;gap:12px;padding:12px;border:1px solid #e2e8f0;border-radius:12px;background:#fff;margin-bottom:8px;align-items:center}
+.classwork-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;flex-shrink:0}
+.classwork-icon.assignment{background:#0B6E4F}
+.classwork-icon.material{background:#3b82f6}
+.classwork-icon.question{background:#f59e0b}
+.classwork-info{flex:1}
+.classwork-info b{font-size:13px;display:block}
+.classwork-info small{color:#64748b;font-size:11px}
+.classwork-status{padding:4px 8px;border-radius:999px;font-size:10px;font-weight:700}
+.status-assigned{background:#dbeafe;color:#1e40af}
+.status-submitted{background:#fef3c7;color:#92400e}
+.status-graded{background:#dcfce7;color:#166534}
+.status-missing{background:#fee2e2;color:#991b1b}
+.status-overdue{background:#fee2e2;color:#991b1b;border:1px solid #fecaca}
+.daily-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.daily-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:12px;text-align:center}
+.daily-card.good{border-color:#10b981;background:#f0fdf4}
+.daily-card.attention{border-color:#f59e0b;background:#fffbeb}
+.mood{font-size:20px;margin-bottom:4px}
+.people-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.person-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:14px;display:flex;gap:10px;align-items:center}
+.person-avatar{width:40px;height:40px;background:#0B6E4F;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700}
+.bbb-card{background:linear-gradient(135deg,#0B6E4F 0%,#081426 100%);color:#fff;border-radius:16px;padding:16px;margin-bottom:12px}
+.bbb-card button{background:#fff;color:#0B6E4F;border:none;padding:10px 16px;border-radius:10px;font-weight:800;cursor:pointer;margin-top:10px}
+@media(max-width:900px){.stream-grid{grid-template-columns:1fr}.classroom-tabs{width:100%;overflow-x:auto}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><div class="brand-mark">📚</div><div><h1>الفصل الدراسي</h1><small>على نمط Google Classroom</small></div></div>
+    <div class="profile-mini"><div class="avatar">👤</div><div><b id="profileName">...</b><small id="profileRole">...</small></div></div>
+    <nav class="nav">
+      <button data-tab="stream" class="active">📢 ساحة المشاركات</button>
+      <button data-tab="classwork">📚 الواجبات والمواد</button>
+      <button data-tab="daily">📅 المتابعة اليومية</button>
+      <button data-tab="people">👥 الأشخاص</button>
+      <button data-tab="grades">📊 الدرجات</button>
+      <button data-tab="bbb">🎥 حصص مباشرة (BBB)</button>
+      <div class="nav-section">روابط</div>
+      <button onclick="location.href='portal.html'">🏛️ البوابة الموحدة</button>
+      <button onclick="location.href='student-homeworks.html'">📝 واجباتي القديمة</button>
+    </nav>
+    <div class="side-footer"><button id="logoutBtn" class="btn red block">تسجيل الخروج</button></div>
+  </aside>
+
+  <main class="main">
+    <div class="classroom-header">
+      <h1 id="classroomTitle">📚 الصف الأول الابتدائي - شعبة أ</h1>
+      <p id="classroomSubtitle">معلم الصف: أ. سليمان معروف — 24 طالب — 2026-2027</p>
+      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;position:relative;z-index:1">
+        <span class="badge" style="background:rgba(255,255,255,.2);color:#fff">📚 12 واجب</span>
+        <span class="badge" style="background:rgba(255,255,255,.2);color:#fff">👥 24 طالب</span>
+        <span class="badge" style="background:rgba(255,255,255,.2);color:#fff">🎥 3 حصص مباشرة هذا الأسبوع</span>
+      </div>
+    </div>
+
+    <div class="classroom-tabs" id="classroomTabs">
+      <button class="classroom-tab active" data-tab="stream">📢 ساحة المشاركات</button>
+      <button class="classroom-tab" data-tab="classwork">📚 الواجبات</button>
+      <button class="classroom-tab" data-tab="daily">📅 متابعة يومية</button>
+      <button class="classroom-tab" data-tab="people">👥 الأشخاص</button>
+      <button class="classroom-tab" data-tab="grades">📊 الدرجات</button>
+      <button class="classroom-tab" data-tab="bbb">🎥 مباشر</button>
+    </div>
+
+    <div id="tab-stream" class="tab-content">
+      <div class="stream-grid">
+        <div>
+          <div class="post-card" style="background:linear-gradient(135deg,#f0fdf4 0%,#fff 100%);border-color:#0B6E4F">
+            <div style="display:flex;gap:10px;align-items:center">
+              <div class="post-avatar">✏️</div>
+              <div style="flex:1">
+                <input id="newPostTitle" placeholder="عنوان المنشور / إعلان / سؤال..." style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:10px;font-family:inherit">
+              </div>
+              <button id="createPostBtn" class="btn" style="background:#0B6E4F;color:#fff;padding:10px 16px;border:none;border-radius:10px;font-weight:700;cursor:pointer">نشر</button>
+            </div>
+            <textarea id="newPostContent" placeholder="شارك شيئاً مع صفك... (مادة، واجب، إعلان، سؤال)" style="width:100%;margin-top:10px;padding:10px;border:1px solid #cbd5e1;border-radius:10px;min-height:70px;font-family:inherit;resize:vertical"></textarea>
+            <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+              <select id="newPostType" style="padding:8px;border:1px solid #cbd5e1;border-radius:8px">
+                <option value="announcement">📢 إعلان</option>
+                <option value="assignment">📚 واجب</option>
+                <option value="material">📄 مادة</option>
+                <option value="question">❓ سؤال</option>
+              </select>
+              <input id="newPostDue" type="date" style="padding:8px;border:1px solid #cbd5e1;border-radius:8px">
+              <label style="display:flex;align-items:center;gap:4px;font-size:12px"><input type="checkbox" id="newPostPinned"> 📌 تثبيت</label>
+            </div>
+          </div>
+          <div id="streamList"></div>
+        </div>
+        <div>
+          <div class="post-card">
+            <h4 style="margin:0 0 10px">📅 الواجبات القادمة</h4>
+            <div id="upcomingList"></div>
+          </div>
+          <div class="post-card">
+            <h4 style="margin:0 0 10px">👥 المعلمون</h4>
+            <div id="teachersList"></div>
+          </div>
+          <div class="post-card" style="background:linear-gradient(135deg,#0B6E4F 0%,#081426 100%);color:#fff">
+            <h4 style="margin:0 0 8px;color:#fff">🎥 حصة مباشرة الآن</h4>
+            <p style="font-size:12px;opacity:.9;margin:0 0 10px">انضم للحصة الإلكترونية مباشرة من الموقع</p>
+            <button onclick="Classroom.joinBBB()" style="width:100%;padding:10px;background:#fff;color:#0B6E4F;border:none;border-radius:10px;font-weight:800;cursor:pointer">🎥 دخول الحصة الآن</button>
+            <small style="display:block;margin-top:8px;opacity:.8;font-size:10px">يتم الانتقال سلس إلى BigBlueButton وربط ملخص الحصة تلقائياً</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-classwork" class="tab-content" style="display:none">
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+        <select id="filterStatus" style="padding:8px;border:1px solid #cbd5e1;border-radius:8px"><option value="">كل الحالات</option><option value="assigned">مكلف</option><option value="missing">ناقص</option><option value="submitted">مسلم</option><option value="graded">مصحح</option></select>
+        <select id="filterSubject" style="padding:8px;border:1px solid #cbd5e1;border-radius:8px"><option value="">كل المواد</option></select>
+        <button class="btn" style="background:#0B6E4F;color:#fff;border:none;padding:8px 14px;border-radius:8px" onclick="Classroom.loadClasswork()">تحديث</button>
+      </div>
+      <div id="classworkList"></div>
+    </div>
+
+    <div id="tab-daily" class="tab-content" style="display:none">
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center">
+        <input id="dailyDate" type="date" style="padding:8px;border:1px solid #cbd5e1;border-radius:8px">
+        <button class="btn" style="background:#0B6E4F;color:#fff;border:none;padding:8px 14px;border-radius:8px" onclick="Classroom.loadDaily()">عرض المتابعة</button>
+        <button class="btn" style="background:#fff;border:1px solid #cbd5e1;padding:8px 14px;border-radius:8px" onclick="Classroom.saveDaily()">💾 حفظ المتابعة اليومية</button>
+      </div>
+      <div id="dailySummary" style="margin-bottom:12px;display:grid;grid-template-columns:repeat(4,1fr);gap:8px"></div>
+      <div id="dailyGrid" class="daily-grid"></div>
+    </div>
+
+    <div id="tab-people" class="tab-content" style="display:none">
+      <div id="peopleGrid" class="people-grid"></div>
+    </div>
+
+    <div id="tab-grades" class="tab-content" style="display:none">
+      <div id="gradesList"></div>
+    </div>
+
+    <div id="tab-bbb" class="tab-content" style="display:none">
+      <div class="bbb-card">
+        <h3 style="margin:0 0 8px">🎥 حصص BigBlueButton المباشرة — انتقال سلس</h3>
+        <p style="font-size:13px;opacity:.9;margin:0 0 12px">اشتريت حسابات لطلابك؟ اربطها هنا. الطالب يضغط "دخول الحصة" من موقعك → ينتقل تلقائياً إلى BBB بدون تسجيل دخول ثاني (SSO) → بعد انتهاء الحصة، ملخص الحصة يرجع تلقائياً إلى موقعك.</p>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px">
+          <div>
+            <label style="font-size:12px">رابط سيرفر BBB:</label>
+            <input id="bbbServer" placeholder="https://bbb.example.com/bigbluebutton/" style="width:100%;padding:8px;border-radius:8px;border:none;margin-top:4px">
+          </div>
+          <div>
+            <label style="font-size:12px">Secret Key:</label>
+            <input id="bbbSecret" placeholder="BBB Secret" type="password" style="width:100%;padding:8px;border-radius:8px;border:none;margin-top:4px">
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+          <button onclick="Classroom.saveBBBConfig()" style="padding:10px 16px;background:#fff;color:#0B6E4F;border:none;border-radius:10px;font-weight:800;cursor:pointer">💾 حفظ إعدادات BBB</button>
+          <button onclick="Classroom.createBBBMeeting()" style="padding:10px 16px;background:#F6B93B;color:#000;border:none;border-radius:10px;font-weight:800;cursor:pointer">➕ إنشاء حصة جديدة</button>
+          <button onclick="Classroom.joinBBB()" style="padding:10px 16px;background:#00C896;color:#fff;border:none;border-radius:10px;font-weight:800;cursor:pointer">🎥 دخول كطالب</button>
+        </div>
+      </div>
+      <div id="bbbMeetingsList"></div>
+      <div id="bbbSummaryForm" style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px;margin-top:12px">
+        <h4>📝 ملخص الحصة — يرتبط تلقائياً بالموقع</h4>
+        <p style="font-size:12px;color:#64748b">بعد انتهاء حصة BBB، المعلم يكتب ملخص هنا ويربطه بالمنهج والواجب</p>
+        <textarea id="bbbSummary" placeholder="ماذا تم شرحه اليوم؟ الواجب للمرة القادمة؟ ملاحظات؟" style="width:100%;min-height:100px;padding:10px;border:1px solid #cbd5e1;border-radius:10px;margin-top:8px;font-family:inherit"></textarea>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <select id="bbbSummarySubject" style="padding:8px;border:1px solid #cbd5e1;border-radius:8px"><option>اختر المادة</option></select>
+          <button onclick="Classroom.saveBBBSummary()" style="padding:8px 14px;background:#0B6E4F;color:#fff;border:none;border-radius:8px;font-weight:700">💾 حفظ ملخص الحصة وربطه</button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div id="toast" class="toast"></div>
+<script src="libs/supabase.min.js"></script>
+<script src="assets/config.js"></script>
+<script src="assets/classroom.js?v=1"></script>
+</body>
+</html>
