@@ -441,7 +441,6 @@ buildDynamicPayments();
 setTimeout(generateQR,500);
 </script>
 <script src="assets/i18n.js"></script>
-<script src="assets/lang-switcher.js"></script>
 <script>
 // Manual translation for print-custom-report specific labels - ensures Farsi works even if i18n.js misses
 const PRINT_TRANSLATIONS = {
@@ -520,5 +519,6 @@ localStorage.setItem=function(k,v){
   if(k==='amin_ui_lang'){ setTimeout(applyPrintTranslations, 400); }
 };
 </script>
+<script src="assets/lang-switcher.js"></script>
 </body>
 </html>

@@ -740,7 +740,6 @@ function buildFamilyPrintWindowHTML(item){
     <div class="sign-box"><b>اعتماد الإدارة</b><span>${esc(({pending:'قيد المراجعة',reviewed:'تمت المراجعة',approved:'معتمد',rejected:'مرفوض'})[String(item.family_status||'').toLowerCase()] || '—')}</span></div>
   </div>
 </div>
-<script src="assets/lang-switcher.js"></script>
 </body>
 </html>`;
 }
