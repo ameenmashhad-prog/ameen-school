@@ -357,33 +357,50 @@ function generateChecksum(apiCall, queryString, secret){
 async function createBBBMeeting(){
   const server=$('#bbbServer')?.value||localStorage.getItem('bbb_server');
   const secret=$('#bbbSecret')?.value||localStorage.getItem('bbb_secret');
-  if(!server||!secret){ toast('تنبيه','أدخل رابط السيرفر و Secret أولاً','red'); return; }
+  if(!server){ toast('تنبيه','أدخل رابط سيرفر BBB أولاً','red'); return; }
   
   const meetingID=`class-${CLASS_ID||'general'}-${Date.now()}`;
   const meetingName=`حصة ${CLASS_NAME} - ${new Date().toLocaleDateString('ar-IQ')}`;
   const attendeePW='student123';
   const moderatorPW='teacher123';
   
-  // In production, this should be done via your backend /api/bbb/create to hide secret
-  // Here we simulate creation and save to DB
   try{
+    // 1) Create in bbb_meetings table (new) - for attendance tracking
+    try{
+      await client().from('bbb_meetings').insert({
+        meeting_id: meetingID,
+        class_id: CLASS_ID,
+        title: meetingName,
+        created_by: ME.id,
+        bbb_server_url: server,
+        moderator_pw: moderatorPW,
+        attendee_pw: attendeePW,
+        status: 'running',
+        started_at: new Date().toISOString()
+      });
+      console.log('✅ BBB meeting created in bbb_meetings table');
+    }catch(e){ console.warn('bbb_meetings insert failed (table may not exist yet, run SQL 172)', e); }
+    
+    // 2) Create announcement post in stream
     const {data,error}=await client().from('classroom_posts').insert({
       class_id: CLASS_ID,
       author_id: ME.id,
       post_type: 'announcement',
       title: `🎥 حصة مباشرة: ${meetingName}`,
-      content: `تم إنشاء حصة مباشرة على BigBlueButton\n\nMeeting ID: ${meetingID}\nرابط المعلم (Moderator): ${server}api/join?meetingID=${meetingID}&password=${moderatorPW}&fullName=${encodeURIComponent(ME.name)}\nرابط الطالب (Attendee): ${server}api/join?meetingID=${meetingID}&password=${attendeePW}&fullName=Student\n\nسيتم الانتقال السلس من موقع المدرسة إلى الحصة الإلكترونية. بعد انتهاء الحصة، سيتم ربط ملخص الحصة تلقائياً بالموقع.`,
+      content: `تم إنشاء حصة مباشرة على BigBlueButton\n\nMeeting ID: ${meetingID}\nرابط المعلم (Moderator): ${server}api/join?meetingID=${meetingID}&password=${moderatorPW}&fullName=${encodeURIComponent(ME.name)}\nرابط الطالب (Attendee): ${server}api/join?meetingID=${meetingID}&password=${attendeePW}&fullName=Student\n\n✅ الحضور سيسجل تلقائياً: من دخل وكم بقي - ويرتبط بسجل الحضور اليومي والشهري\n\nسيتم الانتقال السلس من موقع المدرسة إلى الحصة الإلكترونية. بعد انتهاء الحصة، سيتم ربط ملخص الحصة تلقائياً بالموقع.`,
       is_pinned: true,
       status: 'published'
     }).select().single();
     if(error) throw error;
     
-    // Also save to bbb_meetings table if exists, or as classroom post
-    toast('تم إنشاء الحصة','تم إنشاء حصة BBB وحفظها كمنشور مثبت','green');
+    toast('تم إنشاء الحصة','تم إنشاء حصة BBB وحفظها كمنشور مثبت - الحضور سيسجل تلقائياً','green');
     
-    // Open moderator link directly
-    const modUrl=`${server}api/join?meetingID=${meetingID}&password=${moderatorPW}&fullName=${encodeURIComponent(ME.name)}&checksum=${generateChecksum('join',`fullName=${encodeURIComponent(ME.name)}&meetingID=${meetingID}&password=${moderatorPW}`,secret)}`;
-    window.open(modUrl,'_blank');
+    // 3) Open moderator link via our proxy that generates checksum server-side (secure)
+    const modProxyUrl=`/api/bbb/join?meetingID=${encodeURIComponent(meetingID)}&fullName=${encodeURIComponent(ME.name)}&role=moderator`;
+    window.open(modProxyUrl,'_blank');
+    
+    // 4) Log teacher's own join
+    try{ await client().rpc('log_bbb_join',{p_meeting_id:meetingID, p_full_name:ME.name, p_role:'moderator'}); }catch(e){}
     
     loadStream();
     loadBBBMeetings();
@@ -394,73 +411,235 @@ async function createBBBMeeting(){
 }
 
 async function joinBBB(meetingID=null){
-  // If no meetingID, join latest
-  if(!meetingID){
+  // If no meetingID provided, try to find latest live class
+  let targetMeetingID = meetingID;
+  if(!targetMeetingID){
     try{
-      const {data}=await client().from('classroom_posts').select('*').eq('post_type','announcement').ilike('title','%حصة مباشرة%').order('created_at',{ascending:false}).limit(1).maybeSingle();
-      if(data && data.content){
-        // Extract meetingID from content if exists
-        const match=data.content.match(/Meeting ID:\s*(\S+)/);
-        if(match) meetingID=match[1];
+      // First try bbb_meetings table (new)
+      const {data:bbbMeeting}=await client().from('bbb_meetings').select('meeting_id').eq('status','running').order('created_at',{ascending:false}).limit(1).maybeSingle();
+      if(bbbMeeting) targetMeetingID=bbbMeeting.meeting_id;
+      else {
+        // Fallback to classroom_posts
+        const {data}=await client().from('classroom_posts').select('*').eq('post_type','announcement').ilike('title','%حصة مباشرة%').order('created_at',{ascending:false}).limit(1).maybeSingle();
+        if(data && data.content){
+          const match=data.content.match(/Meeting ID:\s*(\S+)/);
+          if(match) targetMeetingID=match[1];
+        }
       }
-    }catch(e){}
+    }catch(e){ console.warn(e); }
   }
   
   const server=localStorage.getItem('bbb_server')||$('#bbbServer')?.value||'';
-  const secret=localStorage.getItem('bbb_secret')||$('#bbbSecret')?.value||'';
-  
-  if(!meetingID){
-    // Fallback: open generic join page with instructions
+  if(!targetMeetingID){
     const bbbUrl=server||'https://bbb.example.com/';
-    const joinUrl=`${bbbUrl}api/join?meetingID=class-${CLASS_ID||'demo'}&password=student123&fullName=${encodeURIComponent(ME.name||'Student')}`;
     toast('تنبيه','لم يتم العثور على حصة نشطة، سيتم فتح صفحة BBB العامة','blue');
     window.open(bbbUrl,'_blank');
     return;
   }
   
-  // Student join
-  const studentUrl=`${server}api/join?meetingID=${meetingID}&password=student123&fullName=${encodeURIComponent(ME.name||'Student')}`;
-  window.open(studentUrl,'_blank');
-  toast('تم','يتم الانتقال إلى الحصة الإلكترونية...','green');
-  
-  // Log attendance for online class
+  // Log join via new RPC that auto-updates attendance + daily_followup
+  let attendanceLogId=null;
   try{
-    await client().from('daily_followup').upsert({
-      student_id: (await client().from('students').select('id').eq('user_id',ME.id).maybeSingle()).data?.id,
-      class_id: CLASS_ID,
-      followup_date: new Date().toISOString().slice(0,10),
-      attendance_status: 'present',
-      behavior_note: `حضر حصة BBB: ${meetingID}`,
-      created_by: ME.id
-    }, {onConflict:'student_id,followup_date'});
-  }catch(e){}
+    const {data,error}=await client().rpc('log_bbb_join',{
+      p_meeting_id: targetMeetingID,
+      p_full_name: ME.name||'Student',
+      p_role: ME.role==='teacher'?'moderator':'attendee'
+    });
+    if(error) console.warn('log_bbb_join failed',error);
+    else {
+      attendanceLogId=data;
+      localStorage.setItem('bbb_current_attendance_id', attendanceLogId);
+      localStorage.setItem('bbb_current_meeting_id', targetMeetingID);
+      console.log('✅ BBB attendance logged:', attendanceLogId);
+    }
+  }catch(e){ console.warn('BBB log failed',e); }
+  
+  // Build BBB join URL - in production, generate checksum server-side via /api/bbb/join
+  // For now, use direct join (BBB allows join without checksum if guest policy is open, or via our /api/bbb proxy)
+  const secret=localStorage.getItem('bbb_secret')||$('#bbbSecret')?.value||'';
+  let joinUrl;
+  if(server){
+    // Try our proxy first (which will generate checksum server-side)
+    joinUrl=`${server}api/join?meetingID=${targetMeetingID}&password=${ME.role==='teacher'?'teacher123':'student123'}&fullName=${encodeURIComponent(ME.name||'Student')}`;
+    // If we have a local proxy endpoint that generates checksum
+    try{
+      const proxyJoinUrl=`/api/bbb/join?meetingID=${encodeURIComponent(targetMeetingID)}&fullName=${encodeURIComponent(ME.name||'Student')}&role=${ME.role}`;
+      // Actually open proxy URL which will redirect to BBB with correct checksum
+      window.open(proxyJoinUrl,'_blank');
+      toast('تم','يتم الانتقال إلى الحصة الإلكترونية... حضورك سيسجل تلقائياً كم بقيت','green');
+      
+      // Set up leave tracking - when user closes tab or after 60min, log leave
+      const meetingIdForClosure=targetMeetingID;
+      const attendanceIdForClosure=attendanceLogId;
+      window.addEventListener('beforeunload', function(){
+        if(attendanceIdForClosure){
+          navigator.sendBeacon('/api/bbb/leave', JSON.stringify({attendance_id: attendanceIdForClosure}));
+        }
+      });
+      
+      // Auto-log leave after 2 hours as fallback
+      setTimeout(async()=>{
+        try{
+          if(attendanceIdForClosure){
+            await client().rpc('log_bbb_leave',{p_attendance_id: attendanceIdForClosure});
+            console.log('Auto logged BBB leave after 2h');
+          }
+        }catch(e){}
+      }, 2*60*60*1000);
+      
+      return;
+    }catch(e){ console.warn(e); }
+  }
+  
+  // Fallback direct
+  joinUrl=`${server||'https://bbb.example.com/bigbluebutton/'}api/join?meetingID=${targetMeetingID}&password=${ME.role==='teacher'?'teacher123':'student123'}&fullName=${encodeURIComponent(ME.name||'Student')}`;
+  window.open(joinUrl,'_blank');
+  toast('تم','يتم الانتقال إلى الحصة الإلكترونية...','green');
 }
 
 async function loadBBBMeetings(){
   const listEl=$('#bbbMeetingsList');
   if(!listEl) return;
+  listEl.innerHTML='⏳ جاري تحميل الحصص مع حضورها التلقائي...';
   try{
-    const {data}=await client().from('classroom_posts').select('*').eq('post_type','announcement').ilike('title','%حصة مباشرة%').order('created_at',{ascending:false}).limit(10);
-    if(!data||!data.length){ listEl.innerHTML='<div style="text-align:center;padding:20px;color:#64748b">لا توجد حصص مباشرة سابقة</div>'; return; }
-    listEl.innerHTML=data.map(m=>`
-      <div class="post-card">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <b>${esc(m.title)}</b>
-          <small>${formatDate(m.created_at)}</small>
+    // Try enhanced view with attendance summary first
+    let meetings=[];
+    try{
+      const {data,error}=await client().from('v_bbb_attendance_summary').select('*').order('created_at',{ascending:false}).limit(10);
+      if(!error && data && data.length){
+        meetings=data.map(m=>({
+          meeting_id: m.meeting_id,
+          title: m.title,
+          class_name: m.class_name,
+          status: m.status,
+          created_at: m.created_at,
+          started_at: m.started_at,
+          ended_at: m.ended_at,
+          total_attendees: m.total_attendees,
+          valid_count: m.valid_attendance_count,
+          avg_duration: m.avg_duration,
+          attendee_names: m.attendee_names,
+          content: `الحضور: ${m.valid_attendance_count||0}/${m.total_attendees||0} - متوسط البقاء: ${m.avg_duration||0} دقيقة`
+        }));
+      }
+    }catch(e){ console.warn('v_bbb_attendance_summary failed',e); }
+    
+    // Fallback to classroom_posts if no bbb_meetings yet
+    if(!meetings.length){
+      const {data}=await client().from('classroom_posts').select('*').eq('post_type','announcement').ilike('title','%حصة مباشرة%').order('created_at',{ascending:false}).limit(10);
+      meetings=(data||[]).map(m=>({
+        meeting_id: m.id,
+        title: m.title,
+        created_at: m.created_at,
+        content: m.content,
+        total_attendees: 0,
+        valid_count: 0,
+        avg_duration: 0,
+        status: 'archived'
+      }));
+    }
+    
+    if(!meetings.length){ listEl.innerHTML='<div style="text-align:center;padding:20px;color:#64748b">📹 لا توجد حصص مباشرة سابقة — أنشئ أول حصة الآن</div>'; return; }
+    
+    let html='';
+    meetings.forEach(m=>{
+      const isRunning=m.status==='running';
+      const durText=m.avg_duration?`${m.avg_duration} دقيقة متوسط`:'—';
+      const validText=m.valid_count!=null?`${m.valid_count} حضروا فعلياً (≥5 دقائق)`:'—';
+      html+=`
+      <div class="post-card" style="${isRunning?'border-color:#10b981;border-width:2px;background:linear-gradient(135deg,#f0fdf4 0%,#fff 100%)':''}">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+          <div>
+            <b>${esc(m.title)} ${isRunning?'<span style="background:#10b981;color:#fff;padding:2px 8px;border-radius:999px;font-size:10px">● مباشر الآن</span>':''}</b>
+            <div style="font-size:11px;color:#64748b;margin-top:4px">
+              ${formatDate(m.created_at)} · ${esc(m.class_name||'عام')} · ${m.meeting_id?`ID: ${esc(m.meeting_id.slice(0,12))}...`:''}
+            </div>
+          </div>
+          <small style="background:${isRunning?'#dcfce7':'#f1f5f9'};color:${isRunning?'#166534':'#64748b'};padding:4px 8px;border-radius:999px">${esc(m.status||'منتهية')}</small>
         </div>
-        <p style="font-size:12px;color:#64748b;white-space:pre-wrap;margin:8px 0">${esc(m.content||'').slice(0,200)}</p>
-        <div style="display:flex;gap:8px">
-          <button onclick="Classroom.joinBBB('${m.id}')" style="padding:6px 12px;background:#0B6E4F;color:#fff;border:none;border-radius:8px;cursor:pointer">دخول كطالب</button>
-          <button onclick="Classroom.openPost('${m.id}')" style="padding:6px 12px;background:#fff;border:1px solid #cbd5e1;border-radius:8px;cursor:pointer">تفاصيل</button>
+        <p style="font-size:12px;color:#334155;white-space:pre-wrap;margin:8px 0;background:#f8fafc;padding:8px;border-radius:8px;border:1px solid #e2e8f0">${esc(m.content||'').slice(0,250)}</p>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0">
+          <div style="background:#f0fdf4;padding:8px;border-radius:8px;text-align:center;border:1px solid #bbf7d0"><small>إجمالي الدخول</small><br><b>${m.total_attendees||0}</b></div>
+          <div style="background:#dcfce7;padding:8px;border-radius:8px;text-align:center;border:1px solid #86efac"><small>حضور فعلي ≥5د</small><br><b style="color:#166534">${m.valid_count||0}</b></div>
+          <div style="background:#dbeafe;padding:8px;border-radius:8px;text-align:center;border:1px solid #bfdbfe"><small>متوسط البقاء</small><br><b>${durText}</b></div>
+        </div>
+        ${m.attendee_names?`<div style="font-size:11px;color:#475569;background:#f8fafc;padding:6px;border-radius:6px;white-space:pre-wrap">حضر: ${esc(m.attendee_names.slice(0,150))}${m.attendee_names.length>150?'...':''}</div>`:''}
+        <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+          <button onclick="Classroom.joinBBB('${esc(m.meeting_id)}')" style="padding:8px 14px;background:#0B6E4F;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:700">🎥 دخول ${isRunning?'الآن':''}</button>
+          <button onclick="Classroom.openPost('${esc(m.meeting_id)}')" style="padding:8px 14px;background:#fff;border:1px solid #cbd5e1;border-radius:8px;cursor:pointer">📄 تفاصيل</button>
+          ${isRunning?`<button onclick="Classroom.endBBBMeeting('${esc(m.meeting_id)}')" style="padding:8px 14px;background:#dc2626;color:#fff;border:none;border-radius:8px;cursor:pointer">⏹️ إنهاء الحصة</button>`:''}
+          <button onclick="Classroom.viewBBBAttendance('${esc(m.meeting_id)}')" style="padding:8px 14px;background:#f59e0b;color:#fff;border:none;border-radius:8px;cursor:pointer">📊 سجل الحضور التلقائي</button>
         </div>
       </div>
-    `).join('');
+    `;
+    });
+    listEl.innerHTML=html;
   }catch(e){
-    listEl.innerHTML=`<div style="padding:12px;background:#fee2e2;color:#991b1b;border-radius:8px">خطأ: ${esc(e.message)}</div>`;
+    listEl.innerHTML=`<div style="padding:12px;background:#fee2e2;color:#991b1b;border-radius:8px">خطأ تحميل الحصص: ${esc(e.message)}<br><small>تأكد من تشغيل SQL 172_bbb_attendance_tracking.sql</small></div>`;
   }
 }
 
+async function endBBBMeeting(meetingId){
+  if(!meetingId){ toast('تنبيه','اختر حصة لإنهائها','red'); return; }
+  if(!confirm('هل تريد إنهاء الحصة المباشرة؟ سيتم حساب مدة بقاء كل طالب تلقائياً وربطها بالحضور.')) return;
+  try{
+    const {data,error}=await client().rpc('end_bbb_meeting',{p_meeting_id:meetingId, p_summary: document.getElementById('bbbSummary')?.value||null});
+    if(error) throw error;
+    toast('تم إنهاء الحصة',`تم إنهاء الحصة وحفظ حضور ${data?.attendance_count||0} طالب تلقائياً`,'green');
+    loadBBBMeetings();
+    loadDaily();
+  }catch(e){ toast('خطأ',e.message,'red'); }
+}
+
+async function viewBBBAttendance(meetingId){
+  try{
+    const {data,error}=await client().from('bbb_attendance').select('*, student:student_id(name)').eq('meeting_id',meetingId).order('join_time');
+    if(error) throw error;
+    let html=`<div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:16px"><h3>📊 حضور حصة ${esc(meetingId.slice(0,12))}... - ${data.length} طالب</h3><table style="width:100%;border-collapse:collapse;margin-top:12px"><thead><tr style="background:#f1f5f9"><th style="padding:8px;border:1px solid #e2e8f0">الطالب</th><th style="padding:8px;border:1px solid #e2e8f0">دخل</th><th style="padding:8px;border:1px solid #e2e8f0">خرج</th><th style="padding:8px;border:1px solid #e2e8f0">المدة</th><th style="padding:8px;border:1px solid #e2e8f0">حالة</th></tr></thead><tbody>`;
+    data.forEach(a=>{
+      const dur=a.duration_minutes||0;
+      const status=dur>=5?'✅ حاضر فعلي':'⚠️ دخل وخرج سريعاً';
+      html+=`<tr><td style="padding:8px;border:1px solid #e2e8f0">${esc(a.full_name||a.student?.name||'—')}</td><td style="padding:8px;border:1px solid #e2e8f0">${new Date(a.join_time).toLocaleTimeString('ar-IQ')}</td><td style="padding:8px;border:1px solid #e2e8f0">${a.leave_time?new Date(a.leave_time).toLocaleTimeString('ar-IQ'):'—'}</td><td style="padding:8px;border:1px solid #e2e8f0">${dur} دقيقة</td><td style="padding:8px;border:1px solid #e2e8f0">${status}</td></tr>`;
+    });
+    html+='</tbody></table></div>';
+    const w=window.open('','_blank','width=800,height=600');
+    w.document.write(`<!doctype html><html dir="rtl" lang="ar"><head><meta charset="utf-8"><title>حضور BBB - ${meetingId}</title><style>body{font-family:Tahoma;padding:20px}table{width:100%;border-collapse:collapse}th,td{padding:8px;border:1px solid #e2e8f0;text-align:right}</style></head><body>${html}<br><button onclick="window.print()" style="padding:10px 16px;background:#0B6E4F;color:#fff;border:none;border-radius:8px">طباعة</button></body></html>`);
+    w.document.close();
+  }catch(e){ toast('خطأ',e.message,'red'); }
+}
+
+
+async function endBBBMeeting(meetingId){
+  if(!meetingId){ toast('تنبيه','اختر حصة لإنهائها','red'); return; }
+  if(!confirm('هل تريد إنهاء الحصة المباشرة؟ سيتم حساب مدة بقاء كل طالب تلقائياً وربطها بالحضور.')) return;
+  try{
+    const {data,error}=await client().rpc('end_bbb_meeting',{p_meeting_id:meetingId, p_summary: document.getElementById('bbbSummary')?.value||null});
+    if(error) throw error;
+    toast('تم إنهاء الحصة',`تم إنهاء الحصة وحفظ حضور ${data?.attendance_count||0} طالب تلقائياً`,'green');
+    loadBBBMeetings();
+    loadDaily();
+  }catch(e){ toast('خطأ',e.message,'red'); }
+}
+
+async function viewBBBAttendance(meetingId){
+  try{
+    const {data,error}=await client().from('bbb_attendance').select('*, student:student_id(name)').eq('meeting_id',meetingId).order('join_time');
+    if(error) throw error;
+    let html=`<div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:16px"><h3>📊 حضور حصة ${esc(meetingId.slice(0,12))}... - ${data.length} طالب</h3><table style="width:100%;border-collapse:collapse;margin-top:12px"><thead><tr style="background:#f1f5f9"><th style="padding:8px;border:1px solid #e2e8f0">الطالب</th><th style="padding:8px;border:1px solid #e2e8f0">دخل</th><th style="padding:8px;border:1px solid #e2e8f0">خرج</th><th style="padding:8px;border:1px solid #e2e8f0">المدة</th><th style="padding:8px;border:1px solid #e2e8f0">حالة</th></tr></thead><tbody>`;
+    data.forEach(a=>{
+      const dur=a.duration_minutes||0;
+      const status=dur>=5?'✅ حاضر فعلي':'⚠️ دخل وخرج سريعاً';
+      html+=`<tr><td style="padding:8px;border:1px solid #e2e8f0">${esc(a.full_name||a.student?.name||'—')}</td><td style="padding:8px;border:1px solid #e2e8f0">${new Date(a.join_time).toLocaleTimeString('ar-IQ')}</td><td style="padding:8px;border:1px solid #e2e8f0">${a.leave_time?new Date(a.leave_time).toLocaleTimeString('ar-IQ'):'—'}</td><td style="padding:8px;border:1px solid #e2e8f0">${dur} دقيقة</td><td style="padding:8px;border:1px solid #e2e8f0">${status}</td></tr>`;
+    });
+    html+='</tbody></table></div>';
+    const w=window.open('','_blank','width=800,height=600');
+    w.document.write(`<!doctype html><html dir="rtl" lang="ar"><head><meta charset="utf-8"><title>حضور BBB - ${meetingId}</title><style>body{font-family:Tahoma;padding:20px}table{width:100%;border-collapse:collapse}th,td{padding:8px;border:1px solid #e2e8f0;text-align:right}</style></head><body>${html}<br><button onclick="window.print()" style="padding:10px 16px;background:#0B6E4F;color:#fff;border:none;border-radius:8px">طباعة</button></body></html>`);
+    w.document.close();
+  }catch(e){ toast('خطأ',e.message,'red'); }
+}
+
 async function saveBBBSummary(){
+
   const summary=$('#bbbSummary')?.value.trim();
   const subject=$('#bbbSummarySubject')?.value||'';
   if(!summary){ toast('تنبيه','اكتب ملخص الحصة','red'); return; }
