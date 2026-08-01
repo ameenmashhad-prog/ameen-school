@@ -442,5 +442,83 @@ setTimeout(generateQR,500);
 </script>
 <script src="assets/i18n.js"></script>
 <script src="assets/lang-switcher.js"></script>
+<script>
+// Manual translation for print-custom-report specific labels - ensures Farsi works even if i18n.js misses
+const PRINT_TRANSLATIONS = {
+  ar: {
+    'كود سيدا (10 أرقام):': 'كود سيدا (10 أرقام):',
+    'نوع التسجيل:': 'نوع التسجيل:',
+    'تاريخ الولادة ميلادي:': 'تاريخ الولادة ميلادي:',
+    'تاريخ الولادة شمسي:': 'تاريخ الولادة شمسي:',
+    'الجنس:': 'الجنس:',
+    'كلمة المرور (مرجع ورقي):': 'كلمة المرور (مرجع ورقي):',
+    'رقم الجواز:': 'رقم الجواز:',
+    'تاريخ انتهاء الجواز:': 'تاريخ انتهاء الجواز:',
+    'الأيام الباقية:': 'الأيام الباقية:',
+    'اسم المستخدم:': 'اسم المستخدم:',
+  },
+  fa: {
+    'كود سيدا (10 أرقام):': 'کد سیدا (۱۰ رقم):',
+    'نوع التسجيل:': 'نوع ثبت‌نام:',
+    'تاريخ الولادة ميلادي:': 'تاریخ تولد میلادی:',
+    'تاريخ الولادة شمسي:': 'تاریخ تولد شمسی:',
+    'الجنس:': 'جنسیت:',
+    'كلمة المرور (مرجع ورقي):': 'رمز عبور (مرجع کاغذی):',
+    'رقم الجواز:': 'شماره گذرنامه:',
+    'تاريخ انتهاء الجواز:': 'تاریخ پایان گذرنامه:',
+    'الأيام الباقية:': 'روزهای باقی‌مانده:',
+    'اسم المستخدم:': 'نام کاربری:',
+    'المرحلة الابتدائية (من الأول حتى السادس)': 'مقطع ابتدایی (اول تا ششم)',
+    'الأول والثاني المتوسط': 'اول و دوم متوسطه',
+    'الثالث المتوسط (بدون امتحان نهائي)': 'سوم متوسطه (بدون آزمون نهایی)',
+    'الرابع والخامس الإعدادي': 'چهارم و پنجم دبیرستان',
+    'السادس الإعدادي للتسجيل في قم:': 'ششم دبیرستان برای ثبت‌نام در قم:',
+    'عدد الطلاب في مجمع أمين الرضا 1:': 'تعداد دانش‌آموزان مجتمع امین‌الرضا ۱:',
+    'عدد الطلاب في مجمع أمين الرضا 2:': 'تعداد دانش‌آموزان مجتمع امین‌الرضا ۲:',
+  },
+  en: {
+    'كود سيدا (10 أرقام):': 'SEDA Code (10 digits):',
+    'نوع التسجيل:': 'Enrollment Type:',
+    'تاريخ الولادة ميلادي:': 'Gregorian Birth Date:',
+    'تاريخ الولادة شمسي:': 'Shamsi Birth Date:',
+    'الجنس:': 'Gender:',
+    'كلمة المرور (مرجع ورقي):': 'Password (Paper Ref):',
+    'رقم الجواز:': 'Passport No:',
+    'تاريخ انتهاء الجواز:': 'Passport Expiry:',
+    'الأيام الباقية:': 'Days Remaining:',
+    'اسم المستخدم:': 'Username:',
+    'المرحلة الابتدائية (من الأول حتى السادس)': 'Primary Stage (Grade 1-6)',
+    'الأول والثاني المتوسط': 'First & Second Intermediate',
+    'الثالث المتوسط (بدون امتحان نهائي)': 'Third Intermediate (No Final)',
+    'الرابع والخامس الإعدادي': 'Fourth & Fifth Secondary',
+    'السادس الإعدادي للتسجيل في قم:': 'Sixth Secondary Qom Registration:',
+  }
+};
+
+function applyPrintTranslations(){
+  const lang=(localStorage.getItem('amin_ui_lang')||'ar').slice(0,2).toLowerCase();
+  if(lang==='ar') return;
+  const dict=PRINT_TRANSLATIONS[lang];
+  if(!dict) return;
+  document.querySelectorAll('td.label').forEach(td=>{
+    const text=td.textContent.trim();
+    if(dict[text]){ td.textContent=dict[text]; return; }
+    const noColon=text.replace(/:$/,'').trim();
+    if(dict[noColon]){ td.textContent=dict[noColon]+':'; return; }
+    for(const [ar,trans] of Object.entries(dict)){
+      if(text.includes(ar) && ar.length>5 && text.length<100){
+        td.textContent=text.replace(ar,trans);
+        break;
+      }
+    }
+  });
+}
+document.addEventListener('DOMContentLoaded', ()=>{ setTimeout(applyPrintTranslations, 600); setTimeout(applyPrintTranslations, 1500); });
+const origSetItem2=localStorage.setItem;
+localStorage.setItem=function(k,v){
+  origSetItem2.apply(this,arguments);
+  if(k==='amin_ui_lang'){ setTimeout(applyPrintTranslations, 400); }
+};
+</script>
 </body>
 </html>
