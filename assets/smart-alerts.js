@@ -262,7 +262,6 @@ var SmartAlerts = {
   },
 
   render: function() {
-  render: function() {
     var old = document.getElementById('smartAlertsBar');
     if(old) old.remove();
     if(!this.alerts.length) { this.renderEmptyBar(); return; }
