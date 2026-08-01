@@ -181,4 +181,5 @@ function bind(){
 }
 async function init(){client();if(!await ensure())return;bind();await load()}
 window.NotificationsCenter={init,render,markRead,markAll,markCriticalRead};
+}
 }());

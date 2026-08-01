@@ -768,12 +768,12 @@ async function init(){
   $('#logoutBtn')?.addEventListener('click', async()=>{ await client().auth.signOut(); location.href='index.html'; });
   $('#mobileMenuBtn')?.addEventListener('click', ()=>$('#sidebar').classList.toggle('open'));
   $('#createPostBtn')?.addEventListener('click', createPost);
-  $('#dailyDate')?.valueAsDate=new Date();
+  const _dailyEl=$('#dailyDate'); if(_dailyEl) _dailyEl.valueAsDate=new Date();
   bindTabs();
   await loadStream();
   // Load BBB config from localStorage
-  $('#bbbServer').value=localStorage.getItem('bbb_server')||'';
-  $('#bbbSecret').value=localStorage.getItem('bbb_secret')||'';
+  const _bbbS=document.getElementById('bbbServer'); if(_bbbS) _bbbS.value=localStorage.getItem('bbb_server')||'';
+  const _bbbSec=document.getElementById('bbbSecret'); if(_bbbSec) _bbbSec.value=localStorage.getItem('bbb_secret')||'';
 }
 
 window.Classroom={init,loadStream,createPost,loadClasswork,loadDaily,saveDaily,loadPeople,loadGrades,joinBBB,createBBBMeeting,saveBBBConfig,loadBBBMeetings,saveBBBSummary,openPost,openComments,addComment,likePost,markDone};
