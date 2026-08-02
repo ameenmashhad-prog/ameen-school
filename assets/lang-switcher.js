@@ -1,44 +1,34 @@
-// Radical Language Switcher - No duplicate buttons, works 100% with V3 i18n
+// Radical Language Switcher - No duplicates - Supports ?lang=fa URL param
 (function(){
   function getCurrentLang(){ 
-    const radical=window.AminI18nRadical?.getCurrentLang?.();
-    if(radical) return radical;
-    const v2=window.AminI18nV2?.getCurrentLang?.();
-    if(v2) return v2;
-    return (localStorage.getItem('amin_ui_lang')||'ar').slice(0,2).toLowerCase(); 
+    const params=new URLSearchParams(location.search);
+    const urlLang=params.get('lang')||params.get('locale');
+    if(urlLang && ['ar','fa','en'].includes(urlLang.slice(0,2).toLowerCase())) return urlLang.slice(0,2).toLowerCase();
+    return window.AminI18nRadical?.getCurrentLang?.() || (localStorage.getItem('amin_ui_lang')||'ar').slice(0,2).toLowerCase(); 
   }
   function setLang(lang){
     if(!['ar','fa','en'].includes(lang)) return;
-    if(window.AminI18nRadical?.setLang){
-      window.AminI18nRadical.setLang(lang);
-      return;
-    }
-    if(window.AminI18nV2?.setLang){
-      window.AminI18nV2.setLang(lang);
-      return;
-    }
+    if(window.AminI18nRadical?.setLang){ window.AminI18nRadical.setLang(lang); return; }
     localStorage.setItem('amin_ui_lang',''+lang);
-    document.documentElement.lang=lang;
-    document.documentElement.dir=(lang==='en'?'ltr':'rtl');
-    location.reload();
+    const url=new URL(location.href);
+    url.searchParams.set('lang', lang);
+    location.href=url.toString();
   }
   function createSwitcher(){
-    // Remove duplicates first
-    const existing=document.querySelectorAll('#amin-lang-switcher');
-    for(let i=1;i<existing.length;i++) existing[i].remove();
+    document.querySelectorAll('#amin-lang-switcher').forEach((el,i)=>{ if(i>0) el.remove(); });
     if(document.getElementById('amin-lang-switcher')) return;
     const div=document.createElement('div');
     div.id='amin-lang-switcher';
-    div.style.cssText='position:fixed;top:10px;left:10px;z-index:99999;background:#fff;border:1px solid #cbd5e1;border-radius:10px;padding:6px 10px;box-shadow:0 4px 12px rgba(0,0,0,.15);display:flex;gap:6px;align-items:center;font-family:inherit;font-size:12px;';
+    div.style.cssText='position:fixed;top:10px;left:10px;z-index:99999;background:#fff;border:2px solid #0B6E4F;border-radius:12px;padding:8px 12px;box-shadow:0 4px 20px rgba(0,0,0,.2);display:flex;gap:8px;align-items:center;font-family:inherit;font-size:13px;font-weight:700;';
     const current=getCurrentLang();
     div.innerHTML=`
-      <span style="font-size:11px;color:#64748b">🌐</span>
-      <select id="langSelect" style="border:none;background:transparent;font-weight:700;cursor:pointer;font-family:inherit">
+      <span>🌐</span>
+      <select id="langSelect" style="border:none;background:transparent;font-weight:800;cursor:pointer;font-family:inherit;font-size:13px">
         <option value="ar" ${current==='ar'?'selected':''}>العربية</option>
         <option value="fa" ${current==='fa'?'selected':''}>فارسی</option>
         <option value="en" ${current==='en'?'selected':''}>English</option>
       </select>
-      <small style="font-size:9px;color:#0B6E4F">V3</small>
+      <small style="background:#0B6E4F;color:#fff;padding:2px 6px;border-radius:999px;font-size:9px">V3</small>
     `;
     document.body.appendChild(div);
     document.getElementById('langSelect')?.addEventListener('change', (e)=> setLang(e.target.value));
