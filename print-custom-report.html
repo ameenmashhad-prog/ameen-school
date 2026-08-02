@@ -4,7 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>استمارة تسجيل مخصصة — طباعة مضغوطة مع كل الخانات الجديدة</title>
-<link rel="stylesheet" href="assets/i18n.css">
 <link rel="icon" href="/favicon.ico">
 <style>
 @page{size:A4;margin:8mm}
@@ -440,13 +439,7 @@ document.getElementById('annualFee')?.addEventListener('input', ()=>{ buildDynam
 buildDynamicPayments();
 setTimeout(generateQR,500);
 </script>
-<script src="assets/i18n.js"></script>
-<script src="assets/amin-i18n-v2.js"></script>
-<script src="assets/i18n-radical.js"></script>
 <script>
-// Manual translation for print-custom-report specific labels - ensures Farsi works even if i18n.js misses
-<script src="assets/amin-i18n-v2.js"></script>
-<script src="assets/i18n-radical.js"></script>
 const PRINT_TRANSLATIONS = {
   ar: {
     'كود سيدا (10 أرقام):': 'كود سيدا (10 أرقام):',
@@ -523,6 +516,6 @@ localStorage.setItem=function(k,v){
   if(k==='amin_ui_lang'){ setTimeout(applyPrintTranslations, 400); }
 };
 </script>
-<script src="assets/lang-switcher.js"></script>
+<script src="assets/amin-translate.js"></script>
 </body>
 </html>

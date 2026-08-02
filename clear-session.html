@@ -13,7 +13,6 @@ body{margin:0;font-family:var(--font-arabic);background:var(--bg);color:var(--te
 .btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 20px;border-radius:999px;border:1px solid var(--border-subtle);background:var(--surface);color:var(--text-primary);font-weight:800;cursor:pointer;font-family:inherit;}
 .btn:hover{background:var(--primary-tint);color:var(--primary);}
 </style>
-<link rel="stylesheet" href="assets/i18n.css">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="assets/amin-logo-small.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -39,11 +38,8 @@ function clearSession(){
 }
 document.getElementById('clearBtn').addEventListener('click',clearSession);
 </script>
-<script src="assets/platform-modules.js"></script><script src="assets/i18n.js"></script>
-<script src="assets/amin-i18n-v2.js"></script>
-<script src="assets/i18n-radical.js"></script>
 <script src="assets/ux-enhancements.js?v=20260706-3"></script>
 <script src="assets/amin-icons.js?v=20260706-3" defer></script>
-<script src="assets/lang-switcher.js"></script>
+<script src="assets/amin-translate.js"></script>
 </body>
 </html>

@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="assets/amin.css?v=20260706-5">
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<link rel="stylesheet" href="assets/i18n.css">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="assets/amin-logo-small.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -78,9 +77,6 @@
 <script src="libs/calendar-lib.js"></script>
 <script src="assets/config.js"></script>
 <script src="assets/platform-modules.js"></script>
-<script src="assets/i18n.js"></script>
-<script src="assets/amin-i18n-v2.js"></script>
-<script src="assets/i18n-radical.js"></script>
 <script src="assets/finance-runtime.js?v=20260707-1"></script>
 
 <script>
@@ -643,7 +639,8 @@
       '<div class="info-box"><div><b>الطالب:</b> '+esc(ME.name)+'</div></div>'+
       content+
       '<div class="print-footer"><div>📞 '+SCHOOL_PHONE+' | '+SCHOOL_NAME+'</div></div>'+
-      '<script src="assets/amin-theme-injector.js"><\/script></body></html>';
+      '<script src="assets/amin-theme-injector.js"><\/script><script src="assets/amin-translate.js"></script>
+</body></html>';
   }
   
   function buildGradesReport() {
@@ -714,6 +711,6 @@
 <script src="assets/smart-alerts.js"></script>
 <script src="assets/amin-theme-injector.js"></script>
 <script src="assets/amin-icons.js?v=20260706-3" defer></script>
-<script src="assets/lang-switcher.js"></script>
+<script src="assets/amin-translate.js"></script>
 </body>
 </html>

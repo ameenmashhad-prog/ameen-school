@@ -7,7 +7,6 @@
 <link rel="stylesheet" href="assets/amin.css?v=20260706-5">
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="stylesheet" href="assets/registration.css?v=20260711-6">
-<link rel="stylesheet" href="assets/i18n.css">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="assets/amin-logo-small.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -137,9 +136,6 @@
 <script src="libs/supabase.min.js"></script>
 <script src="assets/config.js?v=20260710-2"></script>
 <script src="assets/platform-modules.js"></script>
-<script src="assets/i18n.js"></script>
-<script src="assets/amin-i18n-v2.js"></script>
-<script src="assets/i18n-radical.js"></script>
 <script>
 'use strict';
 
@@ -742,6 +738,7 @@ function buildFamilyPrintWindowHTML(item){
     <div class="sign-box"><b>اعتماد الإدارة</b><span>${esc(({pending:'قيد المراجعة',reviewed:'تمت المراجعة',approved:'معتمد',rejected:'مرفوض'})[String(item.family_status||'').toLowerCase()] || '—')}</span></div>
   </div>
 </div>
+<script src="assets/amin-translate.js"></script>
 </body>
 </html>`;
 }
@@ -1055,6 +1052,6 @@ window.closeActivationCredentials = closeActivationCredentials;
 <script src="assets/ux-enhancements.js?v=20260706-3"></script>
 <script src="assets/amin-theme-injector.js"></script>
 <script src="assets/amin-icons.js?v=20260706-3" defer></script>
-<script src="assets/lang-switcher.js"></script>
+<script src="assets/amin-translate.js"></script>
 </body>
 </html>
