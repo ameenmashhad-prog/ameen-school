@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="assets/amin.css?v=20260706-5">
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="stylesheet" href="assets/i18n.css">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="assets/amin-logo-small.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -83,6 +84,7 @@
 <script src="libs/supabase.min.js"></script>
 <script src="assets/config.js"></script>
 <script src="assets/platform-modules.js"></script>
+<script src="assets/i18n.js"></script>
 
 <script>
 (function(){
@@ -774,8 +776,7 @@
       '</style></head><body>'+
       '<button class="print-btn no-print" onclick="window.print()">🖨️ طباعة</button>'+
       '<div class="print-header"><h1>'+SCHOOL_LOGO+' '+SCHOOL_NAME+'</h1><h2>'+title+'</h2><div>📅 '+today+'</div></div>'+
-      content+'<script src="assets/amin-theme-injector.js"><\/script><script src="assets/amin-translate.js"></script>
-</body></html>';
+      content+'<script src="assets/amin-theme-injector.js"><\/script><script src="assets/amin-translate.js"><\/script></body></html>';
     
     const w = window.open('', '_blank', 'width=900,height=700');
     w.document.write(html);
@@ -846,6 +847,7 @@
 <script src="assets/smart-alerts.js"></script>
 <script src="assets/amin-icons.js?v=20260706-3" defer></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1ce6917ab3f7235',t:'MTc4NDM0NTQ1NQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script src="assets/lang-switcher.js"></script>
 <script src="assets/amin-translate.js"></script>
 </body>
 </html>
