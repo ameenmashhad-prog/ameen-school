@@ -58,26 +58,26 @@ RETURNING id, email;
 
 -- الخطوة 3: تأكيد أن الحساب أصبح سوبر أدمن
 SELECT 
-  id,
-  email,
-  name,
-  role,
-  is_super_admin,
-  active,
-  created_at,
+  u.id,
+  u.email,
+  u.name,
+  u.role,
+  u.is_super_admin,
+  u.active,
+  u.created_at,
   '✅ حساب فاطمة هاشمي جاهز كسوبر أدمن' as status
-FROM public.users
-WHERE email = 'fatemahhashimi@ameen.iq';
+FROM public.users u
+WHERE u.email = 'fatemahhashimi@ameen.iq';
 
 -- الخطوة 4: عرض كل السوبر أدمن الحاليين
 SELECT 
-  id,
-  email,
-  name,
-  role,
-  is_super_admin,
-  active,
-  last_sign_in_at as "آخر دخول (من auth)"
+  u.id,
+  u.email,
+  u.name,
+  u.role,
+  u.is_super_admin,
+  u.active,
+  au.last_sign_in_at as "آخر دخول (من auth)"
 FROM public.users u
 LEFT JOIN auth.users au ON au.id = u.id
 WHERE u.is_super_admin = true OR u.role = 'admin'
