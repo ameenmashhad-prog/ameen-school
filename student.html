@@ -35,7 +35,7 @@
     </div>
 
     <nav class="nav">
-      <button onclick="location.href='portal.html'"><span class="amin-3d-ico-auto" data-size="20" data-emoji="<span class="amin-3d-ico-auto" data-size="20" data-emoji="🏛">🏛</span>️"><span class="amin-3d-ico-auto" data-size="20" data-emoji="🏛">🏛</span>️</span> البوابة الموحدة</button>
+      <button onclick="location.href='portal.html'"><span class="amin-3d-ico-auto" data-size="20" data-emoji="🏛️">🏛️</span> البوابة الموحدة</button>
       <button data-view="overview" class="active"><span class="amin-3d-ico-auto" data-size="20" data-emoji="🏠">🏠</span> الرئيسية</button>
       <button data-view="grades"><span class="amin-3d-ico-auto" data-size="20" data-emoji="📊">📊</span> درجاتي</button>
       <button data-view="attendance"><span class="amin-3d-ico-auto" data-size="20" data-emoji="📋">📋</span> حضوري</button>
@@ -85,7 +85,7 @@
 
   const SCHOOL_PHONE = '+9647700000000';
   const SCHOOL_NAME = 'مدرسة أمين الرضا';
-  const SCHOOL_LOGO = '<span class="amin-3d-ico-auto" data-size="20" data-emoji="🎓">🎓</span>';
+  const SCHOOL_LOGO = '🎓';
 
   function $(s, r){r=r||document;return r.querySelector(s)}
   function esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;')}
@@ -156,7 +156,7 @@
         location.href = 'index.html';
         return;
       }
-      console.log('<span class="amin-3d-ico-auto" data-size="20" data-emoji="✅">✅</span> Session OK:', session.user.email);
+      console.log('✅ Session OK:', session.user.email);
 
       const userRes = await c.from('users').select('*').eq('id', session.user.id).maybeSingle();
       if(userRes.error || !userRes.data) {
@@ -165,7 +165,7 @@
       }
       ME = userRes.data;
       window.ME = ME;
-      console.log('<span class="amin-3d-ico-auto" data-size="20" data-emoji="✅">✅</span> User loaded:', ME.name);
+      console.log('✅ User loaded:', ME.name);
 
       $('#profileName').textContent = ME.name || ME.email || 'طالب';
       $('#profileRole').textContent = 'طالب';
@@ -195,7 +195,7 @@
       // جلب بيانات الطالب
       const studentRes = await c.from('students').select('*').eq('user_id', ME.id).maybeSingle();
       if(studentRes.error || !studentRes.data) {
-        $('#view-overview').innerHTML = '<div class="empty" style="text-align:center;padding:60px;"><span class="amin-3d-ico-auto" data-size="64" data-emoji="<span class="amin-3d-ico-auto" data-size="20" data-emoji="<span class="amin-3d-ico-auto" data-size="20" data-emoji="⚠">⚠</span>️"><span class="amin-3d-ico-auto" data-size="20" data-emoji="⚠">⚠</span>️</span>" style="display:inline-flex;align-items:center;justify-content:center;width:64px;height:64px;"><span class="amin-3d-ico-auto" data-size="20" data-emoji="<span class="amin-3d-ico-auto" data-size="20" data-emoji="⚠">⚠</span>️"><span class="amin-3d-ico-auto" data-size="20" data-emoji="⚠">⚠</span>️</span></span><h3>لم يتم العثور على بياناتك كطالب</h3><p style="color:#999;">يرجى مراجعة الإدارة.</p></div>';
+        $('#view-overview').innerHTML = '<div class="empty" style="text-align:center;padding:60px;"><span class="amin-3d-ico-auto" data-size="64" data-emoji="⚠️" style="display:inline-flex;align-items:center;justify-content:center;width:64px;height:64px;">⚠️</span><h3>لم يتم العثور على بياناتك كطالب</h3><p style="color:#999;">يرجى مراجعة الإدارة.</p></div>';
         return;
       }
       STUDENT = studentRes.data;
@@ -250,7 +250,7 @@
       DATA.achievements = results[5].data || [];
       DATA.notifications = results[6].data || [];
       
-      console.log('<span class="amin-3d-ico-auto" data-size="20" data-emoji="✅">✅</span> Data loaded:', DATA);
+      console.log('✅ Data loaded:', DATA);
     } catch(e) {
       console.error('Data load error:', e);
     }
@@ -265,7 +265,7 @@
     if(total > 0) {
       const rate = (absent/total) * 100;
       if(rate > 20) {
-        alerts.push({type:'danger',icon:'<span class="amin-3d-ico-auto" data-size="20" data-emoji="<span class="amin-3d-ico-auto" data-size="20" data-emoji="⚠">⚠</span>️"><span class="amin-3d-ico-auto" data-size="20" data-emoji="⚠">⚠</span>️</span>',title:'غيابك مرتفع',message:'نسبة الغياب '+Math.round(rate)+'% - حافظ على حضورك!'});
+        alerts.push({type:'danger',icon:'⚠️',title:'غيابك مرتفع',message:'نسبة الغياب '+Math.round(rate)+'% - حافظ على حضورك!'});
       }
     }
     
@@ -278,7 +278,7 @@
       return diff >= 0 && diff <= 3;
     });
     if(upcomingHw.length > 0) {
-      alerts.push({type:'warning',icon:'<span class="amin-3d-ico-auto" data-size="20" data-emoji="📚">📚</span>',title:'واجبات قريبة',message:upcomingHw.length+' واجب خلال 3 أيام'});
+      alerts.push({type:'warning',icon:'📚',title:'واجبات قريبة',message:upcomingHw.length+' واجب خلال 3 أيام'});
     }
     
     // واجبات متأخرة
@@ -298,7 +298,7 @@
       return diff >= 0 && diff <= 7;
     });
     if(upcomingExams.length > 0) {
-      alerts.push({type:'info',icon:'<span class="amin-3d-ico-auto" data-size="20" data-emoji="📝">📝</span>',title:'اختبارات قادمة',message:upcomingExams.length+' اختبار هذا الأسبوع - استعد!'});
+      alerts.push({type:'info',icon:'📝',title:'اختبارات قادمة',message:upcomingExams.length+' اختبار هذا الأسبوع - استعد!'});
     }
     
     // درجات منخفضة
@@ -349,12 +349,12 @@
     html += '<div class="kpi green"><small>نسبة الحضور</small><b>'+attRate+'%</b></div>';
     html += '<div class="kpi gold"><small>المعدل العام</small><b>'+gradesAvg+'%</b></div>';
     html += '<div class="kpi blue"><small>نقاط السلوك</small><b>'+(totalPoints > 0 ? '+' : '')+totalPoints+'</b></div>';
-    html += '<div class="kpi"><small>شاراتي</small><b><span class="amin-3d-ico-auto" data-size="20" data-emoji="🏆">🏆</span> '+badgeCount+'</b></div>';
+    html += '<div class="kpi"><small>شاراتي</small><b>🏆 '+badgeCount+'</b></div>';
     html += '</div>';
     
     // التنبيهات الذكية
     if(alerts.length > 0) {
-      html += '<div style="margin-bottom:24px;"><h3 style="margin-bottom:12px;"><span class="amin-3d-ico-auto" data-size="20" data-emoji="<span class="amin-3d-ico-auto" data-size="20" data-emoji="⚠">⚠</span>️"><span class="amin-3d-ico-auto" data-size="20" data-emoji="⚠">⚠</span>️</span> تنبيهات مهمة ('+alerts.length+')</h3><div class="cards">';
+      html += '<div style="margin-bottom:24px;"><h3 style="margin-bottom:12px;">⚠️ تنبيهات مهمة ('+alerts.length+')</h3><div class="cards">';
       alerts.slice(0, 4).forEach(function(a) {
         const bgColor = a.type === 'danger' ? '#fee2e2' : a.type === 'warning' ? '#fef3c7' : '#dbeafe';
         const borderColor = a.type === 'danger' ? '#dc2626' : a.type === 'warning' ? '#d97706' : '#0B6E4F';
@@ -366,15 +366,15 @@
     // أزرار الإجراءات السريعة
     html += '<h3 style="margin-bottom:12px;">⚡ إجراءات سريعة</h3>';
     html += '<div class="cards" style="margin-bottom:24px;">';
-    html += '<div onclick="StudentPortal.showView(\'homeworks\')" class="card" style="cursor:pointer;text-align:center;padding:20px"><span class="amin-3d-ico-auto" data-size="36" data-emoji="<span class="amin-3d-ico-auto" data-size="20" data-emoji="📚">📚</span>" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;"><span class="amin-3d-ico-auto" data-size="20" data-emoji="📚">📚</span></span><div style="font-weight:bold;margin-top:8px;">واجباتي</div></div>';
-    html += '<div onclick="StudentPortal.showView(\'exams\')" class="card" style="cursor:pointer;text-align:center;padding:20px"><span class="amin-3d-ico-auto" data-size="36" data-emoji="<span class="amin-3d-ico-auto" data-size="20" data-emoji="📝">📝</span>" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;"><span class="amin-3d-ico-auto" data-size="20" data-emoji="📝">📝</span></span><div style="font-weight:bold;margin-top:8px;">اختباراتي</div></div>';
-    html += '<div onclick="StudentPortal.showView(\'grades\')" class="card" style="cursor:pointer;text-align:center;padding:20px"><span class="amin-3d-ico-auto" data-size="36" data-emoji="<span class="amin-3d-ico-auto" data-size="20" data-emoji="📊">📊</span>" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;"><span class="amin-3d-ico-auto" data-size="20" data-emoji="📊">📊</span></span><div style="font-weight:bold;margin-top:8px;">درجاتي</div></div>';
-    html += '<div onclick="StudentPortal.showView(\'achievements\')" class="card" style="cursor:pointer;text-align:center;padding:20px"><span class="amin-3d-ico-auto" data-size="36" data-emoji="<span class="amin-3d-ico-auto" data-size="20" data-emoji="🏆">🏆</span>" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;"><span class="amin-3d-ico-auto" data-size="20" data-emoji="🏆">🏆</span></span><div style="font-weight:bold;margin-top:8px;">شاراتي</div></div>';
+    html += '<div onclick="StudentPortal.showView(\'homeworks\')" class="card" style="cursor:pointer;text-align:center;padding:20px"><span class="amin-3d-ico-auto" data-size="36" data-emoji="📚" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;">📚</span><div style="font-weight:bold;margin-top:8px;">واجباتي</div></div>';
+    html += '<div onclick="StudentPortal.showView(\'exams\')" class="card" style="cursor:pointer;text-align:center;padding:20px"><span class="amin-3d-ico-auto" data-size="36" data-emoji="📝" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;">📝</span><div style="font-weight:bold;margin-top:8px;">اختباراتي</div></div>';
+    html += '<div onclick="StudentPortal.showView(\'grades\')" class="card" style="cursor:pointer;text-align:center;padding:20px"><span class="amin-3d-ico-auto" data-size="36" data-emoji="📊" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;">📊</span><div style="font-weight:bold;margin-top:8px;">درجاتي</div></div>';
+    html += '<div onclick="StudentPortal.showView(\'achievements\')" class="card" style="cursor:pointer;text-align:center;padding:20px"><span class="amin-3d-ico-auto" data-size="36" data-emoji="🏆" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;">🏆</span><div style="font-weight:bold;margin-top:8px;">شاراتي</div></div>';
     html += '</div>';
     
     // الواجبات القريبة
     if(DATA.homeworks.length > 0) {
-      html += '<h3 style="margin:24px 0 12px;"><span class="amin-3d-ico-auto" data-size="20" data-emoji="📚">📚</span> الواجبات القادمة</h3><div class="list">';
+      html += '<h3 style="margin:24px 0 12px;">📚 الواجبات القادمة</h3><div class="list">';
       DATA.homeworks.slice(0, 5).forEach(function(h) {
         const due = dueText(h.due_date || h.due_at);
         const isUrgent = due.includes('متأخر') || due === 'اليوم' || due === 'غداً';
@@ -386,9 +386,9 @@
     
     // آخر الإنجازات
     if(DATA.achievements.length > 0) {
-      html += '<h3 style="margin:24px 0 12px;"><span class="amin-3d-ico-auto" data-size="20" data-emoji="🏆">🏆</span> آخر إنجازاتك</h3><div class="cards">';
+      html += '<h3 style="margin:24px 0 12px;">🏆 آخر إنجازاتك</h3><div class="cards">';
       DATA.achievements.slice(0, 3).forEach(function(a) {
-        html += '<div class="card" style="border:2px solid #f59e0b"><div class="card-body" style="text-align:center;"><span class="amin-3d-ico-auto" data-size="48" data-emoji="<span class="amin-3d-ico-auto" data-size="20" data-emoji="🏆">🏆</span>" style="display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;"><span class="amin-3d-ico-auto" data-size="20" data-emoji="🏆">🏆</span></span><b style="color:#92400e;">'+esc(a.badge_title_ar || a.badge_code || 'شارة')+'</b><div style="color:#78350f;font-size:13px;margin-top:4px;">'+esc(a.awarded_at ? String(a.awarded_at).slice(0,10) : '')+'</div><div style="color:#92400e;font-weight:bold;margin-top:8px;">+'+num(a.points_awarded || 0)+' نقطة</div></div></div>';
+        html += '<div class="card" style="border:2px solid #f59e0b"><div class="card-body" style="text-align:center;"><span class="amin-3d-ico-auto" data-size="48" data-emoji="🏆" style="display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;">🏆</span><b style="color:#92400e;">'+esc(a.badge_title_ar || a.badge_code || 'شارة')+'</b><div style="color:#78350f;font-size:13px;margin-top:4px;">'+esc(a.awarded_at ? String(a.awarded_at).slice(0,10) : '')+'</div><div style="color:#92400e;font-weight:bold;margin-top:8px;">+'+num(a.points_awarded || 0)+' نقطة</div></div></div>';
       });
       html += '</div>';
     }
@@ -403,9 +403,9 @@
     try {
       const blockRes = await client().rpc('check_student_tuition_blocked', { p_student_id: ME.student_id || null });
       if (blockRes && blockRes.data && blockRes.data.blocked === true) {
-        container.innerHTML = '<div class="page-head"><div><h1><span class="amin-3d-ico-auto" data-size="20" data-emoji="📊">📊</span> درجاتي</h1></div></div>' +
+        container.innerHTML = '<div class="page-head"><div><h1>📊 درجاتي</h1></div></div>' +
           '<div class="card" style="border:2px solid #B8860B;background:#fffaf0;padding:24px;text-align:center;border-radius:12px;margin:20px 0">' +
-          '<div style="font-size:48px;margin-bottom:12px">🔒<span class="amin-3d-ico-auto" data-size="20" data-emoji="💵">💵</span></div>' +
+          '<div style="font-size:48px;margin-bottom:12px">🔒💵</div>' +
           '<h2 style="color:#8b0000;margin-bottom:8px">الدرجات والشهادات محجوبة مؤقتاً بسبب الأقساط المدرسية</h2>' +
           '<p style="font-size:16px;color:#333;max-width:600px;margin:0 auto 16px">' + esc(blockRes.data.message) + '</p>' +
           '<div style="background:#fff;border:1px solid #ddd;padding:12px 20px;border-radius:8px;display:inline-block;margin-bottom:16px">' +
@@ -419,8 +419,8 @@
       console.warn('Tuition check error:', e);
     }
     
-    let html = '<div class="page-head" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;"><div><h1><span class="amin-3d-ico-auto" data-size="20" data-emoji="📊">📊</span> درجاتي</h1></div>';
-    html += '<button class="btn" style="background:#0B6E4F;color:white;padding:10px 18px;" onclick="StudentPortal.printReport(\'grades\')"><span class="amin-3d-ico-auto" data-size="20" data-emoji="<span class="amin-3d-ico-auto" data-size="20" data-emoji="🖨">🖨</span>️"><span class="amin-3d-ico-auto" data-size="20" data-emoji="🖨">🖨</span>️</span> طباعة الكشف</button>';
+    let html = '<div class="page-head" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;"><div><h1>📊 درجاتي</h1></div>';
+    html += '<button class="btn" style="background:#0B6E4F;color:white;padding:10px 18px;" onclick="StudentPortal.printReport(\'grades\')">🖨️ طباعة الكشف</button>';
     html += '</div>';
     
     if(!DATA.grades.length) {
@@ -457,8 +457,8 @@
     const absent = DATA.attendance.filter(function(a){ return a.status === 'absent'; }).length;
     const late = DATA.attendance.filter(function(a){ return a.status === 'late'; }).length;
     
-    let html = '<div class="page-head" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;"><div><h1><span class="amin-3d-ico-auto" data-size="20" data-emoji="📋">📋</span> حضوري</h1></div>';
-    html += '<button class="btn" style="background:#0B6E4F;color:white;padding:10px 18px;" onclick="StudentPortal.printReport(\'attendance\')"><span class="amin-3d-ico-auto" data-size="20" data-emoji="<span class="amin-3d-ico-auto" data-size="20" data-emoji="🖨">🖨</span>️"><span class="amin-3d-ico-auto" data-size="20" data-emoji="🖨">🖨</span>️</span> طباعة الكشف</button>';
+    let html = '<div class="page-head" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;"><div><h1>📋 حضوري</h1></div>';
+    html += '<button class="btn" style="background:#0B6E4F;color:white;padding:10px 18px;" onclick="StudentPortal.printReport(\'attendance\')">🖨️ طباعة الكشف</button>';
     html += '</div>';
     html += '<div class="kpis" style="margin-bottom:20px;"><div class="kpi green"><small>أيام الحضور</small><b>'+present+'</b></div><div class="kpi red"><small>أيام الغياب</small><b>'+absent+'</b></div><div class="kpi gold"><small>أيام التأخير</small><b>'+late+'</b></div><div class="kpi blue"><small>الإجمالي</small><b>'+DATA.attendance.length+'</b></div></div>';
     
@@ -481,7 +481,7 @@
   function renderHomeworks() {
     const container = $('#view-homeworks');
     
-    let html = '<div class="page-head"><div><h1><span class="amin-3d-ico-auto" data-size="20" data-emoji="📚">📚</span> واجباتي</h1></div></div>';
+    let html = '<div class="page-head"><div><h1>📚 واجباتي</h1></div></div>';
     
     if(!DATA.homeworks.length) {
       html += emptyState('لا توجد واجبات حالياً','عند نشر واجبات جديدة ستظهر هنا مباشرة.','<button class="btn gold" onclick="location.href=\'smart-calendar.html\'">فتح التقويم</button>');
@@ -501,7 +501,7 @@
         const isSubmitted = h.status === 'submitted';
         const isUrgent = !isSubmitted && (due.includes('متأخر') || due === 'اليوم');
         const badge = isSubmitted ? 'green' : isUrgent ? 'red' : 'blue';
-        const statusLabel = isSubmitted ? '<span class="amin-3d-ico-auto" data-size="20" data-emoji="✅">✅</span> مسلّم' : '⏳ ' + due;
+        const statusLabel = isSubmitted ? '✅ مسلّم' : '⏳ ' + due;
         html += '<div class="item"><div><b>'+esc(h.title || h.homework_title || 'واجب')+'</b><small>'+esc(getSubjectName(h.subject_id))+(h.description ? ' · ' + esc(h.description) : '')+'</small></div><div style="display:flex;gap:8px;align-items:center;"><span class="badge '+badge+'">'+statusLabel+'</span>'+(!isSubmitted ? '<button class="btn small" style="background:#3A3565;color:white;" onclick="location.href=\'student-homeworks.html\'">تسليم</button>' : '')+'</div></div>';
       });
       html += '</div>';
@@ -513,7 +513,7 @@
   function renderExams() {
     const container = $('#view-exams');
     
-    let html = '<div class="page-head"><div><h1><span class="amin-3d-ico-auto" data-size="20" data-emoji="📝">📝</span> اختباراتي</h1></div></div>';
+    let html = '<div class="page-head"><div><h1>📝 اختباراتي</h1></div></div>';
     
     if(!DATA.exams.length) {
       html += emptyState('لا توجد اختبارات قادمة','إذا تم نشر اختبار جديد فسيظهر هنا مع موعده.','<button class="btn blue" onclick="location.href=\'online-exams.html\'">فتح الاختبارات الإلكترونية</button>');
@@ -535,7 +535,7 @@
   function renderBehavior() {
     const container = $('#view-behavior');
     
-    let html = '<div class="page-head"><div><h1><span class="amin-3d-ico-auto" data-size="20" data-emoji="🌟">🌟</span> سلوكي</h1></div></div>';
+    let html = '<div class="page-head"><div><h1>🌟 سلوكي</h1></div></div>';
     html += quickLinksBar();
     
     if(!DATA.behavior.length) {
@@ -567,7 +567,7 @@
   function renderAchievements() {
     const container = $('#view-achievements');
     
-    let html = '<div class="page-head"><div><h1><span class="amin-3d-ico-auto" data-size="20" data-emoji="🏆">🏆</span> إنجازاتي وشاراتي</h1></div></div>';
+    let html = '<div class="page-head"><div><h1>🏆 إنجازاتي وشاراتي</h1></div></div>';
     
     if(!DATA.achievements.length) {
       html += emptyState('ابدأ رحلتك نحو الإنجاز!','حافظ على حضورك وأنجز واجباتك لتحصل على شارات تحفيزية.','<button class="btn gold" onclick="StudentPortal.showView(\'homeworks\')">فتح الواجبات</button>');
@@ -575,13 +575,13 @@
       const totalPoints = DATA.achievements.reduce(function(s,a){ return s + num(a.points_awarded || 0); }, 0);
       
       html += '<div class="kpis" style="margin-bottom:24px;">';
-      html += '<div class="kpi gold"><small>عدد الشارات</small><b><span class="amin-3d-ico-auto" data-size="20" data-emoji="🏆">🏆</span> '+DATA.achievements.length+'</b></div>';
+      html += '<div class="kpi gold"><small>عدد الشارات</small><b>🏆 '+DATA.achievements.length+'</b></div>';
       html += '<div class="kpi green"><small>مجموع النقاط</small><b>'+totalPoints+'</b></div>';
       html += '</div>';
       
       html += '<div class="cards">';
       DATA.achievements.forEach(function(a) {
-        html += '<div class="card" style="border:2px solid #f59e0b;text-align:center"><div class="card-body"><span class="amin-3d-ico-auto" data-size="64" data-emoji="<span class="amin-3d-ico-auto" data-size="20" data-emoji="🏆">🏆</span>" style="display:inline-flex;align-items:center;justify-content:center;width:64px;height:64px;"><span class="amin-3d-ico-auto" data-size="20" data-emoji="🏆">🏆</span></span><b style="color:#92400e;font-size:16px;display:block;margin:8px 0;">'+esc(a.badge_title_ar || a.badge_code || 'شارة')+'</b><div style="color:#78350f;font-size:12px;">'+esc(a.awarded_at ? String(a.awarded_at).slice(0,10) : '')+'</div><div style="color:#92400e;font-weight:bold;margin-top:8px;font-size:14px;">+'+num(a.points_awarded || 0)+' نقطة</div></div></div>';
+        html += '<div class="card" style="border:2px solid #f59e0b;text-align:center"><div class="card-body"><span class="amin-3d-ico-auto" data-size="64" data-emoji="🏆" style="display:inline-flex;align-items:center;justify-content:center;width:64px;height:64px;">🏆</span><b style="color:#92400e;font-size:16px;display:block;margin:8px 0;">'+esc(a.badge_title_ar || a.badge_code || 'شارة')+'</b><div style="color:#78350f;font-size:12px;">'+esc(a.awarded_at ? String(a.awarded_at).slice(0,10) : '')+'</div><div style="color:#92400e;font-weight:bold;margin-top:8px;font-size:14px;">+'+num(a.points_awarded || 0)+' نقطة</div></div></div>';
       });
       html += '</div>';
     }
@@ -634,11 +634,11 @@
       '@media print { body { padding: 15px; } .no-print { display: none !important; } @page { size: A4; margin: 1cm; } }'+
       '.print-btn { position: fixed; top: 20px; left: 20px; background: #0B6E4F; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; }'+
       '</style></head><body>'+
-      '<button class="print-btn no-print" onclick="window.print()"><span class="amin-3d-ico-auto" data-size="20" data-emoji="<span class="amin-3d-ico-auto" data-size="20" data-emoji="🖨">🖨</span>️"><span class="amin-3d-ico-auto" data-size="20" data-emoji="🖨">🖨</span>️</span> طباعة</button>'+
-      '<div class="print-header"><h1>'+SCHOOL_LOGO+' '+SCHOOL_NAME+'</h1><h2>'+title+'</h2><div><span class="amin-3d-ico-auto" data-size="20" data-emoji="📅">📅</span> '+today+'</div></div>'+
+      '<button class="print-btn no-print" onclick="window.print()">🖨️ طباعة</button>'+
+      '<div class="print-header"><h1>'+SCHOOL_LOGO+' '+SCHOOL_NAME+'</h1><h2>'+title+'</h2><div>📅 '+today+'</div></div>'+
       '<div class="info-box"><div><b>الطالب:</b> '+esc(ME.name)+'</div></div>'+
       content+
-      '<div class="print-footer"><div><span class="amin-3d-ico-auto" data-size="20" data-emoji="📞">📞</span> '+SCHOOL_PHONE+' | '+SCHOOL_NAME+'</div></div>'+
+      '<div class="print-footer"><div>📞 '+SCHOOL_PHONE+' | '+SCHOOL_NAME+'</div></div>'+
       '<script src="assets/amin-theme-injector.js"><\/script><script src="assets/amin-translate.js"></script>
 </body></html>';
   }

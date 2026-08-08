@@ -800,7 +800,7 @@ function renderOverview(){
     + '<div class="reg-progress-card"><h4>حالة التحميل</h4><ul class="reg-check-list">'
     + progressItem(totalCurrent?'ok':'warn', totalCurrent?'✓':'!', 'النتائج الحالية', totalCurrent ? ('تم تحميل '+totalCurrent+' طلب/طلبات وفق الفلتر الحالي.') : 'لا توجد نتائج ضمن هذا الفلتر حالياً.')
     + progressItem(state.query?'ok':'warn', state.query?'✓':'!', 'البحث النصي', state.query ? ('البحث الحالي: '+state.query) : 'لم يتم استخدام بحث نصي حتى الآن.')
-    + progressItem('ok','<span class="amin-3d-ico-auto" data-size="20" data-emoji="⏱">⏱</span>','آخر تحديث', 'آخر جلب للبيانات: '+lastLoaded)
+    + progressItem('ok','⏱','آخر تحديث', 'آخر جلب للبيانات: '+lastLoaded)
     + '</ul></div></div>';
 }
 function renderAll(){

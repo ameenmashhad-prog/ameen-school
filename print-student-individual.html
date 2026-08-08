@@ -60,7 +60,7 @@ function daysRemaining(expiry){
   if(diff<0) return {text:`منتهي منذ ${Math.abs(diff)} يوم`,cls:'b-red'};
   if(diff<30) return {text:`${diff} يوم - عاجل 🔴`,cls:'b-red'};
   if(diff<90) return {text:`${diff} يوم - انتبه 🟡`,cls:'b-gold'};
-  return {text:`${diff} يوم - صالح <span class="amin-3d-ico-auto" data-size="20" data-emoji="🟢">🟢</span>`,cls:'b-green'};
+  return {text:`${diff} يوم - صالح 🟢`,cls:'b-green'};
 }
 
 let sb=null;

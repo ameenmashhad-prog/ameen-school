@@ -77,7 +77,7 @@
       <button onclick="location.href='super-admin.html'"><span class="amin-3d-ico-auto" data-size="20" data-emoji="🏠">🏠</span> لوحة المدير</button>
       <button onclick="location.href='family-registration.html'"><span class="amin-3d-ico-auto" data-size="20" data-emoji="📝">📝</span> تسجيل يدوي</button>
       <button onclick="location.href='registrations-admin.html'"><span class="amin-3d-ico-auto" data-size="20" data-emoji="📋">📋</span> مراجعة التسجيلات</button>
-      <button onclick="location.href='portal.html'"><span class="amin-3d-ico-auto" data-size="20" data-emoji="<span class="amin-3d-ico-auto" data-size="20" data-emoji="🏛">🏛</span>️"><span class="amin-3d-ico-auto" data-size="20" data-emoji="🏛">🏛</span>️</span> البوابة الموحدة</button>
+      <button onclick="location.href='portal.html'"><span class="amin-3d-ico-auto" data-size="20" data-emoji="🏛️">🏛️</span> البوابة الموحدة</button>
     </nav>
 
     <div class="side-footer">
@@ -502,8 +502,8 @@
       +   '</div>'
       +   moreText
       +   '<div class="import-actions no-print" style="margin-top:18px">'
-      +     '<button class="btn" style="background:#10b981;color:#fff" '+(ANALYSIS.plan.readyRows.length ? '' : 'disabled')+' onclick="ImportStudents.importAll()"><span class="amin-3d-ico-auto" data-size="20" data-emoji="✅">✅</span> استيراد السجلات الجاهزة ('+esc(ANALYSIS.plan.readyRows.length)+')</button>'
-      +     '<button class="btn" type="button" onclick="window.print()"><span class="amin-3d-ico-auto" data-size="20" data-emoji="<span class="amin-3d-ico-auto" data-size="20" data-emoji="🖨">🖨</span>️"><span class="amin-3d-ico-auto" data-size="20" data-emoji="🖨">🖨</span>️</span> طباعة المعاينة</button>'
+      +     '<button class="btn" style="background:#10b981;color:#fff" '+(ANALYSIS.plan.readyRows.length ? '' : 'disabled')+' onclick="ImportStudents.importAll()">✅ استيراد السجلات الجاهزة ('+esc(ANALYSIS.plan.readyRows.length)+')</button>'
+      +     '<button class="btn" type="button" onclick="window.print()">🖨️ طباعة المعاينة</button>'
       +     '<button class="btn" style="background:#6b7280;color:#fff" type="button" onclick="ImportStudents.cancel()">❌ إلغاء</button>'
       +   '</div>'
       + '</div>';
@@ -676,7 +676,7 @@
 
     section.innerHTML = ''
       + '<div class="import-card">'
-      +   '<h2 style="color:#10b981;margin-bottom:16px"><span class="amin-3d-ico-auto" data-size="20" data-emoji="✅">✅</span> اكتمل الاستيراد</h2>'
+      +   '<h2 style="color:#10b981;margin-bottom:16px">✅ اكتمل الاستيراد</h2>'
       +   '<div class="kpis" style="margin-bottom:20px">'
       +     '<div class="kpi green"><small>أسر محفوظة</small><b>'+esc(familiesSuccess)+'</b></div>'
       +     '<div class="kpi blue"><small>طلاب محفوظون</small><b>'+esc(studentsSuccess)+'</b></div>'
@@ -687,9 +687,9 @@
       +   (failedHtml ? '<h3>عناصر تعذر حفظها</h3><div class="error-list" style="margin-bottom:18px">'+failedHtml+'</div>' : '')
       +   (skippedHtml ? '<h3>سجلات تم تجاوزها</h3><div class="error-list" style="margin-bottom:18px">'+skippedHtml+'</div>' : '')
       +   '<div class="import-actions no-print">'
-      +     '<button class="btn" style="background:#3A3565;color:#fff" onclick="location.href=\'registrations-admin.html\'"><span class="amin-3d-ico-auto" data-size="20" data-emoji="📋">📋</span> مراجعة التسجيلات</button>'
-      +     '<button class="btn" style="background:#10b981;color:#fff" onclick="location.href=\'super-admin.html\'"><span class="amin-3d-ico-auto" data-size="20" data-emoji="🏠">🏠</span> لوحة المدير</button>'
-      +     '<button class="btn" style="background:#6b7280;color:#fff" onclick="ImportStudents.resetPage()"><span class="amin-3d-ico-auto" data-size="20" data-emoji="🔄">🔄</span> استيراد ملف آخر</button>'
+      +     '<button class="btn" style="background:#3A3565;color:#fff" onclick="location.href=\'registrations-admin.html\'">📋 مراجعة التسجيلات</button>'
+      +     '<button class="btn" style="background:#10b981;color:#fff" onclick="location.href=\'super-admin.html\'">🏠 لوحة المدير</button>'
+      +     '<button class="btn" style="background:#6b7280;color:#fff" onclick="ImportStudents.resetPage()">🔄 استيراد ملف آخر</button>'
       +   '</div>'
       + '</div>';
     toast('اكتمل', 'تم حفظ '+familiesSuccess+' أسرة و '+studentsSuccess+' طالب/طلاب', 'green');

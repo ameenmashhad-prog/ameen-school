@@ -43,7 +43,7 @@
   <p>هذه الصفحة تحل مشكلة "الصفحات المختفية" بتوحيد كل شيء في مكان واحد. هنا تجد <b>كل ملفات HTML في المشروع (65 صفحة)</b> مع حالتها: مسجلة في البوابة؟ محجوبة سابقاً؟ عامة؟ تطوير؟ يمكنك البحث والفلترة وفتح أي صفحة مباشرة.</p>
   <div style="margin-block-start:14px;display:flex;gap:8px;flex-wrap:wrap">
     <span class="card-badge b-green"><span class="amin-3d-ico-auto" data-size="20" data-emoji="✅">✅</span> 54 صفحة جذر في main</span>
-    <span class="card-badge b-gold"><span class="amin-3d-ico-auto" data-size="20" data-emoji="<span class="amin-3d-ico-auto" data-size="20" data-emoji="⚠">⚠</span>️"><span class="amin-3d-ico-auto" data-size="20" data-emoji="⚠">⚠</span>️</span> 25 كانت مخفية</span>
+    <span class="card-badge b-gold"><span class="amin-3d-ico-auto" data-size="20" data-emoji="⚠️">⚠️</span> 25 كانت مخفية</span>
     <span class="card-badge b-blue"><span class="amin-3d-ico-auto" data-size="20" data-emoji="🔧">🔧</span> تم إصلاح vercelignore + CSP + registry</span>
   </div>
 </div>
@@ -70,7 +70,7 @@
     <option value="registered">كانت ظاهرة</option>
     <option value="critical">مهمة جداً</option>
   </select>
-  <button class="btn" onclick="window.open('portal.html')"><span class="amin-3d-ico-auto" data-size="20" data-emoji="<span class="amin-3d-ico-auto" data-size="20" data-emoji="🏛">🏛</span>️"><span class="amin-3d-ico-auto" data-size="20" data-emoji="🏛">🏛</span>️</span> البوابة الموحدة</button>
+  <button class="btn" onclick="window.open('portal.html')"><span class="amin-3d-ico-auto" data-size="20" data-emoji="🏛️">🏛️</span> البوابة الموحدة</button>
   <button class="btn" onclick="window.open('super-admin.html')"><span class="amin-3d-ico-auto" data-size="20" data-emoji="👑">👑</span> المسؤول الأعلى</button>
   <button class="btn btn-gold" onclick="window.open('FULL_AUDIT_AND_FIX_AR.md')"><span class="amin-3d-ico-auto" data-size="20" data-emoji="📄">📄</span> تقرير الفحص</button>
 </div>
@@ -179,7 +179,7 @@ function render(){
   const html = filtered.map(p=>{
     const badgeClass = p.status==='hidden-before' ? 'b-red' : p.critical ? 'b-gold' : 'b-green';
     const badgeText = p.status==='hidden-before' ? 'كان مخفي - الآن ظاهر' : p.badge||'ظاهر';
-    const icon = p.group==='finance' ? '<span class="amin-3d-ico-auto" data-size="20" data-emoji="💰">💰</span>' : p.group==='academic' ? '<span class="amin-3d-ico-auto" data-size="20" data-emoji="📚">📚</span>' : p.group==='people' ? '<span class="amin-3d-ico-auto" data-size="20" data-emoji="👥">👥</span>' : p.group==='resources' ? '<span class="amin-3d-ico-auto" data-size="20" data-emoji="📦">📦</span>' : p.group==='analyticsAdmin' ? '<span class="amin-3d-ico-auto" data-size="20" data-emoji="📊">📊</span>' : p.group==='public' ? '🌐' : p.group==='dev' ? '🛠️' : '<span class="amin-3d-ico-auto" data-size="20" data-emoji="🏠">🏠</span>';
+    const icon = p.group==='finance' ? '💰' : p.group==='academic' ? '📚' : p.group==='people' ? '👥' : p.group==='resources' ? '📦' : p.group==='analyticsAdmin' ? '📊' : p.group==='public' ? '🌐' : p.group==='dev' ? '🛠️' : '🏠';
     return `<div class="card">
       <div class="card-head">
         <span class="card-badge ${badgeClass}">${badgeText}</span>

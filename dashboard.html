@@ -76,29 +76,29 @@ main{max-width:1200px;margin:0 auto;padding:24px;}
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im92Y2p6c3JxcWdqc2Jxc3d0a3JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2MjIxNjIsImV4cCI6MjA5NjE5ODE2Mn0._sPE8K26oTCEGlxBaG_vBk-U2yDNKFV1por5YIv8xko";
 
     const CATEGORY_NAMES = {
-      'main': '<span class="amin-3d-ico-auto" data-size="20" data-emoji="🏠">🏠</span> الواجهات الرئيسية',
-      'hr_services': '<span class="amin-3d-ico-auto" data-size="20" data-emoji="👥">👥</span> الموارد البشرية والخدمات',
-      'analytics': '<span class="amin-3d-ico-auto" data-size="20" data-emoji="📊">📊</span> التحليلات وإدارة النظام',
-      'finance': '<span class="amin-3d-ico-auto" data-size="20" data-emoji="💰">💰</span> المالية',
-      'academic': '<span class="amin-3d-ico-auto" data-size="20" data-emoji="📚">📚</span> الأكاديمي والجداول',
+      'main': '🏠 الواجهات الرئيسية',
+      'hr_services': '👥 الموارد البشرية والخدمات',
+      'analytics': '📊 التحليلات وإدارة النظام',
+      'finance': '💰 المالية',
+      'academic': '📚 الأكاديمي والجداول',
       'exams': '✍️ الواجبات والاختبارات',
-      'resources': '<span class="amin-3d-ico-auto" data-size="20" data-emoji="📦">📦</span> الموارد والمرافق'
+      'resources': '📦 الموارد والمرافق'
     };
 
     const MODULE_ICONS = {
-      'calendar': '<span class="amin-3d-ico-auto" data-size="20" data-emoji="📅">📅</span>', 'award': '<span class="amin-3d-ico-auto" data-size="20" data-emoji="🏆">🏆</span>', 'settings': '<span class="amin-3d-ico-auto" data-size="20" data-emoji="<span class="amin-3d-ico-auto" data-size="20" data-emoji="⚙">⚙</span>️"><span class="amin-3d-ico-auto" data-size="20" data-emoji="⚙">⚙</span>️</span>',
-      'briefcase': '💼', 'user': '👤', 'shield': '<span class="amin-3d-ico-auto" data-size="20" data-emoji="<span class="amin-3d-ico-auto" data-size="20" data-emoji="🛡">🛡</span>️"><span class="amin-3d-ico-auto" data-size="20" data-emoji="🛡">🛡</span>️</span>',
-      'users': '<span class="amin-3d-ico-auto" data-size="20" data-emoji="👥">👥</span>', 'file-text': '<span class="amin-3d-ico-auto" data-size="20" data-emoji="📄">📄</span>', 'key': '<span class="amin-3d-ico-auto" data-size="20" data-emoji="🔑">🔑</span>',
-      'bell': '<span class="amin-3d-ico-auto" data-size="20" data-emoji="🔔">🔔</span>', 'bar-chart': '<span class="amin-3d-ico-auto" data-size="20" data-emoji="📊">📊</span>', 'trending-up': '<span class="amin-3d-ico-auto" data-size="20" data-emoji="📈">📈</span>',
-      'megaphone': '<span class="amin-3d-ico-auto" data-size="20" data-emoji="📢">📢</span>', 'check-circle': '<span class="amin-3d-ico-auto" data-size="20" data-emoji="✅">✅</span>', 'shield-check': '🔒',
-      'tool': '<span class="amin-3d-ico-auto" data-size="20" data-emoji="🔧">🔧</span>', 'dollar-sign': '<span class="amin-3d-ico-auto" data-size="20" data-emoji="💵">💵</span>', 'archive': '<span class="amin-3d-ico-auto" data-size="20" data-emoji="📦">📦</span>',
-      'printer': '<span class="amin-3d-ico-auto" data-size="20" data-emoji="<span class="amin-3d-ico-auto" data-size="20" data-emoji="🖨">🖨</span>️"><span class="amin-3d-ico-auto" data-size="20" data-emoji="🖨">🖨</span>️</span>', 'activity': '📉', 'phone-call': '<span class="amin-3d-ico-auto" data-size="20" data-emoji="📞">📞</span>',
-      'credit-card': '<span class="amin-3d-ico-auto" data-size="20" data-emoji="💳">💳</span>', 'sliders': '🎚️', 'book-open': '<span class="amin-3d-ico-auto" data-size="20" data-emoji="📖">📖</span>',
+      'calendar': '📅', 'award': '🏆', 'settings': '⚙️',
+      'briefcase': '💼', 'user': '👤', 'shield': '🛡️',
+      'users': '👥', 'file-text': '📄', 'key': '🔑',
+      'bell': '🔔', 'bar-chart': '📊', 'trending-up': '📈',
+      'megaphone': '📢', 'check-circle': '✅', 'shield-check': '🔒',
+      'tool': '🔧', 'dollar-sign': '💵', 'archive': '📦',
+      'printer': '🖨️', 'activity': '📉', 'phone-call': '📞',
+      'credit-card': '💳', 'sliders': '🎚️', 'book-open': '📖',
       'map': '🗺️', 'clock': '🕐', 'layers': '🗂️',
-      'edit-3': '✏️', 'bar-chart-2': '<span class="amin-3d-ico-auto" data-size="20" data-emoji="📊">📊</span>', 'list': '<span class="amin-3d-ico-auto" data-size="20" data-emoji="📋">📋</span>',
+      'edit-3': '✏️', 'bar-chart-2': '📊', 'list': '📋',
       'database': '🗄️', 'monitor': '🖥️', 'eye': '👁️',
-      'book': '<span class="amin-3d-ico-auto" data-size="20" data-emoji="📚">📚</span>', 'shopping-cart': '🛒', 'package': '<span class="amin-3d-ico-auto" data-size="20" data-emoji="📦">📦</span>',
-      'flask': '<span class="amin-3d-ico-auto" data-size="20" data-emoji="🧪">🧪</span>', 'truck': '<span class="amin-3d-ico-auto" data-size="20" data-emoji="🚌">🚌</span>', 'folder': '📁'
+      'book': '📚', 'shopping-cart': '🛒', 'package': '📦',
+      'flask': '🧪', 'truck': '🚌', 'folder': '📁'
     };
 
     // البحث عن الجلسة بأي اسم محتمل
