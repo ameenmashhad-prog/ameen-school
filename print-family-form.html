@@ -26,7 +26,7 @@ th{background:#f1f5f9}
 
 <div class="print-shell" id="root">
   <div class="header">
-    <h1>👨‍👩‍👧‍👦 استمارة عائلية — مجمع أمين الرضا</h1>
+    <h1><span class="amin-3d-ico-auto" data-size="20" data-emoji="<span class="amin-3d-ico-auto" data-size="20" data-emoji="👨">👨</span>‍<span class="amin-3d-ico-auto" data-size="20" data-emoji="👩">👩</span>‍<span class="amin-3d-ico-auto" data-size="20" data-emoji="👧">👧</span>"><span class="amin-3d-ico-auto" data-size="20" data-emoji="👨">👨</span>‍<span class="amin-3d-ico-auto" data-size="20" data-emoji="👩">👩</span>‍<span class="amin-3d-ico-auto" data-size="20" data-emoji="👧">👧</span></span>‍<span class="amin-3d-ico-auto" data-size="20" data-emoji="👦">👦</span> استمارة عائلية — مجمع أمين الرضا</h1>
     <small>تتضمن عدد الطلاب في فرع 1 وفرع 2 + استيراد ولي أمر سابق + كل الأبناء</small>
   </div>
   <div id="content" style="text-align:center;color:#64748b;padding:40px">أدخل معرف العائلة أو ابحث باسم ولي الأمر</div>
@@ -99,7 +99,7 @@ async function loadFamily(){
         <div class="field"><small>طلاب في مجمع أمين الرضا 2</small><b>${esc(data.students_in_branch_2||0)}</b></div>
         <div class="field" style="grid-column:1/-1"><small>معرف العائلة</small><b style="font-family:monospace;font-size:11px">${esc(data.family_id)}</b></div>
       </div>
-      <h3 style="margin-top:20px">👨‍🎓 الأبناء المسجلون</h3>
+      <h3 style="margin-top:20px"><span class="amin-3d-ico-auto" data-size="20" data-emoji="<span class="amin-3d-ico-auto" data-size="20" data-emoji="👨">👨</span>‍<span class="amin-3d-ico-auto" data-size="20" data-emoji="🎓">🎓</span>"><span class="amin-3d-ico-auto" data-size="20" data-emoji="👨">👨</span>‍<span class="amin-3d-ico-auto" data-size="20" data-emoji="🎓">🎓</span></span> الأبناء المسجلون</h3>
       <table>
         <thead><tr><th>#</th><th>اسم الطالب</th><th>كود سيدا</th><th>النوع</th><th>الميلاد</th><th>صلاحية الجواز</th></tr></thead>
         <tbody>${studentRows || '<tr><td colspan=6 style="text-align:center">لا يوجد طلاب</td></tr>'}</tbody>

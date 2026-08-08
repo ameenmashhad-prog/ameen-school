@@ -19,7 +19,7 @@
 <div class="shell">
   <aside class="sidebar" id="sidebar">
     <div class="brand">
-      <div class="brand-mark">💚</div>
+      <div class="brand-mark"><span class="amin-3d-ico-auto" data-size="20" data-emoji="💚">💚</span></div>
       <div>
         <h1>الإرشاد النفسي</h1>
         <small>متابعة · توجيه · رعاية</small>
@@ -35,19 +35,19 @@
     </div>
 
     <nav class="nav">
-      <button onclick="location.href='portal.html'">🏛️ البوابة الموحدة</button>
-      <button data-view="overview" class="active">🏠 الرئيسية</button>
-      <button data-view="students">👥 الطلاب المتابعون</button>
-      <button data-view="behavior">🌟 السلوك والملاحظات</button>
-      <button data-view="attendance">📋 متابعة الغياب</button>
+      <button onclick="location.href='portal.html'"><span class="amin-3d-ico-auto" data-size="20" data-emoji="<span class="amin-3d-ico-auto" data-size="20" data-emoji="🏛">🏛</span>️"><span class="amin-3d-ico-auto" data-size="20" data-emoji="🏛">🏛</span>️</span> البوابة الموحدة</button>
+      <button data-view="overview" class="active"><span class="amin-3d-ico-auto" data-size="20" data-emoji="🏠">🏠</span> الرئيسية</button>
+      <button data-view="students"><span class="amin-3d-ico-auto" data-size="20" data-emoji="👥">👥</span> الطلاب المتابعون</button>
+      <button data-view="behavior"><span class="amin-3d-ico-auto" data-size="20" data-emoji="🌟">🌟</span> السلوك والملاحظات</button>
+      <button data-view="attendance"><span class="amin-3d-ico-auto" data-size="20" data-emoji="📋">📋</span> متابعة الغياب</button>
       <button data-view="cases">📁 الحالات</button>
-      <button data-view="sessions">📅 الجلسات</button>
+      <button data-view="sessions"><span class="amin-3d-ico-auto" data-size="20" data-emoji="📅">📅</span> الجلسات</button>
       <button data-view="handover">🤝 تسليم الحالات</button>
-      <button data-view="reports">📈 التقارير</button>
+      <button data-view="reports"><span class="amin-3d-ico-auto" data-size="20" data-emoji="📈">📈</span> التقارير</button>
       <hr style="border:none;border-top:1px solid rgba(255,255,255,0.1);margin:8px 0;">
-      <button onclick="location.href='counseling-report.html'">📊 تقارير الإرشاد</button>
-      <button onclick="location.href='notifications.html'">🔔 الإشعارات</button>
-      <button onclick="location.href='smart-calendar.html'">📅 التقويم</button>
+      <button onclick="location.href='counseling-report.html'"><span class="amin-3d-ico-auto" data-size="20" data-emoji="📊">📊</span> تقارير الإرشاد</button>
+      <button onclick="location.href='notifications.html'"><span class="amin-3d-ico-auto" data-size="20" data-emoji="🔔">🔔</span> الإشعارات</button>
+      <button onclick="location.href='smart-calendar.html'"><span class="amin-3d-ico-auto" data-size="20" data-emoji="📅">📅</span> التقويم</button>
     </nav>
 
     <div class="side-footer">
@@ -57,12 +57,12 @@
 
   <main class="main" id="mainContent" tabindex="-1">
     <header class="topbar">
-      <button class="btn mobile-menu" id="mobileMenuBtn">☰</button>
-      <h2>💚 الإرشاد النفسي والمتابعة</h2>
+      <button class="btn mobile-menu" id="mobileMenuBtn"><span class="amin-3d-ico-auto" data-size="20" data-emoji="☰">☰</span></button>
+      <h2><span class="amin-3d-ico-auto" data-size="20" data-emoji="💚">💚</span> الإرشاد النفسي والمتابعة</h2>
       <div class="top-actions" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
         <span id="offlineStatus" class="badge blue">متصل</span>
-        <button id="draftsBtn" class="btn gold" type="button">📝 المسودات <span id="draftCount">0</span></button>
-        <button class="btn" style="background:#3A3565;color:white;" onclick="CounselorPortal.refresh()">🔄 تحديث</button>
+        <button id="draftsBtn" class="btn gold" type="button"><span class="amin-3d-ico-auto" data-size="20" data-emoji="📝">📝</span> المسودات <span id="draftCount">0</span></button>
+        <button class="btn" style="background:#3A3565;color:white;" onclick="CounselorPortal.refresh()"><span class="amin-3d-ico-auto" data-size="20" data-emoji="🔄">🔄</span> تحديث</button>
       </div>
     </header>
 
@@ -89,7 +89,7 @@
 
   const SCHOOL_PHONE = '+9647700000000';
   const SCHOOL_NAME = 'مدرسة أمين الرضا';
-  const SCHOOL_LOGO = '💚';
+  const SCHOOL_LOGO = '<span class="amin-3d-ico-auto" data-size="20" data-emoji="💚">💚</span>';
 
   function $(s, r){r=r||document;return r.querySelector(s)}
   function $$(s, r){r=r||document;return Array.from(r.querySelectorAll(s))}
@@ -209,7 +209,7 @@
       
       DATA.classes.forEach(function(c) { CLASSES_MAP[c.id] = c.name; });
       
-      console.log('✅ Counselor Data loaded:', DATA);
+      console.log('<span class="amin-3d-ico-auto" data-size="20" data-emoji="✅">✅</span> Counselor Data loaded:', DATA);
     } catch(e) {
       console.error('Data load error:', e);
     }
@@ -259,7 +259,7 @@
     
     if(stats.needAttention > 0) {
       alerts.push({
-        type:'danger', icon:'⚠️',
+        type:'danger', icon:'<span class="amin-3d-ico-auto" data-size="20" data-emoji="<span class="amin-3d-ico-auto" data-size="20" data-emoji="⚠">⚠</span>️"><span class="amin-3d-ico-auto" data-size="20" data-emoji="⚠">⚠</span>️</span>',
         title: stats.needAttention + ' طالب يحتاج متابعة عاجلة',
         message:'يوجد طلاب لديهم مشاكل في الحضور أو السلوك أو الدرجات'
       });
@@ -281,7 +281,7 @@
     
     if(studentsWithoutRecords > 0) {
       alerts.push({
-        type:'info', icon:'📝',
+        type:'info', icon:'<span class="amin-3d-ico-auto" data-size="20" data-emoji="📝">📝</span>',
         title: studentsWithoutRecords + ' طالب بدون أي ملاحظات',
         message:'يفضل إضافة ملاحظات متابعة لهم'
       });
@@ -312,13 +312,13 @@
     const alerts = getSmartAlerts();
     const unreadNotifs = DATA.notifications.filter(function(n){ return !n.read_at; }).length;
     
-    let html = '<div class="page-head"><div><h1>أهلاً بك، ' + esc(ME.name) + ' 💚</h1><p>لوحة معلومات الإرشاد النفسي والمتابعة' + (unreadNotifs > 0 ? ' · <span class="badge red">' + unreadNotifs + ' إشعار</span>' : '') + '</p></div></div>';
+    let html = '<div class="page-head"><div><h1>أهلاً بك، ' + esc(ME.name) + ' <span class="amin-3d-ico-auto" data-size="20" data-emoji="💚">💚</span></h1><p>لوحة معلومات الإرشاد النفسي والمتابعة' + (unreadNotifs > 0 ? ' · <span class="badge red">' + unreadNotifs + ' إشعار</span>' : '') + '</p></div></div>';
 
     // تنبيه خصوصية
     html += '<div style="border-right:4px solid #B8860B;padding:16px;border-radius:10px;margin-bottom:24px;color:#78350f"><b>🔒 تنبيه خصوصية:</b> جميع البيانات هنا محمية ومخصصة للمرشد فقط. لا يمكن مشاركتها بدون إذن.</div>';
 
     // الإحصائيات
-    html += '<h3 style="margin-bottom:12px;">📊 الإحصائيات</h3>';
+    html += '<h3 style="margin-bottom:12px;"><span class="amin-3d-ico-auto" data-size="20" data-emoji="📊">📊</span> الإحصائيات</h3>';
     html += '<div class="kpis" style="margin-bottom:24px;">';
     html += '<div class="kpi blue"><small>إجمالي الطلاب</small><b>' + stats.totalStudents + '</b></div>';
     html += '<div class="kpi red"><small>يحتاجون متابعة</small><b>' + stats.needAttention + '</b></div>';
@@ -328,7 +328,7 @@
 
     // التنبيهات
     if(alerts.length > 0) {
-      html += '<h3 style="margin-bottom:12px;">⚠️ تنبيهات تحتاج اهتمامك (' + alerts.length + ')</h3>';
+      html += '<h3 style="margin-bottom:12px;"><span class="amin-3d-ico-auto" data-size="20" data-emoji="<span class="amin-3d-ico-auto" data-size="20" data-emoji="⚠">⚠</span>️"><span class="amin-3d-ico-auto" data-size="20" data-emoji="⚠">⚠</span>️</span> تنبيهات تحتاج اهتمامك (' + alerts.length + ')</h3>';
       html += '<div class="cards" style="margin-bottom:24px;">';
       alerts.forEach(function(a) {
         const bgColor = a.type === 'danger' ? '#fee2e2' : a.type === 'warning' ? '#FBF1DC' : '#E6F4EF';
@@ -341,15 +341,15 @@
     // إجراءات سريعة
     html += '<h3 style="margin-bottom:12px;">⚡ إجراءات سريعة</h3>';
     html += '<div class="cards" style="margin-bottom:24px;">';
-    html += '<div onclick="CounselorPortal.showView(\'students\')" class="card" style="cursor:pointer;text-align:center;padding:20px"><span class="amin-3d-ico-auto" data-size="36" data-emoji="👥" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;">👥</span><div style="font-weight:bold;margin-top:8px;">الطلاب المتابعون</div></div>';
-    html += '<div onclick="CounselorPortal.showView(\'behavior\')" class="card" style="cursor:pointer;text-align:center;padding:20px"><span class="amin-3d-ico-auto" data-size="36" data-emoji="🌟" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;">🌟</span><div style="font-weight:bold;margin-top:8px;">سجل السلوك</div></div>';
-    html += '<div onclick="CounselorPortal.showView(\'attendance\')" class="card" style="cursor:pointer;text-align:center;padding:20px"><span class="amin-3d-ico-auto" data-size="36" data-emoji="📋" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;">📋</span><div style="font-weight:bold;margin-top:8px;">متابعة الغياب</div></div>';
-    html += '<div onclick="CounselorPortal.showView(\'reports\')" class="card" style="cursor:pointer;text-align:center;padding:20px"><span class="amin-3d-ico-auto" data-size="36" data-emoji="📈" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;">📈</span><div style="font-weight:bold;margin-top:8px;">التقارير</div></div>';
+    html += '<div onclick="CounselorPortal.showView(\'students\')" class="card" style="cursor:pointer;text-align:center;padding:20px"><span class="amin-3d-ico-auto" data-size="36" data-emoji="<span class="amin-3d-ico-auto" data-size="20" data-emoji="👥">👥</span>" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;"><span class="amin-3d-ico-auto" data-size="20" data-emoji="👥">👥</span></span><div style="font-weight:bold;margin-top:8px;">الطلاب المتابعون</div></div>';
+    html += '<div onclick="CounselorPortal.showView(\'behavior\')" class="card" style="cursor:pointer;text-align:center;padding:20px"><span class="amin-3d-ico-auto" data-size="36" data-emoji="<span class="amin-3d-ico-auto" data-size="20" data-emoji="🌟">🌟</span>" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;"><span class="amin-3d-ico-auto" data-size="20" data-emoji="🌟">🌟</span></span><div style="font-weight:bold;margin-top:8px;">سجل السلوك</div></div>';
+    html += '<div onclick="CounselorPortal.showView(\'attendance\')" class="card" style="cursor:pointer;text-align:center;padding:20px"><span class="amin-3d-ico-auto" data-size="36" data-emoji="<span class="amin-3d-ico-auto" data-size="20" data-emoji="📋">📋</span>" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;"><span class="amin-3d-ico-auto" data-size="20" data-emoji="📋">📋</span></span><div style="font-weight:bold;margin-top:8px;">متابعة الغياب</div></div>';
+    html += '<div onclick="CounselorPortal.showView(\'reports\')" class="card" style="cursor:pointer;text-align:center;padding:20px"><span class="amin-3d-ico-auto" data-size="36" data-emoji="<span class="amin-3d-ico-auto" data-size="20" data-emoji="📈">📈</span>" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;"><span class="amin-3d-ico-auto" data-size="20" data-emoji="📈">📈</span></span><div style="font-weight:bold;margin-top:8px;">التقارير</div></div>';
     html += '</div>';
 
     // الطلاب الذين يحتاجون متابعة عاجلة
     if(stats.needAttentionList.length > 0) {
-      html += '<h3 style="margin-bottom:12px;">🚨 الطلاب الذين يحتاجون متابعة عاجلة</h3>';
+      html += '<h3 style="margin-bottom:12px;"><span class="amin-3d-ico-auto" data-size="20" data-emoji="🚨">🚨</span> الطلاب الذين يحتاجون متابعة عاجلة</h3>';
       html += '<div class="table-wrap"><table><thead><tr><th>الطالب</th><th>الصف</th><th>الحضور</th><th>السلوك السلبي</th><th>المعدل</th><th>إجراء</th></tr></thead><tbody>';
       
       stats.needAttentionList.slice(0, 10).forEach(function(s) {
@@ -385,7 +385,7 @@
   function renderStudents() {
     const container = $('#view-students');
     
-    let html = '<div class="page-head"><div><h1>👥 الطلاب المتابعون</h1><p>عرض كل الطلاب مع مؤشرات المتابعة</p></div></div>';
+    let html = '<div class="page-head"><div><h1><span class="amin-3d-ico-auto" data-size="20" data-emoji="👥">👥</span> الطلاب المتابعون</h1><p>عرض كل الطلاب مع مؤشرات المتابعة</p></div></div>';
     
     if(!DATA.students.length) {
       html += '<div class="empty" style="text-align:center;padding:60px;">لا يوجد طلاب مسجلون.</div>';
@@ -417,7 +417,7 @@
         html += '<td><span class="badge ' + attColor + '">' + attRate + '%</span></td>';
         html += '<td><span class="badge ' + behaviorColor + '">' + (totalPoints > 0 ? '+' : '') + totalPoints + '</span></td>';
         html += '<td>' + (grades.length ? '<span class="badge ' + gradeColor + '">' + avg + '%</span>' : '—') + '</td>';
-        html += '<td>' + (needsAttention ? '<span class="badge red">⚠️ متابعة</span>' : '<span class="badge green">✅ طبيعي</span>') + '</td>';
+        html += '<td>' + (needsAttention ? '<span class="badge red"><span class="amin-3d-ico-auto" data-size="20" data-emoji="<span class="amin-3d-ico-auto" data-size="20" data-emoji="⚠">⚠</span>️"><span class="amin-3d-ico-auto" data-size="20" data-emoji="⚠">⚠</span>️</span> متابعة</span>' : '<span class="badge green"><span class="amin-3d-ico-auto" data-size="20" data-emoji="✅">✅</span> طبيعي</span>') + '</td>';
         html += '<td><button class="btn small" style="background:#3A3565;color:white;" onclick="CounselorPortal.showStudentCase(\'' + s.id + '\')">👁️ تفاصيل</button></td>';
         html += '</tr>';
       });
@@ -433,8 +433,8 @@
     const container = $('#view-behavior');
     
     let html = '<div class="page-head" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">';
-    html += '<div><h1>🌟 سجل السلوك والملاحظات</h1></div>';
-    html += '<button class="btn" style="background:#0B6E4F;color:white;" onclick="CounselorPortal.printBehaviorReport()">🖨️ طباعة التقرير</button>';
+    html += '<div><h1><span class="amin-3d-ico-auto" data-size="20" data-emoji="🌟">🌟</span> سجل السلوك والملاحظات</h1></div>';
+    html += '<button class="btn" style="background:#0B6E4F;color:white;" onclick="CounselorPortal.printBehaviorReport()"><span class="amin-3d-ico-auto" data-size="20" data-emoji="<span class="amin-3d-ico-auto" data-size="20" data-emoji="🖨">🖨</span>️"><span class="amin-3d-ico-auto" data-size="20" data-emoji="🖨">🖨</span>️</span> طباعة التقرير</button>';
     html += '</div>';
     
     const positive = DATA.behavior.filter(function(b){ return num(b.points) > 0; }).length;
@@ -475,7 +475,7 @@
   function renderAttendance() {
     const container = $('#view-attendance');
     
-    let html = '<div class="page-head"><div><h1>📋 متابعة الحضور والغياب</h1></div></div>';
+    let html = '<div class="page-head"><div><h1><span class="amin-3d-ico-auto" data-size="20" data-emoji="📋">📋</span> متابعة الحضور والغياب</h1></div></div>';
     
     // الطلاب الأكثر غياباً
     const studentsAbsences = {};
@@ -491,7 +491,7 @@
     if(sortedAbsences.length === 0) {
       html += '<div class="empty" style="text-align:center;padding:60px;">🎉 لا توجد حالات غياب!</div>';
     } else {
-      html += '<h3 style="margin-bottom:12px;">⚠️ الطلاب الأكثر غياباً</h3>';
+      html += '<h3 style="margin-bottom:12px;"><span class="amin-3d-ico-auto" data-size="20" data-emoji="<span class="amin-3d-ico-auto" data-size="20" data-emoji="⚠">⚠</span>️"><span class="amin-3d-ico-auto" data-size="20" data-emoji="⚠">⚠</span>️</span> الطلاب الأكثر غياباً</h3>';
       html += '<div class="table-wrap"><table><thead><tr><th>#</th><th>الطالب</th><th>الصف</th><th>أيام الغياب</th><th>الحالة</th></tr></thead><tbody>';
       
       sortedAbsences.forEach(function(item, i) {
@@ -526,7 +526,7 @@
     const cases = stats.needAttentionList;
     
     if(cases.length === 0) {
-      html += '<div class="empty" style="text-align:center;padding:60px;"><span class="amin-3d-ico-auto" data-size="64" data-emoji="😊" style="display:inline-flex;align-items:center;justify-content:center;width:64px;height:64px;">😊</span><h3 style="margin-top:16px;">لا توجد حالات تحتاج متابعة!</h3><p style="color:#666;margin-top:8px;">كل الطلاب في حالة جيدة.</p></div>';
+      html += '<div class="empty" style="text-align:center;padding:60px;"><span class="amin-3d-ico-auto" data-size="64" data-emoji="<span class="amin-3d-ico-auto" data-size="20" data-emoji="😊">😊</span>" style="display:inline-flex;align-items:center;justify-content:center;width:64px;height:64px;"><span class="amin-3d-ico-auto" data-size="20" data-emoji="😊">😊</span></span><h3 style="margin-top:16px;">لا توجد حالات تحتاج متابعة!</h3><p style="color:#666;margin-top:8px;">كل الطلاب في حالة جيدة.</p></div>';
     } else {
       html += '<div class="kpis" style="margin-bottom:24px;">';
       html += '<div class="kpi red"><small>حالات مفتوحة</small><b>' + cases.length + '</b></div>';
@@ -553,14 +553,14 @@
         if(avg && avg < 60) issues.push('درجات منخفضة (' + avg + '%)');
         
         html += '<div class="card" style="border:2px solid #B8860B;">';
-        html += '<div class="card-head"><h3>🎓 ' + esc(studentName) + '</h3><span class="badge red">⚠️ حالة</span></div>';
+        html += '<div class="card-head"><h3><span class="amin-3d-ico-auto" data-size="20" data-emoji="🎓">🎓</span> ' + esc(studentName) + '</h3><span class="badge red"><span class="amin-3d-ico-auto" data-size="20" data-emoji="<span class="amin-3d-ico-auto" data-size="20" data-emoji="⚠">⚠</span>️"><span class="amin-3d-ico-auto" data-size="20" data-emoji="⚠">⚠</span>️</span> حالة</span></div>';
         html += '<div class="card-body">';
         html += '<p><b>الصف:</b> ' + esc(getClassName(s.class_id)) + '</p>';
         html += '<p><b>المشاكل المرصودة:</b></p>';
         html += '<ul style="padding-right:20px;margin:8px 0;color:#dc2626;">';
         issues.forEach(function(iss){ html += '<li>' + esc(iss) + '</li>'; });
         html += '</ul>';
-        html += '<button class="btn small" style="background:#3A3565;color:white;margin-top:8px;" onclick="CounselorPortal.showStudentCase(\'' + s.id + '\')">📋 فتح الملف</button>';
+        html += '<button class="btn small" style="background:#3A3565;color:white;margin-top:8px;" onclick="CounselorPortal.showStudentCase(\'' + s.id + '\')"><span class="amin-3d-ico-auto" data-size="20" data-emoji="📋">📋</span> فتح الملف</button>';
         html += '</div></div>';
       });
       html += '</div>';
@@ -573,21 +573,21 @@
   function renderSessions() {
     const container = $('#view-sessions');
     
-    let html = '<div class="page-head"><div><h1>📅 الجلسات الإرشادية</h1><p>إدارة المواعيد والجلسات</p></div></div>';
+    let html = '<div class="page-head"><div><h1><span class="amin-3d-ico-auto" data-size="20" data-emoji="📅">📅</span> الجلسات الإرشادية</h1><p>إدارة المواعيد والجلسات</p></div></div>';
     
     html += '<div class="empty" style="text-align:center;padding:60px;background:#E6F4EF;border-radius:12px;">';
-    html += '<span class="amin-3d-ico-auto" data-size="64" data-emoji="📅" style="display:inline-flex;align-items:center;justify-content:center;width:64px;height:64px;">📅</span>';
+    html += '<span class="amin-3d-ico-auto" data-size="64" data-emoji="<span class="amin-3d-ico-auto" data-size="20" data-emoji="📅">📅</span>" style="display:inline-flex;align-items:center;justify-content:center;width:64px;height:64px;"><span class="amin-3d-ico-auto" data-size="20" data-emoji="📅">📅</span></span>';
     html += '<h3 style="margin-top:16px;">نظام الجلسات قيد التطوير</h3>';
     html += '<p style="color:#666;margin-top:8px;">سيتم إضافة:</p>';
     html += '<ul style="text-align:right;display:inline-block;padding-right:20px;margin-top:12px;color:#444;">';
-    html += '<li>📅 جدولة المواعيد</li>';
-    html += '<li>📝 تسجيل جلسات SOAP</li>';
-    html += '<li>🎯 وضع الأهداف</li>';
-    html += '<li>📊 متابعة التقدم</li>';
-    html += '<li>🔔 تذكيرات بالمواعيد</li>';
+    html += '<li><span class="amin-3d-ico-auto" data-size="20" data-emoji="📅">📅</span> جدولة المواعيد</li>';
+    html += '<li><span class="amin-3d-ico-auto" data-size="20" data-emoji="📝">📝</span> تسجيل جلسات SOAP</li>';
+    html += '<li><span class="amin-3d-ico-auto" data-size="20" data-emoji="🎯">🎯</span> وضع الأهداف</li>';
+    html += '<li><span class="amin-3d-ico-auto" data-size="20" data-emoji="📊">📊</span> متابعة التقدم</li>';
+    html += '<li><span class="amin-3d-ico-auto" data-size="20" data-emoji="🔔">🔔</span> تذكيرات بالمواعيد</li>';
     html += '</ul>';
     html += '<div style="margin-top:20px;">';
-    html += '<button class="btn blue" onclick="location.href=\'smart-calendar.html\'">📅 افتح التقويم</button>';
+    html += '<button class="btn blue" onclick="location.href=\'smart-calendar.html\'"><span class="amin-3d-ico-auto" data-size="20" data-emoji="📅">📅</span> افتح التقويم</button>';
     html += '</div></div>';
     
     container.innerHTML = html;
@@ -612,30 +612,30 @@
     const container = $('#view-reports');
     const stats = getStats();
     
-    let html = '<div class="page-head"><div><h1>📈 تقارير الإرشاد</h1></div></div>';
+    let html = '<div class="page-head"><div><h1><span class="amin-3d-ico-auto" data-size="20" data-emoji="📈">📈</span> تقارير الإرشاد</h1></div></div>';
     
     html += '<div class="cards">';
-    html += '<div class="card"><div class="card-head"><h3>📊 التقرير العام</h3></div><div class="card-body">';
+    html += '<div class="card"><div class="card-head"><h3><span class="amin-3d-ico-auto" data-size="20" data-emoji="📊">📊</span> التقرير العام</h3></div><div class="card-body">';
     html += '<p>إجمالي الطلاب: <b>' + stats.totalStudents + '</b></p>';
     html += '<p>يحتاجون متابعة: <b style="color:#dc2626;">' + stats.needAttention + '</b></p>';
     html += '<p>نسبة الحالات: <b>' + Math.round((stats.needAttention/stats.totalStudents)*100) + '%</b></p>';
-    html += '<button class="btn blue" style="margin-top:12px;" onclick="CounselorPortal.printGeneralReport()">🖨️ طباعة</button>';
+    html += '<button class="btn blue" style="margin-top:12px;" onclick="CounselorPortal.printGeneralReport()"><span class="amin-3d-ico-auto" data-size="20" data-emoji="<span class="amin-3d-ico-auto" data-size="20" data-emoji="🖨">🖨</span>️"><span class="amin-3d-ico-auto" data-size="20" data-emoji="🖨">🖨</span>️</span> طباعة</button>';
     html += '</div></div>';
     
-    html += '<div class="card"><div class="card-head"><h3>🌟 تقرير السلوك</h3></div><div class="card-body">';
+    html += '<div class="card"><div class="card-head"><h3><span class="amin-3d-ico-auto" data-size="20" data-emoji="🌟">🌟</span> تقرير السلوك</h3></div><div class="card-body">';
     html += '<p>إجمالي السجلات: <b>' + stats.totalBehaviorRecords + '</b></p>';
     html += '<p>إيجابي: <b style="color:#10b981;">' + stats.positiveBehavior + '</b></p>';
     html += '<p>سلبي: <b style="color:#dc2626;">' + stats.negativeBehavior + '</b></p>';
-    html += '<button class="btn green" style="margin-top:12px;" onclick="CounselorPortal.printBehaviorReport()">🖨️ طباعة</button>';
+    html += '<button class="btn green" style="margin-top:12px;" onclick="CounselorPortal.printBehaviorReport()"><span class="amin-3d-ico-auto" data-size="20" data-emoji="<span class="amin-3d-ico-auto" data-size="20" data-emoji="🖨">🖨</span>️"><span class="amin-3d-ico-auto" data-size="20" data-emoji="🖨">🖨</span>️</span> طباعة</button>';
     html += '</div></div>';
     
-    html += '<div class="card"><div class="card-head"><h3>📋 تقرير الغياب</h3></div><div class="card-body">';
+    html += '<div class="card"><div class="card-head"><h3><span class="amin-3d-ico-auto" data-size="20" data-emoji="📋">📋</span> تقرير الغياب</h3></div><div class="card-body">';
     html += '<p>إجمالي الغيابات: <b>' + stats.totalAbsent + '</b></p>';
-    html += '<button class="btn gold" style="margin-top:12px;" onclick="CounselorPortal.printAttendanceReport()">🖨️ طباعة</button>';
+    html += '<button class="btn gold" style="margin-top:12px;" onclick="CounselorPortal.printAttendanceReport()"><span class="amin-3d-ico-auto" data-size="20" data-emoji="<span class="amin-3d-ico-auto" data-size="20" data-emoji="🖨">🖨</span>️"><span class="amin-3d-ico-auto" data-size="20" data-emoji="🖨">🖨</span>️</span> طباعة</button>';
     html += '</div></div>';
     
     html += '<div class="card" style="cursor:pointer" onclick="location.href=\'counseling-report.html\'"><div class="card-body" style="text-align:center;">';
-    html += '<span class="amin-3d-ico-auto" data-size="48" data-emoji="📊" style="display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;">📊</span>';
+    html += '<span class="amin-3d-ico-auto" data-size="48" data-emoji="<span class="amin-3d-ico-auto" data-size="20" data-emoji="📊">📊</span>" style="display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;"><span class="amin-3d-ico-auto" data-size="20" data-emoji="📊">📊</span></span>';
     html += '<h3 style="margin-top:12px;">تقارير الإرشاد المتقدمة</h3>';
     html += '<p style="opacity:0.95;">فتح صفحة التقارير الكاملة</p>';
     html += '</div></div>';
@@ -664,18 +664,18 @@
     
     const avg = grades.length ? Math.round(grades.reduce(function(sum,g){ return sum + num(g.score || g.grade || g.mark); }, 0) / grades.length) : 0;
     
-    let msg = '📋 ملف الطالب: ' + studentName + '\n\n';
-    msg += '📚 الصف: ' + getClassName(s.class_id) + '\n\n';
-    msg += '📋 الحضور:\n';
-    msg += '   ✅ حاضر: ' + present + '\n';
+    let msg = '<span class="amin-3d-ico-auto" data-size="20" data-emoji="📋">📋</span> ملف الطالب: ' + studentName + '\n\n';
+    msg += '<span class="amin-3d-ico-auto" data-size="20" data-emoji="📚">📚</span> الصف: ' + getClassName(s.class_id) + '\n\n';
+    msg += '<span class="amin-3d-ico-auto" data-size="20" data-emoji="📋">📋</span> الحضور:\n';
+    msg += '   <span class="amin-3d-ico-auto" data-size="20" data-emoji="✅">✅</span> حاضر: ' + present + '\n';
     msg += '   ❌ غائب: ' + absent + '\n';
     msg += '   ⏰ متأخر: ' + late + '\n\n';
-    msg += '🌟 السلوك:\n';
+    msg += '<span class="amin-3d-ico-auto" data-size="20" data-emoji="🌟">🌟</span> السلوك:\n';
     msg += '   ➕ إيجابي: ' + positive + '\n';
     msg += '   ➖ سلبي: ' + negative + '\n\n';
-    msg += '📊 الدرجات:\n';
-    msg += '   📚 عدد المواد: ' + grades.length + '\n';
-    if(grades.length > 0) msg += '   📈 المعدل: ' + avg + '%\n';
+    msg += '<span class="amin-3d-ico-auto" data-size="20" data-emoji="📊">📊</span> الدرجات:\n';
+    msg += '   <span class="amin-3d-ico-auto" data-size="20" data-emoji="📚">📚</span> عدد المواد: ' + grades.length + '\n';
+    if(grades.length > 0) msg += '   <span class="amin-3d-ico-auto" data-size="20" data-emoji="📈">📈</span> المعدل: ' + avg + '%\n';
     
     alert(msg);
   }
@@ -701,9 +701,9 @@
       '@media print { @page { size: A4; margin: 1cm; } .no-print { display: none !important; } }'+
       '.print-btn { position: fixed; top: 20px; left: 20px; background: #3A3565; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; }'+
       '</style></head><body>'+
-      '<button class="print-btn no-print" onclick="window.print()">🖨️ طباعة</button>'+
+      '<button class="print-btn no-print" onclick="window.print()"><span class="amin-3d-ico-auto" data-size="20" data-emoji="<span class="amin-3d-ico-auto" data-size="20" data-emoji="🖨">🖨</span>️"><span class="amin-3d-ico-auto" data-size="20" data-emoji="🖨">🖨</span>️</span> طباعة</button>'+
       '<div class="confidential">🔒 سري - مخصص للإرشاد النفسي فقط</div>'+
-      '<div class="print-header"><h1>'+SCHOOL_LOGO+' '+SCHOOL_NAME+'</h1><h2>'+title+'</h2><div>📅 '+today+'</div></div>'+
+      '<div class="print-header"><h1>'+SCHOOL_LOGO+' '+SCHOOL_NAME+'</h1><h2>'+title+'</h2><div><span class="amin-3d-ico-auto" data-size="20" data-emoji="📅">📅</span> '+today+'</div></div>'+
       content+
       '<script src="assets/amin-theme-injector.js"><\/script><script src="assets/amin-translate.js"></script>
 </body></html>';
@@ -716,14 +716,14 @@
 
   function printGeneralReport() {
     const stats = getStats();
-    let content = '<div class="section-title">📊 الإحصائيات العامة</div><div class="stat-grid">';
+    let content = '<div class="section-title"><span class="amin-3d-ico-auto" data-size="20" data-emoji="📊">📊</span> الإحصائيات العامة</div><div class="stat-grid">';
     content += '<div class="stat-card"><div class="label">إجمالي الطلاب</div><div class="value">' + stats.totalStudents + '</div></div>';
     content += '<div class="stat-card"><div class="label">يحتاجون متابعة</div><div class="value">' + stats.needAttention + '</div></div>';
     content += '<div class="stat-card"><div class="label">سجلات إيجابية</div><div class="value">' + stats.positiveBehavior + '</div></div>';
     content += '<div class="stat-card"><div class="label">سجلات سلبية</div><div class="value">' + stats.negativeBehavior + '</div></div></div>';
     
     if(stats.needAttentionList.length > 0) {
-      content += '<div class="section-title">🚨 الحالات التي تحتاج متابعة</div>';
+      content += '<div class="section-title"><span class="amin-3d-ico-auto" data-size="20" data-emoji="🚨">🚨</span> الحالات التي تحتاج متابعة</div>';
       content += '<table><thead><tr><th>#</th><th>الطالب</th><th>الصف</th></tr></thead><tbody>';
       stats.needAttentionList.forEach(function(s, i) {
         const studentName = (s.users && s.users.name) || s.name || 'طالب';
@@ -737,14 +737,14 @@
 
   function printBehaviorReport() {
     const stats = getStats();
-    let content = '<div class="section-title">🌟 إحصائيات السلوك</div><div class="stat-grid">';
+    let content = '<div class="section-title"><span class="amin-3d-ico-auto" data-size="20" data-emoji="🌟">🌟</span> إحصائيات السلوك</div><div class="stat-grid">';
     content += '<div class="stat-card"><div class="label">إجمالي السجلات</div><div class="value">' + stats.totalBehaviorRecords + '</div></div>';
     content += '<div class="stat-card"><div class="label">إيجابي</div><div class="value">' + stats.positiveBehavior + '</div></div>';
     content += '<div class="stat-card"><div class="label">سلبي</div><div class="value">' + stats.negativeBehavior + '</div></div>';
     content += '<div class="stat-card"><div class="label">اليوم</div><div class="value">' + stats.todayBehavior + '</div></div></div>';
     
     if(DATA.behavior.length > 0) {
-      content += '<div class="section-title">📋 آخر السجلات</div>';
+      content += '<div class="section-title"><span class="amin-3d-ico-auto" data-size="20" data-emoji="📋">📋</span> آخر السجلات</div>';
       content += '<table><thead><tr><th>#</th><th>التاريخ</th><th>الطالب</th><th>الملاحظة</th><th>النقاط</th></tr></thead><tbody>';
       DATA.behavior.slice(0, 50).forEach(function(b, i) {
         const student = DATA.students.find(function(s){ return String(s.id) === String(b.student_id); });
@@ -759,7 +759,7 @@
 
   function printAttendanceReport() {
     const stats = getStats();
-    let content = '<div class="section-title">📋 إحصائيات الحضور</div><div class="stat-grid">';
+    let content = '<div class="section-title"><span class="amin-3d-ico-auto" data-size="20" data-emoji="📋">📋</span> إحصائيات الحضور</div><div class="stat-grid">';
     content += '<div class="stat-card"><div class="label">إجمالي الغيابات</div><div class="value">' + stats.totalAbsent + '</div></div>';
     content += '<div class="stat-card"><div class="label">السجلات</div><div class="value">' + DATA.attendance.length + '</div></div></div>';
     
@@ -767,10 +767,10 @@
   }
 
   async function refresh() {
-    toast('🔄 تحديث', 'جاري تحديث البيانات...', 'blue');
+    toast('<span class="amin-3d-ico-auto" data-size="20" data-emoji="🔄">🔄</span> تحديث', 'جاري تحديث البيانات...', 'blue');
     await loadAllData();
     renderOverview();
-    toast('✅ تم', 'تم تحديث البيانات', 'green');
+    toast('<span class="amin-3d-ico-auto" data-size="20" data-emoji="✅">✅</span> تم', 'تم تحديث البيانات', 'green');
   }
 
   window.addEventListener('load', init);
